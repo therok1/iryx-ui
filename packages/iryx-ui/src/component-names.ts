@@ -13,6 +13,7 @@ export const componentNames = [
   'Checkbox',
   'ConfirmDialog',
   'Dialog',
+  'DropdownMenu',
   'EmptyState',
   'Form',
   'FormField',
