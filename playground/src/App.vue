@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Appearance, ThemePresetName } from 'iryx-ui'
-import { themes, useAppearance } from 'iryx-ui'
-import { ArrowRight, Bell, Download, Search } from 'lucide-vue-next'
+import { themes, useAppearance, useConfirm, useToast } from 'iryx-ui'
+import { ArrowRight, Bell, Download, Inbox, Search } from 'lucide-vue-next'
 import { reactive, ref } from 'vue'
 
 const { appearance, isDark, setAppearance } = useAppearance()
@@ -23,6 +23,31 @@ const loading = ref(false)
 const statuses = ['neutral', 'success', 'warning', 'danger', 'info'] as const
 const alertVariants = ['info', 'success', 'warning', 'danger'] as const
 const alertOpen = ref(true)
+
+const dialogOpen = ref(false)
+const blockingOpen = ref(false)
+
+const toast = useToast()
+const { confirm } = useConfirm()
+const confirmResult = ref<string | null>(null)
+
+async function askToDelete() {
+  const ok = await confirm({
+    title: 'Delete this draft?',
+    description: 'This cannot be undone.',
+    confirmLabel: 'Delete',
+    cancelLabel: 'Cancel',
+    danger: true,
+  })
+  confirmResult.value = ok ? 'confirmed' : 'cancelled'
+  if (ok)
+    toast.success({ title: 'Draft deleted', action: { label: 'Undo', onClick: () => toast.info('Restored') } })
+}
+
+const progress = ref(35)
+const taxUsed = ref(42350)
+const taxLimit = 60000
+const eur = new Intl.NumberFormat('sl-SI', { style: 'currency', currency: 'EUR' })
 
 // A hand-rolled Standard Schema validator, so the playground stays dependency-free.
 const signupSchema = {
@@ -296,11 +321,152 @@ function simulateLoad() {
             title="Dismissible"
             description="The close button emits an event — you decide what happens."
             closable
-            close-label="Zapri"
+            close-label="Dismiss"
             @close="alertOpen = false"
           />
           <IButton v-else size="sm" variant="outline" @click="alertOpen = true">
             Bring back the dismissed alert
+          </IButton>
+        </div>
+      </section>
+
+      <section class="space-y-3">
+        <h2 class="font-semibold">
+          Progress
+        </h2>
+        <div class="space-y-4">
+          <IProgress v-model="progress" label="Upload" show-value />
+          <div class="flex flex-wrap items-center gap-2">
+            <IButton size="sm" variant="outline" @click="progress = Math.max(0, progress - 10)">
+              −10
+            </IButton>
+            <IButton size="sm" variant="outline" @click="progress = Math.min(100, progress + 10)">
+              +10
+            </IButton>
+          </div>
+          <IProgress
+            v-model="taxUsed"
+            :max="taxLimit"
+            variant="warning"
+            label="Tax threshold"
+            show-value
+            :format-value="(value, max) => `${eur.format(value)} / ${eur.format(max)}`"
+          />
+          <IProgress :model-value="92" variant="danger" size="lg" label="Storage" show-value />
+          <IProgress indeterminate label="Syncing…" />
+          <div class="flex items-center gap-3">
+            <IProgress :model-value="60" variant="success" size="sm" class="max-w-40" />
+            <span class="text-sm text-muted-foreground">sm, no header</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="space-y-3">
+        <h2 class="font-semibold">
+          Empty state
+        </h2>
+        <ICard padding="none">
+          <IEmptyState
+            :icon="Inbox"
+            title="No invoices yet"
+            description="Create your first invoice and it will show up here."
+          >
+            <template #actions>
+              <IButton size="sm">
+                New invoice
+              </IButton>
+              <IButton size="sm" variant="ghost">
+                Import
+              </IButton>
+            </template>
+          </IEmptyState>
+        </ICard>
+      </section>
+
+      <section class="space-y-3">
+        <h2 class="font-semibold">
+          Dialog
+        </h2>
+        <div class="flex flex-wrap items-center gap-3">
+          <IButton variant="outline" @click="dialogOpen = true">
+            Open dialog
+          </IButton>
+          <IButton variant="outline" @click="blockingOpen = true">
+            Open blocking dialog
+          </IButton>
+        </div>
+
+        <IDialog
+          v-model:open="dialogOpen"
+          title="Edit invoice"
+          description="Escape, the overlay and the corner button all close this."
+        >
+          <div class="space-y-1.5">
+            <ILabel for="dialog-note">
+              Note
+            </ILabel>
+            <ITextarea id="dialog-note" placeholder="Anything to add?" />
+          </div>
+          <template #footer="{ close }">
+            <IButton variant="outline" @click="close()">
+              Cancel
+            </IButton>
+            <IButton @click="close(); toast.success('Invoice saved')">
+              Save
+            </IButton>
+          </template>
+        </IDialog>
+
+        <IDialog
+          v-model:open="blockingOpen"
+          title="Make a choice"
+          description="dismissible=false — Escape and the overlay won't close this one."
+          :dismissible="false"
+          :show-close="false"
+          size="sm"
+        >
+          <template #footer="{ close }">
+            <IButton variant="outline" @click="close()">
+              Got it
+            </IButton>
+          </template>
+        </IDialog>
+      </section>
+
+      <section class="space-y-3">
+        <h2 class="font-semibold">
+          useConfirm — {{ confirmResult ?? 'no answer yet' }}
+        </h2>
+        <IButton variant="outline" @click="askToDelete">
+          Delete draft…
+        </IButton>
+      </section>
+
+      <section class="space-y-3">
+        <h2 class="font-semibold">
+          useToast
+        </h2>
+        <div class="flex flex-wrap items-center gap-2">
+          <IButton size="sm" variant="outline" @click="toast.success('Saved')">
+            success
+          </IButton>
+          <IButton size="sm" variant="outline" @click="toast.warning({ title: 'Almost full', description: 'You are near your plan limit.' })">
+            warning
+          </IButton>
+          <IButton size="sm" variant="outline" @click="toast.danger({ title: 'Failed to send', description: 'Check the email address.' })">
+            danger
+          </IButton>
+          <IButton size="sm" variant="outline" @click="toast.info('Heads up')">
+            info
+          </IButton>
+          <IButton size="sm" variant="outline" @click="toast.toast({ title: 'Note deleted', action: { label: 'Undo', onClick: () => toast.info('Restored') } })">
+            with action
+          </IButton>
+          <IButton size="sm" variant="outline" @click="toast.toast({ title: 'Sticky', description: 'duration 0 — stays until dismissed.', duration: 0 })">
+            sticky
+          </IButton>
+          <IButton size="sm" variant="ghost" @click="toast.clear()">
+            clear all
           </IButton>
         </div>
       </section>
@@ -415,5 +581,9 @@ function simulateLoad() {
         </IButton>
       </section>
     </main>
+
+    <!-- Hosts for the imperative APIs; mount once, anywhere inside IApp. -->
+    <IConfirmDialog />
+    <IToaster />
   </IApp>
 </template>
