@@ -55,6 +55,51 @@ describe('dialog', () => {
     expect(query('[aria-label="Close"]')).toBeNull()
   })
 
+  /*
+   * `dismissible: false` is enforced on the state change, not by preventing
+   * Reka's escapeKeyDown/interactOutside events — those did not reliably stop
+   * the close. The corner button must still work regardless.
+   */
+  it('ignores Escape when not dismissible', async () => {
+    const wrapper = mount(Dialog, {
+      props: { open: true, title: 'Choose', dismissible: false },
+      attachTo: document.body,
+    })
+    await nextTick()
+    expect(query('[role="dialog"]')).not.toBeNull()
+
+    const content = query('[role="dialog"]')!
+    content.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
+    await nextTick()
+    await nextTick()
+    expect(query('[role="dialog"]')).not.toBeNull()
+    expect(wrapper.props('open')).toBe(true)
+  })
+
+  it('still closes a non-dismissible dialog from the corner button', async () => {
+    const wrapper = mount(Dialog, {
+      props: { open: true, title: 'Choose', dismissible: false },
+      attachTo: document.body,
+    })
+    await nextTick()
+    ;(query('[aria-label="Close"]') as HTMLButtonElement).click()
+    await nextTick()
+    expect(wrapper.emitted('update:open')?.at(-1)).toEqual([false])
+  })
+
+  it('closes on Escape when dismissible', async () => {
+    const wrapper = mount(Dialog, {
+      props: { open: true, title: 'Edit' },
+      attachTo: document.body,
+    })
+    await nextTick()
+    query('[role="dialog"]')!.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }),
+    )
+    await nextTick()
+    expect(wrapper.emitted('update:open')?.at(-1)).toEqual([false])
+  })
+
   it('always provides an accessible name, even with no title', async () => {
     mount(Dialog, { props: { open: true }, attachTo: document.body })
     await nextTick()

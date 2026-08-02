@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { X } from 'lucide-vue-next'
 import {
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogOverlay,
@@ -84,27 +83,34 @@ const closeClass = computed(() =>
   isUnstyled.value ? props.ui?.close : theme.value.close({ class: props.ui?.close }),
 )
 
-/** Blocking dialogs opt out of the outside-click and Escape dismissals. */
-function onDismiss(event: Event) {
-  if (!props.dismissible)
-    event.preventDefault()
+/**
+ * Blocking dialogs opt out of the outside-click and Escape dismissals.
+ *
+ * The state is controlled rather than left to Reka: preventing the
+ * `escapeKeyDown` / `interactOutside` events alone did not reliably stop the
+ * close, so the guard lives on the state change itself. Explicit closes (the
+ * corner button, the `close` slot prop) set `open` directly and are unaffected.
+ */
+function onOpenChange(value: boolean) {
+  if (!value && !props.dismissible)
+    return
+  open.value = value
+}
+
+function close() {
+  open.value = false
 }
 </script>
 
 <template>
-  <DialogRoot v-model:open="open">
+  <DialogRoot :open="open" @update:open="onOpenChange">
     <DialogTrigger v-if="$slots.trigger" as-child>
       <slot name="trigger" />
     </DialogTrigger>
 
     <DialogPortal>
       <DialogOverlay :class="overlayClass" />
-      <DialogContent
-        :class="contentClass"
-        @escape-key-down="onDismiss"
-        @pointer-down-outside="onDismiss"
-        @interact-outside="onDismiss"
-      >
+      <DialogContent :class="contentClass">
         <div v-if="props.title || props.description || $slots.header" :class="headerClass">
           <slot name="header">
             <DialogTitle :class="titleClass">
@@ -130,12 +136,20 @@ function onDismiss(event: Event) {
         </div>
 
         <div v-if="$slots.footer" :class="footerClass">
-          <slot name="footer" :close="() => (open = false)" />
+          <slot name="footer" :close="close" />
         </div>
 
-        <DialogClose v-if="props.showClose" :aria-label="props.closeLabel" :class="closeClass">
+        <!-- A plain button, not DialogClose: this must close even when the
+             dialog is not dismissible. -->
+        <button
+          v-if="props.showClose"
+          type="button"
+          :aria-label="props.closeLabel"
+          :class="closeClass"
+          @click="close"
+        >
           <X aria-hidden="true" />
-        </DialogClose>
+        </button>
       </DialogContent>
     </DialogPortal>
   </DialogRoot>

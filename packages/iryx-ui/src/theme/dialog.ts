@@ -8,8 +8,13 @@ export const dialogTheme = tv({
     header: 'flex flex-col gap-1',
     title: 'text-base leading-none font-semibold',
     description: 'text-sm text-muted-foreground',
-    /** Scrolls on its own so the header and footer stay put on small screens. */
-    body: 'min-h-0 flex-1 overflow-y-auto',
+    /*
+     * Scrolls on its own so the header and footer stay put on small screens.
+     * `overflow-y-auto` also clips the x axis, which would cut the focus ring
+     * off a control inside — the padding gives the ring room, and the negative
+     * margin keeps the visual alignment unchanged.
+     */
+    body: '-m-1 min-h-0 flex-1 overflow-y-auto p-1',
     footer: 'flex flex-wrap items-center justify-end gap-2',
     close: 'absolute top-4 right-4 rounded-md p-1 text-muted-foreground transition-colors outline-none hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-primary/50 [&_svg]:size-4',
   },
