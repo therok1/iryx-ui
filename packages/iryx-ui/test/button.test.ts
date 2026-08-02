@@ -2,6 +2,21 @@ import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 import { Button } from '../src'
 
+describe('button press', () => {
+  it('nudges down on press for surface variants', () => {
+    for (const variant of ['solid', 'outline', 'ghost'] as const) {
+      expect(mount(Button, { props: { variant } }).attributes('class'))
+        .toContain('active:translate-y-px')
+    }
+  })
+
+  it('leaves the link variant in place', () => {
+    // The base class is still present, so the override must cancel it.
+    expect(mount(Button, { props: { variant: 'link' } }).attributes('class'))
+      .toContain('active:translate-y-0')
+  })
+})
+
 describe('button', () => {
   it('renders a button with default variant classes', () => {
     const wrapper = mount(Button, { slots: { default: 'Click me' } })
