@@ -1,0 +1,24 @@
+{
+  "name": "@iryx-ui/monorepo",
+  "type": "module",
+  "private": true,
+  "packageManager": "pnpm@10.30.2",
+  "scripts": {
+    "build": "pnpm --filter iryx-ui build",
+    "dev": "pnpm --filter playground dev",
+    "test": "pnpm --filter iryx-ui test",
+    "typecheck": "pnpm --filter iryx-ui typecheck",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "release": "pnpm build && changeset publish"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^9.0.0",
+    "@changesets/cli": "^2.31.0",
+    "eslint": "^10.4.1",
+    "eslint-plugin-better-tailwindcss": "^4.6.0",
+    "tailwindcss": "^4.3.0",
+    "typescript": "^6.0.3",
+    "vue-tsc": "^3.3.4"
+  }
+}

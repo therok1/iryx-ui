@@ -1,0 +1,70 @@
+{
+  "name": "iryx-ui",
+  "type": "module",
+  "version": "0.0.1",
+  "description": "Iryx — an artful Vue 3 component library built on Reka UI and Tailwind CSS v4.",
+  "author": "therok1",
+  "license": "MIT",
+  "homepage": "https://github.com/therok1/iryx-ui#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/therok1/iryx-ui.git"
+  },
+  "bugs": "https://github.com/therok1/iryx-ui/issues",
+  "keywords": [
+    "vue",
+    "nuxt",
+    "components",
+    "component-library",
+    "reka-ui",
+    "tailwindcss",
+    "ui"
+  ],
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./nuxt": {
+      "types": "./dist/nuxt.d.ts",
+      "default": "./dist/nuxt.js"
+    },
+    "./theme.css": "./theme.css"
+  },
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "theme.css"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "vite build && vue-tsc -p tsconfig.build.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "vue-tsc --noEmit"
+  },
+  "peerDependencies": {
+    "vue": "^3.5.0"
+  },
+  "dependencies": {
+    "@nuxt/kit": "^4.4.8",
+    "lucide-vue-next": "^1.0.0",
+    "reka-ui": "^2.9.10",
+    "tailwind-merge": "^3.6.0",
+    "tailwind-variants": "^3.2.2"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.7",
+    "@vue/test-utils": "^2.4.11",
+    "happy-dom": "^20.10.2",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.16",
+    "vitest": "^4.1.8",
+    "vue": "^3.5.35",
+    "vue-tsc": "^3.3.4"
+  }
+}

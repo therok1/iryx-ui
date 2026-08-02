@@ -1,0 +1,8 @@
+@import "tailwindcss";
+@import "../../packages/iryx-ui/theme.css";
+
+/*
+ * The playground develops against the library *source* (vite alias), so
+ * scan it for utility classes on top of theme.css's own dist scan.
+ */
+@source "../../packages/iryx-ui/src";
