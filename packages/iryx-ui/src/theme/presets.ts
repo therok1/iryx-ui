@@ -12,6 +12,31 @@ export interface ThemeColors {
   muted?: string
   mutedForeground?: string
   border?: string
+  /*
+   * Status colours. Each has five roles: the solid fill, text on that fill,
+   * a tinted surface, text on that surface, and a border. Presets leave these
+   * alone, but a custom theme can override them.
+   */
+  success?: string
+  successForeground?: string
+  successMuted?: string
+  successMutedForeground?: string
+  successBorder?: string
+  warning?: string
+  warningForeground?: string
+  warningMuted?: string
+  warningMutedForeground?: string
+  warningBorder?: string
+  danger?: string
+  dangerForeground?: string
+  dangerMuted?: string
+  dangerMutedForeground?: string
+  dangerBorder?: string
+  info?: string
+  infoForeground?: string
+  infoMuted?: string
+  infoMutedForeground?: string
+  infoBorder?: string
 }
 
 /** A theme provides token values per appearance mode. Omitted tokens keep the defaults from theme.css. */
@@ -32,6 +57,26 @@ const TOKEN_VARS: Record<keyof ThemeColors, string> = {
   muted: '--iryx-muted',
   mutedForeground: '--iryx-muted-foreground',
   border: '--iryx-border',
+  success: '--iryx-success',
+  successForeground: '--iryx-success-foreground',
+  successMuted: '--iryx-success-muted',
+  successMutedForeground: '--iryx-success-muted-foreground',
+  successBorder: '--iryx-success-border',
+  warning: '--iryx-warning',
+  warningForeground: '--iryx-warning-foreground',
+  warningMuted: '--iryx-warning-muted',
+  warningMutedForeground: '--iryx-warning-muted-foreground',
+  warningBorder: '--iryx-warning-border',
+  danger: '--iryx-danger',
+  dangerForeground: '--iryx-danger-foreground',
+  dangerMuted: '--iryx-danger-muted',
+  dangerMutedForeground: '--iryx-danger-muted-foreground',
+  dangerBorder: '--iryx-danger-border',
+  info: '--iryx-info',
+  infoForeground: '--iryx-info-foreground',
+  infoMuted: '--iryx-info-muted',
+  infoMutedForeground: '--iryx-info-muted-foreground',
+  infoBorder: '--iryx-info-border',
 }
 
 /**

@@ -32,6 +32,31 @@
   --iryx-primary-foreground: oklch(0.985 0.005 248);
   --iryx-primary-from: oklch(0.59 0.2 277.19);
   --iryx-primary-to: oklch(0.51 0.23 276.99);
+  /*
+   * Status colours. Each has five roles: the solid fill, text on that fill,
+   * a tinted surface, text on that surface, and a border. Components reference
+   * these instead of raw palette classes, so a theme can restyle them.
+   */
+  --iryx-success: oklch(0.596 0.145 163.225);
+  --iryx-success-foreground: oklch(1 0 0);
+  --iryx-success-muted: oklch(0.979 0.021 166.113);
+  --iryx-success-muted-foreground: oklch(0.508 0.118 165.612);
+  --iryx-success-border: oklch(0.905 0.093 164.15);
+  --iryx-warning: oklch(0.666 0.179 58.318);
+  --iryx-warning-foreground: oklch(0.279 0.077 45.635);
+  --iryx-warning-muted: oklch(0.987 0.022 95.277);
+  --iryx-warning-muted-foreground: oklch(0.555 0.163 48.998);
+  --iryx-warning-border: oklch(0.924 0.12 95.746);
+  --iryx-danger: oklch(0.577 0.245 27.325);
+  --iryx-danger-foreground: oklch(1 0 0);
+  --iryx-danger-muted: oklch(0.971 0.013 17.38);
+  --iryx-danger-muted-foreground: oklch(0.505 0.213 27.518);
+  --iryx-danger-border: oklch(0.885 0.062 18.334);
+  --iryx-info: oklch(0.546 0.245 262.881);
+  --iryx-info-foreground: oklch(1 0 0);
+  --iryx-info-muted: oklch(0.97 0.014 254.604);
+  --iryx-info-muted-foreground: oklch(0.488 0.243 264.376);
+  --iryx-info-border: oklch(0.882 0.059 254.128);
 }
 
 .dark {
@@ -48,6 +73,27 @@
   --iryx-primary-foreground: oklch(0.985 0.005 248);
   --iryx-primary-from: oklch(0.62 0.22 293);
   --iryx-primary-to: oklch(0.54 0.24 293);
+  /* Status colours — lighter fills, deep tinted surfaces. */
+  --iryx-success: oklch(0.696 0.17 162.48);
+  --iryx-success-foreground: oklch(0.262 0.051 172.552);
+  --iryx-success-muted: oklch(0.262 0.051 172.552);
+  --iryx-success-muted-foreground: oklch(0.845 0.143 164.978);
+  --iryx-success-border: oklch(0.378 0.077 168.94);
+  --iryx-warning: oklch(0.828 0.189 84.429);
+  --iryx-warning-foreground: oklch(0.279 0.077 45.635);
+  --iryx-warning-muted: oklch(0.279 0.077 45.635);
+  --iryx-warning-muted-foreground: oklch(0.879 0.169 91.605);
+  --iryx-warning-border: oklch(0.414 0.112 45.904);
+  --iryx-danger: oklch(0.637 0.237 25.331);
+  --iryx-danger-foreground: oklch(0.258 0.092 26.042);
+  --iryx-danger-muted: oklch(0.258 0.092 26.042);
+  --iryx-danger-muted-foreground: oklch(0.808 0.114 19.571);
+  --iryx-danger-border: oklch(0.396 0.141 25.723);
+  --iryx-info: oklch(0.623 0.214 259.815);
+  --iryx-info-foreground: oklch(0.282 0.091 267.935);
+  --iryx-info-muted: oklch(0.282 0.091 267.935);
+  --iryx-info-muted-foreground: oklch(0.809 0.105 251.813);
+  --iryx-info-border: oklch(0.379 0.146 265.522);
 }
 
 @theme inline {
@@ -62,4 +108,24 @@
   --color-muted: var(--iryx-muted);
   --color-muted-foreground: var(--iryx-muted-foreground);
   --color-border: var(--iryx-border);
+  --color-success: var(--iryx-success);
+  --color-success-foreground: var(--iryx-success-foreground);
+  --color-success-muted: var(--iryx-success-muted);
+  --color-success-muted-foreground: var(--iryx-success-muted-foreground);
+  --color-success-border: var(--iryx-success-border);
+  --color-warning: var(--iryx-warning);
+  --color-warning-foreground: var(--iryx-warning-foreground);
+  --color-warning-muted: var(--iryx-warning-muted);
+  --color-warning-muted-foreground: var(--iryx-warning-muted-foreground);
+  --color-warning-border: var(--iryx-warning-border);
+  --color-danger: var(--iryx-danger);
+  --color-danger-foreground: var(--iryx-danger-foreground);
+  --color-danger-muted: var(--iryx-danger-muted);
+  --color-danger-muted-foreground: var(--iryx-danger-muted-foreground);
+  --color-danger-border: var(--iryx-danger-border);
+  --color-info: var(--iryx-info);
+  --color-info-foreground: var(--iryx-info-foreground);
+  --color-info-muted: var(--iryx-info-muted);
+  --color-info-muted-foreground: var(--iryx-info-muted-foreground);
+  --color-info-border: var(--iryx-info-border);
 }

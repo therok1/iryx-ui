@@ -1,9 +1,9 @@
 import { tv } from 'tailwind-variants'
 
 /*
- * Status colours use Tailwind's built-in palettes rather than theme tokens:
- * there are no --iryx-success/warning/danger tokens, and adding them would mean
- * touching every preset. Each variant therefore carries explicit dark: classes.
+ * Status colours come from the --iryx-{success,warning,danger,info}-* tokens
+ * in theme.css, which carry their own dark-mode values — so no dark: classes
+ * are needed here, and applyTheme() can restyle them.
  */
 export const badgeTheme = tv({
   slots: {
@@ -30,56 +30,16 @@ export const badgeTheme = tv({
     },
   },
   compoundVariants: [
-    {
-      variant: 'neutral',
-      tone: 'soft',
-      class: { root: 'bg-muted text-muted-foreground' },
-    },
-    {
-      variant: 'neutral',
-      tone: 'solid',
-      class: { root: 'bg-foreground text-background' },
-    },
-    {
-      variant: 'success',
-      tone: 'soft',
-      class: { root: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300' },
-    },
-    {
-      variant: 'success',
-      tone: 'solid',
-      class: { root: 'bg-emerald-600 text-white dark:bg-emerald-500 dark:text-emerald-950' },
-    },
-    {
-      variant: 'warning',
-      tone: 'soft',
-      class: { root: 'bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-300' },
-    },
-    {
-      variant: 'warning',
-      tone: 'solid',
-      class: { root: 'bg-amber-500 text-white dark:bg-amber-400 dark:text-amber-950' },
-    },
-    {
-      variant: 'danger',
-      tone: 'soft',
-      class: { root: 'bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-300' },
-    },
-    {
-      variant: 'danger',
-      tone: 'solid',
-      class: { root: 'bg-red-600 text-white dark:bg-red-500 dark:text-red-950' },
-    },
-    {
-      variant: 'info',
-      tone: 'soft',
-      class: { root: 'bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300' },
-    },
-    {
-      variant: 'info',
-      tone: 'solid',
-      class: { root: 'bg-blue-600 text-white dark:bg-blue-500 dark:text-blue-950' },
-    },
+    { variant: 'neutral', tone: 'soft', class: { root: 'bg-muted text-muted-foreground' } },
+    { variant: 'neutral', tone: 'solid', class: { root: 'bg-foreground text-background' } },
+    { variant: 'success', tone: 'soft', class: { root: 'bg-success-muted text-success-muted-foreground' } },
+    { variant: 'success', tone: 'solid', class: { root: 'bg-success text-success-foreground' } },
+    { variant: 'warning', tone: 'soft', class: { root: 'bg-warning-muted text-warning-muted-foreground' } },
+    { variant: 'warning', tone: 'solid', class: { root: 'bg-warning text-warning-foreground' } },
+    { variant: 'danger', tone: 'soft', class: { root: 'bg-danger-muted text-danger-muted-foreground' } },
+    { variant: 'danger', tone: 'solid', class: { root: 'bg-danger text-danger-foreground' } },
+    { variant: 'info', tone: 'soft', class: { root: 'bg-info-muted text-info-muted-foreground' } },
+    { variant: 'info', tone: 'solid', class: { root: 'bg-info text-info-foreground' } },
   ],
   defaultVariants: {
     variant: 'neutral',

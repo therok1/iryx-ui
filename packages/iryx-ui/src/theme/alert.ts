@@ -1,9 +1,9 @@
 import { tv } from 'tailwind-variants'
 
 /*
- * Status colours use Tailwind's built-in palettes rather than theme tokens,
- * for the same reason as badge.ts — no --iryx-success/warning/danger tokens
- * exist. Each variant carries explicit dark: classes.
+ * Status colours come from the --iryx-{success,warning,danger,info}-* tokens
+ * in theme.css, which carry their own dark-mode values — so no dark: classes
+ * are needed here, and applyTheme() can restyle them.
  */
 export const alertTheme = tv({
   slots: {
@@ -17,20 +17,20 @@ export const alertTheme = tv({
   variants: {
     variant: {
       info: {
-        root: 'border-blue-200 bg-blue-50 text-blue-900 dark:border-blue-900 dark:bg-blue-950 dark:text-blue-200',
-        icon: 'text-blue-600 dark:text-blue-400',
+        root: 'border-info-border bg-info-muted text-info-muted-foreground',
+        icon: 'text-info',
       },
       success: {
-        root: 'border-emerald-200 bg-emerald-50 text-emerald-900 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-200',
-        icon: 'text-emerald-600 dark:text-emerald-400',
+        root: 'border-success-border bg-success-muted text-success-muted-foreground',
+        icon: 'text-success',
       },
       warning: {
-        root: 'border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-200',
-        icon: 'text-amber-600 dark:text-amber-400',
+        root: 'border-warning-border bg-warning-muted text-warning-muted-foreground',
+        icon: 'text-warning',
       },
       danger: {
-        root: 'border-red-200 bg-red-50 text-red-900 dark:border-red-900 dark:bg-red-950 dark:text-red-200',
-        icon: 'text-red-600 dark:text-red-400',
+        root: 'border-danger-border bg-danger-muted text-danger-muted-foreground',
+        icon: 'text-danger',
       },
     },
     /** Tightens the title/description gap when both are present. */

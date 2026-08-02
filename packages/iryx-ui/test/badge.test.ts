@@ -23,17 +23,25 @@ describe('badge', () => {
 
   it('pairs each variant with its tone', () => {
     expect(mount(Badge, { props: { variant: 'success' } }).attributes('class'))
-      .toContain('bg-emerald-50')
+      .toContain('bg-success-muted')
     expect(mount(Badge, { props: { variant: 'success', tone: 'solid' } }).attributes('class'))
-      .toContain('bg-emerald-600')
+      .toContain('bg-success')
     expect(mount(Badge, { props: { variant: 'danger' } }).attributes('class'))
-      .toContain('bg-red-50')
+      .toContain('bg-danger-muted')
   })
 
-  it('ships a dark class for every coloured variant', () => {
+  /*
+   * Status colours must come from theme tokens, which carry their own dark
+   * values — a raw palette class here would ignore applyTheme() and need a
+   * hand-written dark: counterpart.
+   */
+  it('styles every coloured variant from theme tokens, not raw palettes', () => {
     for (const variant of ['success', 'warning', 'danger', 'info'] as const) {
-      for (const tone of ['soft', 'solid'] as const)
-        expect(mount(Badge, { props: { variant, tone } }).attributes('class')).toContain('dark:')
+      for (const tone of ['soft', 'solid'] as const) {
+        const classes = mount(Badge, { props: { variant, tone } }).attributes('class') ?? ''
+        expect(classes).toContain(`-${variant}`)
+        expect(classes).not.toMatch(/dark:|emerald|amber|red-|blue-/)
+      }
     }
   })
 

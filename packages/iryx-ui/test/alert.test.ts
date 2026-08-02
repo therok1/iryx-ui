@@ -49,9 +49,18 @@ describe('alert', () => {
     expect(wrapper.get('button').attributes('aria-label')).toBe('Zapri')
   })
 
-  it('ships a dark class for every variant', () => {
-    for (const variant of ['info', 'success', 'warning', 'danger'] as const)
-      expect(mount(Alert, { props: { variant } }).attributes('class')).toContain('dark:')
+  /*
+   * Status colours must come from theme tokens, which carry their own dark
+   * values — a raw palette class here would ignore applyTheme() and need a
+   * hand-written dark: counterpart.
+   */
+  it('styles every variant from theme tokens, not raw palettes', () => {
+    for (const variant of ['info', 'success', 'warning', 'danger'] as const) {
+      const classes = mount(Alert, { props: { variant } }).attributes('class') ?? ''
+      expect(classes).toContain(`bg-${variant}-muted`)
+      expect(classes).toContain(`border-${variant}-border`)
+      expect(classes).not.toMatch(/dark:|emerald|amber|red-|blue-/)
+    }
   })
 
   it('merges the class prop and per-slot ui overrides', () => {
