@@ -8,6 +8,7 @@ export const componentNames = [
   'App',
   'Badge',
   'Button',
+  'ButtonGroup',
   'Card',
   'Checkbox',
   'ConfirmDialog',
