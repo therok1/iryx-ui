@@ -1,7 +1,7 @@
 import type { Component } from 'vue'
 import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
-import { Button, Card, Checkbox, Input, iryxUiConfigKey, Label, RadioGroup, Select, Switch, Textarea } from '../src'
+import { Badge, Button, Card, Checkbox, Input, iryxUiConfigKey, Label, RadioGroup, Select, Switch, Textarea } from '../src'
 
 /**
  * Regression guard: Vue casts absent boolean props to `false` rather than
@@ -13,6 +13,7 @@ import { Button, Card, Checkbox, Input, iryxUiConfigKey, Label, RadioGroup, Sele
  * Select that's the trigger, since SelectRoot is renderless.
  */
 const components: [string, Component, string][] = [
+  ['Badge', Badge, 'span'],
   ['Button', Button, 'button'],
   ['Card', Card, 'div'],
   ['Input', Input, 'input'],

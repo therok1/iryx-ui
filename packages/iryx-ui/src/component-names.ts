@@ -5,6 +5,7 @@
  */
 export const componentNames = [
   'App',
+  'Badge',
   'Button',
   'Card',
   'Checkbox',
