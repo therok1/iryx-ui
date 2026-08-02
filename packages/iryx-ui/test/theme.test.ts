@@ -86,6 +86,26 @@ describe('useAppearance', () => {
     expect(document.documentElement.classList.contains('dark')).toBe(false)
   })
 
+  /*
+   * The light and dark border tokens are far apart (opaque grey vs. white at
+   * 10% alpha), so letting the colour transition run on a theme switch flashes
+   * a near-white border around every bordered element.
+   */
+  it('suppresses transitions while switching, then restores them', async () => {
+    const { setAppearance } = useAppearance()
+    const suppressing = () => [...document.head.querySelectorAll('style')]
+      .some(s => s.textContent?.includes('transition:none'))
+
+    setAppearance('dark')
+    await nextTick()
+    expect(suppressing()).toBe(true)
+
+    // The guard style is removed on the next frame, not left behind.
+    await new Promise(resolve => requestAnimationFrame(() => resolve(null)))
+    await nextTick()
+    expect(suppressing()).toBe(false)
+  })
+
   it('persists the selection', async () => {
     const { setAppearance } = useAppearance()
     setAppearance('dark')

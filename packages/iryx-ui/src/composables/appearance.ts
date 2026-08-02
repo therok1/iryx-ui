@@ -13,6 +13,28 @@ function resolveDark(): boolean {
   return appearance.value === 'dark' || (appearance.value === 'system' && systemDark.value)
 }
 
+/**
+ * Flip the theme with transitions switched off for one frame.
+ *
+ * Components transition their colours, and the light and dark border tokens
+ * sit far apart (opaque grey vs. white at 10% alpha). Interpolating between
+ * them runs through a near-white, partly opaque border — a visible flash
+ * around every bordered element on each switch.
+ */
+function applyWithoutTransitions(dark: boolean): void {
+  const style = document.createElement('style')
+  style.textContent = '*,*::before,*::after{transition:none !important;animation:none !important}'
+  document.head.appendChild(style)
+
+  document.documentElement.classList.toggle('dark', dark)
+
+  // Force a style recalculation so the new colours are committed while
+  // transitions are still suppressed.
+  void document.body?.offsetHeight
+
+  requestAnimationFrame(() => style.remove())
+}
+
 function start(): void {
   if (started || typeof window === 'undefined')
     return
@@ -31,7 +53,7 @@ function start(): void {
   }
 
   watchEffect(() => {
-    document.documentElement.classList.toggle('dark', resolveDark())
+    applyWithoutTransitions(resolveDark())
     window.localStorage.setItem(STORAGE_KEY, appearance.value)
   })
 }
