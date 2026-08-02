@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { Appearance, ThemePresetName } from 'iryx-ui'
+import type { Appearance, DropdownMenuEntry, ThemePresetName } from 'iryx-ui'
 import { themes, useAppearance, useConfirm, useToast } from 'iryx-ui'
-import { ArrowRight, Bell, Bold, ChevronDown, Download, Inbox, Italic, Search, Underline } from 'lucide-vue-next'
+import { ArrowRight, Bell, Bold, ChevronDown, Copy, Download, Inbox, Italic, Search, Send, Trash2, Underline } from 'lucide-vue-next'
 import { reactive, ref } from 'vue'
 
 const { appearance, isDark, setAppearance } = useAppearance()
@@ -27,14 +27,51 @@ const alertOpen = ref(true)
 const dialogOpen = ref(false)
 const blockingOpen = ref(false)
 
-const splitOpen = ref(false)
-const saveMode = ref('Save')
 const marks = ref<string[]>(['Bold'])
 
-function pickSaveMode(mode: string) {
-  saveMode.value = mode
-  splitOpen.value = false
-}
+const toast = useToast()
+
+// Secondary actions for the split button — each does something, rather than
+// changing what the main button says.
+const saveActions: DropdownMenuEntry[] = [
+  { label: 'Save and send', icon: Send, onSelect: () => toast.success('Saved and sent') },
+  { label: 'Save as template', icon: Copy, onSelect: () => toast.success('Template saved') },
+  '-',
+  { label: 'Discard changes', icon: Trash2, danger: true, onSelect: () => toast.danger('Changes discarded') },
+]
+
+// Nested entries — an item with `items` becomes a submenu trigger.
+const rowActions: DropdownMenuEntry[] = [
+  { label: 'Invoice' },
+  { label: 'Open', icon: Search, onSelect: () => toast.info('Opened') },
+  {
+    label: 'Export as',
+    icon: Download,
+    items: [
+      { label: 'PDF', onSelect: () => toast.success('Exported as PDF') },
+      { label: 'CSV', onSelect: () => toast.success('Exported as CSV') },
+      '-',
+      {
+        label: 'More formats',
+        items: [
+          { label: 'XML', onSelect: () => toast.success('Exported as XML') },
+          { label: 'e-SLOG', onSelect: () => toast.success('Exported as e-SLOG') },
+        ],
+      },
+    ],
+  },
+  {
+    label: 'Send to',
+    icon: Send,
+    items: [
+      { label: 'Client', onSelect: () => toast.success('Sent to client') },
+      { label: 'Accountant', onSelect: () => toast.success('Sent to accountant') },
+      { label: 'Nobody (disabled)', disabled: true, onSelect: () => {} },
+    ],
+  },
+  '-',
+  { label: 'Delete', icon: Trash2, danger: true, onSelect: () => toast.danger('Deleted') },
+]
 
 function toggleMark(mark: string) {
   marks.value = marks.value.includes(mark)
@@ -42,7 +79,6 @@ function toggleMark(mark: string) {
     : [...marks.value, mark]
 }
 
-const toast = useToast()
 const { confirm } = useConfirm()
 const confirmResult = ref<string | null>(null)
 
@@ -383,38 +419,36 @@ function simulateLoad() {
 
         <div class="space-y-2">
           <p class="text-sm text-muted-foreground">
-            Split button — the trailing slot is just another button, so it can open
-            anything. Here it toggles a panel; a dropdown menu would drop in the same way.
+            Split button — the primary action stays put; the arrow opens secondary
+            actions. The trailing slot takes any component, so this is a dropdown by
+            choice, not by design.
           </p>
-          <div class="relative inline-block">
-            <IButtonGroup>
-              <IButton @click="toast.success(`${saveMode} clicked`)">
-                {{ saveMode }}
+          <IButtonGroup>
+            <IButton @click="toast.success('Saved')">
+              Save
+            </IButton>
+            <IDropdownMenu :items="saveActions" align="end">
+              <template #trigger>
+                <IButton square aria-label="More save options">
+                  <ChevronDown />
+                </IButton>
+              </template>
+            </IDropdownMenu>
+          </IButtonGroup>
+        </div>
+
+        <div class="space-y-2">
+          <p class="text-sm text-muted-foreground">
+            Nested menus — give an entry its own <code>items</code> and it becomes a
+            submenu trigger, to any depth.
+          </p>
+          <IDropdownMenu :items="rowActions">
+            <template #trigger>
+              <IButton variant="outline">
+                Row actions <ChevronDown data-icon="inline-end" />
               </IButton>
-              <IButton
-                square
-                aria-label="More save options"
-                :aria-expanded="splitOpen"
-                @click="splitOpen = !splitOpen"
-              >
-                <ChevronDown />
-              </IButton>
-            </IButtonGroup>
-            <div
-              v-if="splitOpen"
-              class="absolute top-full left-0 z-20 mt-1 w-52 rounded-lg border border-border bg-background p-1 shadow-lg"
-            >
-              <button
-                v-for="mode in ['Save', 'Save and send', 'Save as draft']"
-                :key="mode"
-                type="button"
-                class="w-full rounded-md px-2 py-1.5 text-left text-sm hover:bg-accent hover:text-accent-foreground"
-                @click="pickSaveMode(mode)"
-              >
-                {{ mode }}
-              </button>
-            </div>
-          </div>
+            </template>
+          </IDropdownMenu>
         </div>
 
         <div class="space-y-2">
