@@ -1,0 +1,136 @@
+<script setup lang="ts">
+import type { Component } from 'vue'
+import { CircleAlert, CircleCheck, Info, TriangleAlert, X } from 'lucide-vue-next'
+import { Primitive } from 'reka-ui'
+import { computed } from 'vue'
+import { useIryxUiConfig } from '../config'
+import { alertTheme } from '../theme/alert'
+
+export interface AlertProps {
+  /** Render as a different element or component. */
+  as?: string
+  variant?: 'info' | 'success' | 'warning' | 'danger'
+  /** Heading text above the body. */
+  title?: string
+  /** Body text. Ignored when the default slot is used. */
+  description?: string
+  /**
+   * Leading icon. Defaults to one matching the variant; pass a component to
+   * override it, or `false` to drop it entirely.
+   */
+  icon?: Component | false
+  /** Render a dismiss button that emits `close`. */
+  closable?: boolean
+  /** Accessible name for the dismiss button — override for non-English apps. */
+  closeLabel?: string
+  /** Skip built-in classes; you take over styling entirely. */
+  unstyled?: boolean
+  class?: string
+  /** Override classes per slot, e.g. `{ title: 'text-base' }`. */
+  ui?: {
+    root?: string
+    icon?: string
+    content?: string
+    title?: string
+    description?: string
+    close?: string
+  }
+}
+
+// `undefined` defaults are required: Vue casts absent boolean props to `false`.
+// For `unstyled` that would shadow the global config; for `icon` the `| false`
+// in its type makes Vue treat it as a Boolean prop, so an absent icon would
+// read as `false` and silently suppress the default variant icon.
+const props = withDefaults(defineProps<AlertProps>(), {
+  as: 'div',
+  closeLabel: 'Close',
+  icon: undefined,
+  unstyled: undefined,
+})
+
+defineEmits<{ close: [] }>()
+
+const defaultIcons = {
+  info: Info,
+  success: CircleCheck,
+  warning: TriangleAlert,
+  danger: CircleAlert,
+} as const
+
+const resolvedIcon = computed(() => {
+  if (props.icon === false)
+    return undefined
+  return props.icon ?? defaultIcons[props.variant ?? 'info']
+})
+
+/**
+ * Urgent variants interrupt the screen reader; informational ones are
+ * announced politely so they don't cut across what the user is doing.
+ */
+const role = computed(() =>
+  props.variant === 'danger' || props.variant === 'warning' ? 'alert' : 'status',
+)
+
+const config = useIryxUiConfig()
+const isUnstyled = computed(() => props.unstyled ?? config.unstyled)
+
+const theme = computed(() =>
+  alertTheme({ variant: props.variant, withTitle: Boolean(props.title) }),
+)
+
+const rootClass = computed(() =>
+  isUnstyled.value
+    ? [props.ui?.root, props.class]
+    : theme.value.root({ class: [props.ui?.root, props.class] }),
+)
+const iconClass = computed(() =>
+  isUnstyled.value ? props.ui?.icon : theme.value.icon({ class: props.ui?.icon }),
+)
+const contentClass = computed(() =>
+  isUnstyled.value ? props.ui?.content : theme.value.content({ class: props.ui?.content }),
+)
+const titleClass = computed(() =>
+  isUnstyled.value ? props.ui?.title : theme.value.title({ class: props.ui?.title }),
+)
+const descriptionClass = computed(() =>
+  isUnstyled.value ? props.ui?.description : theme.value.description({ class: props.ui?.description }),
+)
+const closeClass = computed(() =>
+  isUnstyled.value ? props.ui?.close : theme.value.close({ class: props.ui?.close }),
+)
+</script>
+
+<template>
+  <Primitive :as="props.as" :role="role" :class="rootClass">
+    <div v-if="resolvedIcon || $slots.icon" :class="iconClass">
+      <slot name="icon">
+        <component :is="resolvedIcon" aria-hidden="true" />
+      </slot>
+    </div>
+
+    <div :class="contentClass">
+      <p v-if="props.title || $slots.title" :class="titleClass">
+        <slot name="title">
+          {{ props.title }}
+        </slot>
+      </p>
+      <div v-if="props.description || $slots.default" :class="descriptionClass">
+        <slot>
+          {{ props.description }}
+        </slot>
+      </div>
+    </div>
+
+    <button
+      v-if="props.closable"
+      type="button"
+      :aria-label="props.closeLabel"
+      :class="closeClass"
+      @click="$emit('close')"
+    >
+      <slot name="close">
+        <X aria-hidden="true" />
+      </slot>
+    </button>
+  </Primitive>
+</template>

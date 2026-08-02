@@ -1,6 +1,7 @@
 export { componentNames } from './component-names'
 export type { ComponentName } from './component-names'
 export * from './components'
+export type { AlertProps } from './components/Alert.vue'
 export type { AppProps } from './components/App.vue'
 export type { BadgeProps } from './components/Badge.vue'
 export type { ButtonProps } from './components/Button.vue'

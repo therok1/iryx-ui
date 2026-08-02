@@ -4,6 +4,7 @@
  * (auto-imports). Keep in sync with `src/components/index.ts`.
  */
 export const componentNames = [
+  'Alert',
   'App',
   'Badge',
   'Button',
