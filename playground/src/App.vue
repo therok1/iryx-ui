@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Appearance, ThemePresetName } from 'iryx-ui'
 import { themes, useAppearance } from 'iryx-ui'
-import { ArrowRight, Download, Search } from 'lucide-vue-next'
+import { ArrowRight, Bell, Download, Search } from 'lucide-vue-next'
 import { reactive, ref } from 'vue'
 
 const { appearance, isDark, setAppearance } = useAppearance()
@@ -19,6 +19,10 @@ const globalUnstyled = ref(false)
 
 const checked = ref(false)
 const loading = ref(false)
+
+const statuses = ['neutral', 'success', 'warning', 'danger', 'info'] as const
+const alertVariants = ['info', 'success', 'warning', 'danger'] as const
+const alertOpen = ref(true)
 
 // A hand-rolled Standard Schema validator, so the playground stays dependency-free.
 const signupSchema = {
@@ -191,6 +195,112 @@ function simulateLoad() {
           </IButton>
           <IButton :loading="loading" @click="simulateLoad">
             {{ loading ? 'Loading…' : 'Click to load' }}
+          </IButton>
+        </div>
+      </section>
+
+      <section class="space-y-3">
+        <h2 class="font-semibold">
+          Card — variants &amp; padding
+        </h2>
+        <div class="grid gap-4 sm:grid-cols-2">
+          <ICard title="Outline" description="The default — border plus background.">
+            <p class="text-sm text-muted-foreground">
+              Body content sits in its own slot.
+            </p>
+          </ICard>
+          <ICard variant="soft" title="Soft" description="Muted surface, no border.">
+            <p class="text-sm text-muted-foreground">
+              Useful for nested or secondary panels.
+            </p>
+          </ICard>
+        </div>
+        <ICard title="With a footer" description="Header, body and footer slots.">
+          <p class="text-sm text-muted-foreground">
+            The header and footer are skipped entirely when unused, so a bare card
+            is just a padded box.
+          </p>
+          <template #footer>
+            <IButton size="sm">
+              Save
+            </IButton>
+            <IButton size="sm" variant="ghost">
+              Cancel
+            </IButton>
+          </template>
+        </ICard>
+        <div class="grid gap-4 sm:grid-cols-3">
+          <ICard padding="sm" title="sm" />
+          <ICard padding="md" title="md" />
+          <ICard padding="lg" title="lg" />
+        </div>
+      </section>
+
+      <section class="space-y-3">
+        <h2 class="font-semibold">
+          Badge — variants, tones &amp; sizes
+        </h2>
+        <div class="flex flex-wrap items-center gap-2">
+          <IBadge v-for="status in statuses" :key="status" :variant="status">
+            {{ status }}
+          </IBadge>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <IBadge v-for="status in statuses" :key="status" :variant="status" tone="solid">
+            {{ status }}
+          </IBadge>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <IBadge v-for="status in statuses" :key="status" :variant="status" dot>
+            {{ status }}
+          </IBadge>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <IBadge variant="success" size="sm">
+            sm
+          </IBadge>
+          <IBadge variant="success" size="md">
+            md
+          </IBadge>
+          <IBadge variant="success" size="lg">
+            lg
+          </IBadge>
+          <IBadge variant="info" size="lg">
+            <Download /> with icon
+          </IBadge>
+        </div>
+      </section>
+
+      <section class="space-y-3">
+        <h2 class="font-semibold">
+          Alert — variants
+        </h2>
+        <div class="space-y-3">
+          <IAlert
+            v-for="variant in alertVariants"
+            :key="variant"
+            :variant="variant"
+            :title="`${variant} alert`"
+            description="Each variant picks its own icon, and sets role=alert only when urgent."
+          />
+          <IAlert variant="success" description="No title — just a one-line message." />
+          <IAlert
+            variant="warning"
+            :icon="Bell"
+            title="Custom icon"
+            description="Pass any component, or :icon=&quot;false&quot; to drop it."
+          />
+          <IAlert
+            v-if="alertOpen"
+            variant="info"
+            title="Dismissible"
+            description="The close button emits an event — you decide what happens."
+            closable
+            close-label="Zapri"
+            @close="alertOpen = false"
+          />
+          <IButton v-else size="sm" variant="outline" @click="alertOpen = true">
+            Bring back the dismissed alert
           </IButton>
         </div>
       </section>
