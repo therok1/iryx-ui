@@ -128,4 +128,15 @@
   --color-info-muted: var(--iryx-info-muted);
   --color-info-muted-foreground: var(--iryx-info-muted-foreground);
   --color-info-border: var(--iryx-info-border);
+  --animate-progress-indeterminate: progress-indeterminate 1.5s ease-in-out infinite;
+}
+
+/* Indeterminate Progress: slide a short bar back and forth across the track. */
+@keyframes progress-indeterminate {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(300%);
+  }
 }
