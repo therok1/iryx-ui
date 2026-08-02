@@ -133,6 +133,7 @@
   --animate-fade-out: fade-out 150ms ease-in;
   --animate-dialog-in: dialog-in 150ms ease-out;
   --animate-dialog-out: dialog-out 150ms ease-in;
+  --animate-toast-in: toast-in 150ms ease-out;
 }
 
 /* Indeterminate Progress: slide a short bar back and forth across the track. */
@@ -172,5 +173,12 @@
   to {
     opacity: 0;
     transform: translate(-50%, -50%) scale(0.95);
+  }
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
   }
 }

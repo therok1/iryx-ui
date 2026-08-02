@@ -22,6 +22,7 @@ export const componentNames = [
   'Select',
   'Switch',
   'Textarea',
+  'Toaster',
 ] as const
 
 export type ComponentName = (typeof componentNames)[number]
