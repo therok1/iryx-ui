@@ -129,6 +129,10 @@
   --color-info-muted-foreground: var(--iryx-info-muted-foreground);
   --color-info-border: var(--iryx-info-border);
   --animate-progress-indeterminate: progress-indeterminate 1.5s ease-in-out infinite;
+  --animate-fade-in: fade-in 150ms ease-out;
+  --animate-fade-out: fade-out 150ms ease-in;
+  --animate-dialog-in: dialog-in 150ms ease-out;
+  --animate-dialog-out: dialog-out 150ms ease-in;
 }
 
 /* Indeterminate Progress: slide a short bar back and forth across the track. */
@@ -138,5 +142,35 @@
   }
   100% {
     transform: translateX(300%);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+/*
+ * Dialog enter/exit. The dialog is centred with a -50%/-50% translate, so the
+ * keyframes must carry that translate too or it would jump on animate.
+ */
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.95);
+  }
+}
+
+@keyframes dialog-out {
+  to {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.95);
   }
 }

@@ -10,6 +10,8 @@ export const componentNames = [
   'Button',
   'Card',
   'Checkbox',
+  'ConfirmDialog',
+  'Dialog',
   'EmptyState',
   'Form',
   'FormField',
