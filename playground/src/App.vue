@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Appearance, ThemePresetName } from 'iryx-ui'
 import { themes, useAppearance, useConfirm, useToast } from 'iryx-ui'
-import { ArrowRight, Bell, Download, Inbox, Search } from 'lucide-vue-next'
+import { ArrowRight, Bell, Bold, ChevronDown, Download, Inbox, Italic, Search, Underline } from 'lucide-vue-next'
 import { reactive, ref } from 'vue'
 
 const { appearance, isDark, setAppearance } = useAppearance()
@@ -26,6 +26,21 @@ const alertOpen = ref(true)
 
 const dialogOpen = ref(false)
 const blockingOpen = ref(false)
+
+const splitOpen = ref(false)
+const saveMode = ref('Save')
+const marks = ref<string[]>(['Bold'])
+
+function pickSaveMode(mode: string) {
+  saveMode.value = mode
+  splitOpen.value = false
+}
+
+function toggleMark(mark: string) {
+  marks.value = marks.value.includes(mark)
+    ? marks.value.filter(m => m !== mark)
+    : [...marks.value, mark]
+}
 
 const toast = useToast()
 const { confirm } = useConfirm()
@@ -181,16 +196,47 @@ function simulateLoad() {
         </h2>
         <div class="flex flex-wrap items-center gap-3">
           <IButton>
-            <Search /> Leading
+            <Search data-icon="inline-start" /> Leading
           </IButton>
           <IButton variant="outline">
-            Trailing <ArrowRight />
+            Trailing <ArrowRight data-icon="inline-end" />
           </IButton>
           <IButton variant="outline" size="sm">
-            <Download /> Download
+            <Download data-icon="inline-start" /> Download
           </IButton>
           <IButton variant="ghost">
-            <Search /> Search <ArrowRight />
+            <Search data-icon="inline-start" /> Search <ArrowRight data-icon="inline-end" />
+          </IButton>
+        </div>
+        <p class="text-sm text-muted-foreground">
+          Mark an icon with <code>data-icon="inline-start"</code> or
+          <code>"inline-end"</code> and the padding tightens on that side;
+          <code>square</code> makes an icon-only button.
+        </p>
+        <div class="flex flex-wrap items-center gap-3">
+          <IButton id="probe-text">
+            Text only
+          </IButton>
+          <IButton id="probe-leading">
+            <Search data-icon="inline-start" /> Leading
+          </IButton>
+          <IButton id="probe-trailing">
+            Trailing <ArrowRight data-icon="inline-end" />
+          </IButton>
+          <IButton id="probe-both">
+            <Search data-icon="inline-start" /> Both <ArrowRight data-icon="inline-end" />
+          </IButton>
+          <IButton id="probe-unmarked">
+            <Search /> Unmarked
+          </IButton>
+          <IButton id="probe-icon" square aria-label="Search">
+            <Search />
+          </IButton>
+          <IButton id="probe-icon-sm" size="sm" square variant="outline" aria-label="Search">
+            <Search />
+          </IButton>
+          <IButton id="probe-icon-xl" size="xl" square variant="outline" aria-label="Search">
+            <Search />
           </IButton>
         </div>
       </section>
@@ -327,6 +373,117 @@ function simulateLoad() {
           <IButton v-else size="sm" variant="outline" @click="alertOpen = true">
             Bring back the dismissed alert
           </IButton>
+        </div>
+      </section>
+
+      <section class="space-y-4">
+        <h2 class="font-semibold">
+          Button group
+        </h2>
+
+        <div class="space-y-2">
+          <p class="text-sm text-muted-foreground">
+            Split button — the trailing slot is just another button, so it can open
+            anything. Here it toggles a panel; a dropdown menu would drop in the same way.
+          </p>
+          <div class="relative inline-block">
+            <IButtonGroup>
+              <IButton @click="toast.success(`${saveMode} clicked`)">
+                {{ saveMode }}
+              </IButton>
+              <IButton
+                square
+                aria-label="More save options"
+                :aria-expanded="splitOpen"
+                @click="splitOpen = !splitOpen"
+              >
+                <ChevronDown />
+              </IButton>
+            </IButtonGroup>
+            <div
+              v-if="splitOpen"
+              class="absolute top-full left-0 z-20 mt-1 w-52 rounded-lg border border-border bg-background p-1 shadow-lg"
+            >
+              <button
+                v-for="mode in ['Save', 'Save and send', 'Save as draft']"
+                :key="mode"
+                type="button"
+                class="w-full rounded-md px-2 py-1.5 text-left text-sm hover:bg-accent hover:text-accent-foreground"
+                @click="pickSaveMode(mode)"
+              >
+                {{ mode }}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <p class="text-sm text-muted-foreground">
+            A segmented toolbar — {{ marks.length ? marks.join(', ') : 'none' }}
+          </p>
+          <IButtonGroup>
+            <IButton
+              v-for="mark in ['Bold', 'Italic', 'Underline']"
+              :key="mark"
+              square
+              :variant="marks.includes(mark) ? 'solid' : 'outline'"
+              :aria-pressed="marks.includes(mark)"
+              :aria-label="mark"
+              @click="toggleMark(mark)"
+            >
+              <Bold v-if="mark === 'Bold'" />
+              <Italic v-else-if="mark === 'Italic'" />
+              <Underline v-else />
+            </IButton>
+          </IButtonGroup>
+        </div>
+
+        <div class="space-y-2">
+          <p class="text-sm text-muted-foreground">
+            Size set once on the group, and mixed content — the last child is a plain link.
+          </p>
+          <IButtonGroup size="sm">
+            <IButton variant="outline">
+              Previous
+            </IButton>
+            <IButton variant="outline">
+              Next
+            </IButton>
+            <a
+              href="#"
+              class="inline-flex h-8 items-center rounded-lg border border-border bg-background px-3 text-sm hover:bg-accent"
+              @click.prevent
+            >
+              Plain link
+            </a>
+          </IButtonGroup>
+        </div>
+
+        <div class="space-y-2">
+          <p class="text-sm text-muted-foreground">
+            Vertical, and block (fills the container).
+          </p>
+          <div class="flex flex-wrap items-start gap-6">
+            <IButtonGroup orientation="vertical">
+              <IButton variant="outline">
+                Top
+              </IButton>
+              <IButton variant="outline">
+                Middle
+              </IButton>
+              <IButton variant="outline">
+                Bottom
+              </IButton>
+            </IButtonGroup>
+            <IButtonGroup block class="max-w-xs flex-1">
+              <IButton variant="outline">
+                Decline
+              </IButton>
+              <IButton>
+                Accept
+              </IButton>
+            </IButtonGroup>
+          </div>
         </div>
       </section>
 
