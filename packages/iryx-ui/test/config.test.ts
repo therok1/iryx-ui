@@ -1,7 +1,7 @@
 import type { Component } from 'vue'
 import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
-import { Button, Checkbox, Input, iryxUiConfigKey, Label, RadioGroup, Select, Switch, Textarea } from '../src'
+import { Button, Card, Checkbox, Input, iryxUiConfigKey, Label, RadioGroup, Select, Switch, Textarea } from '../src'
 
 /**
  * Regression guard: Vue casts absent boolean props to `false` rather than
@@ -14,6 +14,7 @@ import { Button, Checkbox, Input, iryxUiConfigKey, Label, RadioGroup, Select, Sw
  */
 const components: [string, Component, string][] = [
   ['Button', Button, 'button'],
+  ['Card', Card, 'div'],
   ['Input', Input, 'input'],
   ['Textarea', Textarea, 'textarea'],
   ['Label', Label, 'label'],
