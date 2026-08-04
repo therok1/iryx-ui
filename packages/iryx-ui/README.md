@@ -66,7 +66,9 @@ Components are auto-imported with the `I` prefix (configurable via the `iryxUi.p
 
 ### Icons
 
-Just drop an icon component into the button alongside your text — leading, trailing, or both. Icons are sized automatically to match the button, and spaced for you. Works with any SVG icon set; [lucide-vue-next](https://lucide.dev/guide/packages/lucide-vue-next) pairs nicely:
+Just drop an icon component into the button alongside your text — leading, trailing, or both. Icons are sized automatically to match the button. Works with any SVG icon set; [lucide-vue-next](https://lucide.dev/guide/packages/lucide-vue-next) pairs nicely.
+
+Mark the icon with `data-icon="inline-start"` or `"inline-end"` and the padding tightens on the side it sits on. For an icon with no label, add `square`:
 
 ```vue
 <script setup lang="ts">
@@ -75,15 +77,20 @@ import { ArrowRight, Search } from 'lucide-vue-next'
 
 <template>
   <IButton>
-    <Search /> Search
+    <Search data-icon="inline-start" /> Search
   </IButton>
   <IButton variant="outline">
-    Next <ArrowRight />
+    Next <ArrowRight data-icon="inline-end" />
+  </IButton>
+  <IButton square aria-label="Search">
+    <Search />
   </IButton>
 </template>
 ```
 
-When `loading` is set, a spinner appears in the leading position.
+The marker is needed because a label is a bare text node: CSS's `:first-child` and `:last-child` count element children, so an icon beside text matches both. An unmarked icon still renders, it just keeps the full padding.
+
+`IBadge` follows the same convention. When `loading` is set on a button, a spinner takes the leading position automatically.
 
 ## The `IApp` wrapper
 
@@ -186,9 +193,30 @@ For a static re-brand, plain CSS works too — tokens are just variables:
 }
 ```
 
-Available tokens: `background`, `foreground`, `primary`, `primary-foreground`,
-`accent`, `accent-foreground`, `muted`, `muted-foreground`, `border` — each
-usable as a Tailwind color (`bg-primary`, `text-muted-foreground`, …).
+Available tokens, each usable as a Tailwind color (`bg-primary`,
+`text-muted-foreground`, …):
+
+| Group | Tokens |
+| --- | --- |
+| Surfaces | `background`, `foreground`, `accent`, `accent-foreground`, `muted`, `muted-foreground`, `border` |
+| Brand | `primary`, `primary-foreground`, `primary-from`, `primary-to` |
+| Status | `success`, `warning`, `danger`, `info` — each with `-foreground`, `-muted`, `-muted-foreground` and `-border` |
+
+`primary-from` / `primary-to` are the stops of the solid button's vertical
+gradient. The status tokens carry their own dark-mode values, so components
+never need a `dark:` class for them: `success` is the solid fill,
+`success-foreground` the text on it, `success-muted` a tinted surface,
+`success-muted-foreground` the text on that, and `success-border` the edge.
+
+The built-in presets swap only the brand colors — red should mean danger in
+every theme — but `applyTheme()` accepts the status tokens too:
+
+```ts
+applyTheme({
+  light: { success: 'oklch(0.6 0.15 150)', successMuted: 'oklch(0.97 0.02 150)' },
+  dark: { success: 'oklch(0.7 0.15 150)', successMuted: 'oklch(0.26 0.05 150)' },
+})
+```
 
 Tweak a single instance with `class` (conflicts are merged smartly) or per-slot with `ui`:
 
@@ -215,12 +243,20 @@ app.use(createIryxUi({ unstyled: true }))
 
 ## Components
 
+**Layout & structure**
+
 | Component | Description |
 | --- | --- |
 | `IApp` | Root wrapper — reactive global config, theme, appearance, RTL/locale |
+| `ICard` | Panel with `outline`/`soft` variants, four paddings, header and footer slots |
+| `ISeparator` | Horizontal or vertical rule, optionally with a centred label |
+
+**Forms**
+
+| Component | Description |
+| --- | --- |
 | `IForm` | Validating form wrapper — any Standard Schema validator, or your own function |
 | `IFormField` | Label, description, hint, help and error text around a control |
-| `IButton` | Variants (`solid`, `outline`, `ghost`, `link`), five sizes, `loading` and `block` states, polymorphic via `as` / `asChild` |
 | `IInput` | Text field with `sm`/`md`/`lg` sizes, `invalid` state, `v-model` |
 | `ITextarea` | Multi-line field with matching sizes and `invalid` state |
 | `ILabel` | Field label with optional `required` asterisk |
@@ -229,7 +265,108 @@ app.use(createIryxUi({ unstyled: true }))
 | `IRadioGroup` | Radio list with labels wired up automatically; items take a `description` |
 | `ISwitch` | Accessible toggle, optional `label` + `description` |
 
-Every component supports `unstyled`, a `class` override, and multi-part ones take a `ui` prop for per-slot classes. More on the way.
+**Actions**
+
+| Component | Description |
+| --- | --- |
+| `IButton` | Variants (`solid`, `outline`, `ghost`, `link`), five sizes, `loading`, `block` and `square` states, polymorphic via `as` / `asChild` |
+| `IButtonGroup` | Joins any children into a segmented control — split buttons, toolbars, pagers |
+| `IDropdownMenu` | Menu driven by an `items` array, with separators, group labels, danger items and nested submenus |
+
+**Feedback**
+
+| Component | Description |
+| --- | --- |
+| `IAlert` | Inline banner in four variants, with a variant icon and optional dismiss |
+| `IBadge` | Status pill — five variants × `soft`/`solid` tones × three sizes, optional `dot` |
+| `IToaster` | Host for `useToast()`; six viewport positions, stacking, action buttons |
+| `IDialog` | Modal with header/body/footer slots, `dismissible` and `showClose` |
+| `IConfirmDialog` | Host for `useConfirm()` — renders the promise-based confirmation |
+| `IProgress` | Determinate or `indeterminate` bar, five variants, `formatValue` |
+| `ISkeleton` | Loading placeholder — `text`/`rect`/`circle`, stackable with `lines` |
+| `IEmptyState` | Icon, title, description and an `actions` slot for empty lists |
+| `ITooltip` | Hover/focus tooltip with side, align, delay and optional arrow |
+
+**Navigation & data display**
+
+| Component | Description |
+| --- | --- |
+| `ITabs` | `solid` or `line` variants with an animated indicator, horizontal or vertical |
+| `IBreadcrumb` | Trail from an `items` array; the last crumb is marked as the current page |
+| `IPagination` | Page list with ellipsis, edge pages and prev/next controls |
+| `IStepper` | Multi-step progress, horizontal or vertical, optional `linear` ordering |
+| `IStat` | KPI tile — label, value, signed delta with trend colour, and a hint |
+
+Every component supports `unstyled` and a `class` override; multi-part ones take a `ui` prop for per-slot classes.
+
+### Button groups
+
+`IButtonGroup` joins whatever you put inside it — buttons, a menu trigger, a link — squaring the inner edges and collapsing the shared borders. Set `size` once on the group and the buttons inherit it:
+
+```vue
+<template>
+  <IButtonGroup>
+    <IButton @click="save">
+      Save
+    </IButton>
+    <IDropdownMenu :items="saveActions" align="end">
+      <template #trigger>
+        <IButton square aria-label="More options">
+          <ChevronDown />
+        </IButton>
+      </template>
+    </IDropdownMenu>
+  </IButtonGroup>
+</template>
+```
+
+### Menus
+
+`IDropdownMenu` takes entries as data. A `'-'` is a separator, an entry without `onSelect` is a group label, and one with its own `items` opens a submenu — to any depth:
+
+```ts
+const items = [
+  { label: 'Invoice' },
+  { label: 'Open', icon: Search, onSelect: () => open() },
+  { label: 'Export as', icon: Download, items: [
+    { label: 'PDF', onSelect: () => exportPdf() },
+    { label: 'CSV', onSelect: () => exportCsv() },
+  ] },
+  '-',
+  { label: 'Delete', icon: Trash2, danger: true, onSelect: () => remove() },
+]
+```
+
+### Toasts and confirmations
+
+Both are imperative, so they can be called from anywhere — including plain functions outside a component. Mount each host once, typically just inside `<IApp>`:
+
+```vue
+<template>
+  <IApp>
+    <!-- your app -->
+    <IConfirmDialog />
+    <IToaster />
+  </IApp>
+</template>
+```
+
+```ts
+const toast = useToast()
+toast.success('Saved')
+toast.danger({ title: 'Failed to send', description: 'Check the address.' })
+toast.toast({ title: 'Note deleted', action: { label: 'Undo', onClick: restore } })
+
+const { confirm } = useConfirm()
+if (await confirm({ title: 'Delete this draft?', danger: true }))
+  await remove()
+```
+
+`confirm()` resolves `true` on confirmation and `false` on cancel or dismissal.
+
+### Internationalisation
+
+No English string is baked in without an escape hatch. `IAlert`, `IDialog` and `IToaster` take a `closeLabel`, `IPagination` takes `prevLabel` / `nextLabel` / `label`, `IBreadcrumb` and `ISkeleton` take a `label`, and `IProgress` and `IStat` take `formatValue` / `formatDelta` for locale-aware numbers.
 
 ### Forms
 
