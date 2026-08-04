@@ -372,8 +372,11 @@ function simulateLoad() {
           <IBadge variant="success" size="lg">
             lg
           </IBadge>
-          <IBadge variant="info" size="lg">
-            <Download /> with icon
+          <IBadge id="badge-plain" variant="info" size="lg">
+            no icon
+          </IBadge>
+          <IBadge id="badge-icon" variant="info" size="lg">
+            <Download data-icon="inline-start" /> with icon
           </IBadge>
         </div>
       </section>

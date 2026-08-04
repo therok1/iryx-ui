@@ -59,6 +59,22 @@ describe('badge', () => {
     expect(wrapper.get('[aria-hidden="true"]').attributes('class')).toContain('size-4')
   })
 
+  /*
+   * Same rule as Button: the icon declares its position, because a label is a
+   * bare text node that CSS's :first-child / :last-child cannot see past.
+   */
+  it('tightens the padding on the side an icon sits on', () => {
+    for (const [size, start, end] of [
+      ['sm', 'has-[[data-icon=inline-start]]:pl-1.5', 'has-[[data-icon=inline-end]]:pr-1.5'],
+      ['md', 'has-[[data-icon=inline-start]]:pl-2', 'has-[[data-icon=inline-end]]:pr-2'],
+      ['lg', 'has-[[data-icon=inline-start]]:pl-2.5', 'has-[[data-icon=inline-end]]:pr-2.5'],
+    ] as const) {
+      const classes = mount(Badge, { props: { size } }).attributes('class') ?? ''
+      expect(classes).toContain(start)
+      expect(classes).toContain(end)
+    }
+  })
+
   it('drops built-in classes when unstyled', () => {
     const wrapper = mount(Badge, { props: { unstyled: true, class: 'mine' } })
     expect(wrapper.attributes('class')).toBe('mine')
