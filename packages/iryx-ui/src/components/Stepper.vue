@@ -22,7 +22,14 @@ export interface StepperItemOption {
 export interface StepperProps {
   items?: (StepperItemOption | string)[]
   orientation?: 'horizontal' | 'vertical'
-  /** Allow jumping to a step by clicking it. */
+  /**
+   * Require steps to be completed in order.
+   *
+   * Off by default, because when on, a later step cannot be reached until the
+   * ones before it are marked complete — which makes plain `v-model`
+   * increments silently do nothing. Turn it on only if you are driving
+   * navigation through the stepper's own triggers.
+   */
   linear?: boolean
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
@@ -43,7 +50,7 @@ export interface StepperProps {
 // `unstyled: undefined` is required: Vue casts absent boolean props to
 // `false`, which would shadow the global config.
 const props = withDefaults(defineProps<StepperProps>(), {
-  linear: true,
+  linear: false,
   unstyled: undefined,
 })
 

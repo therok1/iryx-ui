@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Appearance, DropdownMenuEntry, ThemePresetName } from 'iryx-ui'
 import { themes, useAppearance, useConfirm, useToast } from 'iryx-ui'
-import { ArrowRight, Bell, Bold, ChevronDown, Copy, Download, Inbox, Italic, Search, Send, Trash2, Underline } from 'lucide-vue-next'
+import { ArrowRight, Bell, Bold, ChevronDown, CircleHelp, Copy, Download, House, Inbox, Italic, Search, Send, Trash2, Underline } from 'lucide-vue-next'
 import { reactive, ref } from 'vue'
 
 const { appearance, isDark, setAppearance } = useAppearance()
@@ -78,6 +78,17 @@ function toggleMark(mark: string) {
     ? marks.value.filter(m => m !== mark)
     : [...marks.value, mark]
 }
+
+const page = ref(2)
+const wizardStep = ref(2)
+const activeTab = ref('Overview')
+const loadingBlock = ref(true)
+
+const crumbs = [
+  { label: 'Home', href: '#', icon: House },
+  { label: 'Invoices', href: '#' },
+  { label: 'INV-2026-014' },
+]
 
 const { confirm } = useConfirm()
 const confirmResult = ref<string | null>(null)
@@ -663,6 +674,156 @@ function simulateLoad() {
             clear all
           </IButton>
         </div>
+      </section>
+
+      <section class="space-y-3">
+        <h2 class="font-semibold">
+          Breadcrumb &amp; separator
+        </h2>
+        <IBreadcrumb :items="crumbs" />
+        <ISeparator />
+        <ISeparator label="or" />
+        <div class="flex h-10 items-center gap-3">
+          <span class="text-sm text-muted-foreground">left</span>
+          <ISeparator orientation="vertical" />
+          <span class="text-sm text-muted-foreground">right</span>
+        </div>
+      </section>
+
+      <section class="space-y-3">
+        <h2 class="font-semibold">
+          Stat
+        </h2>
+        <div class="grid gap-4 sm:grid-cols-3">
+          <ICard>
+            <IStat label="Revenue" value="€12,400" :delta="12" hint="vs last month" />
+          </ICard>
+          <ICard>
+            <IStat label="Overdue" value="€1,150" :delta="-8" trend="up" hint="down is good here" />
+          </ICard>
+          <ICard>
+            <IStat label="Invoices" value="24" :delta="0" hint="unchanged" />
+          </ICard>
+        </div>
+      </section>
+
+      <section class="space-y-3">
+        <h2 class="font-semibold">
+          Tabs
+        </h2>
+        <ITabs v-model="activeTab" :items="['Overview', 'Items', 'History']">
+          <template #Overview>
+            <p class="text-sm text-muted-foreground">
+              The overview panel.
+            </p>
+          </template>
+          <template #Items>
+            <p class="text-sm text-muted-foreground">
+              The items panel.
+            </p>
+          </template>
+          <template #History>
+            <p class="text-sm text-muted-foreground">
+              The history panel.
+            </p>
+          </template>
+        </ITabs>
+        <ITabs variant="line" :items="['Line', 'Variant']">
+          <template #Line>
+            <p class="text-sm text-muted-foreground">
+              Underlined tabs, for page-level navigation.
+            </p>
+          </template>
+          <template #Variant>
+            <p class="text-sm text-muted-foreground">
+              Second panel.
+            </p>
+          </template>
+        </ITabs>
+      </section>
+
+      <section class="space-y-3">
+        <h2 class="font-semibold">
+          Tooltip
+        </h2>
+        <div class="flex flex-wrap items-center gap-3">
+          <ITooltip text="Explains a piece of jargon" arrow>
+            <template #trigger>
+              <IButton variant="outline" square aria-label="Help">
+                <CircleHelp />
+              </IButton>
+            </template>
+          </ITooltip>
+          <ITooltip text="Shown on the right" side="right">
+            <template #trigger>
+              <IButton variant="ghost">
+                Hover me
+              </IButton>
+            </template>
+          </ITooltip>
+        </div>
+      </section>
+
+      <section class="space-y-3">
+        <h2 class="font-semibold">
+          Stepper — step {{ wizardStep }}
+        </h2>
+        <IStepper
+          v-model="wizardStep"
+          :items="[
+            { title: 'Details', description: 'Who it is for' },
+            { title: 'Items', description: 'What you are billing' },
+            { title: 'Review', description: 'Check and send' },
+          ]"
+        />
+        <div class="flex flex-wrap items-center gap-2">
+          <IButton size="sm" variant="outline" @click="wizardStep = Math.max(1, wizardStep - 1)">
+            Back
+          </IButton>
+          <IButton size="sm" @click="wizardStep = Math.min(3, wizardStep + 1)">
+            Next
+          </IButton>
+        </div>
+      </section>
+
+      <section class="space-y-3">
+        <h2 class="font-semibold">
+          Pagination — page {{ page }}
+        </h2>
+        <IPagination v-model:page="page" :total="240" :items-per-page="10" />
+      </section>
+
+      <section class="space-y-3">
+        <h2 class="font-semibold">
+          Skeleton
+        </h2>
+        <div class="flex flex-wrap items-center gap-2">
+          <IButton size="sm" variant="outline" @click="loadingBlock = !loadingBlock">
+            {{ loadingBlock ? 'Show content' : 'Show skeleton' }}
+          </IButton>
+        </div>
+        <ICard>
+          <div v-if="loadingBlock" class="flex items-center gap-4">
+            <ISkeleton variant="circle" class="size-12" />
+            <div class="flex-1 space-y-2">
+              <ISkeleton variant="text" class="max-w-40" />
+              <ISkeleton :lines="2" variant="text" />
+            </div>
+          </div>
+          <div v-else class="flex items-center gap-4">
+            <div class="flex size-12 items-center justify-center rounded-full bg-muted">
+              <Inbox />
+            </div>
+            <div>
+              <p class="font-medium">
+                Acme d.o.o.
+              </p>
+              <p class="text-sm text-muted-foreground">
+                Two invoices outstanding.
+              </p>
+            </div>
+          </div>
+        </ICard>
       </section>
 
       <section class="space-y-3">

@@ -90,6 +90,20 @@ describe('stepper', () => {
     expect(wrapper.findAll('[data-orientation]').length).toBeGreaterThanOrEqual(2)
   })
 
+  /*
+   * `linear` is off by default: when on, Reka refuses to reach a step until
+   * the ones before it are complete, which makes plain v-model increments
+   * silently do nothing.
+   */
+  it('lets the model move freely between steps by default', async () => {
+    const wrapper = mount(Stepper, {
+      props: { items, modelValue: 1 },
+      attachTo: document.body,
+    })
+    await wrapper.setProps({ modelValue: 3 })
+    expect(wrapper.get('[data-state="active"]').text()).toContain('Review')
+  })
+
   it('drops built-in classes when unstyled', () => {
     const wrapper = mount(Stepper, { props: { items, unstyled: true, class: 'mine' } })
     expect(wrapper.attributes('class')).toBe('mine')

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Component } from 'vue'
-import { TabsContent, TabsList, TabsRoot, TabsTrigger } from 'reka-ui'
+import { TabsContent, TabsIndicator, TabsList, TabsRoot, TabsTrigger } from 'reka-ui'
 import { computed } from 'vue'
 import { useIryxUiConfig } from '../config'
 import { tabsTheme } from '../theme/tabs'
@@ -29,6 +29,7 @@ export interface TabsProps {
   ui?: {
     root?: string
     list?: string
+    indicator?: string
     trigger?: string
     content?: string
   }
@@ -64,6 +65,9 @@ const rootClass = computed(() =>
 const listClass = computed(() =>
   isUnstyled.value ? props.ui?.list : theme.value.list({ class: props.ui?.list }),
 )
+const indicatorClass = computed(() =>
+  isUnstyled.value ? props.ui?.indicator : theme.value.indicator({ class: props.ui?.indicator }),
+)
 const triggerClass = computed(() =>
   isUnstyled.value ? props.ui?.trigger : theme.value.trigger({ class: props.ui?.trigger }),
 )
@@ -80,6 +84,7 @@ const contentClass = computed(() =>
     :class="rootClass"
   >
     <TabsList :class="listClass">
+      <TabsIndicator :class="indicatorClass" />
       <slot name="list">
         <TabsTrigger
           v-for="item in options"
