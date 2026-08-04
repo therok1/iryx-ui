@@ -4,11 +4,19 @@ export const buttonTheme = tv({
   // `active:translate-y-px` gives the press a physical nudge. Tailwind v4 maps
   // it to the standalone `translate` property, so it composes with any
   // `transform` rather than overwriting it.
-  // Every variant carries a border of the same width — transparent unless the
-  // variant colours it. Without it, swapping variants at runtime animates
-  // border-color up from `currentColor` (a white flash on solid buttons) and
-  // shifts the layout by a pixel as the border appears.
-  base: 'inline-flex shrink-0 items-center justify-center gap-2 rounded-lg border border-transparent font-medium transition-all outline-none focus-visible:ring-2 focus-visible:ring-primary/50 active:translate-y-px disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0',
+  /*
+   * Every variant carries a border of the same width — transparent unless the
+   * variant colours it. Without it, swapping variants at runtime animates
+   * border-color up from `currentColor` (a white flash on solid buttons) and
+   * shifts the layout by a pixel as the border appears.
+   *
+   * The transition lists properties explicitly rather than using
+   * `transition-all`: geometry must not ease. A spinner appearing changes the
+   * padding and width, and animating those makes the button visibly stretch.
+   * `filter` is included for the solid variant's hover brightness, `translate`
+   * for the press nudge.
+   */
+  base: 'inline-flex shrink-0 items-center justify-center gap-2 rounded-lg border border-transparent font-medium transition-[color,background-color,border-color,box-shadow,opacity,filter,translate] outline-none focus-visible:ring-2 focus-visible:ring-primary/50 active:translate-y-px disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0',
   variants: {
     variant: {
       solid: 'bg-linear-to-b from-primary-from to-primary-to text-primary-foreground hover:brightness-110 active:brightness-95',

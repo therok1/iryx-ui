@@ -53,6 +53,18 @@ describe('button icon padding', () => {
   })
 })
 
+describe('button transitions', () => {
+  /*
+   * Geometry must not ease: a spinner appearing changes the padding and width,
+   * and `transition-all` made the button visibly stretch on every load.
+   */
+  it('animates colour and motion but never geometry', () => {
+    const classes = mount(Button).attributes('class') ?? ''
+    expect(classes).not.toContain('transition-all')
+    expect(classes).toContain('transition-[color,background-color,border-color,box-shadow,opacity,filter,translate]')
+  })
+})
+
 describe('button press', () => {
   it('nudges down on press for surface variants', () => {
     for (const variant of ['solid', 'outline', 'ghost'] as const) {
