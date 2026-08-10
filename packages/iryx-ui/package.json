@@ -2,7 +2,7 @@
   "name": "iryx-ui",
   "type": "module",
   "version": "0.3.0",
-  "description": "Iryx — an artful Vue 3 component library built on Reka UI and Tailwind CSS v4.",
+  "description": "A Vue 3 component library built on Reka UI and Tailwind CSS v4.",
   "author": "therok1",
   "license": "MIT",
   "homepage": "https://github.com/therok1/iryx-ui#readme",
