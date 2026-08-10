@@ -1,5 +1,30 @@
 # iryx-ui
 
+## 0.3.0
+
+### Minor Changes
+
+- Add the remaining wishlist components, and fix three animation issues.
+
+  **New components**
+
+  - `IButtonGroup` — joins any children into a segmented control, squaring the inner edges and collapsing shared borders. Covers split buttons, toolbars and pagers; set `size` once and the buttons inherit it.
+  - `IDropdownMenu` — driven by an `items` array, with separators, group labels, danger items and nested submenus to any depth.
+  - `IEmptyState`, `IProgress`, `IDialog` + `useConfirm()`, `IToaster` + `useToast()`.
+  - `ISeparator`, `ISkeleton`, `IStat`, `IBreadcrumb`, `ITooltip`, `ITabs`, `IPagination`, `IStepper`.
+
+  **Buttons and badges**
+
+  - Padding tightens on the side an icon sits on. Mark the icon with `data-icon="inline-start"` or `"inline-end"`; a loading spinner marks itself.
+  - `square` prop for icon-only buttons.
+  - Buttons nudge down on press, and every variant now carries a same-width border so swapping variants no longer flashes or shifts the layout by a pixel.
+
+  **Fixes**
+
+  - Buttons no longer animate their geometry. `transition-all` eased padding and width, so a button visibly stretched when its spinner appeared.
+  - Switching light/dark no longer flashes a white border. The light and dark border tokens sit far apart, so the colour transition interpolated through a near-white edge; transitions are now suppressed for the frame the theme flips.
+  - The stepper's previous step no longer flashes when moving on, and the tabs indicator animates between triggers in both variants.
+
 ## 0.2.0
 
 ### Minor Changes
