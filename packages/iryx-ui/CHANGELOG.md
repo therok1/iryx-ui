@@ -1,5 +1,22 @@
 # iryx-ui
 
+## 0.4.0
+
+### Minor Changes
+
+- Add `INumberInput`, and drop the label indent.
+
+  **`INumberInput`** — a numeric field whose model is a decimal **string**, never a `number`. Binary floating point cannot represent decimal money (`0.1 + 0.2` is `0.30000000000000004`, and `10.00` collapses to `10`), so values are added, compared, clamped and rounded with `BigInt` internally and precision survives at any magnitude.
+
+  - `min` / `max` / `step` are decimal strings; stepping is exact.
+  - `precision` fixes the scale, rounding half-up and keeping trailing zeros.
+  - `locale` changes the **display** only — `sl` renders `1.234,56` while the model stays `"1234.56"` — and typing in the locale's format is accepted. The field shows the canonical value while focused so separators don't fight typing.
+  - Renders a text field with `inputmode="decimal"` and `role="spinbutton"` rather than `type="number"`, which would strip precision and reformat the value.
+
+  The decimal helpers are exported too: `addDecimals`, `compareDecimals`, `roundDecimal`, `clampDecimal`, `parseDecimal`, `formatForLocale`, `parseFromLocale`.
+
+  **Removed:** the label indent added in 0.3.0. `ILabel` and `IFormField` no longer inset their text, and the `indent` prop is gone — it read oddly next to the rest of the components.
+
 ## 0.3.0
 
 ### Minor Changes

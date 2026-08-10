@@ -143,6 +143,8 @@ const bio = ref('')
 const terms = ref(false)
 const partial = ref<boolean | 'indeterminate'>('indeterminate')
 const framework = ref('vue')
+const amount = ref('1234.56')
+const qty = ref('1')
 const plan = ref('pro')
 
 function simulateLoad() {
@@ -845,6 +847,34 @@ function simulateLoad() {
             Submitted: <code>{{ submitted }}</code>
           </p>
         </IForm>
+      </section>
+
+      <section class="space-y-3">
+        <h2 class="font-semibold">
+          Number input
+        </h2>
+        <p class="text-sm text-muted-foreground">
+          The model is a decimal <em>string</em>, so precision survives. Display is
+          locale-aware while the stored value stays canonical.
+        </p>
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div class="space-y-2">
+            <ILabel for="amount">
+              Amount — sl-SI, 2dp
+            </ILabel>
+            <INumberInput id="amount" v-model="amount" locale="sl" :precision="2" step="0.01" min="0" />
+          </div>
+          <div class="space-y-2">
+            <ILabel for="qty">
+              Quantity — 1 to 10
+            </ILabel>
+            <INumberInput id="qty" v-model="qty" min="1" max="10" step="1" />
+          </div>
+        </div>
+        <p class="text-sm text-muted-foreground">
+          Stored: amount <code>{{ JSON.stringify(amount) }}</code>, quantity
+          <code>{{ JSON.stringify(qty) }}</code>
+        </p>
       </section>
 
       <section class="space-y-4">
