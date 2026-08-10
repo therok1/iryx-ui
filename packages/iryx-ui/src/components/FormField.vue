@@ -19,6 +19,15 @@ export interface FormFieldProps {
   required?: boolean
   /** Force an error message, bypassing the form's validation. */
   error?: string
+  /**
+   * Indent the label, description, error and help text so they line up with
+   * the control's own text rather than its outer edge.
+   *
+   * The values match the input's horizontal padding, so pass the same size you
+   * gave the control. Use `none` for controls that draw their own label, like
+   * a checkbox or switch.
+   */
+  indent?: 'none' | 'sm' | 'md' | 'lg'
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   class?: string
@@ -73,10 +82,10 @@ function onFocusOut(): void {
 
 const config = useIryxUiConfig()
 const isUnstyled = computed(() => props.unstyled ?? config.unstyled)
-const slots = formFieldTheme()
+const slots = computed(() => formFieldTheme({ indent: props.indent }))
 
-function cls(slot: keyof typeof slots, override?: string) {
-  return isUnstyled.value ? override : slots[slot]({ class: override })
+function cls(slot: keyof ReturnType<typeof formFieldTheme>, override?: string) {
+  return isUnstyled.value ? override : slots.value[slot]({ class: override })
 }
 
 provide(formFieldContextKey, {
@@ -94,7 +103,14 @@ provide(formFieldContextKey, {
     @focusout="onFocusOut"
   >
     <div v-if="props.label || props.hint || $slots.hint" :class="cls('header', props.ui?.header)">
-      <Label v-if="props.label" :for="fieldId" :required="props.required" :class="props.ui?.label">
+      <!-- The header is already indented; indenting the label too would double it. -->
+      <Label
+        v-if="props.label"
+        :for="fieldId"
+        :required="props.required"
+        indent="none"
+        :class="props.ui?.label"
+      >
         {{ props.label }}
       </Label>
       <span v-if="props.hint || $slots.hint" :class="cls('hint', props.ui?.hint)">

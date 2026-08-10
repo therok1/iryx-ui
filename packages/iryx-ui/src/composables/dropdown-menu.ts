@@ -1,9 +1,9 @@
-import type { Component } from 'vue'
+import type { IconLike } from './icon'
 
 export interface DropdownMenuItemOption {
   label: string
   /** Leading icon component. */
-  icon?: Component
+  icon?: IconLike
   disabled?: boolean
   /** Style the item as destructive. */
   danger?: boolean

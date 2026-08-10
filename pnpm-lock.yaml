@@ -32,12 +32,15 @@ importers:
 
   packages/iryx-ui:
     dependencies:
+      '@hugeicons/core-free-icons':
+        specifier: ^4.2.3
+        version: 4.2.3
+      '@hugeicons/vue':
+        specifier: ^1.0.7
+        version: 1.0.7(vue@3.5.35(typescript@6.0.3))
       '@nuxt/kit':
         specifier: ^4.4.8
         version: 4.4.8
-      lucide-vue-next:
-        specifier: ^1.0.0
-        version: 1.0.0(vue@3.5.35(typescript@6.0.3))
       reka-ui:
         specifier: ^2.9.10
         version: 2.9.10(vue@3.5.35(typescript@6.0.3))
@@ -75,12 +78,15 @@ importers:
 
   playground:
     dependencies:
+      '@hugeicons/core-free-icons':
+        specifier: ^4.2.3
+        version: 4.2.3
+      '@hugeicons/vue':
+        specifier: ^1.0.7
+        version: 1.0.7(vue@3.5.35(typescript@6.0.3))
       iryx-ui:
         specifier: workspace:*
         version: link:../packages/iryx-ui
-      lucide-vue-next:
-        specifier: ^1.0.0
-        version: 1.0.0(vue@3.5.35(typescript@6.0.3))
       vue:
         specifier: ^3.5.35
         version: 3.5.35(typescript@6.0.3)
@@ -348,6 +354,14 @@ packages:
 
   '@floating-ui/vue@1.1.11':
     resolution: {integrity: sha512-HzHKCNVxnGS35r9fCHBc3+uCnjw9IWIlCPL683cGgM9Kgj2BiAl8x1mS7vtvP6F9S/e/q4O6MApwSHj8hNLGfw==}
+
+  '@hugeicons/core-free-icons@4.2.3':
+    resolution: {integrity: sha512-fpiU0qFZkv4ABi23xJ2m4qNr0BBfuIaYjPboN8WDA6aj9D+OzXa7eykxKOpACZRuGbDz1U9S5DsNx1d5KNnsgA==}
+
+  '@hugeicons/vue@1.0.7':
+    resolution: {integrity: sha512-oUE0ztUNYbsMFpMgbV3bsxQBObNkeouomUThFuFPzYC5eV++VTYonStsltJu2MoLMkxV8mzpoVvIbuMPBZSN0w==}
+    peerDependencies:
+      vue: ^2.6.0 || ^3.0.0
 
   '@humanfs/core@0.19.2':
     resolution: {integrity: sha512-UhXNm+CFMWcbChXywFwkmhqjs3PRCmcSa/hfBgLIb7oQ5HNb1wS0icWsGtSAUNgefHeI+eBrA8I1fxmbHsGdvA==}
@@ -1824,12 +1838,6 @@ packages:
   lru-cache@10.4.3:
     resolution: {integrity: sha512-JNAzZcXrCt42VGLuYz0zfAzDfAvJWW6AfYlDBQyDV5DClI2m5sAmK+OIO7s59XfsRsWHp02jAJrRadPRGTt6SQ==}
 
-  lucide-vue-next@1.0.0:
-    resolution: {integrity: sha512-V6SPvx1IHTj/UY+FrIYWV5faISsPSb8BnWSFDxAtezWKvWc9ZZ40PDrdu1/Qb5vg4lHWr1hs1BAMGVGm6V1Xdg==}
-    deprecated: Package deprecated. Please use @lucide/vue instead.
-    peerDependencies:
-      vue: '>=3.0.1'
-
   magic-string@0.30.21:
     resolution: {integrity: sha512-vd2F4YUyEXKGcLHoq+TEyCjxueSeHnFxyyjNp80yg0XV4vUhnDer/lvvlqM/arB5bXQN5K2/3oinyCRyx8T2CQ==}
 
@@ -3007,6 +3015,12 @@ snapshots:
     transitivePeerDependencies:
       - '@vue/composition-api'
       - vue
+
+  '@hugeicons/core-free-icons@4.2.3': {}
+
+  '@hugeicons/vue@1.0.7(vue@3.5.35(typescript@6.0.3))':
+    dependencies:
+      vue: 3.5.35(typescript@6.0.3)
 
   '@humanfs/core@0.19.2':
     dependencies:
@@ -4469,10 +4483,6 @@ snapshots:
   longest-streak@3.1.0: {}
 
   lru-cache@10.4.3: {}
-
-  lucide-vue-next@1.0.0(vue@3.5.35(typescript@6.0.3)):
-    dependencies:
-      vue: 3.5.35(typescript@6.0.3)
 
   magic-string@0.30.21:
     dependencies:

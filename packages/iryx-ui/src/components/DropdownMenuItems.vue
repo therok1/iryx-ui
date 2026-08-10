@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { DropdownMenuEntry } from '../composables/dropdown-menu'
-import { ChevronRight } from 'lucide-vue-next'
+import { ArrowRight01Icon } from '@hugeicons/core-free-icons'
 import {
   DropdownMenuItem,
   DropdownMenuLabel,
@@ -12,6 +12,7 @@ import {
 } from 'reka-ui'
 import { isSeparator, isSubmenu } from '../composables/dropdown-menu'
 import { dropdownMenuTheme } from '../theme/dropdown-menu'
+import Icon from './Icon.vue'
 
 /**
  * Renders one level of menu entries, recursing into submenus.
@@ -53,9 +54,9 @@ const subTriggerIconClass = props.unstyled ? undefined : dropdownMenuTheme().sub
     <!-- Nested menu: the entry becomes a trigger for its own content. -->
     <DropdownMenuSub v-else-if="isSubmenu(entry)">
       <DropdownMenuSubTrigger :disabled="entry.disabled" :class="slotClass('subTrigger')">
-        <component :is="entry.icon" v-if="entry.icon" aria-hidden="true" />
+        <Icon v-if="entry.icon" :icon="entry.icon" />
         {{ entry.label }}
-        <ChevronRight :class="subTriggerIconClass" aria-hidden="true" />
+        <Icon :icon="ArrowRight01Icon" :class="subTriggerIconClass" />
       </DropdownMenuSubTrigger>
       <DropdownMenuPortal>
         <DropdownMenuSubContent :class="slotClass('subContent')" :side-offset="4">
@@ -78,7 +79,7 @@ const subTriggerIconClass = props.unstyled ? undefined : dropdownMenuTheme().sub
       :class="slotClass('item', entry.danger)"
       @select="entry.onSelect"
     >
-      <component :is="entry.icon" v-if="entry.icon" aria-hidden="true" />
+      <Icon v-if="entry.icon" :icon="entry.icon" />
       {{ entry.label }}
     </DropdownMenuItem>
   </template>

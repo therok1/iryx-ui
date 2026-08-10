@@ -1,16 +1,17 @@
 <script setup lang="ts">
-import type { Component } from 'vue'
-import { ChevronRight } from 'lucide-vue-next'
+import type { IconLike } from '../composables/icon'
+import { ArrowRight01Icon } from '@hugeicons/core-free-icons'
 import { Primitive } from 'reka-ui'
 import { computed } from 'vue'
 import { useIryxUiConfig } from '../config'
 import { breadcrumbTheme } from '../theme/breadcrumb'
+import Icon from './Icon.vue'
 
 export interface BreadcrumbItem {
   label: string
   /** Omit on the current page. */
   href?: string
-  icon?: Component
+  icon?: IconLike
   /** Handle navigation yourself, e.g. with a router. */
   onSelect?: () => void
 }
@@ -65,7 +66,7 @@ function slotClass(slot: 'root' | 'list' | 'item' | 'link' | 'current' | 'separa
     <ol :class="slotClass('list')">
       <li v-for="(item, index) in entries" :key="index" :class="slotClass('item')">
         <span v-if="index === lastIndex" aria-current="page" :class="slotClass('current')">
-          <component :is="item.icon" v-if="item.icon" aria-hidden="true" />
+          <Icon v-if="item.icon" :icon="item.icon" />
           {{ item.label }}
         </span>
         <component
@@ -76,13 +77,13 @@ function slotClass(slot: 'root' | 'list' | 'item' | 'link' | 'current' | 'separa
           :class="slotClass('link')"
           @click="item.onSelect?.()"
         >
-          <component :is="item.icon" v-if="item.icon" aria-hidden="true" />
+          <Icon v-if="item.icon" :icon="item.icon" />
           {{ item.label }}
         </component>
 
         <span v-if="index !== lastIndex" aria-hidden="true" :class="slotClass('separator')">
           <slot name="separator">
-            <ChevronRight />
+            <Icon :icon="ArrowRight01Icon" />
           </slot>
         </span>
       </li>

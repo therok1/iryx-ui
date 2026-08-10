@@ -1,15 +1,16 @@
 <script setup lang="ts">
-import type { Component } from 'vue'
+import type { IconLike } from '../composables/icon'
 import { TabsContent, TabsIndicator, TabsList, TabsRoot, TabsTrigger } from 'reka-ui'
 import { computed } from 'vue'
 import { useIryxUiConfig } from '../config'
 import { tabsTheme } from '../theme/tabs'
+import Icon from './Icon.vue'
 
 export interface TabsItem {
   label: string
   /** Identifies the tab. Defaults to the label. */
   value?: string
-  icon?: Component
+  icon?: IconLike
   disabled?: boolean
 }
 
@@ -92,7 +93,7 @@ const contentClass = computed(() =>
           :class="triggerClass"
         >
           <slot name="trigger" :item="item">
-            <component :is="item.icon" v-if="item.icon" aria-hidden="true" />
+            <Icon v-if="item.icon" :icon="item.icon" />
             {{ item.label }}
           </slot>
         </TabsTrigger>

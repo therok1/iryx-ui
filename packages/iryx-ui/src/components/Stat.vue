@@ -1,8 +1,10 @@
 <script setup lang="ts">
+import { ArrowDown01Icon, ArrowRight01Icon, ArrowUp01Icon } from '@hugeicons/core-free-icons'
 import { Primitive } from 'reka-ui'
 import { computed } from 'vue'
 import { useIryxUiConfig } from '../config'
 import { statTheme } from '../theme/stat'
+import Icon from './Icon.vue'
 
 export interface StatProps {
   /** Render as a different element or component. */
@@ -53,7 +55,9 @@ const trend = computed(() => {
 })
 
 /** Decorative: the colour and the formatted value already carry the meaning. */
-const trendArrow = computed(() => ({ up: '↑', down: '↓', neutral: '→' }[trend.value]))
+const trendArrow = computed(() =>
+  ({ up: ArrowUp01Icon, down: ArrowDown01Icon, neutral: ArrowRight01Icon }[trend.value]),
+)
 
 const formattedDelta = computed(() => {
   if (props.delta == null)
@@ -103,7 +107,7 @@ const rowClass = computed(() =>
       </span>
       <span v-if="formattedDelta || $slots.delta" :class="deltaClass">
         <slot name="delta" :trend="trend">
-          <span aria-hidden="true">{{ trendArrow }}</span>
+          <Icon :icon="trendArrow" data-icon="inline-start" />
           {{ formattedDelta }}
         </slot>
       </span>

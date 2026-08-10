@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import type { CheckboxRootEmits, CheckboxRootProps } from 'reka-ui'
-import { Check, Minus } from 'lucide-vue-next'
+import { MinusSignIcon, Tick02Icon } from '@hugeicons/core-free-icons'
 import { CheckboxIndicator, CheckboxRoot, Label, useForwardPropsEmits, useId } from 'reka-ui'
 import { computed } from 'vue'
 import { useIryxUiConfig } from '../config'
 import { checkboxTheme } from '../theme/checkbox'
+import Icon from './Icon.vue'
 
 export interface CheckboxProps extends CheckboxRootProps {
   /** Text shown beside the box. Also makes the text clickable. */
@@ -89,8 +90,8 @@ const descriptionClass = computed(() =>
     >
       <CheckboxIndicator :class="indicatorClass">
         <slot>
-          <Minus v-if="props.modelValue === 'indeterminate'" />
-          <Check v-else />
+          <Icon v-if="props.modelValue === 'indeterminate'" :icon="MinusSignIcon" />
+          <Icon v-else :icon="Tick02Icon" />
         </slot>
       </CheckboxIndicator>
     </CheckboxRoot>
@@ -110,8 +111,8 @@ const descriptionClass = computed(() =>
   <CheckboxRoot v-else :id="props.id" v-bind="forwarded" :class="rootClass">
     <CheckboxIndicator :class="indicatorClass">
       <slot>
-        <Minus v-if="props.modelValue === 'indeterminate'" />
-        <Check v-else />
+        <Icon v-if="props.modelValue === 'indeterminate'" :icon="MinusSignIcon" />
+        <Icon v-else :icon="Tick02Icon" />
       </slot>
     </CheckboxIndicator>
   </CheckboxRoot>

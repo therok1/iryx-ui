@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import type { Appearance, DropdownMenuEntry, ThemePresetName } from 'iryx-ui'
+import { ArrowDown01Icon, ArrowRight01Icon, Copy01Icon, Delete02Icon, Download01Icon, HelpCircleIcon, Home01Icon, InboxIcon, Search01Icon, SentIcon, TextBoldIcon, TextItalicIcon, TextUnderlineIcon } from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/vue'
 import { themes, useAppearance, useConfirm, useToast } from 'iryx-ui'
-import { ArrowRight, Bell, Bold, ChevronDown, CircleHelp, Copy, Download, House, Inbox, Italic, Search, Send, Trash2, Underline } from 'lucide-vue-next'
 import { reactive, ref } from 'vue'
 
 const { appearance, isDark, setAppearance } = useAppearance()
@@ -34,19 +35,19 @@ const toast = useToast()
 // Secondary actions for the split button — each does something, rather than
 // changing what the main button says.
 const saveActions: DropdownMenuEntry[] = [
-  { label: 'Save and send', icon: Send, onSelect: () => toast.success('Saved and sent') },
-  { label: 'Save as template', icon: Copy, onSelect: () => toast.success('Template saved') },
+  { label: 'Save and send', icon: SentIcon, onSelect: () => toast.success('Saved and sent') },
+  { label: 'Save as template', icon: Copy01Icon, onSelect: () => toast.success('Template saved') },
   '-',
-  { label: 'Discard changes', icon: Trash2, danger: true, onSelect: () => toast.danger('Changes discarded') },
+  { label: 'Discard changes', icon: Delete02Icon, danger: true, onSelect: () => toast.danger('Changes discarded') },
 ]
 
 // Nested entries — an item with `items` becomes a submenu trigger.
 const rowActions: DropdownMenuEntry[] = [
   { label: 'Invoice' },
-  { label: 'Open', icon: Search, onSelect: () => toast.info('Opened') },
+  { label: 'Open', icon: Search01Icon, onSelect: () => toast.info('Opened') },
   {
     label: 'Export as',
-    icon: Download,
+    icon: Download01Icon,
     items: [
       { label: 'PDF', onSelect: () => toast.success('Exported as PDF') },
       { label: 'CSV', onSelect: () => toast.success('Exported as CSV') },
@@ -62,7 +63,7 @@ const rowActions: DropdownMenuEntry[] = [
   },
   {
     label: 'Send to',
-    icon: Send,
+    icon: SentIcon,
     items: [
       { label: 'Client', onSelect: () => toast.success('Sent to client') },
       { label: 'Accountant', onSelect: () => toast.success('Sent to accountant') },
@@ -70,7 +71,7 @@ const rowActions: DropdownMenuEntry[] = [
     ],
   },
   '-',
-  { label: 'Delete', icon: Trash2, danger: true, onSelect: () => toast.danger('Deleted') },
+  { label: 'Delete', icon: Delete02Icon, danger: true, onSelect: () => toast.danger('Deleted') },
 ]
 
 function toggleMark(mark: string) {
@@ -85,7 +86,7 @@ const activeTab = ref('Overview')
 const loadingBlock = ref(true)
 
 const crumbs = [
-  { label: 'Home', href: '#', icon: House },
+  { label: 'Home', href: '#', icon: Home01Icon },
   { label: 'Invoices', href: '#' },
   { label: 'INV-2026-014' },
 ]
@@ -243,16 +244,16 @@ function simulateLoad() {
         </h2>
         <div class="flex flex-wrap items-center gap-3">
           <IButton>
-            <Search data-icon="inline-start" /> Leading
+            <HugeiconsIcon :icon="Search01Icon" data-icon="inline-start" /> Leading
           </IButton>
           <IButton variant="outline">
-            Trailing <ArrowRight data-icon="inline-end" />
+            Trailing <HugeiconsIcon :icon="ArrowRight01Icon" data-icon="inline-end" />
           </IButton>
           <IButton variant="outline" size="sm">
-            <Download data-icon="inline-start" /> Download
+            <HugeiconsIcon :icon="Download01Icon" data-icon="inline-start" /> Download
           </IButton>
           <IButton variant="ghost">
-            <Search data-icon="inline-start" /> Search <ArrowRight data-icon="inline-end" />
+            <HugeiconsIcon :icon="Search01Icon" data-icon="inline-start" /> Search <HugeiconsIcon :icon="ArrowRight01Icon" data-icon="inline-end" />
           </IButton>
         </div>
         <p class="text-sm text-muted-foreground">
@@ -265,25 +266,25 @@ function simulateLoad() {
             Text only
           </IButton>
           <IButton id="probe-leading">
-            <Search data-icon="inline-start" /> Leading
+            <HugeiconsIcon :icon="Search01Icon" data-icon="inline-start" /> Leading
           </IButton>
           <IButton id="probe-trailing">
-            Trailing <ArrowRight data-icon="inline-end" />
+            Trailing <HugeiconsIcon :icon="ArrowRight01Icon" data-icon="inline-end" />
           </IButton>
           <IButton id="probe-both">
-            <Search data-icon="inline-start" /> Both <ArrowRight data-icon="inline-end" />
+            <HugeiconsIcon :icon="Search01Icon" data-icon="inline-start" /> Both <HugeiconsIcon :icon="ArrowRight01Icon" data-icon="inline-end" />
           </IButton>
           <IButton id="probe-unmarked">
-            <Search /> Unmarked
+            <HugeiconsIcon :icon="Search01Icon" /> Unmarked
           </IButton>
           <IButton id="probe-icon" square aria-label="Search">
-            <Search />
+            <HugeiconsIcon :icon="Search01Icon" />
           </IButton>
           <IButton id="probe-icon-sm" size="sm" square variant="outline" aria-label="Search">
-            <Search />
+            <HugeiconsIcon :icon="Search01Icon" />
           </IButton>
           <IButton id="probe-icon-xl" size="xl" square variant="outline" aria-label="Search">
-            <Search />
+            <HugeiconsIcon :icon="Search01Icon" />
           </IButton>
         </div>
       </section>
@@ -387,7 +388,7 @@ function simulateLoad() {
             no icon
           </IBadge>
           <IBadge id="badge-icon" variant="info" size="lg">
-            <Download data-icon="inline-start" /> with icon
+            <HugeiconsIcon :icon="Download01Icon" data-icon="inline-start" /> with icon
           </IBadge>
         </div>
       </section>
@@ -444,7 +445,7 @@ function simulateLoad() {
             <IDropdownMenu :items="saveActions" align="end">
               <template #trigger>
                 <IButton square aria-label="More save options">
-                  <ChevronDown />
+                  <HugeiconsIcon :icon="ArrowDown01Icon" />
                 </IButton>
               </template>
             </IDropdownMenu>
@@ -459,7 +460,7 @@ function simulateLoad() {
           <IDropdownMenu :items="rowActions">
             <template #trigger>
               <IButton variant="outline">
-                Row actions <ChevronDown data-icon="inline-end" />
+                Row actions <HugeiconsIcon :icon="ArrowDown01Icon" data-icon="inline-end" />
               </IButton>
             </template>
           </IDropdownMenu>
@@ -479,9 +480,9 @@ function simulateLoad() {
               :aria-label="mark"
               @click="toggleMark(mark)"
             >
-              <Bold v-if="mark === 'Bold'" />
-              <Italic v-else-if="mark === 'Italic'" />
-              <Underline v-else />
+              <HugeiconsIcon v-if="mark === 'Bold'" :icon="TextBoldIcon" />
+              <HugeiconsIcon v-else-if="mark === 'Italic'" :icon="TextItalicIcon" />
+              <HugeiconsIcon v-else :icon="TextUnderlineIcon" />
             </IButton>
           </IButtonGroup>
         </div>
@@ -570,9 +571,9 @@ function simulateLoad() {
         <h2 class="font-semibold">
           Empty state
         </h2>
-        <ICard padding="none">
+        <ICard>
           <IEmptyState
-            :icon="Inbox"
+            :icon="InboxIcon"
             title="No invoices yet"
             description="Create your first invoice and it will show up here."
           >
@@ -606,7 +607,7 @@ function simulateLoad() {
           title="Edit invoice"
           description="Escape, the overlay and the corner button all close this."
         >
-          <div class="space-y-1.5">
+          <div class="space-y-2">
             <ILabel for="dialog-note">
               Note
             </ILabel>
@@ -750,7 +751,7 @@ function simulateLoad() {
           <ITooltip text="Explains a piece of jargon" arrow>
             <template #trigger>
               <IButton variant="outline" square aria-label="Help">
-                <CircleHelp />
+                <HugeiconsIcon :icon="HelpCircleIcon" />
               </IButton>
             </template>
           </ITooltip>
@@ -812,7 +813,7 @@ function simulateLoad() {
           </div>
           <div v-else class="flex items-center gap-4">
             <div class="flex size-12 items-center justify-center rounded-full bg-muted">
-              <Inbox />
+              <HugeiconsIcon :icon="InboxIcon" />
             </div>
             <div>
               <p class="font-medium">
@@ -850,19 +851,19 @@ function simulateLoad() {
         <h2 class="font-semibold">
           Form fields
         </h2>
-        <div class="space-y-1.5">
+        <div class="space-y-2">
           <ILabel for="email" required>
             Email
           </ILabel>
           <IInput id="email" v-model="email" type="email" placeholder="you@example.com" />
         </div>
-        <div class="space-y-1.5">
+        <div class="space-y-2">
           <ILabel for="bio">
             Bio
           </ILabel>
           <ITextarea id="bio" v-model="bio" placeholder="A few words about you…" />
         </div>
-        <div class="space-y-1.5">
+        <div class="space-y-2">
           <ILabel for="invalid">
             Invalid state
           </ILabel>

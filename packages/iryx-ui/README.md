@@ -58,26 +58,38 @@ Components are auto-imported with the `I` prefix (configurable via the `iryxUi.p
 
 ### Icons
 
-Put an icon component in the default slot, leading or trailing. Icons are sized to match the button, and any SVG icon set works — the examples use [lucide-vue-next](https://lucide.dev/guide/packages/lucide-vue-next).
-
-Mark the icon with `data-icon="inline-start"` or `"inline-end"` and the padding tightens on the side it sits on. For an icon with no label, add `square`:
+Put an icon in the default slot, leading or trailing. Icons are sized to match the button, and any SVG icon set works. Iryx's own icons come from [Hugeicons](https://hugeicons.com), which ships icons as data rather than components:
 
 ```vue
 <script setup lang="ts">
-import { ArrowRight, Search } from 'lucide-vue-next'
+import { ArrowRight01Icon, Search01Icon } from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/vue'
 </script>
 
 <template>
   <IButton>
-    <Search data-icon="inline-start" /> Search
+    <HugeiconsIcon :icon="Search01Icon" data-icon="inline-start" /> Search
   </IButton>
   <IButton variant="outline">
-    Next <ArrowRight data-icon="inline-end" />
+    Next <HugeiconsIcon :icon="ArrowRight01Icon" data-icon="inline-end" />
   </IButton>
   <IButton square aria-label="Search">
-    <Search />
+    <HugeiconsIcon :icon="Search01Icon" />
   </IButton>
 </template>
+```
+
+Mark the icon with `data-icon="inline-start"` or `"inline-end"` and the padding tightens on the side it sits on. For an icon with no label, add `square`.
+
+Props that take an icon — `IAlert`'s `icon`, and the `icon` on `IDropdownMenu`, `IBreadcrumb`, `ITabs` and `IEmptyState` items — accept **either** a Hugeicons icon or any component that renders an SVG, so an icon set like Lucide still works:
+
+```ts
+import { Alert02Icon } from '@hugeicons/core-free-icons'
+import { Bell } from 'lucide-vue-next'
+
+// Both are valid.
+const a = { label: 'Alerts', icon: Alert02Icon }
+const b = { label: 'Alerts', icon: Bell }
 ```
 
 The marker is needed because a label is a bare text node: CSS's `:first-child` and `:last-child` count element children, so an icon beside text matches both. An unmarked icon still renders, it just keeps the full padding.
@@ -251,7 +263,7 @@ app.use(createIryxUi({ unstyled: true }))
 | `IFormField` | Label, description, hint, help and error text around a control |
 | `IInput` | Text field with `sm`/`md`/`lg` sizes, `invalid` state, `v-model` |
 | `ITextarea` | Multi-line field with matching sizes and `invalid` state |
-| `ILabel` | Field label with optional `required` asterisk |
+| `ILabel` | Field label with optional `required` asterisk, indented to line up with the control's text |
 | `ICheckbox` | Tri-state checkbox (`true` / `false` / `'indeterminate'`), optional `label` + `description` |
 | `ISelect` | Listbox with keyboard nav and typeahead, driven by an `items` array |
 | `IRadioGroup` | Radio list with labels wired up automatically; items take a `description` |
@@ -443,6 +455,25 @@ The control inside a field automatically inherits its `id`, invalid styling and 
 ```
 
 **Server errors and manual control** — grab a template ref to the form and call `validate()`, `clear(name?)` or `setErrors()`. `IFormField` also takes a plain `error` prop that bypasses validation entirely.
+
+### Label alignment
+
+`ILabel` and `IFormField` indent their text so it lines up with the control's
+text rather than its outer edge, putting the label directly above the
+placeholder. The offset matches the input's horizontal padding — `sm` 10px,
+`md` 12px, `lg` 16px — so pass the same size you gave the control:
+
+```vue
+<template>
+  <ILabel for="amount" indent="lg">
+    Amount
+  </ILabel>
+  <IInput id="amount" size="lg" />
+</template>
+```
+
+Use `indent="none"` when the label wraps its control, as with a checkbox, since
+there is no text to line up with.
 
 ### Labels and descriptions
 

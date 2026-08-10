@@ -7,8 +7,9 @@
     "build": "vite build"
   },
   "dependencies": {
+    "@hugeicons/core-free-icons": "^4.2.3",
+    "@hugeicons/vue": "^1.0.7",
     "iryx-ui": "workspace:*",
-    "lucide-vue-next": "^1.0.0",
     "vue": "^3.5.35"
   },
   "devDependencies": {

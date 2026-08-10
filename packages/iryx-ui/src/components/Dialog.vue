@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { X } from 'lucide-vue-next'
+import { Cancel01Icon } from '@hugeicons/core-free-icons'
 import {
   DialogContent,
   DialogDescription,
@@ -13,6 +13,7 @@ import {
 import { computed } from 'vue'
 import { useIryxUiConfig } from '../config'
 import { dialogTheme } from '../theme/dialog'
+import Icon from './Icon.vue'
 
 export interface DialogProps {
   title?: string
@@ -146,7 +147,7 @@ function close() {
           :class="closeClass"
           @click="close"
         >
-          <X aria-hidden="true" />
+          <Icon :icon="Cancel01Icon" />
         </button>
       </DialogContent>
     </DialogPortal>

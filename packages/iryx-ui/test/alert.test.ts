@@ -1,7 +1,11 @@
+import { Alert02Icon } from '@hugeicons/core-free-icons'
 import { mount } from '@vue/test-utils'
-import { Bell } from 'lucide-vue-next'
 import { describe, expect, it } from 'vitest'
+import { h } from 'vue'
 import { Alert } from '../src'
+
+/** Stand-in for a component icon, e.g. from Lucide. */
+const Bell = () => h('svg')
 
 describe('alert', () => {
   it('renders title and description', () => {
@@ -27,6 +31,14 @@ describe('alert', () => {
   it('accepts a custom icon and drops it entirely on false', () => {
     expect(mount(Alert, { props: { icon: Bell } }).find('svg').exists()).toBe(true)
     expect(mount(Alert, { props: { icon: false } }).find('svg').exists()).toBe(false)
+  })
+
+  /*
+   * Hugeicons ships icons as data arrays rather than components, so both forms
+   * have to render — a component icon from any set still works.
+   */
+  it('accepts a Hugeicons icon array as well as a component', () => {
+    expect(mount(Alert, { props: { icon: Alert02Icon } }).find('svg').exists()).toBe(true)
   })
 
   it('announces urgent variants assertively and the rest politely', () => {

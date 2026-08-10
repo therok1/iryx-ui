@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import type { Component } from 'vue'
-import { CircleAlert, CircleCheck, Info, TriangleAlert, X } from 'lucide-vue-next'
+import type { IconLike } from '../composables/icon'
+import { Alert02Icon, AlertCircleIcon, Cancel01Icon, CheckmarkCircle02Icon, InformationCircleIcon } from '@hugeicons/core-free-icons'
 import { Primitive } from 'reka-ui'
 import { computed } from 'vue'
 import { useIryxUiConfig } from '../config'
 import { alertTheme } from '../theme/alert'
+import Icon from './Icon.vue'
 
 export interface AlertProps {
   /** Render as a different element or component. */
@@ -18,7 +19,7 @@ export interface AlertProps {
    * Leading icon. Defaults to one matching the variant; pass a component to
    * override it, or `false` to drop it entirely.
    */
-  icon?: Component | false
+  icon?: IconLike | false
   /** Render a dismiss button that emits `close`. */
   closable?: boolean
   /** Accessible name for the dismiss button — override for non-English apps. */
@@ -51,10 +52,10 @@ const props = withDefaults(defineProps<AlertProps>(), {
 defineEmits<{ close: [] }>()
 
 const defaultIcons = {
-  info: Info,
-  success: CircleCheck,
-  warning: TriangleAlert,
-  danger: CircleAlert,
+  info: InformationCircleIcon,
+  success: CheckmarkCircle02Icon,
+  warning: Alert02Icon,
+  danger: AlertCircleIcon,
 } as const
 
 const resolvedIcon = computed(() => {
@@ -104,7 +105,7 @@ const closeClass = computed(() =>
   <Primitive :as="props.as" :role="role" :class="rootClass">
     <div v-if="resolvedIcon || $slots.icon" :class="iconClass">
       <slot name="icon">
-        <component :is="resolvedIcon" aria-hidden="true" />
+        <Icon :icon="resolvedIcon" />
       </slot>
     </div>
 
@@ -129,7 +130,7 @@ const closeClass = computed(() =>
       @click="$emit('close')"
     >
       <slot name="close">
-        <X aria-hidden="true" />
+        <Icon :icon="Cancel01Icon" />
       </slot>
     </button>
   </Primitive>

@@ -1,7 +1,10 @@
 import { mount } from '@vue/test-utils'
-import { Home } from 'lucide-vue-next'
 import { describe, expect, it } from 'vitest'
+import { h } from 'vue'
 import { Breadcrumb, Separator, Skeleton, Stat } from '../src'
+
+/** Stand-in for a component icon, e.g. from Lucide. */
+const Home = () => h('svg')
 
 describe('separator', () => {
   it('is hidden from assistive tech by default', () => {

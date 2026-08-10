@@ -1,15 +1,16 @@
 <script setup lang="ts">
-import type { Component } from 'vue'
+import type { IconLike } from '../composables/icon'
 import { Primitive } from 'reka-ui'
 import { computed } from 'vue'
 import { useIryxUiConfig } from '../config'
 import { emptyStateTheme } from '../theme/empty-state'
+import Icon from './Icon.vue'
 
 export interface EmptyStateProps {
   /** Render as a different element or component. */
   as?: string
   /** Illustrative icon shown above the title. Omitted when not given. */
-  icon?: Component | false
+  icon?: IconLike | false
   title?: string
   description?: string
   size?: 'sm' | 'md' | 'lg'
@@ -65,7 +66,7 @@ const actionsClass = computed(() =>
   <Primitive :as="props.as" :class="rootClass">
     <div v-if="resolvedIcon || $slots.icon" :class="iconClass">
       <slot name="icon">
-        <component :is="resolvedIcon" aria-hidden="true" />
+        <Icon :icon="resolvedIcon" />
       </slot>
     </div>
 

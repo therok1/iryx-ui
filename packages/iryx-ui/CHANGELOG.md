@@ -19,6 +19,18 @@
   - `square` prop for icon-only buttons.
   - Buttons nudge down on press, and every variant now carries a same-width border so swapping variants no longer flashes or shifts the layout by a pixel.
 
+  **Icons**
+
+  - Iryx's own icons now come from [Hugeicons](https://hugeicons.com) rather than Lucide. Hugeicons ships icons as data, so props that take an icon accept **either** a Hugeicons icon or any component that renders an SVG — an existing Lucide icon still works.
+
+  **Labels**
+
+  - `ILabel` and `IFormField` indent their text to line up with the control's text rather than its outer edge, so the label sits directly above the placeholder. The offset matches the input's horizontal padding per size; pass `indent="none"` for controls that draw their own label.
+
+  **Stat**
+
+  - Reworked as a KPI tile: uppercase label, larger value, the change as a coloured pill on its own line.
+
   **Fixes**
 
   - Buttons no longer animate their geometry. `transition-all` eased padding and width, so a button visibly stretched when its spinner appeared.

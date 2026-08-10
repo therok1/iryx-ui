@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Check } from 'lucide-vue-next'
+import { Tick02Icon } from '@hugeicons/core-free-icons'
 import {
   StepperDescription,
   StepperIndicator,
@@ -12,6 +12,7 @@ import {
 import { computed } from 'vue'
 import { useIryxUiConfig } from '../config'
 import { stepperTheme } from '../theme/stepper'
+import Icon from './Icon.vue'
 
 export interface StepperItemOption {
   title: string
@@ -93,7 +94,7 @@ const rootClass = computed(() =>
       <StepperTrigger :class="slotClass('trigger')">
         <StepperIndicator :class="slotClass('indicator')">
           <slot name="indicator" :step="index + 1" :item="item">
-            <Check v-if="index + 1 < step" aria-hidden="true" />
+            <Icon v-if="index + 1 < step" :icon="Tick02Icon" />
             <template v-else>
               {{ index + 1 }}
             </template>

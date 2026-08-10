@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { LoaderCircle } from 'lucide-vue-next'
+import { Loading03Icon } from '@hugeicons/core-free-icons'
 import { Primitive } from 'reka-ui'
 import { computed } from 'vue'
 import { useButtonGroup } from '../composables/button-group'
 import { useIryxUiConfig } from '../config'
 import { buttonTheme } from '../theme/button'
+import Icon from './Icon.vue'
 
 export interface ButtonProps {
   /** Render as a different element or component. */
@@ -64,7 +65,7 @@ const classes = computed(() => {
     :disabled="props.disabled || props.loading || undefined" :class="classes"
   >
     <!-- The spinner renders ahead of the slot, so it marks itself as leading. -->
-    <LoaderCircle v-if="props.loading" data-icon="inline-start" class="animate-spin" aria-hidden="true" />
+    <Icon v-if="props.loading" :icon="Loading03Icon" data-icon="inline-start" class="animate-spin" />
     <slot />
   </Primitive>
 </template>

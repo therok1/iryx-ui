@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { SelectRootEmits, SelectRootProps } from 'reka-ui'
-import { Check, ChevronDown } from 'lucide-vue-next'
+import { ArrowDown01Icon, Tick02Icon } from '@hugeicons/core-free-icons'
 import {
   SelectContent,
   SelectIcon,
@@ -17,6 +17,7 @@ import {
 import { computed } from 'vue'
 import { useIryxUiConfig } from '../config'
 import { selectTheme } from '../theme/select'
+import Icon from './Icon.vue'
 
 export interface SelectItemOption {
   label: string
@@ -87,7 +88,7 @@ const itemIndicatorClass = computed(() =>
     <SelectTrigger :class="triggerClass">
       <SelectValue :placeholder="props.placeholder" />
       <SelectIcon as-child>
-        <ChevronDown />
+        <Icon :icon="ArrowDown01Icon" />
       </SelectIcon>
     </SelectTrigger>
 
@@ -103,7 +104,7 @@ const itemIndicatorClass = computed(() =>
               :class="itemClass"
             >
               <SelectItemIndicator :class="itemIndicatorClass">
-                <Check />
+                <Icon :icon="Tick02Icon" />
               </SelectItemIndicator>
               <SelectItemText>{{ option.label }}</SelectItemText>
             </SelectItem>

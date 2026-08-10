@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ChevronLeft, ChevronRight } from 'lucide-vue-next'
+import { ArrowLeft01Icon, ArrowRight01Icon } from '@hugeicons/core-free-icons'
 import {
   PaginationEllipsis,
   PaginationList,
@@ -11,6 +11,7 @@ import {
 import { computed } from 'vue'
 import { useIryxUiConfig } from '../config'
 import { paginationTheme } from '../theme/pagination'
+import Icon from './Icon.vue'
 
 export interface PaginationProps {
   /** Total number of records, not pages. */
@@ -89,7 +90,7 @@ function itemClass(active: boolean) {
     <PaginationList v-slot="{ items }" :class="listClass">
       <PaginationPrev :aria-label="props.prevLabel" :class="itemClass(false)">
         <slot name="prev">
-          <ChevronLeft />
+          <Icon :icon="ArrowLeft01Icon" />
         </slot>
       </PaginationPrev>
 
@@ -108,7 +109,7 @@ function itemClass(active: boolean) {
 
       <PaginationNext :aria-label="props.nextLabel" :class="itemClass(false)">
         <slot name="next">
-          <ChevronRight />
+          <Icon :icon="ArrowRight01Icon" />
         </slot>
       </PaginationNext>
     </PaginationList>

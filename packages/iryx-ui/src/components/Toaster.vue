@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { ToastRecord } from '../composables/toast'
-import { CircleAlert, CircleCheck, Info, TriangleAlert, X } from 'lucide-vue-next'
+import { Alert02Icon, AlertCircleIcon, Cancel01Icon, CheckmarkCircle02Icon, InformationCircleIcon } from '@hugeicons/core-free-icons'
 import {
   ToastAction,
   ToastClose,
@@ -15,6 +15,7 @@ import { computed } from 'vue'
 import { useToast, useToastState } from '../composables/toast'
 import { useIryxUiConfig } from '../config'
 import { toastTheme } from '../theme/toast'
+import Icon from './Icon.vue'
 
 export interface ToasterProps {
   position?: 'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right'
@@ -48,10 +49,10 @@ const toasts = useToastState()
 const { dismiss } = useToast()
 
 const defaultIcons = {
-  success: CircleCheck,
-  warning: TriangleAlert,
-  danger: CircleAlert,
-  info: Info,
+  success: CheckmarkCircle02Icon,
+  warning: Alert02Icon,
+  danger: AlertCircleIcon,
+  info: InformationCircleIcon,
 } as const
 
 function iconFor(toast: ToastRecord) {
@@ -103,7 +104,7 @@ function onAction(toast: ToastRecord) {
       @update:open="(open: boolean) => !open && dismiss(toast.id)"
     >
       <div v-if="iconFor(toast)" :class="slotClass(toast, 'icon')">
-        <component :is="iconFor(toast)" aria-hidden="true" />
+        <Icon :icon="iconFor(toast)" />
       </div>
 
       <div :class="slotClass(toast, 'content')">
@@ -125,7 +126,7 @@ function onAction(toast: ToastRecord) {
       </ToastAction>
 
       <ToastClose :aria-label="props.closeLabel" :class="slotClass(toast, 'close')">
-        <X aria-hidden="true" />
+        <Icon :icon="Cancel01Icon" />
       </ToastClose>
     </ToastRoot>
 
