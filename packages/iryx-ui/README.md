@@ -1,17 +1,9 @@
 # iryx-ui
 
-> An artful Vue 3 component library built on [Reka UI](https://reka-ui.com) and [Tailwind CSS v4](https://tailwindcss.com).
+A Vue 3 component library built on [Reka UI](https://reka-ui.com) and [Tailwind CSS v4](https://tailwindcss.com). Styled by default, headless when you need it, with a Vue plugin and a Nuxt module in one package.
 
 [![npm version](https://img.shields.io/npm/v/iryx-ui.svg)](https://www.npmjs.com/package/iryx-ui)
 [![license](https://img.shields.io/npm/l/iryx-ui.svg)](https://github.com/therok1/iryx-ui/blob/main/LICENSE)
-
-- 🎨 **Styled by default** — sensible Tailwind v4 themes via [tailwind-variants](https://www.tailwind-variants.org)
-- 🌗 **Light & dark out of the box** — `useAppearance()` with `light` / `dark` / `system`, persisted
-- 🌈 **Swappable themes** — built-in color presets or your own, switchable at runtime with `applyTheme()`
-- 🪶 **Headless when you want** — `unstyled` per component or globally, leaving bare Reka UI primitives
-- 🧩 **Composable theming** — override any slot with the `ui` prop or re-brand with CSS theme tokens
-- ⚡ **Vue 3 + Nuxt** — a Vue plugin and a Nuxt module with auto-imports, from one package
-- 🌳 **Tree-shakeable, ESM-only, fully typed**
 
 ## Installation
 
@@ -66,7 +58,7 @@ Components are auto-imported with the `I` prefix (configurable via the `iryxUi.p
 
 ### Icons
 
-Just drop an icon component into the button alongside your text — leading, trailing, or both. Icons are sized automatically to match the button. Works with any SVG icon set; [lucide-vue-next](https://lucide.dev/guide/packages/lucide-vue-next) pairs nicely.
+Put an icon component in the default slot, leading or trailing. Icons are sized to match the button, and any SVG icon set works — the examples use [lucide-vue-next](https://lucide.dev/guide/packages/lucide-vue-next).
 
 Mark the icon with `data-icon="inline-start"` or `"inline-end"` and the padding tightens on the side it sits on. For an icon with no label, add `square`:
 

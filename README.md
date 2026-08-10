@@ -1,8 +1,8 @@
 # iryx-ui monorepo
 
-> An artful Vue 3 component library built on [Reka UI](https://reka-ui.com) and Tailwind CSS v4.
+A Vue 3 component library built on [Reka UI](https://reka-ui.com) and Tailwind CSS v4.
 
-📦 The published package lives in [`packages/iryx-ui`](packages/iryx-ui) — see its [README](packages/iryx-ui/README.md) for usage docs.
+The published package lives in [`packages/iryx-ui`](packages/iryx-ui) — see its [README](packages/iryx-ui/README.md) for usage docs.
 
 ## Structure
 
