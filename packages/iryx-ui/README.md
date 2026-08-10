@@ -262,8 +262,9 @@ app.use(createIryxUi({ unstyled: true }))
 | `IForm` | Validating form wrapper — any Standard Schema validator, or your own function |
 | `IFormField` | Label, description, hint, help and error text around a control |
 | `IInput` | Text field with `sm`/`md`/`lg` sizes, `invalid` state, `v-model` |
+| `INumberInput` | Decimal-safe numeric field — the model is a **string**, with `min`/`max`/`step`, `precision` and locale-aware display |
 | `ITextarea` | Multi-line field with matching sizes and `invalid` state |
-| `ILabel` | Field label with optional `required` asterisk, indented to line up with the control's text |
+| `ILabel` | Field label with optional `required` asterisk |
 | `ICheckbox` | Tri-state checkbox (`true` / `false` / `'indeterminate'`), optional `label` + `description` |
 | `ISelect` | Listbox with keyboard nav and typeahead, driven by an `items` array |
 | `IRadioGroup` | Radio list with labels wired up automatically; items take a `description` |
@@ -405,6 +406,45 @@ const framework = ref('vue')
 
 `ISelect` and `IRadioGroup` accept plain strings or `{ label, value, disabled }` objects. Both also take a default slot if you'd rather compose the Reka primitives yourself.
 
+### Numbers and money
+
+`INumberInput` never turns your value into a `number`. The model is a decimal
+**string**, because binary floating point cannot represent decimal money —
+`0.1 + 0.2` is `0.30000000000000004`, and `10.00` becomes `10`. Values are
+added, compared and rounded with `BigInt` internally, so precision survives
+regardless of magnitude.
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+
+// A string, and it stays one.
+const amount = ref('1234.56')
+</script>
+
+<template>
+  <INumberInput v-model="amount" locale="sl" :precision="2" step="0.01" min="0" />
+</template>
+```
+
+`locale` affects the **display only** — `sl` shows `1.234,56` while the model
+stays `"1234.56"`. Typing in the locale's own format works too. While the field
+is focused it shows the canonical value so separators can't fight your typing.
+
+`precision` fixes the number of decimal places, rounding half-up, and preserves
+trailing zeros (`"10.00"` stays `"10.00"`). `min`, `max` and `step` are decimal
+strings as well, and stepping is exact: `0.1 + 0.2` gives `"0.3"`.
+
+The underlying helpers are exported if you need them elsewhere:
+
+```ts
+import { addDecimals, compareDecimals, roundDecimal } from 'iryx-ui'
+
+addDecimals('0.1', '0.2') // '0.3'
+roundDecimal('1.005', 2) // '1.01'
+compareDecimals('1.10', '1.1') // 0
+```
+
 ### Validated forms
 
 `IForm` handles client-side validation. It accepts any [Standard Schema](https://standardschema.dev) validator — Zod 3.24+, Valibot, ArkType — so Iryx doesn't depend on a validation library. Wrap each control in an `IFormField` with a `name` matching the schema path and errors wire themselves up.
@@ -455,25 +495,6 @@ The control inside a field automatically inherits its `id`, invalid styling and 
 ```
 
 **Server errors and manual control** — grab a template ref to the form and call `validate()`, `clear(name?)` or `setErrors()`. `IFormField` also takes a plain `error` prop that bypasses validation entirely.
-
-### Label alignment
-
-`ILabel` and `IFormField` indent their text so it lines up with the control's
-text rather than its outer edge, putting the label directly above the
-placeholder. The offset matches the input's horizontal padding — `sm` 10px,
-`md` 12px, `lg` 16px — so pass the same size you gave the control:
-
-```vue
-<template>
-  <ILabel for="amount" indent="lg">
-    Amount
-  </ILabel>
-  <IInput id="amount" size="lg" />
-</template>
-```
-
-Use `indent="none"` when the label wraps its control, as with a checkbox, since
-there is no text to line up with.
 
 ### Labels and descriptions
 

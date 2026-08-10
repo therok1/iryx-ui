@@ -20,6 +20,7 @@ export const componentNames = [
   'FormField',
   'Input',
   'Label',
+  'NumberInput',
   'Pagination',
   'Progress',
   'RadioGroup',
