@@ -23,8 +23,6 @@ export interface RadioGroupProps extends RadioGroupRootProps {
   ui?: { root?: string, item?: string, label?: string, description?: string }
 }
 
-// `unstyled: undefined` is required: Vue casts absent boolean props to
-// `false`, which would shadow the global config.
 const props = withDefaults(defineProps<RadioGroupProps>(), {
   unstyled: undefined,
 })

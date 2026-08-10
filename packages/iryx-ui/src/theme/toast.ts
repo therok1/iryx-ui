@@ -1,10 +1,5 @@
 import { tv } from 'tailwind-variants'
 
-/*
- * Status colours come from the --iryx-{success,warning,danger,info}-* tokens
- * in theme.css, which carry their own dark-mode values — so no dark: classes
- * are needed here, and applyTheme() can restyle them.
- */
 export const toastTheme = tv({
   slots: {
     viewport: 'fixed z-50 flex max-h-screen w-full flex-col gap-2 p-4 outline-none sm:max-w-sm',

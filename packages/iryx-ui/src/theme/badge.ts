@@ -1,10 +1,5 @@
 import { tv } from 'tailwind-variants'
 
-/*
- * Status colours come from the --iryx-{success,warning,danger,info}-* tokens
- * in theme.css, which carry their own dark-mode values — so no dark: classes
- * are needed here, and applyTheme() can restyle them.
- */
 export const badgeTheme = tv({
   slots: {
     root: 'inline-flex shrink-0 items-center rounded-full font-medium whitespace-nowrap [&_svg]:pointer-events-none [&_svg]:shrink-0',

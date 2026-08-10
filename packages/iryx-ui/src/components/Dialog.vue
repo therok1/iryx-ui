@@ -40,8 +40,6 @@ export interface DialogProps {
   }
 }
 
-// `undefined` defaults are required: Vue casts absent boolean props to
-// `false`, which would shadow the global config.
 const props = withDefaults(defineProps<DialogProps>(), {
   dismissible: true,
   showClose: true,

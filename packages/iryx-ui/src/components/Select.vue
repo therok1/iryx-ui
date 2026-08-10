@@ -35,8 +35,6 @@ export interface SelectProps extends SelectRootProps {
   ui?: { trigger?: string, content?: string, viewport?: string, item?: string }
 }
 
-// `unstyled: undefined` is required: Vue casts absent boolean props to
-// `false`, which would shadow the global config.
 const props = withDefaults(defineProps<SelectProps>(), {
   unstyled: undefined,
 })

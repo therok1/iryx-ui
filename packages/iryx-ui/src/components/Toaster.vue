@@ -38,8 +38,6 @@ export interface ToasterProps {
   }
 }
 
-// `unstyled: undefined` is required: Vue casts absent boolean props to
-// `false`, which would shadow the global config.
 const props = withDefaults(defineProps<ToasterProps>(), {
   duration: 5000,
   closeLabel: 'Close',

@@ -22,8 +22,6 @@ export interface ButtonGroupProps {
   class?: string
 }
 
-// `unstyled: undefined` is required: Vue casts absent boolean props to
-// `false`, which would shadow the global config.
 const props = withDefaults(defineProps<ButtonGroupProps>(), {
   as: 'div',
   unstyled: undefined,

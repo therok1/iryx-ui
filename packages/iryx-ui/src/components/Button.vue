@@ -32,8 +32,6 @@ export interface ButtonProps {
   class?: string
 }
 
-// `unstyled: undefined` is required: Vue casts absent boolean props to
-// `false`, which would shadow the global config.
 const props = withDefaults(defineProps<ButtonProps>(), {
   as: 'button',
   type: 'button',

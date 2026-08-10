@@ -26,8 +26,6 @@ export interface AppProps extends /* @vue-ignore */ ConfigProviderProps {
   class?: string
 }
 
-// `unstyled: undefined` keeps it distinguishable from an explicit `false`,
-// since Vue casts absent boolean props to `false`.
 const props = withDefaults(defineProps<AppProps>(), {
   as: 'template',
   unstyled: undefined,

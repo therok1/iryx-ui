@@ -18,8 +18,6 @@ export interface InputProps {
   class?: string
 }
 
-// `undefined` defaults are required: Vue casts absent boolean props to
-// `false`, which would shadow the FormField context and the global config.
 const props = withDefaults(defineProps<InputProps>(), {
   type: 'text',
   invalid: undefined,

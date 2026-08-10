@@ -1,10 +1,5 @@
 import { tv } from 'tailwind-variants'
 
-/*
- * Status colours come from the --iryx-{success,warning,danger,info}-* tokens
- * in theme.css, which carry their own dark-mode values — so no dark: classes
- * are needed here, and applyTheme() can restyle them.
- */
 export const alertTheme = tv({
   slots: {
     root: 'flex w-full gap-3 rounded-lg border p-4',
