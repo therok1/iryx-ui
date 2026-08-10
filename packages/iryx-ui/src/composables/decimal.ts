@@ -130,6 +130,19 @@ export function formatForLocale(value: string, locale: string, precision?: numbe
 }
 
 /**
+ * Render a canonical decimal for *editing*: the locale's decimal separator,
+ * but no grouping.
+ *
+ * Editing must not show the canonical `1234.56` in a locale where `.` groups
+ * digits — parsing that back would read it as `123456`.
+ */
+export function toEditable(value: string, locale?: string): string {
+  if (!value || !locale)
+    return value
+  return value.replace('.', localeSeparators(locale).decimal)
+}
+
+/**
  * Turn typed input into a canonical decimal, accepting the locale's
  * separators. `1.234,56` in `sl` becomes `1234.56`.
  */

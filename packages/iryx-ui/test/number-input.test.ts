@@ -139,14 +139,50 @@ describe('numberInput', () => {
     expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toBe('1234.56')
   })
 
-  it('shows the locale format while idle and the raw value while editing', async () => {
+  it('shows the locale format while idle and an ungrouped one while editing', async () => {
     const wrapper = mount(NumberInput, { props: { modelValue: '1234.56', locale: 'sl', precision: 2 } })
     await nextTick()
     const input = wrapper.get('input')
     expect((input.element as HTMLInputElement).value).toBe('1.234,56')
 
+    // Ungrouped, but still the locale's decimal separator.
+    await input.trigger('focus')
+    expect((input.element as HTMLInputElement).value).toBe('1234,56')
+  })
+
+  /*
+   * Regression: editing used to show the canonical `1234.56`, which parses as
+   * `123456` in a locale where `.` groups digits — a focus/blur round trip
+   * silently multiplied the value and appended two zeros.
+   */
+  it('survives a focus/blur round trip unchanged in a comma-decimal locale', async () => {
+    const wrapper = mount(NumberInput, {
+      props: { modelValue: '1234.56', locale: 'sl', precision: 2 },
+    })
+    await nextTick()
+    const input = wrapper.get('input')
+
+    await input.trigger('focus')
+    await input.trigger('blur')
+
+    const emitted = wrapper.emitted('update:modelValue')?.at(-1)?.[0]
+    expect(emitted ?? '1234.56').toBe('1234.56')
+    expect((input.element as HTMLInputElement).value).toBe('1.234,56')
+  })
+
+  it('round trips in a dot-decimal locale too', async () => {
+    const wrapper = mount(NumberInput, {
+      props: { modelValue: '1234.56', locale: 'en', precision: 2 },
+    })
+    await nextTick()
+    const input = wrapper.get('input')
+
     await input.trigger('focus')
     expect((input.element as HTMLInputElement).value).toBe('1234.56')
+    await input.trigger('blur')
+
+    expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0] ?? '1234.56').toBe('1234.56')
+    expect((input.element as HTMLInputElement).value).toBe('1,234.56')
   })
 
   it('keeps the last good value when input cannot be parsed', async () => {

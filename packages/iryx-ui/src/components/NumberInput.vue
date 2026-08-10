@@ -9,6 +9,7 @@ import {
   isDecimal,
   parseFromLocale,
   roundDecimal,
+  toEditable,
 } from '../composables/decimal'
 import { useFormField } from '../composables/form'
 import { useIryxUiConfig } from '../config'
@@ -124,8 +125,9 @@ function commit(raw: string): void {
 
 function onFocus(): void {
   editing.value = true
-  // Editing happens on the canonical value, so separators can't fight typing.
-  display.value = model.value
+  // Ungrouped, but in the locale's own decimal separator: showing the
+  // canonical `1234.56` where `.` groups digits would parse back as `123456`.
+  display.value = toEditable(model.value, props.locale)
 }
 
 function onBlur(): void {
@@ -143,7 +145,7 @@ function nudge(direction: 1 | -1): void {
   const clamped = clampDecimal(next, props.min, props.max)
   const rounded = props.precision != null ? roundDecimal(clamped, props.precision) ?? clamped : clamped
   model.value = rounded
-  display.value = editing.value ? rounded : toDisplay(rounded)
+  display.value = editing.value ? toEditable(rounded, props.locale) : toDisplay(rounded)
 }
 
 const atMin = computed(() => props.min != null && model.value !== '' && compareDecimals(model.value, props.min) <= 0)
