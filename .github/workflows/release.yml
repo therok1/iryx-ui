@@ -1,8 +1,15 @@
 name: Release
 
+# Manual only for now: publishing needs an NPM_TOKEN repo secret, and without
+# one this failed on every push to main. Add the secret (a Granular Access
+# Token scoped to iryx-ui, read/write) and restore the push trigger to go back
+# to automatic releases:
+#
+#   on:
+#     push:
+#       branches: [main]
 on:
-  push:
-    branches: [main]
+  workflow_dispatch:
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
