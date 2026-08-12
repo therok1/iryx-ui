@@ -1,9 +1,9 @@
 import { mount } from '@vue/test-utils'
 import { afterEach, describe, expect, it } from 'vitest'
 import { nextTick } from 'vue'
-import { RadioGroup, Select } from '../src'
+import { Combobox, RadioGroup, Select } from '../src'
 
-// Select portals its content to <body>, so clear it between tests.
+// Select and Combobox portal their content to <body>, so clear it between tests.
 afterEach(() => {
   document.body.innerHTML = ''
 })
@@ -38,6 +38,122 @@ describe('select', () => {
     const options = [...document.querySelectorAll('[role="option"]')]
     expect(options.map(o => o.textContent?.trim())).toEqual(['One', 'Second'])
     expect(options[1]?.hasAttribute('data-disabled')).toBe(true)
+  })
+})
+
+describe('combobox', () => {
+  const clients = [
+    { label: 'Acme Industries', value: 'acme' },
+    { label: 'Bolt Logistics', value: 'bolt' },
+    { label: 'Cirrus Systems', value: 'cirrus', disabled: true },
+  ]
+
+  it('shows the selected option label, not its value', async () => {
+    const wrapper = mount(Combobox, {
+      props: { items: clients, modelValue: 'acme' },
+      attachTo: document.body,
+    })
+    await nextTick()
+    expect(wrapper.get('input').element.value).toBe('Acme Industries')
+  })
+
+  it('renders options when open, expanding string items', async () => {
+    mount(Combobox, {
+      props: { items: ['One', 'Two'], defaultOpen: true },
+      attachTo: document.body,
+    })
+    await nextTick()
+    const options = [...document.querySelectorAll('[role="option"]')]
+    expect(options.map(o => o.textContent?.trim())).toEqual(['One', 'Two'])
+  })
+
+  it('marks disabled options as disabled', async () => {
+    mount(Combobox, { props: { items: clients, defaultOpen: true }, attachTo: document.body })
+    await nextTick()
+    const options = [...document.querySelectorAll('[role="option"]')]
+    expect(options[2]?.hasAttribute('data-disabled')).toBe(true)
+  })
+
+  it('filters options down to the typed query', async () => {
+    const wrapper = mount(Combobox, {
+      props: { items: clients, defaultOpen: true },
+      attachTo: document.body,
+    })
+    await nextTick()
+    await wrapper.get('input').setValue('bo')
+    await nextTick()
+
+    const visible = [...document.querySelectorAll('[role="option"]')]
+      .filter(o => !o.hasAttribute('hidden') && o.getAttribute('data-state') !== 'hidden')
+    expect(visible.map(o => o.textContent?.trim())).toEqual(['Bolt Logistics'])
+  })
+
+  it('emits update:modelValue when an option is chosen', async () => {
+    const wrapper = mount(Combobox, {
+      props: { items: clients, defaultOpen: true },
+      attachTo: document.body,
+    })
+    await nextTick()
+    const option = document.querySelectorAll('[role="option"]')[1] as HTMLElement
+    option.click()
+    await nextTick()
+    expect(wrapper.emitted('update:modelValue')?.[0]).toEqual(['bolt'])
+  })
+
+  it('emits create with the query instead of selecting it', async () => {
+    const wrapper = mount(Combobox, {
+      props: { items: clients, defaultOpen: true, create: true },
+      attachTo: document.body,
+    })
+    await nextTick()
+    await wrapper.get('input').setValue('  Delta  ')
+    await nextTick()
+
+    const createRow = document.querySelector('[data-create]') as HTMLElement
+    expect(createRow.textContent?.trim()).toBe('Create "Delta"')
+
+    createRow.click()
+    await nextTick()
+    expect(wrapper.emitted('create')?.[0]).toEqual(['Delta'])
+    // The query isn't a real value, so nothing may be selected from it.
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+  })
+
+  it('keeps the create row as the query grows', async () => {
+    // Reka registers an item's filter text on mount, so a create row mounted
+    // at "D" filters itself out once the query is "Delta" unless it remounts.
+    const wrapper = mount(Combobox, {
+      props: { items: clients, defaultOpen: true, create: true },
+      attachTo: document.body,
+    })
+    await nextTick()
+    for (const query of ['D', 'De', 'Delta']) {
+      await wrapper.get('input').setValue(query)
+      await nextTick()
+      expect(document.querySelector('[data-create]')?.textContent?.trim()).toBe(`Create "${query}"`)
+    }
+  })
+
+  it('offers no create row when an option already has that label', async () => {
+    const wrapper = mount(Combobox, {
+      props: { items: clients, defaultOpen: true, create: true },
+      attachTo: document.body,
+    })
+    await nextTick()
+    await wrapper.get('input').setValue('acme industries')
+    await nextTick()
+    expect(document.querySelector('[data-create]')).toBeNull()
+  })
+
+  it('renders overridable empty text rather than a baked-in English string', async () => {
+    const wrapper = mount(Combobox, {
+      props: { items: clients, defaultOpen: true, emptyText: 'Nothing matched.' },
+      attachTo: document.body,
+    })
+    await nextTick()
+    await wrapper.get('input').setValue('zzz')
+    await nextTick()
+    expect(document.body.textContent).toContain('Nothing matched.')
   })
 })
 

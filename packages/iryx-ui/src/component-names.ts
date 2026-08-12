@@ -12,6 +12,7 @@ export const componentNames = [
   'ButtonGroup',
   'Card',
   'Checkbox',
+  'Combobox',
   'ConfirmDialog',
   'Dialog',
   'DropdownMenu',

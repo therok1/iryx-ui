@@ -267,6 +267,7 @@ app.use(createIryxUi({ unstyled: true }))
 | `ILabel` | Field label with optional `required` asterisk |
 | `ICheckbox` | Tri-state checkbox (`true` / `false` / `'indeterminate'`), optional `label` + `description` |
 | `ISelect` | Listbox with keyboard nav and typeahead, driven by an `items` array |
+| `ICombobox` | Searchable select — filters as you type, with an optional "create from query" row |
 | `IRadioGroup` | Radio list with labels wired up automatically; items take a `description` |
 | `ISwitch` | Accessible toggle, optional `label` + `description` |
 
@@ -405,6 +406,39 @@ const framework = ref('vue')
 ```
 
 `ISelect` and `IRadioGroup` accept plain strings or `{ label, value, disabled }` objects. Both also take a default slot if you'd rather compose the Reka primitives yourself.
+
+### Searchable selects
+
+`ICombobox` takes the same `items` as `ISelect` and filters them against what
+the user types, which is what you want once a list runs to hundreds of entries.
+The field shows the selected option's **label** while the model holds its value.
+
+```vue
+<ICombobox
+  v-model="clientId"
+  :items="clients"
+  placeholder="Search clients"
+  empty-text="No clients found."
+/>
+```
+
+Set `create` to offer a row for whatever the user typed when nothing matches.
+Choosing it emits `create` with the query and does **not** change the model —
+the option doesn't exist yet, so you add it and select it yourself:
+
+```vue
+<ICombobox
+  v-model="clientId"
+  :items="clients"
+  create
+  :create-label="query => `Add ${query}`"
+  @create="query => clients.push({ label: query, value: addClient(query) })"
+/>
+```
+
+Both `empty-text` and `create-label` are props precisely so a non-English app
+never inherits an English string; `empty` and `create` slots take over the
+markup entirely if you need more than text.
 
 ### Numbers and money
 

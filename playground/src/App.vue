@@ -147,6 +147,24 @@ const amount = ref('1234.56')
 const qty = ref('1')
 const plan = ref('pro')
 
+// Combobox: a list long enough that scrolling it would be the wrong UX.
+const clientId = ref('acme')
+const clients = ref([
+  { label: 'Acme Industries', value: 'acme' },
+  { label: 'Bolt Logistics', value: 'bolt' },
+  { label: 'Cirrus Systems', value: 'cirrus' },
+  { label: 'Delta Retail', value: 'delta' },
+  { label: 'Everest Consulting', value: 'everest' },
+  { label: 'Fjord Studio (disabled)', value: 'fjord', disabled: true },
+])
+
+function addClient(name: string) {
+  const value = name.toLowerCase().replace(/\s+/g, '-')
+  clients.value.push({ label: name, value })
+  clientId.value = value
+  toast.success(`Added ${name}`)
+}
+
 function simulateLoad() {
   loading.value = true
   setTimeout(() => (loading.value = false), 1500)
@@ -819,7 +837,7 @@ function simulateLoad() {
             </div>
             <div>
               <p class="font-medium">
-                Acme d.o.o.
+                Acme Industries
               </p>
               <p class="text-sm text-muted-foreground">
                 Two invoices outstanding.
@@ -925,6 +943,29 @@ function simulateLoad() {
             { label: 'Angular (disabled)', value: 'angular', disabled: true },
           ]"
         />
+      </section>
+
+      <section class="space-y-3">
+        <h2 class="font-semibold">
+          Combobox — {{ clientId }}
+        </h2>
+        <div class="flex flex-wrap gap-4">
+          <ICombobox
+            v-model="clientId"
+            class="max-w-64"
+            placeholder="Search clients"
+            :items="clients"
+          />
+          <ICombobox
+            v-model="clientId"
+            class="max-w-64"
+            placeholder="Search or add a client"
+            :items="clients"
+            create
+            :create-label="query => `Add “${query}”`"
+            @create="addClient"
+          />
+        </div>
       </section>
 
       <section class="space-y-3">

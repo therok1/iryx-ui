@@ -1,7 +1,7 @@
 import type { Component } from 'vue'
 import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
-import { Alert, Badge, Button, Card, Checkbox, EmptyState, Input, iryxUiConfigKey, Label, Progress, RadioGroup, Select, Switch, Textarea } from '../src'
+import { Alert, Badge, Button, Card, Checkbox, Combobox, EmptyState, Input, iryxUiConfigKey, Label, Progress, RadioGroup, Select, Switch, Textarea } from '../src'
 
 /**
  * Regression guard: Vue casts absent boolean props to `false` rather than
@@ -25,6 +25,7 @@ const components: [string, Component, string][] = [
   ['Checkbox', Checkbox, '[role="checkbox"]'],
   ['Switch', Switch, '[role="switch"]'],
   ['Select', Select, '[role="combobox"]'],
+  ['Combobox', Combobox, 'input'],
   ['RadioGroup', RadioGroup, '[role="radiogroup"]'],
 ]
 
