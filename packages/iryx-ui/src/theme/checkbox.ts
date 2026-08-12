@@ -4,7 +4,7 @@ export const checkboxTheme = tv({
   slots: {
     /** Only rendered when a `label` or `description` is provided. */
     wrapper: 'flex items-start gap-2.5',
-    root: 'peer flex shrink-0 cursor-pointer items-center justify-center rounded border border-border bg-background text-primary-foreground transition-colors outline-none focus-visible:ring-2 focus-visible:ring-primary/50 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-primary data-[state=checked]:bg-primary data-[state=indeterminate]:border-primary data-[state=indeterminate]:bg-primary',
+    root: 'peer flex shrink-0 cursor-pointer items-center justify-center rounded border border-border bg-background text-primary-foreground transition-colors outline-none focus:ring-2 focus:ring-primary/50 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-primary data-[state=checked]:bg-primary data-[state=indeterminate]:border-primary data-[state=indeterminate]:bg-primary',
     indicator: 'flex items-center justify-center text-current',
     content: 'grid gap-1',
     // leading-5 gives a 20px line box; the control is nudged down to centre in it.

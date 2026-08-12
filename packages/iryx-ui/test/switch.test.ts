@@ -8,6 +8,14 @@ describe('switch', () => {
     expect(wrapper.attributes('data-state')).toBe('unchecked')
   })
 
+  // Was an offset outline; now the same ring every other control uses.
+  it('rings on focus, however focus arrived', () => {
+    const classes = mount(Switch).attributes('class') ?? ''
+    expect(classes).toContain('focus:ring-2')
+    expect(classes).toContain('focus:ring-primary/50')
+    expect(classes).not.toContain('outline-primary')
+  })
+
   it('emits update:modelValue on click', async () => {
     const wrapper = mount(Switch, { props: { modelValue: false } })
     await wrapper.trigger('click')

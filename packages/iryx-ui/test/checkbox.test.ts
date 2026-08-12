@@ -9,6 +9,15 @@ describe('checkbox', () => {
     expect(wrapper.attributes('data-state')).toBe('unchecked')
   })
 
+  // `focus-visible` skips mouse focus, so clicking left the box with no ring
+  // while a clicked text input showed one. Plain `focus` matches the input.
+  it('rings on focus, however focus arrived', () => {
+    const classes = mount(Checkbox).attributes('class') ?? ''
+    expect(classes).toContain('focus:ring-2')
+    expect(classes).toContain('focus:ring-primary/50')
+    expect(classes).not.toContain('focus-visible:ring')
+  })
+
   it('emits update:modelValue on click', async () => {
     const wrapper = mount(Checkbox, { props: { modelValue: false } })
     await wrapper.trigger('click')
