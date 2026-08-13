@@ -202,9 +202,14 @@ Available tokens, each usable as a Tailwind color (`bg-primary`,
 
 | Group | Tokens |
 | --- | --- |
-| Surfaces | `background`, `foreground`, `accent`, `accent-foreground`, `muted`, `muted-foreground`, `border` |
+| Surfaces | `background`, `foreground`, `accent`, `accent-foreground`, `muted`, `muted-foreground`, `border`, `input` |
 | Brand | `primary`, `primary-foreground`, `primary-from`, `primary-to` |
 | Status | `success`, `warning`, `danger`, `info` — each with `-foreground`, `-muted`, `-muted-foreground` and `-border` |
+
+`input` is the fill behind `IInput`, `ITextarea`, `INumberInput`, the `ISelect`
+trigger and the `ICombobox` anchor — a token of its own rather than a reused
+`muted`, so how raised a field looks can be tuned without moving every muted
+surface with it.
 
 `primary-from` / `primary-to` are the stops of the solid button's vertical
 gradient. The status tokens carry their own dark-mode values, so components

@@ -27,6 +27,13 @@
   --iryx-muted: oklch(0.97 0 0);
   --iryx-muted-foreground: oklch(0.556 0 0);
   --iryx-border: oklch(0.922 0 0);
+  /*
+   * Field fill for Input, Textarea, NumberInput, the Select trigger and the
+   * Combobox anchor. Its own token rather than `--iryx-muted`: how raised a
+   * field looks is a separate decision from how a muted surface reads, and
+   * the two want different values per mode.
+   */
+  --iryx-input: oklch(0.985 0 0);
   /* Brand primary — kept as a violet gradient. */
   --iryx-primary: oklch(0.59 0.2 277.19);
   --iryx-primary-foreground: oklch(0.985 0.005 248);
@@ -68,6 +75,8 @@
   --iryx-muted: oklch(0.269 0 0);
   --iryx-muted-foreground: oklch(0.708 0 0);
   --iryx-border: oklch(1 0 0 / 10%);
+  /* Lifted just off the background — `--iryx-muted` reads as a panel here. */
+  --iryx-input: oklch(0.205 0 0);
   /* Brand primary — kept as a violet gradient. */
   --iryx-primary: oklch(0.62 0.22 293);
   --iryx-primary-foreground: oklch(0.985 0.005 248);
@@ -108,6 +117,7 @@
   --color-muted: var(--iryx-muted);
   --color-muted-foreground: var(--iryx-muted-foreground);
   --color-border: var(--iryx-border);
+  --color-input: var(--iryx-input);
   --color-success: var(--iryx-success);
   --color-success-foreground: var(--iryx-success-foreground);
   --color-success-muted: var(--iryx-success-muted);

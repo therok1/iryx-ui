@@ -2,7 +2,7 @@ import { tv } from 'tailwind-variants'
 
 /** Shared field chrome for Input, Textarea and the Select trigger. */
 export const fieldBase
-  = 'w-full rounded-lg border border-border bg-background text-foreground transition-colors outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/50 disabled:cursor-not-allowed disabled:opacity-50'
+  = 'w-full rounded-lg border border-border bg-input text-foreground transition-colors outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/50 disabled:cursor-not-allowed disabled:opacity-50'
 
 export const inputTheme = tv({
   base: `flex ${fieldBase}`,
