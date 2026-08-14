@@ -18,9 +18,9 @@ export const tabsTheme = tv({
     variant: {
       /** Pill sliding along a muted track. */
       solid: {
-        list: 'rounded-lg bg-muted p-1',
-        indicator: 'top-1 h-[calc(100%---spacing(2))] rounded-md bg-background shadow-sm',
-        trigger: 'rounded-md px-3 py-1.5 text-muted-foreground data-[state=active]:text-foreground',
+        list: 'rounded-xl bg-muted p-1',
+        indicator: 'top-1 h-[calc(100%---spacing(2))] rounded-lg bg-background shadow-sm',
+        trigger: 'rounded-lg px-3 py-1.5 text-muted-foreground data-[state=active]:text-foreground',
       },
       /**
        * Underline for page-level navigation. The trigger is square: a rounded

@@ -6,7 +6,7 @@ export const skeletonTheme = tv({
     /** `text` sizes itself to the current line height so it sits in copy. */
     variant: {
       text: 'h-[1em] w-full rounded',
-      rect: 'rounded-lg',
+      rect: 'rounded-xl',
       circle: 'aspect-square rounded-full',
     },
   },

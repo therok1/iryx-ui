@@ -3,13 +3,13 @@ import { tv } from 'tailwind-variants'
 export const toastTheme = tv({
   slots: {
     viewport: 'fixed z-50 flex max-h-screen w-full flex-col gap-2 p-4 outline-none sm:max-w-sm',
-    root: 'flex items-start gap-3 rounded-lg border p-4 shadow-lg data-[state=closed]:animate-fade-out data-[state=open]:animate-toast-in',
+    root: 'flex items-start gap-3 rounded-xl border p-4 shadow-lg data-[state=closed]:animate-fade-out data-[state=open]:animate-toast-in',
     icon: 'mt-0.5 shrink-0 [&_svg]:size-5',
     content: 'min-w-0 flex-1',
     title: 'text-sm font-medium',
     description: 'text-sm opacity-90',
-    action: 'shrink-0 self-center rounded-md px-2 py-1 text-sm font-medium underline-offset-4 transition-colors outline-none hover:underline focus-visible:ring-2 focus-visible:ring-current/50',
-    close: '-m-1 shrink-0 self-start rounded-md p-1 opacity-70 transition-opacity outline-none hover:opacity-100 focus-visible:ring-2 focus-visible:ring-current/50 [&_svg]:size-4',
+    action: 'shrink-0 self-center rounded-lg px-2 py-1 text-sm font-medium underline-offset-4 transition-colors outline-none hover:underline focus-visible:ring-2 focus-visible:ring-current/50',
+    close: '-m-1 shrink-0 self-start rounded-lg p-1 opacity-70 transition-opacity outline-none hover:opacity-100 focus-visible:ring-2 focus-visible:ring-current/50 [&_svg]:size-4',
   },
   variants: {
     variant: {

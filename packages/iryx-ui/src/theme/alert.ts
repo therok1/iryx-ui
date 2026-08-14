@@ -2,12 +2,12 @@ import { tv } from 'tailwind-variants'
 
 export const alertTheme = tv({
   slots: {
-    root: 'flex w-full gap-3 rounded-lg border p-4',
+    root: 'flex w-full gap-3 rounded-xl border p-4',
     icon: 'mt-0.5 shrink-0 [&_svg]:size-5',
     content: 'min-w-0 flex-1',
     title: 'text-sm font-medium',
     description: 'text-sm opacity-90',
-    close: '-m-1 shrink-0 self-start rounded-md p-1 opacity-70 transition-opacity outline-none hover:opacity-100 focus-visible:ring-2 focus-visible:ring-current/50 [&_svg]:size-4',
+    close: '-m-1 shrink-0 self-start rounded-lg p-1 opacity-70 transition-opacity outline-none hover:opacity-100 focus-visible:ring-2 focus-visible:ring-current/50 [&_svg]:size-4',
   },
   variants: {
     variant: {

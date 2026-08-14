@@ -28,12 +28,16 @@
   --iryx-muted-foreground: oklch(0.556 0 0);
   --iryx-border: oklch(0.922 0 0);
   /*
-   * Field fill for Input, Textarea, NumberInput, the Select trigger and the
-   * Combobox anchor. Its own token rather than `--iryx-muted`: how raised a
-   * field looks is a separate decision from how a muted surface reads, and
-   * the two want different values per mode.
+   * Fill for controls that read as recessed — the fields and the outline
+   * button. Its own token rather than `--iryx-muted`, since how raised a
+   * control looks is a separate decision from how a muted surface reads.
+   *
+   * Flat in light and raised in dark, which is where the lift is legible;
+   * shadcn does the same with `bg-transparent dark:bg-input/30`. Expressed as
+   * two token values rather than a `dark:` variant, so components never carry
+   * mode-specific classes.
    */
-  --iryx-input: oklch(0.985 0 0);
+  --iryx-input: oklch(1 0 0);
   /* Brand primary — kept as a violet gradient. */
   --iryx-primary: oklch(0.59 0.2 277.19);
   --iryx-primary-foreground: oklch(0.985 0.005 248);

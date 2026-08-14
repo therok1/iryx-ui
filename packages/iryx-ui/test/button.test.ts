@@ -98,7 +98,7 @@ describe('button', () => {
   it('merges a custom class over conflicting defaults', () => {
     const wrapper = mount(Button, { props: { class: 'rounded-full' } })
     expect(wrapper.classes()).toContain('rounded-full')
-    expect(wrapper.classes()).not.toContain('rounded-lg')
+    expect(wrapper.classes()).not.toContain('rounded-xl')
   })
 
   it('renders no built-in classes when unstyled', () => {

@@ -4,7 +4,7 @@ export const stepperTheme = tv({
   slots: {
     root: 'flex w-full',
     item: 'group relative flex flex-1 items-center gap-3',
-    trigger: 'flex items-center gap-3 rounded-lg text-left outline-none focus-visible:ring-2 focus-visible:ring-primary/50 disabled:pointer-events-none disabled:opacity-50',
+    trigger: 'flex items-center gap-3 rounded-xl text-left outline-none focus-visible:ring-2 focus-visible:ring-primary/50 disabled:pointer-events-none disabled:opacity-50',
     /*
      * The numbered circle, filled once the step is active or done.
      *

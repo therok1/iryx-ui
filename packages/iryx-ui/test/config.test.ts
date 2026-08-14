@@ -46,6 +46,6 @@ describe('global unstyled config', () => {
       props: { unstyled: false },
       global: { provide: { [iryxUiConfigKey as symbol]: { unstyled: true } } },
     })
-    expect(wrapper.attributes('class')).toContain('rounded-lg')
+    expect(wrapper.attributes('class')).toContain('rounded-xl')
   })
 })

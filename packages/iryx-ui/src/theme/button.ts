@@ -16,11 +16,11 @@ export const buttonTheme = tv({
    * `filter` is included for the solid variant's hover brightness, `translate`
    * for the press nudge.
    */
-  base: 'inline-flex shrink-0 items-center justify-center gap-2 rounded-lg border border-transparent font-medium transition-[color,background-color,border-color,box-shadow,opacity,filter,translate] outline-none focus-visible:ring-2 focus-visible:ring-primary/50 active:translate-y-px disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0',
+  base: 'inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border border-transparent font-medium transition-[color,background-color,border-color,box-shadow,opacity,filter,translate] outline-none focus-visible:ring-2 focus-visible:ring-primary/50 active:translate-y-px disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0',
   variants: {
     variant: {
       solid: 'bg-linear-to-b from-primary-from to-primary-to text-primary-foreground hover:brightness-110 active:brightness-95',
-      outline: 'border-border bg-background text-foreground hover:bg-accent hover:text-accent-foreground',
+      outline: 'border-border bg-input text-foreground hover:bg-accent hover:text-accent-foreground',
       ghost: 'text-foreground hover:bg-accent hover:text-accent-foreground',
       // A text link has no surface to press, so it stays put.
       link: 'text-primary underline-offset-4 hover:underline active:translate-y-0',
