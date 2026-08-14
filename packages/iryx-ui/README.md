@@ -197,6 +197,24 @@ For a static re-brand, plain CSS works too — tokens are just variables:
 }
 ```
 
+### Typeface
+
+The library ships **no webfont** — that would put font files, a licence and a
+network request into every app whether it wanted them or not. It reads one
+variable, defaulting to the system stack. Point it at your own family and
+everything follows, including Tailwind's `font-sans`:
+
+```css
+@import "@fontsource-variable/instrument-sans"; /* or a <link>, or self-hosted */
+
+:root {
+  --iryx-font-sans: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
+}
+```
+
+Unlike the colour tokens, this one is not mode-specific — there is no `.dark`
+counterpart to keep in sync.
+
 Available tokens, each usable as a Tailwind color (`bg-primary`,
 `text-muted-foreground`, …):
 
@@ -292,8 +310,9 @@ app.use(createIryxUi({ unstyled: true }))
 
 | Component | Description |
 | --- | --- |
-| `IAlert` | Inline banner in four variants, with a variant icon and optional dismiss |
-| `IBadge` | Status pill — five variants × `soft`/`solid` tones × three sizes, optional `dot` |
+| `IAlert` | Inline, contextual message in four variants — variant icon, `actions` slot, optional dismiss |
+| `IBanner` | Page-level announcement — full-bleed, six variants, sticky top or fixed bottom |
+| `IBadge` | Status pill — five variants × three sizes; `dot` moves the colour onto a leading dot |
 | `IToaster` | Host for `useToast()`; six viewport positions, stacking, action buttons |
 | `IDialog` | Modal with header/body/footer slots, `dismissible` and `showClose` |
 | `IConfirmDialog` | Host for `useConfirm()` — renders the promise-based confirmation |
@@ -308,9 +327,10 @@ app.use(createIryxUi({ unstyled: true }))
 | --- | --- |
 | `ITabs` | `solid` or `line` variants with an animated indicator, horizontal or vertical |
 | `IBreadcrumb` | Trail from an `items` array; the last crumb is marked as the current page |
-| `IPagination` | Page list with ellipsis, edge pages and prev/next controls |
+| `IPagination` | Page list with ellipsis, edge pages and prev/next controls; `align` places it, `size` sets the button scale |
 | `IStepper` | Multi-step progress, horizontal or vertical, optional `linear` ordering |
 | `IStat` | KPI tile — label, value, signed delta with trend colour, and a hint |
+| `ITable` | Data table — sorting, selection, expansion and per-cell slots, client- or server-driven |
 
 Every component supports `unstyled` and a `class` override; multi-part ones take a `ui` prop for per-slot classes.
 
@@ -606,6 +626,188 @@ The control inside a field automatically inherits its `id`, invalid styling and 
 ```
 
 Use the `#label` / `#description` slots instead of the props when you need markup (a link, a badge) inside the text.
+
+### Alerts and banners
+
+They look similar and do different jobs, so they're separate components.
+
+**`IAlert` is contextual.** It sits in the flow next to the thing it's about —
+a failed upload, a form that won't submit — boxed, with an icon and a title.
+Danger and warning variants take `role="alert"` so a screen reader interrupts,
+because the user caused it and needs to know now.
+
+**`IBanner` is page-level.** It spans the full width and announces something
+that isn't about any one element: a trial ending, scheduled maintenance. It's a
+labelled `role="region"`, never an alert — it's ambient, so interrupting
+someone mid-task would be wrong.
+
+```vue
+<IBanner
+  v-model:open="showTrial"
+  variant="primary"
+  position="top"
+  title="Trial ends in 3 days."
+  description="Upgrade to keep your data."
+  closable
+  label="Trial notice"
+>
+  <template #actions>
+    <IButton size="sm" variant="outline">Upgrade</IButton>
+  </template>
+</IBanner>
+```
+
+`position` is `static` (in flow), `top` (sticky) or `bottom` (fixed to the
+viewport, with the rule moved to its top edge). `contained` keeps the text at a
+readable measure while the fill still spans the window.
+
+Both dismiss through `v-model:open`, so the usual case is one binding instead
+of a `close` handler plus a `v-if`. `close` still fires if you need to persist
+or confirm first:
+
+```vue
+<IAlert v-model:open="visible" variant="danger" title="Upload failed" closable>
+  The file was larger than 10 MB.
+  <template #actions>
+    <IButton size="sm" @click="retry()">Retry</IButton>
+  </template>
+</IAlert>
+```
+
+### Tables
+
+`ITable` takes `rows` and `columns` and renders a real `<table>`. Columns are
+plain objects — no render functions — and anything beyond the raw value is a
+slot:
+
+```vue
+<script setup>
+const columns = [
+  { key: 'number', label: 'Invoice', sortable: true },
+  { key: 'customer.name', label: 'Customer', sortable: true, sortKey: 'customer_name' },
+  { key: 'total', label: 'Total', sortable: true, numeric: true },
+  { key: 'status', label: 'Status' },
+]
+</script>
+
+<template>
+  <ITable :rows="invoices" :columns="columns" label="Invoices">
+    <template #cell-total="{ value }">
+      {{ formatMoney(value) }}
+    </template>
+    <template #cell-status="{ row }">
+      <IBadge :variant="row.paid ? 'success' : 'warning'">
+        {{ row.paid ? 'Paid' : 'Due' }}
+      </IBadge>
+    </template>
+  </ITable>
+</template>
+```
+
+`key` doubles as the accessor (dot-notation reaches nested values) and the slot
+suffix, so `#cell-customer.name` targets that column. `#header-<key>` replaces a
+header the same way.
+
+`numeric` gives a column tabular figures and end alignment, so amounts line up
+digit-for-digit down the column instead of wandering with each glyph's width.
+Set `align` alongside it to keep the figures but place the column differently.
+
+#### Client or server
+
+**The table never fetches.** It renders what you give it and emits what the
+user did, so caching, cancellation and auth stay in your data layer.
+
+Which mode it runs in is decided by one prop. Omit `total` and it sorts and
+paginates `rows` itself. Provide `total` and it does neither — the rows you
+passed are already the page the server returned, so it only reflects state and
+emits changes:
+
+```vue
+<ITable
+  v-model:sort="sort"
+  v-model:page="page"
+  :rows="data.rows"
+  :columns="columns"
+  :total="data.total"
+  :loading="pending"
+/>
+```
+
+Watch those models and refetch. Sorting a column resets `page` to 1, since the
+old page number means nothing against a reordered list.
+
+#### State ownership
+
+Every model is optional. Bind one and you own that state — put it in the URL, a
+store, or `useState`. Leave it unbound and the table keeps it internally, so the
+simple case needs no wiring:
+
+| Model | Type |
+| --- | --- |
+| `v-model:sort` | `{ key, order } \| null` — `null` is "unsorted", distinct from never-sorted |
+| `v-model:page` | `number`, 1-indexed |
+| `v-model:perPage` | `number` |
+| `v-model:selection` | `(string \| number)[]` of row keys |
+| `v-model:expanded` | `(string \| number)[]` of row keys |
+
+#### Selection and expansion
+
+`selectable` adds a checkbox column whose header is tri-state over the rows on
+screen. Selection is held as **row keys** (`rowKey`, default `'id'`), and
+select-all only touches the current page, so selections made on other pages
+survive. `isRowSelectable` vetoes a row — its checkbox is hidden and the header
+skips it.
+
+`expandable` adds a disclosure column and renders the `#expanded` slot beneath
+an open row; `canExpandRow` vetoes it per row.
+
+```vue
+<ITable
+  v-model:selection="selected"
+  :rows="rows"
+  :columns="columns"
+  selectable
+  expandable
+  :is-row-selectable="row => !row.locked"
+>
+  <template #expanded="{ row }">
+    <div class="p-4">{{ row.notes }}</div>
+  </template>
+</ITable>
+```
+
+#### States and props
+
+`loading` sets `aria-busy` and, when there is nothing to show yet, renders
+`loadingRows` skeleton rows instead of the empty message. With rows already on
+screen it leaves them in place, so a refetch doesn't blank the table. Otherwise
+`emptyText` — or the `#empty` slot — takes over.
+
+| Prop | What it does |
+| --- | --- |
+| `rowKey` | Field identifying a row. Default `'id'` |
+| `clickableRows` | Emits `rowClick` and shows a pointer cursor |
+| `striped` / `hoverable` / `stickyHeader` | Row and header treatment |
+| `size` | `sm` / `md` / `lg` row density |
+| `label` / `caption` | Accessible name, and an optional visible caption |
+
+Headers are real `<button>`s, sorted columns carry `aria-sort`, and the table is
+a plain `<table>`, so screen readers and keyboard users get the semantics for
+free. Give it a `label` (or a `caption`) — a table with no accessible name is
+hard to place when tabbing through a page.
+
+#### Without the markup
+
+`useDataTable()` holds the whole state machine — sorting, paging, selection,
+expansion — and renders nothing, if you want the logic under your own markup:
+
+```ts
+const table = useDataTable({
+  rows: () => rows.value,
+  columns: () => columns,
+})
+// table.pageRows, table.toggleSort, table.headerSelection, …
+```
 
 ## License
 

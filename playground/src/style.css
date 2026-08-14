@@ -6,3 +6,7 @@
  * scan it for utility classes on top of theme.css's own dist scan.
  */
 @source "../../packages/iryx-ui/src";
+
+:root {
+  --iryx-font-sans: "Switzer", ui-sans-serif, system-ui, sans-serif;
+}

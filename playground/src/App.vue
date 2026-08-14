@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { Appearance, DropdownMenuEntry, ThemePresetName } from 'iryx-ui'
-import { ArrowDown01Icon, ArrowRight01Icon, BellIcon, Copy01Icon, Delete02Icon, Download01Icon, HelpCircleIcon, Home01Icon, InboxIcon, Search01Icon, SentIcon, TextBoldIcon, TextItalicIcon, TextUnderlineIcon } from '@hugeicons/core-free-icons'
+import type { Appearance, DropdownMenuEntry, TableColumn, ThemePresetName } from 'iryx-ui'
+import { ArrowDown01Icon, ArrowRight01Icon, BellIcon, Copy01Icon, Delete02Icon, Download01Icon, HelpCircleIcon, Home01Icon, InboxIcon, InformationCircleIcon, Search01Icon, SentIcon, TextBoldIcon, TextItalicIcon, TextUnderlineIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/vue'
 import { themes, useAppearance, useConfirm, useToast } from 'iryx-ui'
 import { reactive, ref } from 'vue'
@@ -18,11 +18,31 @@ function pickTheme(name: ThemePresetName) {
 
 const globalUnstyled = ref(false)
 
+const invoiceColumns: TableColumn[] = [
+  { key: 'number', label: 'Invoice', sortable: true, width: '9rem' },
+  { key: 'customer.name', label: 'Customer', sortable: true },
+  { key: 'total', label: 'Total', sortable: true, numeric: true },
+  { key: 'paid', label: 'Status', sortable: true, align: 'center' },
+]
+
+const invoices = [
+  { id: 1, number: 'INV-001', customer: { name: 'Acme Corp' }, total: 1240.5, paid: true, notes: 'Paid by transfer on 12 March.' },
+  { id: 2, number: 'INV-002', customer: { name: 'Globex Ltd' }, total: 320, paid: false, notes: 'Due in 14 days.' },
+  { id: 3, number: 'INV-003', customer: { name: 'Initech' }, total: 89.9, paid: true, notes: 'Paid in cash.' },
+  { id: 4, number: 'INV-004', customer: { name: 'Umbrella Co' }, total: 4500, paid: false, notes: 'Awaiting purchase order.' },
+  { id: 5, number: 'INV-005', customer: { name: 'Hooli' }, total: 76.2, paid: true, notes: 'Recurring monthly charge.' },
+  { id: 6, number: 'INV-006', customer: { name: 'Vandelay' }, total: 2100, paid: false, notes: 'Partially settled.' },
+]
+
+const tableSelection = ref<(string | number)[]>([])
+const tablePage = ref(1)
+
 const checked = ref(false)
 const loading = ref(false)
 
 const statuses = ['neutral', 'success', 'warning', 'danger', 'info'] as const
 const alertVariants = ['info', 'success', 'warning', 'danger'] as const
+const bannerVariants = ['info', 'success', 'warning', 'danger'] as const
 const alertOpen = ref(true)
 
 const dialogOpen = ref(false)
@@ -150,7 +170,7 @@ const plan = ref('pro')
 // Combobox: a list long enough that scrolling it would be the wrong UX.
 const clientId = ref('acme')
 const clients = ref([
-  { label: 'Acme Industries', value: 'acme' },
+  { label: 'Acme Corp', value: 'acme' },
   { label: 'Bolt Logistics', value: 'bolt' },
   { label: 'Cirrus Systems', value: 'cirrus' },
   { label: 'Delta Retail', value: 'delta' },
@@ -160,7 +180,7 @@ const clients = ref([
 
 const groupedClient = ref('acme')
 const clientGroups = [
-  { label: 'Recent', items: [{ label: 'Acme Industries', value: 'acme' }, { label: 'Bolt Logistics', value: 'bolt' }] },
+  { label: 'Recent', items: [{ label: 'Acme Corp', value: 'acme' }, { label: 'Bolt Logistics', value: 'bolt' }] },
   { label: 'Archived', items: [{ label: 'Cirrus Systems', value: 'cirrus' }, { label: 'Delta Retail', value: 'delta' }] },
 ]
 
@@ -387,15 +407,10 @@ function simulateLoad() {
 
       <section class="space-y-3">
         <h2 class="font-semibold">
-          Badge — variants, tones &amp; sizes
+          Badge — variants, dot &amp; sizes
         </h2>
         <div class="flex flex-wrap items-center gap-2">
           <IBadge v-for="status in statuses" :key="status" :variant="status">
-            {{ status }}
-          </IBadge>
-        </div>
-        <div class="flex flex-wrap items-center gap-2">
-          <IBadge v-for="status in statuses" :key="status" :variant="status" tone="solid">
             {{ status }}
           </IBadge>
         </div>
@@ -443,17 +458,62 @@ function simulateLoad() {
             description="Pass any component, or :icon=&quot;false&quot; to drop it."
           />
           <IAlert
-            v-if="alertOpen"
+            v-model:open="alertOpen"
             variant="info"
             title="Dismissible"
-            description="The close button emits an event — you decide what happens."
+            description="v-model:open hides it — no v-if needed."
             closable
             close-label="Dismiss"
-            @close="alertOpen = false"
           />
-          <IButton v-else size="sm" variant="outline" @click="alertOpen = true">
+          <IButton v-if="!alertOpen" size="sm" variant="outline" @click="alertOpen = true">
             Bring back the dismissed alert
           </IButton>
+          <IAlert variant="danger" title="Upload failed" description="The file was larger than 10 MB.">
+            <template #actions>
+              <IButton size="sm" @click="toast.info('Retrying…')">
+                Retry
+              </IButton>
+              <IButton size="sm" variant="ghost" @click="toast.info('Opened help')">
+                Learn more
+              </IButton>
+            </template>
+          </IAlert>
+        </div>
+      </section>
+
+      <section class="space-y-3">
+        <h2 class="font-semibold">
+          Banner — page-level announcements
+        </h2>
+        <p class="text-sm text-muted-foreground">
+          Full-bleed and ambient: a labelled region, never role=alert.
+        </p>
+        <div class="space-y-3 overflow-hidden rounded-xl border border-border">
+          <IBanner
+            variant="primary"
+            title="Trial ends in 3 days."
+            description="Upgrade to keep your data."
+            closable
+          >
+            <template #actions>
+              <IButton size="sm" variant="outline" @click="toast.success('Upgraded')">
+                Upgrade
+              </IButton>
+            </template>
+          </IBanner>
+          <IBanner
+            v-for="variant in bannerVariants"
+            :key="variant"
+            :variant="variant"
+            :icon="InformationCircleIcon"
+            :description="`A ${variant} banner, spanning the full width.`"
+          />
+          <IBanner
+            variant="neutral"
+            contained
+            align="center"
+            description="Contained and centred — the fill still spans, the text does not."
+          />
         </div>
       </section>
 
@@ -847,7 +907,7 @@ function simulateLoad() {
             </div>
             <div>
               <p class="font-medium">
-                Acme Industries
+                Acme Corp
               </p>
               <p class="text-sm text-muted-foreground">
                 Two invoices outstanding.
@@ -1054,6 +1114,62 @@ function simulateLoad() {
             label="Push notifications"
             description="Send alerts to this device when something needs your attention."
           />
+        </div>
+      </section>
+
+      <section class="space-y-3">
+        <h2 class="font-semibold">
+          Table
+        </h2>
+        <p class="text-sm text-muted-foreground">
+          Client mode — no <code>total</code>, so it sorts and pages the rows itself.
+          Selected: {{ tableSelection.length }}
+        </p>
+        <ICard padding="none" class="overflow-hidden">
+          <ITable
+            v-model:selection="tableSelection"
+            v-model:page="tablePage"
+            :rows="invoices"
+            :columns="invoiceColumns"
+            :per-page="4"
+            label="Invoices"
+            selectable
+            expandable
+            striped
+          >
+            <template #cell-total="{ value }">
+              €{{ (value as number).toFixed(2) }}
+            </template>
+            <template #cell-paid="{ row }">
+              <IBadge :variant="row.paid ? 'success' : 'warning'">
+                {{ row.paid ? 'Paid' : 'Due' }}
+              </IBadge>
+            </template>
+            <template #expanded="{ row }">
+              <div class="px-4 py-3 text-sm text-muted-foreground">
+                {{ row.notes }}
+              </div>
+            </template>
+          </ITable>
+        </ICard>
+        <IPagination
+          v-model:page="tablePage"
+          :total="invoices.length"
+          :items-per-page="4"
+        />
+      </section>
+
+      <section class="space-y-3">
+        <h2 class="font-semibold">
+          Table — loading and empty
+        </h2>
+        <div class="grid gap-4 sm:grid-cols-2">
+          <ICard padding="none" class="overflow-hidden">
+            <ITable :columns="invoiceColumns.slice(0, 3)" :rows="[]" loading :loading-rows="3" label="Loading" />
+          </ICard>
+          <ICard padding="none" class="overflow-hidden">
+            <ITable :columns="invoiceColumns.slice(0, 3)" :rows="[]" empty-text="No invoices yet." label="Empty" />
+          </ICard>
         </div>
       </section>
 
