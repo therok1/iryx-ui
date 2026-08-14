@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Appearance, DropdownMenuEntry, ThemePresetName } from 'iryx-ui'
-import { ArrowDown01Icon, ArrowRight01Icon, Copy01Icon, Delete02Icon, Download01Icon, HelpCircleIcon, Home01Icon, InboxIcon, Search01Icon, SentIcon, TextBoldIcon, TextItalicIcon, TextUnderlineIcon } from '@hugeicons/core-free-icons'
+import { ArrowDown01Icon, ArrowRight01Icon, BellIcon, Copy01Icon, Delete02Icon, Download01Icon, HelpCircleIcon, Home01Icon, InboxIcon, Search01Icon, SentIcon, TextBoldIcon, TextItalicIcon, TextUnderlineIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/vue'
 import { themes, useAppearance, useConfirm, useToast } from 'iryx-ui'
 import { reactive, ref } from 'vue'
@@ -157,6 +157,16 @@ const clients = ref([
   { label: 'Everest Consulting', value: 'everest' },
   { label: 'Fjord Studio (disabled)', value: 'fjord', disabled: true },
 ])
+
+const groupedClient = ref('acme')
+const clientGroups = [
+  { label: 'Recent', items: [{ label: 'Acme Industries', value: 'acme' }, { label: 'Bolt Logistics', value: 'bolt' }] },
+  { label: 'Archived', items: [{ label: 'Cirrus Systems', value: 'cirrus' }, { label: 'Delta Retail', value: 'delta' }] },
+]
+
+// 5000 rows: without `virtual` this alone would put 5000 nodes in the DOM.
+const bigItem = ref('sku-0')
+const bigList = Array.from({ length: 5000 }, (_, i) => ({ label: `Item ${i}`, value: `sku-${i}` }))
 
 function addClient(name: string) {
   const value = name.toLowerCase().replace(/\s+/g, '-')
@@ -428,7 +438,7 @@ function simulateLoad() {
           <IAlert variant="success" description="No title — just a one-line message." />
           <IAlert
             variant="warning"
-            :icon="Bell"
+            :icon="BellIcon"
             title="Custom icon"
             description="Pass any component, or :icon=&quot;false&quot; to drop it."
           />
@@ -853,10 +863,11 @@ function simulateLoad() {
         </h2>
         <IForm :state="signup" :schema="signupSchema" class="space-y-4" @submit="onSignup">
           <IFormField name="email" label="Email" required description="We'll never share it.">
-            <IInput v-model="signup.email" type="email" placeholder="you@example.com" />
+            <IInput v-model="signup.email" type="email" autocomplete="email" placeholder="you@example.com" />
           </IFormField>
           <IFormField name="password" label="Password" hint="Optional hint" help="At least 8 characters.">
-            <IInput v-model="signup.password" type="password" placeholder="••••••••" />
+            <!-- `new-password`, not Chrome's suggested `current-password`: this form creates an account. -->
+            <IInput v-model="signup.password" type="password" autocomplete="new-password" placeholder="••••••••" />
           </IFormField>
           <IButton type="submit">
             Create account
@@ -932,17 +943,36 @@ function simulateLoad() {
         <h2 class="font-semibold">
           Select — {{ framework }}
         </h2>
-        <ISelect
-          v-model="framework"
-          class="max-w-56"
-          placeholder="Pick a framework"
-          :items="[
-            { label: 'Vue', value: 'vue' },
-            { label: 'React', value: 'react' },
-            { label: 'Svelte', value: 'svelte' },
-            { label: 'Angular (disabled)', value: 'angular', disabled: true },
-          ]"
-        />
+        <div class="flex flex-wrap gap-4">
+          <ISelect
+            v-model="framework"
+            class="max-w-56"
+            placeholder="Pick a framework"
+            :items="[
+              { label: 'Vue', value: 'vue' },
+              { label: 'React', value: 'react' },
+              { label: 'Svelte', value: 'svelte' },
+              { label: 'Angular (disabled)', value: 'angular', disabled: true },
+            ]"
+          />
+          <ISelect
+            v-model="framework"
+            class="max-w-56"
+            placeholder="Grouped"
+            :items="[
+              { label: 'Virtual DOM',
+                items: [
+                  { label: 'Vue', value: 'vue' },
+                  { label: 'React', value: 'react' },
+                ] },
+              { label: 'Compiled',
+                items: [
+                  { label: 'Svelte', value: 'svelte' },
+                  { label: 'Angular (disabled)', value: 'angular', disabled: true },
+                ] },
+            ]"
+          />
+        </div>
       </section>
 
       <section class="space-y-3">
@@ -966,6 +996,34 @@ function simulateLoad() {
             @create="addClient"
           />
         </div>
+      </section>
+
+      <section class="space-y-3">
+        <h2 class="font-semibold">
+          Combobox groups — {{ groupedClient }}
+        </h2>
+        <ICombobox
+          v-model="groupedClient"
+          class="max-w-64"
+          placeholder="Search clients"
+          :items="clientGroups"
+        />
+      </section>
+
+      <section class="space-y-3">
+        <h2 class="font-semibold">
+          Combobox virtualized — {{ bigItem }}
+        </h2>
+        <p class="text-sm text-muted-foreground">
+          5000 options, only the visible rows in the DOM.
+        </p>
+        <ICombobox
+          v-model="bigItem"
+          virtual
+          class="max-w-64"
+          placeholder="Search 5000 items"
+          :items="bigList"
+        />
       </section>
 
       <section class="space-y-3">
