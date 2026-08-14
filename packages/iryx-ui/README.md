@@ -104,7 +104,7 @@ and every component updates.
 
 ```vue
 <template>
-  <IApp theme="emerald" appearance="system" dir="ltr">
+  <IApp theme="rose" appearance="system" dir="ltr">
     <RouterView />
   </IApp>
 </template>
@@ -165,14 +165,14 @@ utilities (shadcn-style `@custom-variant dark`).
 
 ## Theming
 
-Pick a built-in color preset — `violet` (default), `emerald`, `rose`,
-`amber`, `sky` — at startup or at runtime:
+Pick a built-in color preset — `violet` (default) or `rose` — at startup or at
+runtime:
 
 ```ts
 import { applyTheme } from 'iryx-ui'
 
-app.use(createIryxUi({ theme: 'emerald' }))
-// nuxt.config.ts → iryxUi: { theme: 'emerald' }
+app.use(createIryxUi({ theme: 'rose' }))
+// nuxt.config.ts → iryxUi: { theme: 'rose' }
 
 applyTheme('rose') // runtime, e.g. from a theme picker
 ```
@@ -206,10 +206,14 @@ Available tokens, each usable as a Tailwind color (`bg-primary`,
 | Brand | `primary`, `primary-foreground`, `primary-from`, `primary-to` |
 | Status | `success`, `warning`, `danger`, `info` — each with `-foreground`, `-muted`, `-muted-foreground` and `-border` |
 
-`input` is the fill behind `IInput`, `ITextarea`, `INumberInput`, the `ISelect`
-trigger and the `ICombobox` anchor — a token of its own rather than a reused
-`muted`, so how raised a field looks can be tuned without moving every muted
-surface with it.
+`input` is the fill behind the fields — `IInput`, `ITextarea`, `INumberInput`,
+the `ISelect` trigger, the `ICombobox` anchor — and behind `IButton`'s
+`outline` variant, so the two read as the same kind of surface. It's a token
+of its own rather than a reused `muted`, so how raised a control looks can be
+tuned without moving every muted surface with it. It matches the page
+background in light mode and lifts off it in dark, where the difference is
+legible; that split lives in the token values, so no component needs a `dark:`
+class for it.
 
 `primary-from` / `primary-to` are the stops of the solid button's vertical
 gradient. The status tokens carry their own dark-mode values, so components
@@ -271,8 +275,8 @@ app.use(createIryxUi({ unstyled: true }))
 | `ITextarea` | Multi-line field with matching sizes and `invalid` state |
 | `ILabel` | Field label with optional `required` asterisk |
 | `ICheckbox` | Tri-state checkbox (`true` / `false` / `'indeterminate'`), optional `label` + `description` |
-| `ISelect` | Listbox with keyboard nav and typeahead, driven by an `items` array |
-| `ICombobox` | Searchable select — filters as you type, with an optional "create from query" row |
+| `ISelect` | Listbox with keyboard nav and typeahead, driven by an `items` array, with optional groups |
+| `ICombobox` | Searchable select — filters as you type, with optional groups, virtualized rows and a "create from query" row |
 | `IRadioGroup` | Radio list with labels wired up automatically; items take a `description` |
 | `ISwitch` | Accessible toggle, optional `label` + `description` |
 
@@ -412,6 +416,19 @@ const framework = ref('vue')
 
 `ISelect` and `IRadioGroup` accept plain strings or `{ label, value, disabled }` objects. Both also take a default slot if you'd rather compose the Reka primitives yourself.
 
+`ISelect` also takes groups — an entry with its own `items` becomes a labelled
+heading, the same shape `ICombobox` uses:
+
+```vue
+<ISelect
+  v-model="framework"
+  :items="[
+    { label: 'Virtual DOM', items: ['Vue', 'React'] },
+    { label: 'Compiled', items: [{ label: 'Svelte', value: 'svelte' }] },
+  ]"
+/>
+```
+
 ### Searchable selects
 
 `ICombobox` takes the same `items` as `ISelect` and filters them against what
@@ -444,6 +461,31 @@ the option doesn't exist yet, so you add it and select it yourself:
 Both `empty-text` and `create-label` are props precisely so a non-English app
 never inherits an English string; `empty` and `create` slots take over the
 markup entirely if you need more than text.
+
+An entry with its own `items` becomes a labelled group. A group disappears on
+its own once nothing inside it matches:
+
+```vue
+<ICombobox
+  v-model="clientId"
+  :items="[
+    { label: 'Recent', items: ['Acme Industries', 'Bolt Logistics'] },
+    { label: 'Archived', items: [{ label: 'Cirrus Systems', value: 'cirrus' }] },
+  ]"
+/>
+```
+
+For lists in the thousands, `virtual` renders only the rows on screen:
+
+```vue
+<ICombobox v-model="sku" virtual :items="fiveThousandItems" :estimate-size="32" />
+```
+
+`virtual` and grouped items are **mutually exclusive** — the underlying
+virtualizer is a flat window with no notion of group headings, so groups are
+flattened and their labels dropped (with a warning in dev). `estimate-size` is
+the assumed row height in px, used to size the scrollbar before rows are
+measured; set it if you have restyled rows to a different height.
 
 ### Numbers and money
 
