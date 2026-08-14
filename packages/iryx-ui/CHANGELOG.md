@@ -1,5 +1,33 @@
 # iryx-ui
 
+## 0.6.0
+
+### Minor Changes
+
+- **Breaking:** status colour moves from the surface to the mark. `IAlert`, `IToaster` and `IBadge` no longer wash their whole background in the variant colour — the chrome is neutral and the colour sits where it carries meaning: the dot on a badge, the icon on an alert or toast. A saturated block shouts before it is read, and a stack of them turns a page into a traffic light.
+
+  `IBadge` drops the `tone` prop. `soft` and `solid` become a single bordered look; setting `dot` switches the badge to neutral chrome with a coloured dot. Corners drop from a full pill to the shared radius, and the horizontal padding tightens one step at every size. Passing `tone` is now a type error.
+
+  `IStat`'s delta is coloured text with its arrow rather than a filled pill, which competed with the value for attention. `IToaster`'s action is a real button rather than an underlined link.
+
+  `IProgress` is deliberately unchanged: its coloured bar is the data, not decoration around a message.
+
+- Add `IBanner` for page-level announcements. Where `IAlert` is contextual — it sits next to the thing it is about — a banner spans the full width and announces something tied to no single element: a trial ending, scheduled maintenance. It is a labelled `role="region"`, never an alert, because it is ambient and must not interrupt a screen reader mid-task. `position` puts it in the flow, sticky at the top, or fixed to the bottom; `contained` keeps the text at a readable measure while the fill still spans the window.
+
+  `IAlert` gains `v-model:open`, so dismissing is one binding rather than a `close` handler plus a `v-if` — `close` still fires for callers that want to confirm or persist first. It also gains an `actions` slot, so "Retry" and "Undo" have somewhere to live other than the description.
+
+- The typeface now comes from `--iryx-font-sans`, defaulting to the system stack and feeding Tailwind's `font-sans` so utilities follow too. The library still ships no webfont — that would put font files, a licence and a network request into every consuming app whether it wanted them or not. Point the variable at your own family and everything follows. Unlike the colour tokens it is deliberately not mode-specific, so there is no `.dark` counterpart to keep in sync.
+- **Breaking:** `IPagination` buttons default to `sm` instead of `md`, and a new `align` prop (`start` / `center` / `end`) places the control, defaulting to `center`. Both change how an existing pagination looks without the caller touching anything — pass `size="md"` and `align="start"` to keep the old appearance. `md` and `lg` are otherwise unchanged.
+- Add `ITable`, a data table that **never fetches**. It renders the rows you give it and emits what the user did, so caching, cancellation and auth stay in your data layer. Passing `total` switches it to server mode — it stops sorting and paginating locally, because those rows are already the page the server returned; omit it and it handles both itself.
+
+  Every model (`sort`, `page`, `perPage`, `selection`, `expanded`) is optional. Bind one and you own that state — the URL, a store, `useState`, anything — leave it unbound and the table keeps it internally.
+
+  Columns are plain objects rather than render functions: `key` is the dot-notation accessor and the slot suffix, so `#cell-customer.name` targets that column and `#header-<key>` replaces its header. `numeric` gives a column tabular figures and end alignment so amounts line up down the column. Selection is held as row keys with `rowKey`, and select-all covers only the current page, so selections made elsewhere survive.
+
+  Sorting cycles ascending → descending → unsorted, with `null` distinct from never-sorted so a server-mode caller can fall back to its own ordering. Real `<table>` semantics throughout: `aria-sort` on headers, sortable headers as buttons, `aria-busy` while loading.
+
+  `useDataTable()` is exported separately for the whole state machine without any markup.
+
 ## 0.5.0
 
 ### Minor Changes
