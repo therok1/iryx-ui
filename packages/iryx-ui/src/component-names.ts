@@ -31,6 +31,7 @@ export const componentNames = [
   'Stat',
   'Stepper',
   'Switch',
+  'Table',
   'Tabs',
   'Textarea',
   'Toaster',
