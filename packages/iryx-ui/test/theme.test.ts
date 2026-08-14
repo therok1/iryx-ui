@@ -22,12 +22,20 @@ function tokensIn(source: string): string[] {
 }
 
 /**
+ * Tokens that are deliberately mode-independent: a typeface does not change
+ * between light and dark, so redeclaring it under `.dark` would be noise that
+ * every future theme has to keep in sync for no benefit.
+ */
+const modeAgnosticTokens = ['--iryx-font-sans']
+
+/**
  * A token is only usable if it is declared for both modes and exposed to
  * Tailwind. Miss any of the three and the class silently resolves to nothing.
  */
 describe('theme.css tokens', () => {
-  it('declares every :root token in .dark too', () => {
-    expect(tokensIn(block('\\.dark')).sort()).toEqual(tokensIn(block(':root')).sort())
+  it('declares every :root colour token in .dark too', () => {
+    const rootTokens = tokensIn(block(':root')).filter(t => !modeAgnosticTokens.includes(t))
+    expect(tokensIn(block('\\.dark')).sort()).toEqual(rootTokens.sort())
   })
 
   it('maps every token into @theme inline', () => {

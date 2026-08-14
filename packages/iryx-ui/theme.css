@@ -19,6 +19,15 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
+  /*
+   * Typeface. The library ships no webfont — that would put font files, a
+   * licence and a network request in every consumer's bundle whether they
+   * wanted them or not. Point this at your own family instead:
+   *
+   *   :root { --iryx-font-sans: "Instrument Sans", sans-serif; }
+   */
+  --iryx-font-sans: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
   /* Neutral surfaces — shadcn/ui "zinc" palette. */
   --iryx-background: oklch(1 0 0);
   --iryx-foreground: oklch(0.145 0 0);
@@ -110,6 +119,7 @@
 }
 
 @theme inline {
+  --font-sans: var(--iryx-font-sans);
   --color-background: var(--iryx-background);
   --color-foreground: var(--iryx-foreground);
   --color-primary: var(--iryx-primary);
