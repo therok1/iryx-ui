@@ -34,6 +34,7 @@ export interface AlertProps {
     content?: string
     title?: string
     description?: string
+    actions?: string
     close?: string
   }
 }
@@ -50,6 +51,13 @@ const props = withDefaults(defineProps<AlertProps>(), {
 })
 
 defineEmits<{ close: [] }>()
+
+/**
+ * Dismissal as a model, so the common case is one binding rather than a
+ * `close` handler plus a `v-if` in every consumer. `close` still fires, for
+ * callers that want to confirm or persist before it goes.
+ */
+const open = defineModel<boolean>('open', { default: true })
 
 const defaultIcons = {
   info: InformationCircleIcon,
@@ -96,13 +104,16 @@ const titleClass = computed(() =>
 const descriptionClass = computed(() =>
   isUnstyled.value ? props.ui?.description : theme.value.description({ class: props.ui?.description }),
 )
+const actionsClass = computed(() =>
+  isUnstyled.value ? props.ui?.actions : theme.value.actions({ class: props.ui?.actions }),
+)
 const closeClass = computed(() =>
   isUnstyled.value ? props.ui?.close : theme.value.close({ class: props.ui?.close }),
 )
 </script>
 
 <template>
-  <Primitive :as="props.as" :role="role" :class="rootClass">
+  <Primitive v-if="open" :as="props.as" :role="role" :class="rootClass">
     <div v-if="resolvedIcon || $slots.icon" :class="iconClass">
       <slot name="icon">
         <Icon :icon="resolvedIcon" />
@@ -120,6 +131,9 @@ const closeClass = computed(() =>
           {{ props.description }}
         </slot>
       </div>
+      <div v-if="$slots.actions" :class="actionsClass">
+        <slot name="actions" />
+      </div>
     </div>
 
     <button
@@ -127,7 +141,7 @@ const closeClass = computed(() =>
       type="button"
       :aria-label="props.closeLabel"
       :class="closeClass"
-      @click="$emit('close')"
+      @click="open = false; $emit('close')"
     >
       <slot name="close">
         <Icon :icon="Cancel01Icon" />

@@ -68,10 +68,23 @@ describe('alert', () => {
    */
   it('styles every variant from theme tokens, not raw palettes', () => {
     for (const variant of ['info', 'success', 'warning', 'danger'] as const) {
+      const wrapper = mount(Alert, { props: { variant } })
+      const iconClasses = wrapper.get('[role] > div').attributes('class') ?? ''
+      expect(iconClasses).toContain(`text-${variant}`)
+      expect(iconClasses).not.toMatch(/dark:|emerald|amber|red-|blue-/)
+    }
+  })
+
+  /*
+   * The surface stays neutral across variants — colour belongs to the icon, so
+   * a column of alerts reads as one family instead of a traffic light.
+   */
+  it('keeps the surface neutral whatever the variant', () => {
+    for (const variant of ['info', 'success', 'warning', 'danger'] as const) {
       const classes = mount(Alert, { props: { variant } }).attributes('class') ?? ''
-      expect(classes).toContain(`bg-${variant}-muted`)
-      expect(classes).toContain(`border-${variant}-border`)
-      expect(classes).not.toMatch(/dark:|emerald|amber|red-|blue-/)
+      expect(classes).toContain('bg-background')
+      expect(classes).toContain('border-border')
+      expect(classes).not.toContain(`bg-${variant}-muted`)
     }
   })
 
