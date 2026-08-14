@@ -107,13 +107,22 @@ describe('useToast', () => {
     expect(body()).not.toContain('Deleted')
   })
 
-  it('colours variants from status tokens, not raw palettes', async () => {
+  /*
+   * The surface stays neutral and the icon carries the status, matching IAlert
+   * and IBadge — stacked toasts would otherwise be a column of washed blocks
+   * fighting each other and the page behind them.
+   */
+  it('colours the icon from status tokens, keeping the surface neutral', async () => {
     mount(Toaster, { attachTo: document.body })
     useToast().danger('Failed')
     await settle()
     const root = toastElements()[0]!
-    expect(root.className).toContain('bg-danger-muted')
-    expect(root.className).not.toMatch(/dark:|emerald|amber|red-|blue-/)
+    expect(root.className).toContain('bg-background')
+    expect(root.className).not.toContain('bg-danger-muted')
+
+    const icon = root.querySelector('div')!
+    expect(icon.className).toContain('text-danger')
+    expect(icon.className).not.toMatch(/dark:|emerald|amber|red-|blue-/)
   })
 
   it('allows overriding the close label for non-English apps', async () => {

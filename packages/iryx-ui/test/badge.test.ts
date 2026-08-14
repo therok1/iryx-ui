@@ -17,17 +17,31 @@ describe('badge', () => {
     expect(mount(Badge, { props: { as: 'div' } }).element.tagName).toBe('DIV')
   })
 
-  it('defaults to the neutral soft variant', () => {
+  it('defaults to the neutral variant', () => {
     expect(mount(Badge).attributes('class')).toContain('bg-muted')
   })
 
-  it('pairs each variant with its tone', () => {
-    expect(mount(Badge, { props: { variant: 'success' } }).attributes('class'))
-      .toContain('bg-success-muted')
-    expect(mount(Badge, { props: { variant: 'success', tone: 'solid' } }).attributes('class'))
-      .toContain('bg-success')
+  it('tints the surface, border and text per variant', () => {
+    const success = mount(Badge, { props: { variant: 'success' } }).attributes('class') ?? ''
+    expect(success).toContain('bg-success-muted')
+    expect(success).toContain('border-success-border')
+    expect(success).toContain('text-success-muted-foreground')
     expect(mount(Badge, { props: { variant: 'danger' } }).attributes('class'))
       .toContain('bg-danger-muted')
+  })
+
+  /*
+   * The dotted look moves the colour off the badge and onto the dot, so a row
+   * of mixed statuses reads as one family rather than five competing blocks.
+   */
+  it('goes neutral when dotted, colouring only the dot', () => {
+    const wrapper = mount(Badge, { props: { variant: 'danger', dot: true, label: 'Overdue' } })
+    const root = wrapper.attributes('class') ?? ''
+
+    expect(root).toContain('bg-background')
+    expect(root).toContain('border-border')
+    expect(root).not.toContain('bg-danger-muted')
+    expect(wrapper.get('[aria-hidden="true"]').attributes('class')).toContain('bg-danger')
   })
 
   /*
@@ -37,11 +51,15 @@ describe('badge', () => {
    */
   it('styles every coloured variant from theme tokens, not raw palettes', () => {
     for (const variant of ['success', 'warning', 'danger', 'info'] as const) {
-      for (const tone of ['soft', 'solid'] as const) {
-        const classes = mount(Badge, { props: { variant, tone } }).attributes('class') ?? ''
-        expect(classes).toContain(`-${variant}`)
-        expect(classes).not.toMatch(/dark:|emerald|amber|red-|blue-/)
-      }
+      const plain = mount(Badge, { props: { variant } })
+      const classes = plain.attributes('class') ?? ''
+      expect(classes).toContain(`-${variant}`)
+      expect(classes).not.toMatch(/dark:|emerald|amber|red-|blue-/)
+
+      const dotted = mount(Badge, { props: { variant, dot: true } })
+      const dotClasses = dotted.get('[aria-hidden="true"]').attributes('class') ?? ''
+      expect(dotClasses).toContain(`bg-${variant}`)
+      expect(dotClasses).not.toMatch(/dark:|emerald|amber|red-|blue-/)
     }
   })
 
@@ -65,9 +83,9 @@ describe('badge', () => {
    */
   it('tightens the padding on the side an icon sits on', () => {
     for (const [size, start, end] of [
-      ['sm', 'has-[[data-icon=inline-start]]:pl-1.5', 'has-[[data-icon=inline-end]]:pr-1.5'],
-      ['md', 'has-[[data-icon=inline-start]]:pl-2', 'has-[[data-icon=inline-end]]:pr-2'],
-      ['lg', 'has-[[data-icon=inline-start]]:pl-2.5', 'has-[[data-icon=inline-end]]:pr-2.5'],
+      ['sm', 'has-[[data-icon=inline-start]]:pl-1', 'has-[[data-icon=inline-end]]:pr-1'],
+      ['md', 'has-[[data-icon=inline-start]]:pl-1.5', 'has-[[data-icon=inline-end]]:pr-1.5'],
+      ['lg', 'has-[[data-icon=inline-start]]:pl-2', 'has-[[data-icon=inline-end]]:pr-2'],
     ] as const) {
       const classes = mount(Badge, { props: { size } }).attributes('class') ?? ''
       expect(classes).toContain(start)

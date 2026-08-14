@@ -11,12 +11,19 @@ export const statTheme = tv({
     label: 'text-xs font-medium tracking-wide text-muted-foreground uppercase',
     value: 'font-semibold tracking-tight text-foreground tabular-nums',
     /*
-     * A pill rather than loose text, so the change reads at a glance. Padding
-     * tightens on the side the arrow sits on, as on Button and Badge.
+     * Coloured text with an arrow, not a filled pill. The pill competed with
+     * the value for attention — the number is the point of a stat, and the
+     * delta is a footnote to it. The arrow already encodes direction, so the
+     * colour is reinforcement rather than the only signal.
      */
-    delta: 'inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 text-xs font-medium tabular-nums has-[[data-icon=inline-end]]:pe-1 has-[[data-icon=inline-start]]:ps-1 [&_svg]:size-3.5',
+    delta: 'inline-flex items-center gap-0.5 text-xs font-medium tabular-nums [&_svg]:size-3.5',
     hint: 'text-xs text-muted-foreground',
-    /** Column, so the delta always sits on its own line under the value. */
+    /*
+     * The delta always sits on its own line. Inline reads tighter, but whether
+     * it fits depends on how long that particular value is — so a row of cards
+     * wraps unevenly, one tile breaking while its neighbours don't. A column
+     * is the same shape whatever the number.
+     */
     row: 'flex flex-col items-start gap-1.5',
   },
   variants: {
@@ -30,9 +37,9 @@ export const statTheme = tv({
      * result does not read as either good or bad.
      */
     trend: {
-      up: { delta: 'bg-success-muted text-success-muted-foreground' },
-      down: { delta: 'bg-danger-muted text-danger-muted-foreground' },
-      neutral: { delta: 'bg-muted text-muted-foreground' },
+      up: { delta: 'text-success' },
+      down: { delta: 'text-danger' },
+      neutral: { delta: 'text-muted-foreground' },
     },
   },
   defaultVariants: {

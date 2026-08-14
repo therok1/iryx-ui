@@ -3,21 +3,32 @@ import { tv } from 'tailwind-variants'
 export const toastTheme = tv({
   slots: {
     viewport: 'fixed z-50 flex max-h-screen w-full flex-col gap-2 p-4 outline-none sm:max-w-sm',
-    root: 'flex items-start gap-3 rounded-xl border p-4 shadow-lg data-[state=closed]:animate-fade-out data-[state=open]:animate-toast-in',
-    icon: 'mt-0.5 shrink-0 [&_svg]:size-5',
+    /*
+     * Neutral surface for every variant, as on IAlert and IBadge — colour goes
+     * in the icon. It matters more here: toasts stack, and three washed blocks
+     * in a corner fight both each other and the page underneath. Opaque
+     * background, since a toast floats over content.
+     */
+    root: 'flex items-start gap-3 rounded-xl border border-border bg-background p-4 text-foreground shadow-lg data-[state=closed]:animate-fade-out data-[state=open]:animate-toast-in',
+    icon: 'mt-px shrink-0 [&_svg]:size-4.5',
     content: 'min-w-0 flex-1',
-    title: 'text-sm font-medium',
-    description: 'text-sm opacity-90',
-    action: 'shrink-0 self-center rounded-lg px-2 py-1 text-sm font-medium underline-offset-4 transition-colors outline-none hover:underline focus-visible:ring-2 focus-visible:ring-current/50',
-    close: '-m-1 shrink-0 self-start rounded-lg p-1 opacity-70 transition-opacity outline-none hover:opacity-100 focus-visible:ring-2 focus-visible:ring-current/50 [&_svg]:size-4',
+    title: 'text-sm font-medium text-foreground',
+    description: 'text-sm text-muted-foreground',
+    /*
+     * A real button rather than an underlined link: the action is the one thing
+     * in a toast worth clicking, and it disappears on a timer, so it needs to
+     * look pressable at a glance.
+     */
+    action: 'shrink-0 self-center rounded-lg border border-border px-2.5 py-1 text-xs font-medium transition-colors outline-none hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-primary/50',
+    close: '-m-1 shrink-0 self-start rounded-lg p-1 text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary/50 [&_svg]:size-4',
   },
   variants: {
     variant: {
-      neutral: { root: 'border-border bg-background text-foreground', icon: 'text-muted-foreground' },
-      success: { root: 'border-success-border bg-success-muted text-success-muted-foreground', icon: 'text-success' },
-      warning: { root: 'border-warning-border bg-warning-muted text-warning-muted-foreground', icon: 'text-warning' },
-      danger: { root: 'border-danger-border bg-danger-muted text-danger-muted-foreground', icon: 'text-danger' },
-      info: { root: 'border-info-border bg-info-muted text-info-muted-foreground', icon: 'text-info' },
+      neutral: { icon: 'text-muted-foreground' },
+      success: { icon: 'text-success' },
+      warning: { icon: 'text-warning' },
+      danger: { icon: 'text-danger' },
+      info: { icon: 'text-info' },
     },
     position: {
       'top-left': { viewport: 'top-0 left-0' },

@@ -10,10 +10,11 @@ export interface BadgeProps {
   /** Merge props onto the immediate child instead of rendering an element. */
   asChild?: boolean
   variant?: 'neutral' | 'success' | 'warning' | 'danger' | 'info'
-  /** `soft` is a tinted background; `solid` is a filled block of colour. */
-  tone?: 'soft' | 'solid'
   size?: 'sm' | 'md' | 'lg'
-  /** Show a small leading dot in the current text colour. */
+  /**
+   * Show a leading status dot. This also switches the look: the badge goes
+   * neutral and the dot alone carries the variant's colour.
+   */
   dot?: boolean
   /** Text content. Ignored when the default slot is used. */
   label?: string
@@ -36,7 +37,7 @@ const config = useIryxUiConfig()
 const isUnstyled = computed(() => props.unstyled ?? config.unstyled)
 
 const theme = computed(() =>
-  badgeTheme({ variant: props.variant, tone: props.tone, size: props.size }),
+  badgeTheme({ variant: props.variant, withDot: props.dot ?? false, size: props.size }),
 )
 
 const rootClass = computed(() =>
