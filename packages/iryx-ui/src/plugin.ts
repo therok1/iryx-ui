@@ -13,7 +13,7 @@ export interface IryxUiPluginOptions extends Partial<IryxUiConfig> {
   prefix?: string
   /** Startup appearance. A preference the user already stored wins over this. */
   appearance?: Appearance
-  /** Color theme: a preset name (`'emerald'`, `'rose'`…) or a custom theme. */
+  /** Color theme: a preset name (`'violet'`, `'rose'`) or a custom theme. */
   theme?: Theme | ThemePresetName
 }
 

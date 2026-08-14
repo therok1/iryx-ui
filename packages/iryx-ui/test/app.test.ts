@@ -46,21 +46,21 @@ describe('app', () => {
       props: { unstyled: true },
       slots: { default: () => h(Input, { unstyled: false }) },
     })
-    expect(wrapper.get('input').attributes('class')).toContain('rounded-lg')
+    expect(wrapper.get('input').attributes('class')).toContain('rounded-xl')
   })
 
   it('applies a theme preset', () => {
-    mount(App, { props: { theme: 'emerald' }, slots: { default: () => h(Input) } })
+    mount(App, { props: { theme: 'violet' }, slots: { default: () => h(Input) } })
     const style = document.getElementById('iryx-ui-theme')
-    expect(style?.textContent).toContain(`--iryx-primary: ${themes.emerald.light.primary};`)
+    expect(style?.textContent).toContain(`--iryx-primary: ${themes.violet.light.primary};`)
   })
 
   it('swaps the theme reactively and clears it when removed', async () => {
-    const theme = ref<'emerald' | 'rose' | undefined>('emerald')
+    const theme = ref<'violet' | 'rose' | undefined>('violet')
     mount(defineComponent({
       setup: () => () => h(App, { theme: theme.value }, { default: () => h(Input) }),
     }))
-    expect(document.getElementById('iryx-ui-theme')?.textContent).toContain(themes.emerald.light.primary!)
+    expect(document.getElementById('iryx-ui-theme')?.textContent).toContain(themes.violet.light.primary!)
 
     theme.value = 'rose'
     await flushPromises()

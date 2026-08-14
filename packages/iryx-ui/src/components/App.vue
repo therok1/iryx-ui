@@ -14,7 +14,7 @@ export interface AppProps extends /* @vue-ignore */ ConfigProviderProps {
    * below. Reactive, unlike the install-time plugin option.
    */
   unstyled?: boolean
-  /** Colour theme: a preset name (`'emerald'`…) or a custom theme. */
+  /** Colour theme: a preset name (`'violet'`, `'rose'`) or a custom theme. */
   theme?: Theme | ThemePresetName
   /** Startup appearance. A preference the user already stored wins over this. */
   appearance?: Appearance

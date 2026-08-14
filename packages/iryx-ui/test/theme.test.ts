@@ -47,16 +47,16 @@ describe('theme.css tokens', () => {
 
 describe('applyTheme', () => {
   it('injects token overrides for both light and dark modes', () => {
-    applyTheme('emerald')
+    applyTheme('violet')
     const style = document.getElementById('iryx-ui-theme')
     expect(style).toBeTruthy()
     expect(style!.textContent).toContain(':root')
     expect(style!.textContent).toContain('.dark')
-    expect(style!.textContent).toContain(`--iryx-primary: ${themes.emerald.light.primary};`)
+    expect(style!.textContent).toContain(`--iryx-primary: ${themes.violet.light.primary};`)
   })
 
   it('replaces a previously applied theme instead of stacking', () => {
-    applyTheme('emerald')
+    applyTheme('violet')
     applyTheme({ light: { primary: 'red' }, dark: { primary: 'pink' } })
     const styles = document.querySelectorAll('#iryx-ui-theme')
     expect(styles.length).toBe(1)
