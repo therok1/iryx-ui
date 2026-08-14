@@ -22,6 +22,8 @@ export interface PaginationProps {
   /** Keep the first and last page visible however far away they are. */
   showEdges?: boolean
   size?: 'sm' | 'md' | 'lg'
+  /** Where the control sits in its container. Centred by default. */
+  align?: 'start' | 'center' | 'end'
   /** Accessible names — override for non-English apps. */
   prevLabel?: string
   nextLabel?: string
@@ -54,7 +56,7 @@ const page = defineModel<number>('page', { default: 1 })
 const config = useIryxUiConfig()
 const isUnstyled = computed(() => props.unstyled ?? config.unstyled)
 
-const theme = computed(() => paginationTheme({ size: props.size }))
+const theme = computed(() => paginationTheme({ size: props.size, align: props.align }))
 
 const rootClass = computed(() =>
   isUnstyled.value

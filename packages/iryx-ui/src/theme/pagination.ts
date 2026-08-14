@@ -16,9 +16,19 @@ export const paginationTheme = tv({
       md: { item: 'h-9 min-w-9 px-2.5', ellipsis: 'h-9 min-w-9' },
       lg: { item: 'h-10 min-w-10 px-3', ellipsis: 'h-10 min-w-10' },
     },
+    /*
+     * The root fills its parent, so this places the whole control. Centred by
+     * default because pagination normally sits under the content it pages.
+     */
+    align: {
+      start: { root: 'justify-start' },
+      center: { root: 'justify-center' },
+      end: { root: 'justify-end' },
+    },
   },
   defaultVariants: {
-    size: 'md',
+    size: 'sm',
+    align: 'center',
   },
 })
 
