@@ -649,9 +649,17 @@ visually-hidden table instead, so a screen reader gets the actual numbers
 rather than a blank graphic. That table renders even before the container has
 been measured — the data is never gated behind layout.
 
-Long category labels thin out to every *n*th rather than rotating or
-colliding. For many categories or long names, that's the honest limit of this
-chart — reach for a table.
+**`orientation="horizontal"`** runs the categories down the side:
+
+```vue
+<IBarChart :data="spend" orientation="horizontal" label="Spend by category" />
+```
+
+Vertical charts thin colliding labels to every *n*th, which is fine for `Jan`
+/ `Feb` and lossy for `Travel and accommodation`. Turn the chart and the names
+get real width, so nothing is dropped — that's the case horizontal is for.
+Everything else behaves the same: grouped series, the tooltip, the round-number
+axis anchored at zero.
 
 #### Sparklines
 

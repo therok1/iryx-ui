@@ -165,6 +165,54 @@ describe('barChart', () => {
     expect(wrapper.findAll('tbody tr')).toHaveLength(3)
   })
 
+  /**
+   * The reason horizontal exists: vertical charts thin colliding labels, and
+   * long category names are exactly the case where dropping every other one
+   * loses the information the chart is about.
+   */
+  it('shows every long label horizontally that it would thin vertically', async () => {
+    const long = [
+      { label: 'Travel and accommodation', value: 4300 },
+      { label: 'Professional services', value: 3800 },
+      { label: 'Software licences', value: 9200 },
+      { label: 'Office and utilities', value: 6100 },
+      { label: 'Subcontractors', value: 18400 },
+      { label: 'Equipment', value: 2400 },
+    ]
+
+    const vertical = await mountChart({ data: long })
+    const shownVertically = vertical.findAll('text').filter(node => node.text().includes(' ')).length
+
+    const horizontal = await mountChart({ data: long, orientation: 'horizontal' })
+    const shownHorizontally = horizontal.findAll('text').filter(node => node.text().includes(' ')).length
+
+    expect(shownHorizontally).toBeGreaterThan(shownVertically)
+    for (const datum of long)
+      expect(horizontal.text()).toContain(datum.label)
+  })
+
+  it('runs bars along the value axis when horizontal', async () => {
+    const wrapper = await mountChart({ orientation: 'horizontal' })
+    const boxOf = (d: string) => {
+      const xs = [...d.matchAll(/[ML]([\d.]+) ([\d.]+)/g)].map(m => [Number(m[1]), Number(m[2])] as const)
+      return {
+        w: Math.max(...xs.map(p => p[0])) - Math.min(...xs.map(p => p[0])),
+        h: Math.max(...xs.map(p => p[1])) - Math.min(...xs.map(p => p[1])),
+      }
+    }
+
+    // Bars are wider than they are tall once the chart turns.
+    const bar = boxOf(wrapper.findAll('path')[1]!.attributes('d')!)
+    expect(bar.w).toBeGreaterThan(bar.h)
+  })
+
+  it('keeps the axis anchored at zero in both orientations', async () => {
+    for (const orientation of ['vertical', 'horizontal'] as const) {
+      const wrapper = await mountChart({ orientation })
+      expect(wrapper.findAll('text').map(node => node.text())).toContain('0')
+    }
+  })
+
   it('survives an empty series', async () => {
     const wrapper = await mountChart({ data: [] })
     expect(wrapper.findAll('path')).toHaveLength(0)

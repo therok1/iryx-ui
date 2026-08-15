@@ -173,6 +173,16 @@ const netByMonth = months.slice(0, 6).map((label, index) => ({
   value: [1200, -450, 800, -1100, 300, 1650][index]!,
 }))
 
+// Names far too long for a vertical axis — the case horizontal exists for.
+const expenseCategories = [
+  { label: 'Subcontractors', value: 18400 },
+  { label: 'Software licences', value: 9200 },
+  { label: 'Office and utilities', value: 6100 },
+  { label: 'Travel and accommodation', value: 4300 },
+  { label: 'Professional services', value: 3800 },
+  { label: 'Equipment', value: 2400 },
+]
+
 // Slots are pinned, so hiding one series never repaints the others.
 const cashflowSeries = [
   { key: 'revenue', name: 'Revenue', slot: 0 },
@@ -906,6 +916,20 @@ function simulateLoad() {
           <IBarChart
             :data="revenueByMonth"
             label="Revenue by month"
+            locale="de-DE"
+            :format="{ style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }"
+          />
+        </ICard>
+
+        <p class="text-sm text-muted-foreground">
+          Horizontal — long category names get room instead of being thinned out.
+        </p>
+        <ICard>
+          <IBarChart
+            :data="expenseCategories"
+            orientation="horizontal"
+            label="Spend by category"
+            :height="260"
             locale="de-DE"
             :format="{ style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }"
           />

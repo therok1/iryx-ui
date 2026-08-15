@@ -15,7 +15,15 @@ export const AXIS_GAP = 8
 export const CATEGORY_HEIGHT = 20
 export const TOP_PAD = 8
 
+/**
+ * Which way the bands run. `vertical` puts categories along the bottom;
+ * `horizontal` puts them down the side, where a long name has room to be read
+ * instead of being thinned out or rotated.
+ */
+export type ChartOrientation = 'vertical' | 'horizontal'
+
 export interface CartesianInput {
+  orientation?: ChartOrientation
   /** Every plotted value, gaps included — only the finite ones set the domain. */
   values: readonly SparseValue[]
   /** How many slots along the x axis. */
@@ -39,19 +47,28 @@ export interface CartesianInput {
 }
 
 export interface CartesianLayout {
+  orientation: ChartOrientation
   ticks: number[]
   plot: { left: number, top: number, width: number, height: number }
-  /** Value to y-pixel, already inverted for SVG's downward axis. */
+  /**
+   * A value to its pixel along the value axis — y when vertical, x when
+   * horizontal. Named for the job rather than the axis, so callers do not have
+   * to care which way round the chart is.
+   */
+  value: (value: number) => number
+  /** Backwards-compatible alias for the vertical case. */
   y: (value: number) => number
-  /** Width of one category slot. */
+  /** Size of one category slot, along whichever axis carries the categories. */
   bandWidth: number
   /** Draw every nth category label; the rest would collide. */
   labelStep: number
-  /** Centre of a category slot, in px. */
+  /** Centre of a category slot, in px along the category axis. */
   bandCentre: (index: number) => number
 }
 
 export function cartesianLayout(input: CartesianInput): CartesianLayout {
+  const orientation = input.orientation ?? 'vertical'
+  const horizontal = orientation === 'horizontal'
   const span = extent(input.values)
 
   const axis = span
@@ -62,31 +79,58 @@ export function cartesianLayout(input: CartesianInput): CartesianLayout {
       )
     : niceTicks(0, 1, input.tickCount)
 
-  const gutter = input.showAxis
-    ? Math.ceil(Math.max(...axis.ticks.map(tick => input.formatTick(tick).length), 1) * CHAR_WIDTH) + AXIS_GAP
-    : 0
+  const tickWidth = Math.ceil(
+    Math.max(...axis.ticks.map(tick => input.formatTick(tick).length), 1) * CHAR_WIDTH,
+  ) + AXIS_GAP
+
+  /**
+   * The left gutter holds whichever labels sit beside the plot: the value
+   * ticks when vertical, the category names when horizontal. Horizontal is
+   * the whole point of the orientation — a long name gets real width here
+   * rather than being thinned out along the bottom.
+   */
+  const gutter = horizontal
+    ? Math.ceil(input.longestLabel * CHAR_WIDTH) + AXIS_GAP
+    : (input.showAxis ? tickWidth : 0)
+
+  // Both orientations reserve the bottom strip: category names when vertical,
+  // value ticks when horizontal.
+  const bottom = horizontal && !input.showAxis ? 0 : CATEGORY_HEIGHT
 
   const plot = {
     left: gutter,
     top: TOP_PAD,
     width: Math.max(input.width - gutter, 0),
-    height: Math.max(input.height - TOP_PAD - CATEGORY_HEIGHT, 0),
+    height: Math.max(input.height - TOP_PAD - bottom, 0),
   }
 
-  const y = linearScale([axis.min, axis.max], [plot.top + plot.height, plot.top])
-  const bandWidth = input.categories ? plot.width / input.categories : 0
+  const value = horizontal
+    // Left to right, so a bigger number reaches further right.
+    ? linearScale([axis.min, axis.max], [plot.left, plot.left + plot.width])
+    // Inverted: SVG y grows downward, so the largest value sits at the top.
+    : linearScale([axis.min, axis.max], [plot.top + plot.height, plot.top])
 
-  const labelStep = bandWidth
-    ? Math.max(1, Math.ceil((input.longestLabel * CHAR_WIDTH + 8) / bandWidth))
-    : 1
+  const bandSpan = horizontal ? plot.height : plot.width
+  const bandWidth = input.categories ? bandSpan / input.categories : 0
+  const bandStart = horizontal ? plot.top : plot.left
+
+  /**
+   * Vertical labels collide side to side, so the test is the text's width.
+   * Horizontal labels stack, so the test is line height — which is why long
+   * names stop being a problem the moment the chart turns.
+   */
+  const labelFootprint = horizontal ? 16 : input.longestLabel * CHAR_WIDTH + 8
+  const labelStep = bandWidth ? Math.max(1, Math.ceil(labelFootprint / bandWidth)) : 1
 
   return {
+    orientation,
     ticks: axis.ticks,
     plot,
-    y,
+    value,
+    y: value,
     bandWidth,
     labelStep,
-    bandCentre: (index: number) => plot.left + bandWidth * (index + 0.5),
+    bandCentre: (index: number) => bandStart + bandWidth * (index + 0.5),
   }
 }
 
@@ -148,6 +192,22 @@ export function warnOnSlotOverflow(count: number): void {
  * visible at the unclamped position and visibly jumps.
  */
 export function clampTooltip(centre: number, text: string, width: number): number {
-  const half = (text.length * CHAR_WIDTH + 28) / 2
+  const half = tooltipHalfWidth(text)
+  if (width <= half * 2)
+    return width / 2
   return Math.min(Math.max(centre, half), Math.max(width - half, half))
+}
+
+/**
+ * Half the tooltip's estimated width, for callers that need to offset it.
+ *
+ * Narrower per character than `CHAR_WIDTH`, which is sized for axis labels
+ * where over-reserving costs nothing. A tooltip is placed against that width,
+ * so overshooting makes it dodge out of the way of space it would have fitted
+ * in.
+ */
+const TOOLTIP_CHAR_WIDTH = 5.6
+
+export function tooltipHalfWidth(text: string): number {
+  return (text.length * TOOLTIP_CHAR_WIDTH + 28) / 2
 }

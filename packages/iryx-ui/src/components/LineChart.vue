@@ -206,7 +206,11 @@ const tooltip = computed(() => {
   if (!rows.length)
     return undefined
 
-  const widest = Math.max(...rows.map(row => row.name.length + row.value.length))
+  // Matches what is rendered: one line for a single series, a row per measure
+  // under the category label otherwise.
+  const widest = isMulti.value
+    ? Math.max(datum.label.length, ...rows.map(row => row.name.length + row.value.length + 3))
+    : datum.label.length + rows[0]!.value.length + 2
 
   return {
     label: datum.label,

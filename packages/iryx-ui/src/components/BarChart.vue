@@ -2,7 +2,7 @@
 import type { ChartSeries } from '../composables/cartesian'
 import type { SparseValue } from '../composables/scale'
 import { computed, ref } from 'vue'
-import { AXIS_GAP, cartesianLayout, clampTooltip, seriesColor, slotOf, warnOnSlotOverflow } from '../composables/cartesian'
+import { AXIS_GAP, cartesianLayout, clampTooltip, seriesColor, slotOf, tooltipHalfWidth, warnOnSlotOverflow } from '../composables/cartesian'
 import { useElementSize } from '../composables/element-size'
 import { useIryxUiConfig } from '../config'
 import { barChartTheme } from '../theme/bar-chart'
@@ -24,6 +24,12 @@ export interface BarChartProps {
   data?: readonly BarChartDatum[]
   /** Two or more measures per category. Omit for the single-series case. */
   series?: readonly ChartSeries[]
+  /**
+   * `horizontal` runs the categories down the side, where a long name has room
+   * to be read. Vertical charts thin their labels to avoid collisions, so long
+   * or numerous category names are the case to turn the chart for.
+   */
+  orientation?: 'vertical' | 'horizontal'
   /** Rendered height in px. Width always fills the container. */
   height?: number
   /** Target tick count. The axis lands on round numbers, so this is a hint. */
@@ -52,6 +58,7 @@ export interface BarChartProps {
 
 const props = withDefaults(defineProps<BarChartProps>(), {
   data: () => [],
+  orientation: 'vertical',
   height: 240,
   ticks: 5,
   axis: true,
@@ -91,7 +98,10 @@ function readValue(datum: BarChartDatum, key: string): SparseValue {
   return typeof raw === 'number' && Number.isFinite(raw) ? raw : null
 }
 
+const horizontal = computed(() => props.orientation === 'horizontal')
+
 const layout = computed(() => cartesianLayout({
+  orientation: props.orientation,
   values: props.data.flatMap(datum => series.value.map(entry => readValue(datum, entry.key))),
   categories: props.data.length,
   longestLabel: Math.max(...props.data.map(datum => datum.label.length), 1),
@@ -124,7 +134,8 @@ interface Bar {
   y: number
   width: number
   height: number
-  up: boolean
+  /** Which side of the baseline the bar grows toward. */
+  direction: 'up' | 'down' | 'right' | 'left'
   seriesIndex: number
   categoryIndex: number
 }
@@ -133,8 +144,10 @@ const bars = computed<Bar[]>(() => {
   if (!width.value || !props.data.length)
     return []
 
-  const baseline = yScale.value(0)
+  const baseline = layout.value.value(0)
   const total = series.value.length
+  // Neighbouring bars in a group need a sliver of surface between them.
+  const gap = total > 1 ? 1 : 0
 
   return props.data.flatMap((datum, categoryIndex) =>
     series.value.flatMap((entry, seriesIndex) => {
@@ -142,19 +155,33 @@ const bars = computed<Bar[]>(() => {
       if (value == null)
         return []
 
-      const y = yScale.value(value)
+      const tip = layout.value.value(value)
       // Group centred on the band, then each bar offset within the group.
-      const groupLeft = layout.value.bandCentre(categoryIndex) - (barWidth.value * total) / 2
+      const groupStart = layout.value.bandCentre(categoryIndex) - (barWidth.value * total) / 2
+      const bandOffset = groupStart + barWidth.value * seriesIndex + gap
+      const thickness = Math.max(barWidth.value - gap * 2, 1)
+      const length = Math.abs(tip - baseline)
 
-      return [{
-        x: groupLeft + barWidth.value * seriesIndex,
-        y: Math.min(y, baseline),
-        width: barWidth.value,
-        height: Math.abs(baseline - y),
-        up: value >= 0,
-        seriesIndex,
-        categoryIndex,
-      }]
+      // The band axis and the value axis swap; everything else is the same.
+      return [horizontal.value
+        ? {
+            x: Math.min(tip, baseline),
+            y: bandOffset,
+            width: length,
+            height: thickness,
+            direction: value >= 0 ? 'right' as const : 'left' as const,
+            seriesIndex,
+            categoryIndex,
+          }
+        : {
+            x: bandOffset,
+            y: Math.min(tip, baseline),
+            width: thickness,
+            height: length,
+            direction: value >= 0 ? 'up' as const : 'down' as const,
+            seriesIndex,
+            categoryIndex,
+          }]
     }),
   )
 })
@@ -162,24 +189,23 @@ const bars = computed<Bar[]>(() => {
 /**
  * Rounded at the data end, square at the baseline — the rounding reads as the
  * tip of the value, so rounding both ends would detach the bar from its axis.
- * Grouped bars leave a 2px gap so neighbours read as separate marks.
  */
 function barPath(bar: Bar): string {
-  const gap = series.value.length > 1 ? 1 : 0
-  const x = bar.x + gap
-  const w = Math.max(bar.width - gap * 2, 1)
-  const radius = Math.min(4, w / 2, bar.height)
+  const { x, y, width: w, height: h } = bar
   const right = x + w
+  const bottom = y + h
+  const r = Math.min(4, w / 2, h / 2, bar.direction === 'up' || bar.direction === 'down' ? h : w)
 
-  if (bar.up) {
-    const top = bar.y
-    const base = bar.y + bar.height
-    return `M${x} ${base} L${x} ${top + radius} Q${x} ${top} ${x + radius} ${top} L${right - radius} ${top} Q${right} ${top} ${right} ${top + radius} L${right} ${base} Z`
+  switch (bar.direction) {
+    case 'up':
+      return `M${x} ${bottom} L${x} ${y + r} Q${x} ${y} ${x + r} ${y} L${right - r} ${y} Q${right} ${y} ${right} ${y + r} L${right} ${bottom} Z`
+    case 'down':
+      return `M${x} ${y} L${x} ${bottom - r} Q${x} ${bottom} ${x + r} ${bottom} L${right - r} ${bottom} Q${right} ${bottom} ${right} ${bottom - r} L${right} ${y} Z`
+    case 'right':
+      return `M${x} ${y} L${right - r} ${y} Q${right} ${y} ${right} ${y + r} L${right} ${bottom - r} Q${right} ${bottom} ${right - r} ${bottom} L${x} ${bottom} Z`
+    default:
+      return `M${right} ${y} L${x + r} ${y} Q${x} ${y} ${x} ${y + r} L${x} ${bottom - r} Q${x} ${bottom} ${x + r} ${bottom} L${right} ${bottom} Z`
   }
-
-  const base = bar.y
-  const bottom = bar.y + bar.height
-  return `M${x} ${base} L${x} ${bottom - radius} Q${x} ${bottom} ${x + radius} ${bottom} L${right - radius} ${bottom} Q${right} ${bottom} ${right} ${bottom - radius} L${right} ${base} Z`
 }
 
 /** Every nth label; the rest would collide. Dropping beats rotating. */
@@ -207,11 +233,49 @@ const tooltip = computed(() => {
   if (!rows.length)
     return undefined
 
-  const widest = Math.max(...rows.map(row => row.name.length + row.value.length))
+  /**
+   * Estimated from what is actually rendered: a single-series tooltip shows
+   * the category and the value on one line, while a multi-series one stacks a
+   * row per measure under the category. Measuring the series name in the
+   * single case underestimated the box by half and let it cover the mark.
+   */
+  const widest = isMulti.value
+    ? Math.max(datum.label.length, ...rows.map(row => row.name.length + row.value.length + 3))
+    : datum.label.length + rows[0]!.value.length + 2
+  const centre = layout.value.bandCentre(hovered.value)
+
+  // Horizontal: anchor past the longest bar in the group, at the band's centre.
+  if (horizontal.value) {
+    const reach = Math.max(
+      ...series.value.map((entry) => {
+        const value = readValue(datum, entry.key)
+        return value == null ? Number.NEGATIVE_INFINITY : layout.value.value(value)
+      }),
+    )
+    /**
+     * Past the tip rather than over it — the end of the bar is the reading, so
+     * covering it defeats the tooltip. Where a long bar leaves no room on the
+     * right, it flips to the inside rather than being squashed against the
+     * edge and overlapping the tip anyway.
+     */
+    const text = 'x'.repeat(widest)
+    const half = tooltipHalfWidth(text)
+    const outside = reach + half + 8
+    const fits = outside + half <= width.value
+
+    return {
+      label: datum.label,
+      rows,
+      multi: isMulti.value,
+      x: clampTooltip(fits ? outside : reach - half - 8, text, width.value),
+      y: centre,
+    }
+  }
+
   const top = Math.min(
     ...series.value.map((entry) => {
       const value = readValue(datum, entry.key)
-      return value == null ? Number.POSITIVE_INFINITY : Math.min(yScale.value(value), yScale.value(0))
+      return value == null ? Number.POSITIVE_INFINITY : Math.min(layout.value.value(value), layout.value.value(0))
     }),
   )
 
@@ -219,7 +283,7 @@ const tooltip = computed(() => {
     label: datum.label,
     rows,
     multi: isMulti.value,
-    x: clampTooltip(layout.value.bandCentre(hovered.value), 'x'.repeat(widest), width.value),
+    x: clampTooltip(centre, 'x'.repeat(widest), width.value),
     y: top,
   }
 })
@@ -258,19 +322,20 @@ function barClass(bar: Bar) {
       >
         <template v-if="props.axis">
           <g v-for="tick in layout.ticks" :key="`tick-${tick}`">
+            <!-- Gridlines cross the value axis, so they turn with the chart. -->
             <line
-              :x1="plot.left"
-              :y1="yScale(tick)"
-              :x2="plot.left + plot.width"
-              :y2="yScale(tick)"
+              :x1="horizontal ? layout.value(tick) : plot.left"
+              :y1="horizontal ? plot.top : yScale(tick)"
+              :x2="horizontal ? layout.value(tick) : plot.left + plot.width"
+              :y2="horizontal ? plot.top + plot.height : yScale(tick)"
               stroke-width="1"
               :class="slotClass('grid')"
             />
             <text
-              :x="plot.left - AXIS_GAP"
-              :y="yScale(tick)"
-              text-anchor="end"
-              dominant-baseline="middle"
+              :x="horizontal ? layout.value(tick) : plot.left - AXIS_GAP"
+              :y="horizontal ? plot.top + plot.height + 14 : yScale(tick)"
+              :text-anchor="horizontal ? 'middle' : 'end'"
+              :dominant-baseline="horizontal ? undefined : 'middle'"
               :class="slotClass('tick')"
             >
               {{ formatValue(tick) }}
@@ -288,12 +353,14 @@ function barClass(bar: Bar) {
           :class="barClass(bar)"
         />
 
+        <!-- Beside the plot when horizontal, where a long name has room. -->
         <template v-for="(datum, index) in props.data" :key="`label-${datum.label}-${index}`">
           <text
             v-if="index % labelStep === 0"
-            :x="layout.bandCentre(index)"
-            :y="plot.top + plot.height + 14"
-            text-anchor="middle"
+            :x="horizontal ? plot.left - AXIS_GAP : layout.bandCentre(index)"
+            :y="horizontal ? layout.bandCentre(index) : plot.top + plot.height + 14"
+            :text-anchor="horizontal ? 'end' : 'middle'"
+            :dominant-baseline="horizontal ? 'middle' : undefined"
             :class="slotClass('category')"
           >
             {{ datum.label }}
@@ -305,10 +372,10 @@ function barClass(bar: Bar) {
         <rect
           v-for="(datum, index) in props.data"
           :key="`hit-${datum.label}-${index}`"
-          :x="plot.left + bandWidth * index"
-          :y="plot.top"
-          :width="bandWidth"
-          :height="plot.height"
+          :x="horizontal ? plot.left : plot.left + bandWidth * index"
+          :y="horizontal ? plot.top + bandWidth * index : plot.top"
+          :width="horizontal ? plot.width : bandWidth"
+          :height="horizontal ? bandWidth : plot.height"
           :class="isUnstyled ? undefined : theme.hit()"
           @pointerenter="hovered = index"
           @pointerleave="hovered = undefined"
@@ -318,7 +385,15 @@ function barClass(bar: Bar) {
       <div
         v-if="tooltip"
         :class="slotClass('tooltip', tooltip.multi ? 'flex-col items-start gap-1' : undefined)"
-        :style="{ left: `${tooltip.x}px`, top: `${tooltip.y}px`, transform: 'translate(-50%, -100%) translateY(-8px)' }"
+        :style="{
+          left: `${tooltip.x}px`,
+          top: `${tooltip.y}px`,
+          // Horizontal bars grow sideways, so the free space is beside the
+          // tip rather than above it.
+          transform: horizontal
+            ? 'translate(-50%, -50%)'
+            : 'translate(-50%, -100%) translateY(-8px)',
+        }"
       >
         <span :class="slotClass('tooltipLabel')">{{ tooltip.label }}</span>
         <template v-if="tooltip.multi">
