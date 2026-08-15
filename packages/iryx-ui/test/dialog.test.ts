@@ -1,5 +1,5 @@
 import { enableAutoUnmount, mount } from '@vue/test-utils'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { nextTick } from 'vue'
 import { ConfirmDialog, Dialog, useConfirm } from '../src'
 
@@ -21,6 +21,41 @@ function query(selector: string) {
 }
 
 describe('dialog', () => {
+  /**
+   * Reka warns when `aria-describedby` is present but points at an element
+   * that does not exist — which is every dialog without a description, since
+   * it always renders the attribute. Its message suggests
+   * `aria-describedby="undefined"`, but that is React phrasing: there, passing
+   * `undefined` omits the attribute. In Vue the attribute has to be removed,
+   * and the literal string still counts as present.
+   */
+  it('does not warn when it has no description', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    mount(Dialog, { props: { open: true, title: 'Edit' }, attachTo: document.body })
+    await nextTick()
+
+    const described = warn.mock.calls.flat().filter(
+      arg => typeof arg === 'string' && arg.includes('Missing `Description`'),
+    )
+    expect(described).toEqual([])
+    warn.mockRestore()
+  })
+
+  it('keeps aria-describedby wired up when it does have one', async () => {
+    const wrapper = mount(Dialog, {
+      props: { open: true, title: 'Edit', description: 'Change the name.' },
+      attachTo: document.body,
+    })
+    await nextTick()
+
+    const content = document.querySelector('[role="dialog"]')!
+    const id = content.getAttribute('aria-describedby')
+    expect(id).toBeTruthy()
+    expect(document.getElementById(id!)?.textContent).toContain('Change the name.')
+    wrapper.unmount()
+  })
+
   it('renders nothing until opened', async () => {
     mount(Dialog, { props: { title: 'Edit' }, attachTo: document.body })
     await nextTick()

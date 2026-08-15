@@ -76,12 +76,19 @@ const descriptionClass = computed(() =>
 const slots = useSlots()
 
 /**
- * The literal string, not the value: Reka treats `aria-describedby="undefined"`
- * as "this dialog deliberately has no description" and stays quiet. Leaving it
- * unset warns on every description-less dialog.
+ * Reka renders `aria-describedby` unconditionally, pointing at an id that only
+ * exists when a `DialogDescription` was rendered — so every dialog without one
+ * warns about a dangling reference. Its message suggests
+ * `aria-describedby="undefined"`, but that is React phrasing where `undefined`
+ * omits the attribute; the check here is for the attribute's *presence*, so
+ * the literal string is no better than the id. It has to be removed.
+ *
+ * Binding `undefined` through `$attrs` overrides Reka's own value and Vue
+ * drops the attribute. With a description we bind nothing, so Reka's id
+ * survives and the dialog stays properly described.
  */
-const describedBy = computed(() =>
-  props.description || slots.description ? undefined : 'undefined',
+const describedByAttrs = computed(() =>
+  props.description || slots.description ? {} : { 'aria-describedby': undefined },
 )
 const bodyClass = computed(() =>
   isUnstyled.value ? props.ui?.body : theme.value.body({ class: props.ui?.body }),
@@ -120,12 +127,7 @@ function close() {
 
     <DialogPortal>
       <DialogOverlay :class="overlayClass" />
-      <!--
-        `aria-describedby="undefined"` is Reka's opt-out for a dialog that
-        genuinely has no description. Without it every such dialog warns, which
-        trains people to ignore the warning that matters.
-      -->
-      <DialogContent :class="contentClass" :aria-describedby="describedBy">
+      <DialogContent :class="contentClass" v-bind="describedByAttrs">
         <div v-if="props.title || props.description || $slots.header" :class="headerClass">
           <slot name="header">
             <DialogTitle :class="titleClass">

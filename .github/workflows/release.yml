@@ -62,9 +62,23 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Reached only once the version PR is merged and no changesets remain.
+      # "No changesets" is not the same as "unreleased": every later push to
+      # main also has none, and npm rejects publishing over a version that
+      # exists. Ask the registry instead of assuming.
+      - name: Check whether this version is already on npm
+        id: state
+        run: |
+          VERSION=$(node -p "require('./packages/iryx-ui/package.json').version")
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          if npm view "iryx-ui@$VERSION" version >/dev/null 2>&1; then
+            echo "needs_publish=false" >> "$GITHUB_OUTPUT"
+            echo "iryx-ui@$VERSION is already published; nothing to do."
+          else
+            echo "needs_publish=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Publish to npm
-        if: steps.changesets.outputs.hasChangesets == 'false'
+        if: steps.changesets.outputs.hasChangesets == 'false' && steps.state.outputs.needs_publish == 'true'
         working-directory: packages/iryx-ui
         run: npm publish --access public --provenance
 
@@ -72,11 +86,11 @@ jobs:
       # pointer, so GitHub shows the commit it lands on — which is always the
       # merge of the version PR, hence tags reading "Merge pull request #2".
       - name: Tag and publish release notes
-        if: steps.changesets.outputs.hasChangesets == 'false'
+        if: steps.changesets.outputs.hasChangesets == 'false' && steps.state.outputs.needs_publish == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          VERSION=$(node -p "require('./packages/iryx-ui/package.json').version")
+          VERSION="${{ steps.state.outputs.version }}"
           TAG="iryx-ui@$VERSION"
           node scripts/release-notes.mjs "$VERSION"
           git config user.name "github-actions[bot]"
