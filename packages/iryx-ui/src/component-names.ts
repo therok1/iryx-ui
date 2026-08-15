@@ -15,6 +15,8 @@ export const componentNames = [
   'Checkbox',
   'Combobox',
   'ConfirmDialog',
+  'DatePicker',
+  'DateRangePicker',
   'Dialog',
   'DropdownMenu',
   'EmptyState',

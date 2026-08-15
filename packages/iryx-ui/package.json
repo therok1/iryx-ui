@@ -53,6 +53,7 @@
   "dependencies": {
     "@hugeicons/core-free-icons": "^4.2.3",
     "@hugeicons/vue": "^1.0.7",
+    "@internationalized/date": "^3.12.3",
     "@nuxt/kit": "^4.4.8",
     "reka-ui": "^2.9.10",
     "tailwind-merge": "^3.6.0",

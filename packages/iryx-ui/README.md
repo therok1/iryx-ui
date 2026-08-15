@@ -290,6 +290,8 @@ app.use(createIryxUi({ unstyled: true }))
 | `IFormField` | Label, description, hint, help and error text around a control |
 | `IInput` | Text field with `sm`/`md`/`lg` sizes, `invalid` state, `v-model`, `leading`/`trailing` slots, `clearable`, `loading`, `debounce` |
 | `INumberInput` | Decimal-safe numeric field — the model is a **string**, with `min`/`max`/`step`, `precision` and locale-aware display |
+| `IDatePicker` | Calendar in a popover; the model is an ISO `YYYY-MM-DD` **string** |
+| `IDateRangePicker` | Two-month range calendar; the model is `{ start, end }` ISO strings |
 | `IPasswordInput` | Masked field with a show/hide toggle and an optional strength meter |
 | `ITextarea` | Multi-line field with matching sizes, `invalid` state and optional `autosize` |
 | `ILabel` | Field label with optional `required` asterisk |
@@ -477,6 +479,59 @@ chrome; use `ui` to reach the parts (`root`, `input`, `leading`, `trailing`,
 `clear`). Stray attributes like `name`, `autocomplete` and `maxlength` are
 forwarded to the `<input>` itself. `ref` exposes the element as `.input` for
 focus management.
+
+#### Dates
+
+The model is an ISO `YYYY-MM-DD` **string**, never a `Date`.
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+
+const issuedOn = ref<string | null>('2026-08-15')
+const period = ref({ start: '2026-08-01', end: '2026-08-31' })
+</script>
+
+<template>
+  <IDatePicker v-model="issuedOn" clearable />
+  <IDateRangePicker v-model="period" clearable />
+</template>
+```
+
+A `Date` is a timestamp, so it always carries a time zone. `new Date('2026-08-15')`
+parses as UTC midnight, and a user west of Greenwich formatting it locally sees
+the 14th — which silently moves a record into the wrong reporting period. A
+calendar date has no zone, so it stays the day you picked. Internally the
+components use `@internationalized/date`; that never reaches your model, so
+formatting the string with `dayjs` or anything else on the way out is fine.
+
+| Prop | Effect |
+| --- | --- |
+| `min` / `max` | Selectable bounds, as ISO strings |
+| `locale` | Month names, weekday initials, and the trigger's text |
+| `format` | `Intl.DateTimeFormatOptions` for the trigger, e.g. `{ dateStyle: 'full' }` |
+| `weekStartsOn` | `0` is Sunday. Defaults to the locale's convention |
+| `clearable` | Adds a clear action to the footer |
+| `months` | Range picker only — months side by side, default `2` |
+| `separator` | Range picker only — text between the two dates |
+
+Navigation and footer labels (`todayLabel`, `clearLabel`, `previousLabel`,
+`nextLabel`) are all props, so nothing bakes in English.
+
+Both render their calendar at a fixed six weeks, so a short month cannot stretch
+its rows to match a taller neighbour and the popover does not resize as you page
+through it. The range picker draws only the committed range — the days between
+the endpoints take a flat tint while the two ends take the solid fill, so a long
+span still shows where it begins and ends.
+
+The helpers behind them are exported, for formatting the same values elsewhere:
+
+```ts
+import { formatIsoDate, isoToday, toCalendarDate, toIsoDate } from 'iryx-ui'
+
+formatIsoDate('2026-08-15', 'en-GB', { dateStyle: 'long' }) // '15 August 2026'
+formatIsoDate('nonsense') // '' — malformed input is "no selection", not a crash
+```
 
 #### Passwords
 

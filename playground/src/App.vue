@@ -161,6 +161,9 @@ function onSignup(event: { data: typeof signup }) {
 const email = ref('')
 const bio = ref('')
 
+const issuedOn = ref<string | null>('2026-08-15')
+const period = ref({ start: '2026-08-01', end: '2026-08-31' } as { start: string | null, end: string | null })
+
 const password = ref('')
 const note = ref('')
 
@@ -1048,6 +1051,45 @@ function simulateLoad() {
               Model: <code>{{ JSON.stringify(debounced) }}</code>
             </p>
           </div>
+        </div>
+      </section>
+
+      <section class="space-y-4">
+        <h2 class="font-semibold">
+          Date picker — the model is an ISO string
+        </h2>
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div class="space-y-2">
+            <ILabel for="issued">
+              Issued on
+            </ILabel>
+            <IDatePicker id="issued" v-model="issuedOn" clearable />
+            <p class="text-sm text-muted-foreground">
+              Model: <code>{{ JSON.stringify(issuedOn) }}</code>
+            </p>
+          </div>
+          <div class="space-y-2">
+            <ILabel for="period">
+              Reporting period
+            </ILabel>
+            <IDateRangePicker id="period" v-model="period" clearable />
+            <p class="text-sm text-muted-foreground">
+              Model: <code>{{ JSON.stringify(period) }}</code>
+            </p>
+          </div>
+        </div>
+        <div class="space-y-2">
+          <ILabel for="deadline">
+            British format, bounded to this year
+          </ILabel>
+          <IDatePicker
+            id="deadline"
+            v-model="issuedOn"
+            locale="en-GB"
+            min="2026-01-01"
+            max="2026-12-31"
+            :format="{ weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }"
+          />
         </div>
       </section>
 
