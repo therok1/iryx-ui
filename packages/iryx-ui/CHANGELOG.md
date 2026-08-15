@@ -1,5 +1,11 @@
 # iryx-ui
 
+## 0.10.2
+
+### Patch Changes
+
+- c25a51e: `IDialog` really does stop warning about a missing description now. Reka renders `aria-describedby` unconditionally, pointing at an id that only exists when a description was rendered, and its check tests whether the attribute is _present_ — so the `aria-describedby="undefined"` its message suggests (React phrasing, where `undefined` omits the attribute) changed nothing. The attribute is now removed instead, and a dialog that does have a description keeps its wiring.
+
 ## 0.10.1
 
 ### Patch Changes
