@@ -5,9 +5,14 @@ name: Release
 # PR leaves no changesets, so the next run publishes. The merge is the release
 # button, and `changeset version` is run for you rather than by hand.
 #
-# Needs an NPM_TOKEN repo secret (Granular Access Token, read/write on
-# iryx-ui) and "Allow GitHub Actions to create and approve pull requests"
-# enabled under Settings → Actions → General.
+# Publishes via npm Trusted Publishing: npmjs.com trusts this repo and this
+# workflow filename, GitHub mints a short-lived OIDC token at publish time, and
+# no long-lived credential exists anywhere. `id-token: write` below is what
+# makes that possible. Provenance is attached automatically, so it is not
+# configured here.
+#
+# Also needs "Allow GitHub Actions to create and approve pull requests" enabled
+# under Settings → Actions → General, or opening the version PR fails.
 on:
   push:
     branches: [main]
@@ -46,5 +51,3 @@ jobs:
           publish: pnpm release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NPM_CONFIG_PROVENANCE: 'true'
