@@ -290,6 +290,7 @@ app.use(createIryxUi({ unstyled: true }))
 | `IFormField` | Label, description, hint, help and error text around a control |
 | `IInput` | Text field with `sm`/`md`/`lg` sizes, `invalid` state, `v-model`, `leading`/`trailing` slots, `clearable`, `loading`, `debounce` |
 | `INumberInput` | Decimal-safe numeric field — the model is a **string**, with `min`/`max`/`step`, `precision` and locale-aware display |
+| `ISparkline` | Tiny inline trend chart — pure SVG, no charting dependency |
 | `IFileUpload` | Drag-and-drop file field with `accept` / `maxSize` / `maxFiles`, thumbnails and a remove action |
 | `IDatePicker` | Calendar in a popover; the model is an ISO `YYYY-MM-DD` **string** |
 | `IDateRangePicker` | Two-month range calendar; the model is `{ start, end }` ISO strings |
@@ -480,6 +481,57 @@ chrome; use `ui` to reach the parts (`root`, `input`, `leading`, `trailing`,
 `clear`). Stray attributes like `name`, `autocomplete` and `maxlength` are
 forwarded to the `<input>` itself. `ref` exposes the element as `.input` for
 focus management.
+
+#### Sparklines
+
+A trend at a glance, for a stat tile or a table cell. Plain SVG — no charting
+library, no canvas, nothing to install.
+
+```vue
+<ISparkline
+  :data="[4200, 4600, 4100, 5200, 5800, 6300]"
+  variant="area"
+  end-dot
+  label="Revenue over six months, trending up"
+/>
+```
+
+Because it is SVG, colour comes from `currentColor`: recolour it with a text
+utility, and it follows your theme preset and light/dark automatically with no
+JavaScript. A canvas chart cannot read CSS variables, so it would need a
+re-render on every theme change.
+
+| Prop | Effect |
+| --- | --- |
+| `data` | Values, oldest first. `null` is a **gap**, not a zero — the line breaks |
+| `variant` | `line` (default) or `area`, which adds a wash beneath the line |
+| `endDot` | Marks the most recent point |
+| `baseline` | Lower edge of the `area` wash: `min` (default) or `zero` |
+| `min` / `max` | Pin the domain — set both to put several sparklines on one scale |
+| `muted` | Draw in muted ink, for a de-emphasised trend |
+| `height` | Rendered height in px (default 32). Width always fills the container |
+
+Width is fluid and the stroke never distorts: the drawing stretches via
+`preserveAspectRatio="none"`, while every stroke carries
+`vector-effect="non-scaling-stroke"`, so a 2px line stays 2px and the end dot
+stays circular at any aspect ratio.
+
+`label` sets an accessible description. **Without one the sparkline is hidden
+from assistive tech as decorative** — which is correct when it sits beside a
+value that already states the number, and wrong if it is the only thing
+carrying the information.
+
+Edge cases behave: an empty series draws nothing, a flat series draws through
+the middle rather than collapsing to an edge, and a single reading is a dot.
+
+The scale helpers are exported for building your own marks:
+
+```ts
+import { extent, linearScale } from 'iryx-ui'
+
+extent([3, null, 9, 1]) // [1, 9] — gaps ignored
+linearScale([0, 10], [100, 0])(10) // 0 — ranges may be inverted for SVG's y-axis
+```
 
 #### Files
 

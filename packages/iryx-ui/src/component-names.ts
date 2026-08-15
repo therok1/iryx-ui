@@ -33,6 +33,7 @@ export const componentNames = [
   'Select',
   'Separator',
   'Skeleton',
+  'Sparkline',
   'Stat',
   'Stepper',
   'Switch',

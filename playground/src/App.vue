@@ -161,6 +161,11 @@ function onSignup(event: { data: typeof signup }) {
 const email = ref('')
 const bio = ref('')
 
+const revenueTrend = [4200, 4600, 4100, 5200, 5800, 5400, 6300, 6900, 6600, 7400, 8100, 8600]
+const overdueTrend = [1800, 1720, 1650, 1740, 1500, 1420, 1380, 1290, 1310, 1220, 1180, 1150]
+// A dropped reading mid-series: the line should break, not bridge it.
+const gappyTrend = [820, 910, 880, null, null, 1040, 1120, 1080, 1190, 1240, 1210, 1284]
+
 const logo = ref<File[]>([])
 const attachments = ref<File[]>([])
 
@@ -810,6 +815,57 @@ function simulateLoad() {
             <IStat label="Invoices" value="24" :delta="0" hint="unchanged" />
           </ICard>
         </div>
+      </section>
+
+      <section class="space-y-4">
+        <h2 class="font-semibold">
+          Sparkline
+        </h2>
+        <div class="grid gap-4 sm:grid-cols-3">
+          <ICard>
+            <IStat label="Revenue" value="€12,400" :delta="12" hint="vs last month" />
+            <ISparkline
+              class="mt-3"
+              :data="revenueTrend"
+              variant="area"
+              end-dot
+              label="Revenue over the last 12 months, trending up"
+            />
+          </ICard>
+          <ICard>
+            <IStat label="Overdue" value="€1,150" :delta="-8" trend="up" hint="down is good here" />
+            <ISparkline class="mt-3" :data="overdueTrend" end-dot muted />
+          </ICard>
+          <ICard>
+            <IStat label="Sessions" value="1,284" :delta="3" hint="with a gap in the data" />
+            <ISparkline class="mt-3" :data="gappyTrend" variant="area" end-dot />
+          </ICard>
+        </div>
+
+        <p class="text-sm text-muted-foreground">
+          Edge cases — flat, a single reading, and two pinned to a shared scale.
+        </p>
+        <div class="grid gap-4 sm:grid-cols-4">
+          <ICard>
+            <ISparkline :data="[4, 4, 4, 4, 4]" end-dot />
+          </ICard>
+          <ICard>
+            <ISparkline :data="[7]" end-dot />
+          </ICard>
+          <ICard>
+            <ISparkline :data="[0, 2, 1, 3]" :min="0" :max="10" end-dot />
+          </ICard>
+          <ICard>
+            <ISparkline :data="[7, 9, 8, 10]" :min="0" :max="10" end-dot />
+          </ICard>
+        </div>
+
+        <p class="text-sm text-muted-foreground">
+          Stretched wide, and squeezed into a table cell — the stroke stays 2px either way.
+        </p>
+        <ICard>
+          <ISparkline :data="revenueTrend" variant="area" :height="80" end-dot />
+        </ICard>
       </section>
 
       <section class="space-y-3">
