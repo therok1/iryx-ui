@@ -1,5 +1,28 @@
 # iryx-ui
 
+## 0.9.0
+
+### Minor Changes
+
+- 39fa4e9: Add `IBarChart` — a categorical bar chart in plain SVG, with the axis layer the rest of the charts will share.
+
+  The axis picks the domain rather than the data: values snap outwards to a 1/2/5 step so ticks read `0 / 2,000 / 4,000` instead of `0 / 1,726.8`, and zero is always included because bars are compared by length. Bars cap at 24px with air between them, rounded at the data end and square at the baseline. Hovering dims the rest of the series and shows a tooltip clamped inside the chart; hit targets span the full band so short bars are no harder to hit than tall ones.
+
+  The SVG is `aria-hidden` and the data is exposed as a visually-hidden table, which renders even before the container is measured. Long category labels thin to every *n*th rather than rotating.
+
+  Adds `niceTicks` to the scale helpers and a `useElementSize` composable.
+
+- 474610a: Add `ISparkline` — a tiny inline trend chart, and the first piece of charting in the library. Plain SVG with no charting dependency: colour comes from `currentColor`, so it follows the theme preset and light/dark with no JavaScript, which a canvas chart cannot do.
+
+  `line` and `area` variants, an optional end dot, `min`/`max` to put several sparklines on one scale, and `null` for a genuine gap rather than a zero. Width is fluid without distorting the ink — the drawing stretches via `preserveAspectRatio="none"` while strokes use `vector-effect="non-scaling-stroke"`. Empty, flat and single-reading series all render sensibly.
+
+  Exports the scale helpers behind it (`extent`, `finiteValues`, `linearScale`) for building your own marks.
+
+### Patch Changes
+
+- 9642a8b: `IBarChart` sizes bars as a share of their band instead of the band minus a fixed gap. Subtracting a constant collapsed at narrow bands — 26 categories in a phone-width card left 2px hairlines. The bar and the space beside it now shrink together, as they do in every charting library, with the 24px cap unchanged.
+- 69dff93: `ISparkline` keeps its marks inside its own box. Marks are centred on their data point, so the end dot sat exactly on the corner of the drawing and half its 12px ring painted outside the component — invisible inside a padded card, bleeding into the neighbour in a table cell. The plot is now inset by the mark's radius, taken out of the drawing rather than added around it, so the height a caller reserves is still the height the sparkline occupies.
+
 ## 0.8.0
 
 ### Minor Changes
