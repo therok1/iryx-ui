@@ -1,0 +1,300 @@
+<script setup lang="ts">
+import type { SparseValue } from '../composables/scale'
+import { computed, ref } from 'vue'
+import { AXIS_GAP, cartesianLayout, clampTooltip } from '../composables/cartesian'
+import { useElementSize } from '../composables/element-size'
+import { useIryxUiConfig } from '../config'
+import { lineChartTheme } from '../theme/line-chart'
+
+export interface LineChartDatum {
+  label: string
+  /** `null` is a missing reading — the line breaks rather than bridging it. */
+  value: SparseValue
+}
+
+export interface LineChartProps {
+  data?: readonly LineChartDatum[]
+  /** `area` adds a wash beneath the same line. */
+  variant?: 'line' | 'area'
+  /** Rendered height in px. Width always fills the container. */
+  height?: number
+  /** Target tick count. The axis lands on round numbers, so this is a hint. */
+  ticks?: number
+  /** Drop the value axis and its gridlines. */
+  axis?: boolean
+  /**
+   * Force zero onto the axis. Off by default: a line is read by its shape, and
+   * a series hovering around 8,000 flattens into a straight edge once the axis
+   * starts at nothing. Bars are the opposite case and always include zero.
+   */
+  zero?: boolean
+  /** Locale and options for every number shown — ticks and tooltip alike. */
+  locale?: string
+  format?: Intl.NumberFormatOptions
+  /**
+   * Accessible name for the figure. The line is hidden from assistive tech and
+   * the data is exposed as a table instead, so this names what that is.
+   */
+  label?: string
+  /** Skip built-in classes; you take over styling entirely. */
+  unstyled?: boolean
+  class?: string
+  ui?: Partial<Record<
+    'root' | 'svg' | 'grid' | 'tick' | 'category' | 'line' | 'area' | 'crosshair'
+    | 'marker' | 'markerRing' | 'tooltip' | 'tooltipLabel' | 'tooltipValue' | 'table',
+    string
+  >>
+}
+
+const props = withDefaults(defineProps<LineChartProps>(), {
+  data: () => [],
+  variant: 'line',
+  height: 240,
+  ticks: 5,
+  axis: true,
+  zero: false,
+  unstyled: undefined,
+})
+
+const config = useIryxUiConfig()
+const isUnstyled = computed(() => props.unstyled ?? config.unstyled)
+
+const root = ref<HTMLElement>()
+const { width } = useElementSize(root)
+
+const formatter = computed(() => new Intl.NumberFormat(props.locale, props.format))
+function formatValue(value: number): string {
+  return formatter.value.format(value)
+}
+
+const layout = computed(() => cartesianLayout({
+  values: props.data.map(datum => datum.value),
+  categories: props.data.length,
+  longestLabel: Math.max(...props.data.map(datum => datum.label.length), 1),
+  width: width.value,
+  height: props.height,
+  tickCount: props.ticks,
+  showAxis: props.axis,
+  formatTick: formatValue,
+  includeZero: props.zero,
+}))
+
+interface Point { x: number, y: number, index: number }
+
+/** Runs of consecutive readings. A gap ends one run and starts the next. */
+const runs = computed<Point[][]>(() => {
+  if (!width.value)
+    return []
+
+  const result: Point[][] = []
+  let current: Point[] = []
+
+  props.data.forEach((datum, index) => {
+    const value = datum.value
+    if (typeof value !== 'number' || !Number.isFinite(value)) {
+      if (current.length)
+        result.push(current)
+      current = []
+      return
+    }
+    current.push({
+      x: round(layout.value.bandCentre(index)),
+      y: round(layout.value.y(value)),
+      index,
+    })
+  })
+
+  if (current.length)
+    result.push(current)
+
+  return result
+})
+
+function round(value: number): number {
+  return Math.round(value * 100) / 100
+}
+
+function toLine(points: Point[]): string {
+  return points.map((point, index) => `${index === 0 ? 'M' : 'L'}${point.x} ${point.y}`).join(' ')
+}
+
+/** Closed down to the bottom of the plot, not to zero — the axis may not show it. */
+function toArea(points: Point[]): string {
+  const base = layout.value.plot.top + layout.value.plot.height
+  const first = points[0]!
+  const last = points[points.length - 1]!
+  return `${toLine(points)} L${last.x} ${base} L${first.x} ${base} Z`
+}
+
+const hovered = ref<number>()
+
+/** The plotted point under the cursor, if that category has a reading at all. */
+const marker = computed<Point | undefined>(() => {
+  if (hovered.value == null)
+    return undefined
+  for (const run of runs.value) {
+    const found = run.find(point => point.index === hovered.value)
+    if (found)
+      return found
+  }
+  return undefined
+})
+
+const tooltip = computed(() => {
+  if (hovered.value == null)
+    return undefined
+  const datum = props.data[hovered.value]
+  if (!datum || typeof datum.value !== 'number')
+    return undefined
+
+  const label = datum.label
+  const value = formatValue(datum.value)
+
+  return {
+    label,
+    value,
+    x: clampTooltip(layout.value.bandCentre(hovered.value), label + value, width.value),
+    y: layout.value.y(datum.value),
+  }
+})
+
+const theme = computed(() => lineChartTheme())
+
+function slotClass(slot: keyof NonNullable<LineChartProps['ui']>, extra?: string) {
+  const override = props.ui?.[slot]
+  return isUnstyled.value ? [override, extra] : theme.value[slot]({ class: [override, extra] })
+}
+</script>
+
+<template>
+  <div
+    ref="root"
+    :role="props.label ? 'figure' : undefined"
+    :aria-label="props.label"
+    :class="slotClass('root', props.class)"
+  >
+    <svg
+      :width="width"
+      :height="props.height"
+      :viewBox="`0 0 ${width} ${props.height}`"
+      aria-hidden="true"
+      :class="slotClass('svg')"
+    >
+      <template v-if="props.axis">
+        <g v-for="tick in layout.ticks" :key="`tick-${tick}`">
+          <line
+            :x1="layout.plot.left"
+            :y1="layout.y(tick)"
+            :x2="layout.plot.left + layout.plot.width"
+            :y2="layout.y(tick)"
+            stroke-width="1"
+            :class="slotClass('grid')"
+          />
+          <text
+            :x="layout.plot.left - AXIS_GAP"
+            :y="layout.y(tick)"
+            text-anchor="end"
+            dominant-baseline="middle"
+            :class="slotClass('tick')"
+          >
+            {{ formatValue(tick) }}
+          </text>
+        </g>
+      </template>
+
+      <!-- Behind the line, so the wash never dulls the reading itself. -->
+      <template v-if="props.variant === 'area'">
+        <path
+          v-for="(points, index) in runs"
+          :key="`area-${index}`"
+          :d="toArea(points)"
+          :class="slotClass('area')"
+        />
+      </template>
+
+      <!-- Under the line too: a crosshair drawn on top would cut through it. -->
+      <line
+        v-if="marker"
+        :x1="marker.x"
+        :y1="layout.plot.top"
+        :x2="marker.x"
+        :y2="layout.plot.top + layout.plot.height"
+        stroke-width="1"
+        :class="slotClass('crosshair')"
+      />
+
+      <path
+        v-for="(points, index) in runs"
+        :key="`line-${index}`"
+        :d="toLine(points)"
+        :class="slotClass('line')"
+      />
+
+      <!--
+        One marker, on the reading under the cursor. A dot on every point is
+        noise, and the axis plus the tooltip already carry the rest.
+      -->
+      <template v-if="marker">
+        <circle :cx="marker.x" :cy="marker.y" r="6" :class="slotClass('markerRing')" />
+        <circle :cx="marker.x" :cy="marker.y" r="4" :class="slotClass('marker')" />
+      </template>
+
+      <template v-for="(datum, index) in props.data" :key="`label-${datum.label}-${index}`">
+        <text
+          v-if="index % layout.labelStep === 0"
+          :x="layout.bandCentre(index)"
+          :y="layout.plot.top + layout.plot.height + 14"
+          text-anchor="middle"
+          :class="slotClass('category')"
+        >
+          {{ datum.label }}
+        </text>
+      </template>
+
+      <!-- Hit targets span the whole band, so a point is no harder to reach
+           than the bar equivalent would be. -->
+      <rect
+        v-for="(datum, index) in props.data"
+        :key="`hit-${datum.label}-${index}`"
+        :x="layout.plot.left + layout.bandWidth * index"
+        :y="layout.plot.top"
+        :width="layout.bandWidth"
+        :height="layout.plot.height"
+        :class="isUnstyled ? undefined : theme.hit()"
+        @pointerenter="hovered = index"
+        @pointerleave="hovered = undefined"
+      />
+    </svg>
+
+    <div
+      v-if="tooltip"
+      :class="slotClass('tooltip')"
+      :style="{ left: `${tooltip.x}px`, top: `${tooltip.y}px`, transform: 'translate(-50%, -100%) translateY(-12px)' }"
+    >
+      <span :class="slotClass('tooltipLabel')">{{ tooltip.label }}</span>
+      <span :class="slotClass('tooltipValue')">{{ tooltip.value }}</span>
+    </div>
+
+    <!-- The marks are decorative to assistive tech; this carries the data. -->
+    <table :class="slotClass('table')">
+      <caption>{{ props.label }}</caption>
+      <thead>
+        <tr>
+          <th scope="col">
+            Category
+          </th><th scope="col">
+            Value
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(datum, index) in props.data" :key="`row-${datum.label}-${index}`">
+          <th scope="row">
+            {{ datum.label }}
+          </th>
+          <td>{{ typeof datum.value === 'number' ? formatValue(datum.value) : '—' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</template>

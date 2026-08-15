@@ -26,6 +26,7 @@ export const componentNames = [
   'FormField',
   'Input',
   'Label',
+  'LineChart',
   'NumberInput',
   'Pagination',
   'PasswordInput',

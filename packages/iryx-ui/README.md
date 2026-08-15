@@ -291,6 +291,7 @@ app.use(createIryxUi({ unstyled: true }))
 | `INumberInput` | Decimal-safe numeric field — the model is a **string**, with `min`/`max`/`step`, `precision` and locale-aware display |
 | `ISparkline` | Tiny inline trend chart — pure SVG, no charting dependency |
 | `IBarChart` | Categorical bar chart with a round-number axis, hover tooltip and a table view |
+| `ILineChart` | Line or area chart with a crosshair, hover marker and a table view |
 | `IFileUpload` | Drag-and-drop file field with `accept` / `maxSize` / `maxFiles`, thumbnails and a remove action |
 | `IDatePicker` | Calendar in a popover; the model is an ISO `YYYY-MM-DD` **string** |
 | `IDateRangePicker` | Two-month range calendar; the model is `{ start, end }` ISO strings |
@@ -481,6 +482,41 @@ chrome; use `ui` to reach the parts (`root`, `input`, `leading`, `trailing`,
 `clear`). Stray attributes like `name`, `autocomplete` and `maxlength` are
 forwarded to the `<input>` itself. `ref` exposes the element as `.input` for
 focus management.
+
+#### Line charts
+
+```vue
+<ILineChart
+  :data="[
+    { label: 'Jan', value: 4200 },
+    { label: 'Feb', value: null },
+    { label: 'Mar', value: 5600 },
+  ]"
+  variant="area"
+  label="Revenue by month"
+/>
+```
+
+Same `data`, `height`, `ticks`, `axis`, `locale`, `format` and `label` props as
+`IBarChart`, plus:
+
+| Prop | Effect |
+| --- | --- |
+| `variant` | `line` (default) or `area`, which adds a wash beneath the line |
+| `zero` | Force zero onto the axis. **Off by default** |
+
+**`zero` is off here and always on for bars, deliberately.** A bar is read by
+length, so a truncated baseline lies about the comparison. A line is read by
+its *shape*, and a series hovering around 8,000 flattens into a straight edge
+once the axis starts at nothing. Turn it on when the distance from zero is the
+point.
+
+`null` breaks the line rather than bridging it, so a missing reading never
+draws a slope that didn't happen.
+
+Hovering shows a crosshair and a single ringed marker on the reading under the
+cursor — not a dot on every point, which is noise the axis and tooltip already
+cover.
 
 #### Bar charts
 

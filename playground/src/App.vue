@@ -173,6 +173,10 @@ const netByMonth = months.slice(0, 6).map((label, index) => ({
   value: [1200, -450, 800, -1100, 300, 1650][index]!,
 }))
 
+// A dropped reading mid-series: the line should break, not bridge it.
+const gappyByWeek = [820, 910, 880, null, null, 1040, 1120, 1080, 1190, 1240, 1210, 1284]
+  .map((value, index) => ({ label: `W${index + 1}`, value }))
+
 const weeklyVolume = Array.from({ length: 26 }, (_, index) => ({
   label: `W${index + 1}`,
   value: Math.round(400 + Math.sin(index / 2) * 180 + index * 12),
@@ -830,6 +834,33 @@ function simulateLoad() {
           </ICard>
           <ICard>
             <IStat label="Invoices" value="24" :delta="0" hint="unchanged" />
+          </ICard>
+        </div>
+      </section>
+
+      <section class="space-y-4">
+        <h2 class="font-semibold">
+          Line chart
+        </h2>
+        <ICard>
+          <ILineChart
+            :data="revenueByMonth"
+            variant="area"
+            label="Revenue by month"
+            locale="de-DE"
+            :format="{ style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }"
+          />
+        </ICard>
+
+        <p class="text-sm text-muted-foreground">
+          A gap in the series, and the same data with zero forced onto the axis.
+        </p>
+        <div class="grid gap-4 lg:grid-cols-2">
+          <ICard>
+            <ILineChart :data="gappyByWeek" label="Sessions by week" :height="200" />
+          </ICard>
+          <ICard>
+            <ILineChart :data="revenueByMonth" zero label="Revenue, axis from zero" :height="200" />
           </ICard>
         </div>
       </section>

@@ -1,0 +1,27 @@
+import { tv } from 'tailwind-variants'
+
+export const lineChartTheme = tv({
+  slots: {
+    root: 'relative w-full text-primary',
+    svg: 'block w-full overflow-visible',
+    grid: 'stroke-border',
+    tick: 'fill-muted-foreground text-xs [font-variant-numeric:tabular-nums]',
+    category: 'fill-muted-foreground text-xs',
+    /** 2px, round join and cap, per the shared line-mark spec. */
+    line: 'fill-none stroke-current stroke-2 [stroke-linecap:round] [stroke-linejoin:round]',
+    /** A wash at ~10%, never a saturated block competing with the line. */
+    area: 'fill-current stroke-none opacity-10',
+    /** Recessive: it locates the reading, it is not a reading itself. */
+    crosshair: 'stroke-border',
+    marker: 'fill-current',
+    /** Keeps the marker legible where it sits on top of the line. */
+    markerRing: 'fill-background',
+    hit: 'fill-transparent',
+    tooltip: 'pointer-events-none absolute z-10 flex items-baseline gap-1.5 rounded-lg border border-border bg-background px-2 py-1 text-xs whitespace-nowrap text-foreground shadow-md',
+    tooltipLabel: 'text-muted-foreground',
+    tooltipValue: 'font-medium [font-variant-numeric:tabular-nums]',
+    table: 'sr-only',
+  },
+})
+
+export type LineChartSlots = keyof ReturnType<typeof lineChartTheme>

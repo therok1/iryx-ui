@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { SparseValue } from '../composables/scale'
 import { computed, ref } from 'vue'
+import { AXIS_GAP, cartesianLayout, clampTooltip } from '../composables/cartesian'
 import { useElementSize } from '../composables/element-size'
-import { extent, linearScale, niceTicks } from '../composables/scale'
 import { useIryxUiConfig } from '../config'
 import { barChartTheme } from '../theme/bar-chart'
 
@@ -52,49 +52,27 @@ const isUnstyled = computed(() => props.unstyled ?? config.unstyled)
 const root = ref<HTMLElement>()
 const { width } = useElementSize(root)
 
-/** Rough text metrics. Measuring for real would cost a layout pass per label. */
-const CHAR_WIDTH = 6.5
-const AXIS_GAP = 8
-const CATEGORY_HEIGHT = 20
-const TOP_PAD = 8
-
 const formatter = computed(() => new Intl.NumberFormat(props.locale, props.format))
 function formatValue(value: number): string {
   return formatter.value.format(value)
 }
 
-/** The axis decides the domain, not the data — see `niceTicks`. */
-const axis = computed(() => {
-  const span = extent(props.data.map(datum => datum.value))
-  if (!span)
-    return niceTicks(0, 1, props.ticks)
-
-  // Bars grow from a baseline, so zero always has to be inside the domain or
-  // the lengths stop being comparable.
-  return niceTicks(Math.min(0, span[0]), Math.max(0, span[1]), props.ticks)
-})
-
-const gutter = computed(() => {
-  if (!props.axis)
-    return 0
-  const widest = Math.max(...axis.value.ticks.map(tick => formatValue(tick).length), 1)
-  return Math.ceil(widest * CHAR_WIDTH) + AXIS_GAP
-})
-
-const plot = computed(() => ({
-  left: gutter.value,
-  top: TOP_PAD,
-  width: Math.max(width.value - gutter.value, 0),
-  height: Math.max(props.height - TOP_PAD - CATEGORY_HEIGHT, 0),
+const layout = computed(() => cartesianLayout({
+  values: props.data.map(datum => datum.value),
+  categories: props.data.length,
+  longestLabel: Math.max(...props.data.map(datum => datum.label.length), 1),
+  width: width.value,
+  height: props.height,
+  tickCount: props.ticks,
+  showAxis: props.axis,
+  formatTick: formatValue,
+  // Bars are read by length, so a truncated baseline makes the comparison lie.
+  includeZero: true,
 }))
 
-const yScale = computed(() =>
-  linearScale([axis.value.min, axis.value.max], [plot.value.top + plot.value.height, plot.value.top]),
-)
-
-const bandWidth = computed(() =>
-  props.data.length ? plot.value.width / props.data.length : 0,
-)
+const plot = computed(() => layout.value.plot)
+const yScale = computed(() => layout.value.y)
+const bandWidth = computed(() => layout.value.bandWidth)
 
 /**
  * A proportion of the band, then capped — never the band minus a fixed gap.
@@ -122,7 +100,7 @@ const bars = computed<Bar[]>(() => {
       return []
 
     const y = yScale.value(value)
-    const centre = plot.value.left + bandWidth.value * (index + 0.5)
+    const centre = layout.value.bandCentre(index)
 
     return [{
       x: centre - barWidth.value / 2,
@@ -155,16 +133,8 @@ function barPath(bar: Bar): string {
   return `M${x} ${base} L${x} ${bottom - radius} Q${x} ${bottom} ${x + radius} ${bottom} L${right - radius} ${bottom} Q${right} ${bottom} ${right} ${bottom - radius} L${right} ${base} Z`
 }
 
-/**
- * Show every nth category label so they never overlap. Dropping labels beats
- * rotating them, which costs more height and is harder to read.
- */
-const labelStep = computed(() => {
-  if (!bandWidth.value || !props.data.length)
-    return 1
-  const widest = Math.max(...props.data.map(datum => datum.label.length), 1)
-  return Math.max(1, Math.ceil((widest * CHAR_WIDTH + 8) / bandWidth.value))
-})
+/** Every nth label; the rest would collide. Dropping beats rotating. */
+const labelStep = computed(() => layout.value.labelStep)
 
 const hovered = ref<number>()
 
@@ -178,21 +148,12 @@ const tooltip = computed(() => {
   const label = datum.label
   const value = formatValue(datum.value)
 
-  /**
-   * Kept inside the chart's own box. Estimated from the text rather than
-   * measured: measuring needs an extra tick, during which the tooltip is
-   * visible at the unclamped position and visibly jumps.
-   */
-  const estimatedWidth = (label.length + value.length) * CHAR_WIDTH + 28
-  const half = estimatedWidth / 2
-  const centre = plot.value.left + bandWidth.value * (hovered.value + 0.5)
-
   return {
     label,
     value,
     // Anchored to the band, not the pointer: a tooltip that follows the cursor
     // inside a bar wobbles for no informational gain.
-    x: Math.min(Math.max(centre, half), Math.max(width.value - half, half)),
+    x: clampTooltip(layout.value.bandCentre(hovered.value), label + value, width.value),
     y: Math.min(yScale.value(datum.value), yScale.value(0)),
   }
 })
@@ -227,7 +188,7 @@ function barClass(index: number) {
       :class="slotClass('svg')"
     >
       <template v-if="props.axis">
-        <g v-for="tick in axis.ticks" :key="`tick-${tick}`">
+        <g v-for="tick in layout.ticks" :key="`tick-${tick}`">
           <line
             :x1="plot.left"
             :y1="yScale(tick)"
