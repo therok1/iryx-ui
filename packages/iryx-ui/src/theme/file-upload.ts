@@ -11,7 +11,12 @@ export const fileUploadTheme = tv({
     dropzone: 'flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-input px-4 py-6 text-center transition-colors focus-within:ring-2 focus-within:ring-primary/50 hover:border-primary/50',
     /** Visually hidden rather than `display:none`, which drops it from the tab order. */
     input: 'sr-only',
-    icon: 'text-muted-foreground [&_svg]:size-6',
+    /**
+     * A filled disc behind the glyph. A bare icon floating in the middle of a
+     * large dashed box reads as an artefact; the disc gives it enough weight
+     * to be the thing the zone is built around.
+     */
+    icon: 'flex size-12 items-center justify-center rounded-full bg-muted text-muted-foreground [&_svg]:size-5',
     label: 'text-sm text-foreground',
     hint: 'text-xs text-muted-foreground',
     list: 'flex flex-col gap-2',
