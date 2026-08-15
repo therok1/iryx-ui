@@ -521,6 +521,47 @@ multiples.
 `variant="area"` is ignored for multiple series — overlapping washes muddy into
 a colour that belongs to neither.
 
+#### Annotations, and why there is no plugin API
+
+Chart.js has plugins because canvas is opaque — once painted you cannot select
+or style anything, so the only way in is an imperative draw hook. SVG has no
+such problem, so these charts hand you the layout and let you write ordinary
+markup into it:
+
+```vue
+<ILineChart :data="revenue" label="Revenue against target">
+  <template #overlay="{ plot, value }">
+    <line
+      :x1="plot.left" :y1="value(7000)"
+      :x2="plot.left + plot.width" :y2="value(7000)"
+      stroke="var(--iryx-warning)" stroke-width="2" stroke-dasharray="4 4"
+    />
+  </template>
+</ILineChart>
+```
+
+`#underlay` renders behind the marks — target bands, shaded regions. `#overlay`
+renders in front — reference lines, callouts. Both sit below the hit targets,
+so hovering keeps working through whatever you draw.
+
+Both receive the `CartesianLayout`:
+
+| Prop | What it gives you |
+| --- | --- |
+| `plot` | `{ left, top, width, height }` of the plot rectangle, in px |
+| `value(n)` | A data value to its pixel on the value axis |
+| `bandCentre(i)` | The centre of category `i`, in px |
+| `bandWidth` | Size of one category slot |
+| `ticks` | The axis values actually drawn |
+| `orientation` | `'vertical'` or `'horizontal'` |
+
+That's strictly more capable than a draw hook: it's declarative, reactive, and
+type-checked, with no lifecycle or registration order to learn.
+
+For a chart type that doesn't exist here, the same primitives are exported —
+`cartesianLayout`, `linearScale`, `niceTicks`, `seriesColor` — so you can build
+one on the same spine rather than starting over.
+
 #### Chart colours
 
 Eight categorical slots, `--iryx-chart-1` … `--iryx-chart-8`, usable as Tailwind

@@ -343,6 +343,17 @@ function barClass(bar: Bar) {
           </g>
         </template>
 
+        <!--
+          Extension points, in place of a plugin system. SVG does not need one:
+          the layout is handed to the caller, who writes ordinary markup into
+          it — declarative, reactive and type-checked, which an imperative draw
+          hook can never be. `underlay` sits behind the marks for bands and
+          shaded regions, `overlay` in front for reference lines and
+          annotations. Both go under the hit targets, so hovering still works
+          through whatever is drawn.
+        -->
+        <slot name="underlay" v-bind="layout" />
+
         <!-- Colour is set inline, not by class: Tailwind cannot generate a class
            name assembled at runtime, so `fill-chart-3` would never exist. -->
         <path
@@ -369,6 +380,8 @@ function barClass(bar: Bar) {
 
         <!-- Hit targets span the whole band and the full plot height, so a short
            bar is no harder to hover than a tall one. -->
+        <slot name="overlay" v-bind="layout" />
+
         <rect
           v-for="(datum, index) in props.data"
           :key="`hit-${datum.label}-${index}`"

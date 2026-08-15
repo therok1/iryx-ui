@@ -169,6 +169,74 @@ describe('lineChart', () => {
   })
 })
 
+/**
+ * The answer to "does it have plugins": no registry, a scoped slot. The layout
+ * goes to the caller and they write ordinary SVG into it.
+ */
+describe('chart annotations', () => {
+  it('hands the layout to the overlay slot', async () => {
+    withWidth(600)
+    const wrapper = mount(LineChart, {
+      props: { data },
+      slots: {
+        overlay: `<template #overlay="{ plot, value }">
+          <line class="target" :x1="plot.left" :y1="value(5000)" :x2="plot.left + plot.width" :y2="value(5000)" />
+        </template>`,
+      },
+      attachTo: document.body,
+    })
+    await nextTick()
+
+    const target = wrapper.get('line.target')
+    // Positioned by the chart's own scale, not by the caller guessing pixels.
+    expect(Number(target.attributes('y1'))).toBeGreaterThan(0)
+    expect(target.attributes('x1')).not.toBe('0')
+  })
+
+  it('draws the underlay behind the marks and the overlay in front', async () => {
+    withWidth(600)
+    const wrapper = mount(LineChart, {
+      props: { data },
+      slots: {
+        underlay: '<rect class="band" />',
+        overlay: '<rect class="note" />',
+      },
+      attachTo: document.body,
+    })
+    await nextTick()
+
+    const order = [...wrapper.element.querySelectorAll('svg *')]
+    const band = order.findIndex(node => node.classList.contains('band'))
+    const line = order.findIndex(node => node.tagName === 'path')
+    const note = order.findIndex(node => node.classList.contains('note'))
+
+    expect(band).toBeLessThan(line)
+    expect(note).toBeGreaterThan(line)
+  })
+
+  /** Annotations must not swallow the pointer, or hovering silently dies. */
+  it('keeps hit targets above the annotations', async () => {
+    withWidth(600)
+    const wrapper = mount(LineChart, {
+      props: { data },
+      slots: { overlay: '<rect class="note" />' },
+      attachTo: document.body,
+    })
+    await nextTick()
+
+    const order = [...wrapper.element.querySelectorAll('svg *')]
+    const note = order.findIndex(node => node.classList.contains('note'))
+    const lastHit = order.map(node => node.tagName).lastIndexOf('rect')
+
+    expect(lastHit).toBeGreaterThan(note)
+  })
+
+  it('renders nothing extra when the slots are unused', async () => {
+    const wrapper = await mountChart()
+    expect(wrapper.findAll('rect')).toHaveLength(data.length)
+  })
+})
+
 const multi = [
   { label: 'Jan', revenue: 4200, expenses: 3100 },
   { label: 'Feb', revenue: 5600, expenses: 3400 },

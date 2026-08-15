@@ -268,6 +268,17 @@ function slotClass(slot: keyof NonNullable<LineChartProps['ui']>, extra?: string
           </g>
         </template>
 
+        <!--
+          Extension points, in place of a plugin system. SVG does not need one:
+          the layout is handed to the caller, who writes ordinary markup into
+          it — declarative, reactive and type-checked, which an imperative draw
+          hook can never be. `underlay` sits behind the marks for bands and
+          shaded regions, `overlay` in front for reference lines and
+          annotations. Both go under the hit targets, so hovering still works
+          through whatever is drawn.
+        -->
+        <slot name="underlay" v-bind="layout" />
+
         <!-- Behind the line, so the wash never dulls the reading itself. -->
         <template v-if="showArea">
           <path
@@ -322,6 +333,8 @@ function slotClass(slot: keyof NonNullable<LineChartProps['ui']>, extra?: string
             {{ datum.label }}
           </text>
         </template>
+
+        <slot name="overlay" v-bind="layout" />
 
         <rect
           v-for="(datum, index) in props.data"

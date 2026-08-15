@@ -889,6 +889,34 @@ function simulateLoad() {
         </ICard>
 
         <p class="text-sm text-muted-foreground">
+          Annotations via the <code>overlay</code> slot — no plugin API, just markup
+          with the layout handed to it.
+        </p>
+        <ICard>
+          <ILineChart :data="revenueByMonth" label="Revenue against target" :height="220">
+            <template #overlay="{ plot, value }">
+              <line
+                :x1="plot.left"
+                :y1="value(7000)"
+                :x2="plot.left + plot.width"
+                :y2="value(7000)"
+                stroke="var(--iryx-warning)"
+                stroke-width="2"
+                stroke-dasharray="4 4"
+              />
+              <text
+                :x="plot.left + plot.width"
+                :y="value(7000) - 6"
+                text-anchor="end"
+                class="fill-warning text-xs"
+              >
+                Target
+              </text>
+            </template>
+          </ILineChart>
+        </ICard>
+
+        <p class="text-sm text-muted-foreground">
           Three series — legend, one crosshair, every reading in one tooltip.
         </p>
         <ICard>
