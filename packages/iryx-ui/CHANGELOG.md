@@ -1,5 +1,17 @@
 # iryx-ui
 
+## 0.8.0
+
+### Minor Changes
+
+- 54650a4: Add `IFileUpload` — a drag-and-drop dropzone with `accept`, `maxSize` and `maxFiles`, image thumbnails, a browse button and a remove action.
+
+  The model is always a `File[]`, even without `multiple`; without it, picking again replaces rather than appends. `accept` is enforced in the component as well as on the input, since a dragged-in file bypasses the native filter. Refused files raise `@reject` with `{ file, reason }` (`'type'`, `'size'` or `'count'`), and every string — `label`, `browseLabel`, `hint`, `removeLabel` and the three rejection messages — is a prop. Thumbnail object URLs are revoked when a file leaves the list or the component unmounts.
+
+### Patch Changes
+
+- dacd57c: `IPasswordInput` hides Edge's native reveal and clear controls. Edge draws its own eye on `input[type=password]`, and its own clear cross once the field is revealed, so the field showed two of each in that browser.
+
 ## 0.7.0
 
 ### Minor Changes

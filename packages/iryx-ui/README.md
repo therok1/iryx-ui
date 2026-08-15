@@ -495,7 +495,8 @@ const logo = ref<File[]>([])
     v-model="logo"
     accept="image/*"
     :max-size="2 * 1024 * 1024"
-    label="Choose a logo or drag it here"
+    label="Drag your logo here"
+    browse-label="Browse images"
     hint="PNG, JPG or SVG up to 2 MB"
     @reject="onReject"
   />
@@ -513,6 +514,12 @@ again replaces rather than appends.
 | `accept` | Native syntax: `image/*`, `.pdf`, `image/png` |
 | `maxSize` | Largest accepted size, in bytes |
 | `maxFiles` | Cap on how many files may be held at once |
+| `label` | Prompt in the zone, above the hint |
+| `browseLabel` | Text on the browse button |
+| `hint` | Fine print under the prompt — the accepted types belong here |
+
+Every string is a prop, including `removeLabel` and the three rejection
+messages, so nothing bakes in English.
 
 `accept` is enforced in the component as well as on the input, because a
 dragged-in file bypasses the native filter entirely. Refused files raise
