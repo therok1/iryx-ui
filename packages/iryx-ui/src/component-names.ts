@@ -20,6 +20,7 @@ export const componentNames = [
   'DatePicker',
   'DateRangePicker',
   'Dialog',
+  'Drawer',
   'DropdownMenu',
   'EmptyState',
   'FileUpload',

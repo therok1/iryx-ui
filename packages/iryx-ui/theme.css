@@ -200,6 +200,19 @@
   --animate-dialog-in: dialog-in 150ms ease-out;
   --animate-dialog-out: dialog-out 150ms ease-in;
   --animate-toast-in: toast-in 150ms ease-out;
+  /*
+   * One easing for every drawer transition, enter/exit and drag-release alike,
+   * so a panel that is let go mid-swipe finishes the way it would have opened.
+   */
+  --iryx-drawer-ease: cubic-bezier(0.32, 0.72, 0, 1);
+  --animate-drawer-in-right: drawer-in-right 300ms var(--iryx-drawer-ease);
+  --animate-drawer-out-right: drawer-out-right 300ms var(--iryx-drawer-ease);
+  --animate-drawer-in-left: drawer-in-left 300ms var(--iryx-drawer-ease);
+  --animate-drawer-out-left: drawer-out-left 300ms var(--iryx-drawer-ease);
+  --animate-drawer-in-top: drawer-in-top 300ms var(--iryx-drawer-ease);
+  --animate-drawer-out-top: drawer-out-top 300ms var(--iryx-drawer-ease);
+  --animate-drawer-in-bottom: drawer-in-bottom 300ms var(--iryx-drawer-ease);
+  --animate-drawer-out-bottom: drawer-out-bottom 300ms var(--iryx-drawer-ease);
 }
 
 /* Indeterminate Progress: slide a short bar back and forth across the track. */
@@ -248,5 +261,106 @@
   from {
     opacity: 0;
     transform: translateY(0.5rem);
+  }
+}
+
+/*
+ * Drawer enter/exit, one pair per edge.
+ *
+ * These animate the independent `translate` property, NOT `transform` — the
+ * exact opposite of the dialog's constraint, and for the same underlying
+ * reason. Reka's drawer follows the finger by writing `transform` from
+ * `--drawer-swipe-movement-*` (see `.iryx-drawer` below), so a keyframe on
+ * `transform` would clobber the drag offset and the panel would refuse to
+ * move under the pointer. `translate` composes with it instead.
+ *
+ * The slide is the whole animation — fading a panel that is already moving
+ * reads as two effects fighting.
+ */
+@keyframes drawer-in-right {
+  from {
+    translate: 100% 0;
+  }
+}
+
+@keyframes drawer-out-right {
+  to {
+    translate: 100% 0;
+  }
+}
+
+@keyframes drawer-in-left {
+  from {
+    translate: -100% 0;
+  }
+}
+
+@keyframes drawer-out-left {
+  to {
+    translate: -100% 0;
+  }
+}
+
+@keyframes drawer-in-top {
+  from {
+    translate: 0 -100%;
+  }
+}
+
+@keyframes drawer-out-top {
+  to {
+    translate: 0 -100%;
+  }
+}
+
+@keyframes drawer-in-bottom {
+  from {
+    translate: 0 100%;
+  }
+}
+
+@keyframes drawer-out-bottom {
+  to {
+    translate: 0 100%;
+  }
+}
+
+/*
+ * Drawer drag plumbing.
+ *
+ * This is plain CSS rather than Tailwind utilities because it is variable
+ * arithmetic keyed on an attribute Reka sets at runtime — there is no class
+ * name to generate. Reka writes the live drag offset into
+ * `--drawer-swipe-movement-x/y` and the resting snap position into
+ * `--drawer-snap-point-offset`; both act on the swipe axis, so they add.
+ *
+ * `[data-swiping]` kills the transition while a finger is down, or the panel
+ * lags behind the pointer by a whole easing curve.
+ */
+@layer components {
+  .iryx-drawer {
+    transition: transform 300ms var(--iryx-drawer-ease);
+  }
+
+  .iryx-drawer[data-swipe-direction="up"],
+  .iryx-drawer[data-swipe-direction="down"] {
+    transform: translate3d(
+      0,
+      calc(var(--drawer-swipe-movement-y, 0px) + var(--drawer-snap-point-offset, 0px)),
+      0
+    );
+  }
+
+  .iryx-drawer[data-swipe-direction="left"],
+  .iryx-drawer[data-swipe-direction="right"] {
+    transform: translate3d(
+      calc(var(--drawer-swipe-movement-x, 0px) + var(--drawer-snap-point-offset, 0px)),
+      0,
+      0
+    );
+  }
+
+  .iryx-drawer[data-swiping] {
+    transition-duration: 0ms;
   }
 }

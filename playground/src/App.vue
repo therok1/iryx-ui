@@ -47,6 +47,15 @@ const alertOpen = ref(true)
 
 const dialogOpen = ref(false)
 const blockingOpen = ref(false)
+const drawerSide = ref<'right' | 'left' | 'top' | 'bottom'>('right')
+const drawerOpen = ref(false)
+const sheetOpen = ref(false)
+const sheetSnap = ref<number | string | null>(0.45)
+
+function openDrawer(side: 'right' | 'left' | 'top' | 'bottom') {
+  drawerSide.value = side
+  drawerOpen.value = true
+}
 
 const marks = ref<string[]>(['Bold'])
 
@@ -803,6 +812,77 @@ function simulateLoad() {
             </IButton>
           </template>
         </IDialog>
+      </section>
+
+      <section class="space-y-3">
+        <h2 class="font-semibold">
+          Drawer
+        </h2>
+        <p class="text-sm text-muted-foreground">
+          Drag the panel towards its own edge to dismiss it — the handle is a hint, but the
+          whole panel is the target.
+        </p>
+        <div class="flex flex-wrap items-center gap-3">
+          <IButton variant="outline" @click="openDrawer('right')">
+            Right
+          </IButton>
+          <IButton variant="outline" @click="openDrawer('left')">
+            Left
+          </IButton>
+          <IButton variant="outline" @click="openDrawer('top')">
+            Top
+          </IButton>
+          <IButton variant="outline" @click="openDrawer('bottom')">
+            Bottom
+          </IButton>
+          <IButton variant="outline" @click="sheetOpen = true">
+            Bottom sheet with snap points
+          </IButton>
+        </div>
+
+        <IDrawer
+          v-model:open="drawerOpen"
+          :side="drawerSide"
+          title="Filters"
+          description="Narrow the list down to what you are looking for."
+        >
+          <div class="space-y-4">
+            <div class="space-y-2">
+              <ILabel for="drawer-search">
+                Search
+              </ILabel>
+              <IInput id="drawer-search" placeholder="Reference or name" clearable />
+            </div>
+            <ICheckbox label="Unpaid only" description="Hide anything already settled." />
+            <ICheckbox label="Include drafts" />
+          </div>
+          <template #footer="{ close }">
+            <IButton variant="outline" @click="close()">
+              Reset
+            </IButton>
+            <IButton @click="close(); toast.success('Filters applied')">
+              Apply
+            </IButton>
+          </template>
+        </IDrawer>
+
+        <IDrawer
+          v-model:open="sheetOpen"
+          v-model:snap-point="sheetSnap"
+          side="bottom"
+          :snap-points="[0.45, 1]"
+          title="Payment method"
+          description="Drag the sheet up to see the whole list."
+        >
+          <div class="space-y-3">
+            <p class="text-sm text-muted-foreground">
+              Resting at snap point {{ sheetSnap }}.
+            </p>
+            <ICard v-for="method in ['Bank transfer', 'Card ending 4417', 'Direct debit', 'Cash']" :key="method">
+              {{ method }}
+            </ICard>
+          </div>
+        </IDrawer>
       </section>
 
       <section class="space-y-3">

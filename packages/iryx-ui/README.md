@@ -321,6 +321,7 @@ app.use(createIryxUi({ unstyled: true }))
 | `IBadge` | Status pill — five variants × three sizes; `dot` moves the colour onto a leading dot |
 | `IToaster` | Host for `useToast()`; six viewport positions, stacking, action buttons |
 | `IDialog` | Modal with header/body/footer slots, `dismissible` and `showClose` |
+| `IDrawer` | Panel or sheet attached to any edge — swipe to dismiss, optional snap points |
 | `IConfirmDialog` | Host for `useConfirm()` — renders the promise-based confirmation |
 | `IProgress` | Determinate or `indeterminate` bar, five variants, `formatValue` |
 | `ISkeleton` | Loading placeholder — `text`/`rect`/`circle`, stackable with `lines` |
@@ -405,9 +406,47 @@ if (await confirm({ title: 'Delete this draft?', danger: true }))
 
 `confirm()` resolves `true` on confirmation and `false` on cancel or dismissal.
 
+### Drawers and sheets
+
+`IDrawer` is a panel attached to an edge of the viewport. It shares `IDialog`'s slots — `trigger`, `header` / `title` / `description`, the default body slot and `footer` (which receives `close`) — plus `dismissible`, `showClose` and `closeLabel`:
+
+```vue
+<IDrawer v-model:open="filtersOpen" title="Filters" description="Narrow the list down.">
+  <IInput v-model="search" placeholder="Reference or name" clearable />
+  <template #footer="{ close }">
+    <IButton variant="outline" @click="close()">
+      Reset
+    </IButton>
+    <IButton @click="close()">
+      Apply
+    </IButton>
+  </template>
+</IDrawer>
+```
+
+`side` picks the edge — `right` (default), `left`, `top` or `bottom` — and doubles as the direction you drag to dismiss. `size` means width on a `left`/`right` drawer and maximum height on a `top`/`bottom` sheet, so `sm`–`xl` and `full` read naturally either way. A sheet gets a drag handle by default and a side drawer does not; `handle` overrides that in both directions.
+
+Add `snapPoints` for a sheet that rests part-way. Points are fractions of the viewport (`0.45`), pixel numbers, or CSS lengths (`'20rem'`), and `v-model:snapPoint` reads or sets the current one:
+
+```vue
+<IDrawer
+  v-model:open="open"
+  v-model:snap-point="snap"
+  side="bottom"
+  :snap-points="[0.45, 1]"
+  title="Payment method"
+/>
+```
+
+Snap points position the panel by translating it rather than resizing it, so `size` stops capping the height when they are set — otherwise the fully expanded state would be clipped instead of parked below the fold.
+
+`modal` controls how much of the page the drawer takes over: `true` (default) traps focus and blocks everything behind it, `'trap-focus'` keeps the page interactive while still holding the Tab ring — what a persistent side panel wants — and `false` does neither.
+
+Dragging is real pointer work, so it only happens in a browser. The panel follows the finger, snaps back when the drag is too short, and dismisses when it is not; `dismissible: false` refuses the swipe along with Escape and the overlay, while the corner button still closes.
+
 ### Internationalisation
 
-No English string is baked in without an escape hatch. `IAlert`, `IDialog` and `IToaster` take a `closeLabel`, `IPagination` takes `prevLabel` / `nextLabel` / `label`, `IBreadcrumb` and `ISkeleton` take a `label`, and `IProgress` and `IStat` take `formatValue` / `formatDelta` for locale-aware numbers.
+No English string is baked in without an escape hatch. `IAlert`, `IDialog`, `IDrawer` and `IToaster` take a `closeLabel`, `IPagination` takes `prevLabel` / `nextLabel` / `label`, `IBreadcrumb` and `ISkeleton` take a `label`, and `IProgress` and `IStat` take `formatValue` / `formatDelta` for locale-aware numbers.
 
 ### Forms
 
