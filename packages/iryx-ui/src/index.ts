@@ -17,6 +17,7 @@ export type { DateRange, DateRangePickerProps } from './components/DateRangePick
 export type { DialogProps } from './components/Dialog.vue'
 export type { DropdownMenuProps } from './components/DropdownMenu.vue'
 export type { EmptyStateProps } from './components/EmptyState.vue'
+export type { FileRejection, FileUploadProps } from './components/FileUpload.vue'
 export type { FormProps } from './components/Form.vue'
 export type { FormFieldProps } from './components/FormField.vue'
 export type { InputProps } from './components/Input.vue'

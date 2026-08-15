@@ -161,6 +161,9 @@ function onSignup(event: { data: typeof signup }) {
 const email = ref('')
 const bio = ref('')
 
+const logo = ref<File[]>([])
+const attachments = ref<File[]>([])
+
 const issuedOn = ref<string | null>('2026-08-15')
 const period = ref({ start: '2026-08-01', end: '2026-08-31' } as { start: string | null, end: string | null })
 
@@ -1050,6 +1053,40 @@ function simulateLoad() {
             <p class="text-sm text-muted-foreground">
               Model: <code>{{ JSON.stringify(debounced) }}</code>
             </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="space-y-4">
+        <h2 class="font-semibold">
+          File upload
+        </h2>
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div class="space-y-2">
+            <ILabel for="logo">
+              Logo — images only, max 2 MB
+            </ILabel>
+            <IFileUpload
+              id="logo"
+              v-model="logo"
+              accept="image/*"
+              :max-size="2 * 1024 * 1024"
+              label="Choose a logo or drag it here"
+              hint="PNG, JPG or SVG up to 2 MB"
+            />
+          </div>
+          <div class="space-y-2">
+            <ILabel for="attachments">
+              Attachments — up to 3
+            </ILabel>
+            <IFileUpload
+              id="attachments"
+              v-model="attachments"
+              multiple
+              :max-files="3"
+              label="Add attachments"
+              hint="Any file type, 3 at most"
+            />
           </div>
         </div>
       </section>

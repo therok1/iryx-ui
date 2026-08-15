@@ -20,6 +20,7 @@ export const componentNames = [
   'Dialog',
   'DropdownMenu',
   'EmptyState',
+  'FileUpload',
   'Form',
   'FormField',
   'Input',

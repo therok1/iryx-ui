@@ -290,6 +290,7 @@ app.use(createIryxUi({ unstyled: true }))
 | `IFormField` | Label, description, hint, help and error text around a control |
 | `IInput` | Text field with `sm`/`md`/`lg` sizes, `invalid` state, `v-model`, `leading`/`trailing` slots, `clearable`, `loading`, `debounce` |
 | `INumberInput` | Decimal-safe numeric field — the model is a **string**, with `min`/`max`/`step`, `precision` and locale-aware display |
+| `IFileUpload` | Drag-and-drop file field with `accept` / `maxSize` / `maxFiles`, thumbnails and a remove action |
 | `IDatePicker` | Calendar in a popover; the model is an ISO `YYYY-MM-DD` **string** |
 | `IDateRangePicker` | Two-month range calendar; the model is `{ start, end }` ISO strings |
 | `IPasswordInput` | Masked field with a show/hide toggle and an optional strength meter |
@@ -479,6 +480,49 @@ chrome; use `ui` to reach the parts (`root`, `input`, `leading`, `trailing`,
 `clear`). Stray attributes like `name`, `autocomplete` and `maxlength` are
 forwarded to the `<input>` itself. `ref` exposes the element as `.input` for
 focus management.
+
+#### Files
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+
+const logo = ref<File[]>([])
+</script>
+
+<template>
+  <IFileUpload
+    v-model="logo"
+    accept="image/*"
+    :max-size="2 * 1024 * 1024"
+    label="Choose a logo or drag it here"
+    hint="PNG, JPG or SVG up to 2 MB"
+    @reject="onReject"
+  />
+</template>
+```
+
+The model is **always a `File[]`**, even without `multiple` — a `File | File[]`
+union would make every caller narrow the type before touching it, and the
+single case is just an array holding at most one. Without `multiple`, picking
+again replaces rather than appends.
+
+| Prop | Effect |
+| --- | --- |
+| `multiple` | Accept more than one file |
+| `accept` | Native syntax: `image/*`, `.pdf`, `image/png` |
+| `maxSize` | Largest accepted size, in bytes |
+| `maxFiles` | Cap on how many files may be held at once |
+
+`accept` is enforced in the component as well as on the input, because a
+dragged-in file bypasses the native filter entirely. Refused files raise
+`@reject` with `{ file, reason }` — `'type'`, `'size'` or `'count'` — so you
+can word your own message; the built-in text is available through the
+`tooLargeText`, `wrongTypeText` and `tooManyText` props.
+
+Image files get a thumbnail, anything else a placeholder of the same size so
+rows stay aligned. The object URLs behind those thumbnails are revoked as soon
+as a file leaves the list or the component unmounts.
 
 #### Dates
 
