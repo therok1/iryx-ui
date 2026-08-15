@@ -219,3 +219,86 @@ describe('barChart', () => {
     expect(wrapper.findAll('tbody tr')).toHaveLength(0)
   })
 })
+
+const stackData = [
+  { label: 'Jan', a: 100, b: 200, c: 300 },
+  { label: 'Feb', a: 150, b: 150, c: 300 },
+]
+const stackSeries = [{ key: 'a', name: 'A' }, { key: 'b', name: 'B' }, { key: 'c', name: 'C' }]
+
+describe('stacked bars', () => {
+  /** The axis has to fit the total, or the top of every stack is clipped. */
+  it('sizes the axis against the running total, not the largest reading', async () => {
+    const grouped = await mountChart({ data: stackData, series: stackSeries })
+    const stacked = await mountChart({ data: stackData, series: stackSeries, stacked: true })
+
+    const top = (w: typeof grouped) =>
+      Math.max(...w.findAll('text').map(n => Number(n.text().replace(/,/g, ''))).filter(Number.isFinite))
+
+    expect(top(stacked)).toBeGreaterThanOrEqual(600)
+    expect(top(grouped)).toBeLessThan(600)
+  })
+
+  it('puts one bar per category rather than one per series', async () => {
+    const stacked = await mountChart({ data: stackData, series: stackSeries, stacked: true })
+    // Still three segments per category, but sharing a single band slot.
+    expect(stacked.findAll('path')).toHaveLength(6)
+
+    const xs = stacked.findAll('path').map(p => p.attributes('d')!.match(/M([\d.]+)/)![1])
+    // Two distinct x positions — one stack per category.
+    expect(new Set(xs).size).toBe(2)
+  })
+
+  it('rounds only the outermost segment', async () => {
+    const wrapper = await mountChart({ data: stackData, series: stackSeries, stacked: true })
+    const curved = wrapper.findAll('path').filter(p => p.attributes('d')!.includes('Q'))
+    // One capped segment per category.
+    expect(curved).toHaveLength(2)
+  })
+
+  it('reports the total alongside the parts', async () => {
+    const wrapper = await mountChart({ data: stackData, series: stackSeries, stacked: true })
+    await wrapper.findAll('rect')[0]!.trigger('pointerenter')
+
+    const tooltip = wrapper.findAll('div').at(-1)!
+    expect(tooltip.text()).toContain('Total')
+    expect(tooltip.text()).toContain('600')
+  })
+
+  it('stacks negatives away from zero instead of cancelling them out', async () => {
+    const mixed = [{ label: 'Jan', a: 100, b: -50 }]
+    const wrapper = await mountChart({
+      data: mixed,
+      series: [{ key: 'a', name: 'A' }, { key: 'b', name: 'B' }],
+      stacked: true,
+    })
+
+    const ticks = wrapper.findAll('text').map(n => n.text())
+    // Both directions are on the axis; they do not net to a single 50.
+    expect(ticks).toContain('0')
+    expect(ticks.some(t => t.startsWith('-'))).toBe(true)
+  })
+
+  it('ignores stacking for a single series', async () => {
+    const wrapper = await mountChart({ stacked: true })
+    expect(wrapper.findAll('path')).toHaveLength(3)
+  })
+
+  it('stacks horizontally too', async () => {
+    const wrapper = await mountChart({
+      data: stackData,
+      series: stackSeries,
+      stacked: true,
+      orientation: 'horizontal',
+    })
+    expect(wrapper.findAll('path')).toHaveLength(6)
+
+    // Segments run along x, so each is wider than it is tall.
+    const d = wrapper.get('path').attributes('d')!
+    const xs = [...d.matchAll(/[ML]([\d.]+) ([\d.]+)/g)].map(m => [Number(m[1]), Number(m[2])] as const)
+    const w = Math.max(...xs.map(p => p[0])) - Math.min(...xs.map(p => p[0]))
+    const h = Math.max(...xs.map(p => p[1])) - Math.min(...xs.map(p => p[1]))
+    expect(w).toBeGreaterThan(0)
+    expect(h).toBeGreaterThan(0)
+  })
+})

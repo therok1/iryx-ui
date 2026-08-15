@@ -690,6 +690,23 @@ visually-hidden table instead, so a screen reader gets the actual numbers
 rather than a blank graphic. That table renders even before the container has
 been measured — the data is never gated behind layout.
 
+**`stacked`** turns grouped series into one bar per category:
+
+```vue
+<IBarChart :data="cashflow" :series="series" stacked label="Cashflow" />
+```
+
+Stacking answers *"what makes up the total"*; grouping answers *"how do these
+compare"*. Only the bottom segment shares a baseline, so segments above it are
+hard to compare across categories — stay with grouped bars when the comparison
+matters more than the total.
+
+The axis is sized against the running totals, only the outermost segment is
+rounded, and the tooltip adds a **Total** row (`totalLabel` to rename it).
+Negative values stack downward from zero rather than cancelling positives out,
+so a mixed stack shows both sides at full length. Stacking is ignored for a
+single series, and works horizontally too.
+
 **`orientation="horizontal"`** runs the categories down the side:
 
 ```vue

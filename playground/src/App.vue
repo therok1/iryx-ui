@@ -971,6 +971,13 @@ function simulateLoad() {
         </ICard>
 
         <p class="text-sm text-muted-foreground">
+          Stacked — one bar per category, and the tooltip carries the total.
+        </p>
+        <ICard>
+          <IBarChart :data="cashflow" :series="cashflowSeries" stacked label="Cashflow, stacked" :height="220" />
+        </ICard>
+
+        <p class="text-sm text-muted-foreground">
           Spanning zero, and enough categories that the labels have to thin out.
         </p>
         <div class="grid gap-4 lg:grid-cols-2">

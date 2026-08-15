@@ -30,6 +30,16 @@ export interface BarChartProps {
    * or numerous category names are the case to turn the chart for.
    */
   orientation?: 'vertical' | 'horizontal'
+  /**
+   * Stack the series into one bar per category instead of grouping them
+   * side by side.
+   *
+   * Stacking answers "what makes up the total"; grouping answers "how do these
+   * compare". Only the bottom segment shares a baseline, so every segment
+   * above it is hard to compare across categories — reach for grouped bars
+   * when the comparison matters more than the total.
+   */
+  stacked?: boolean
   /** Rendered height in px. Width always fills the container. */
   height?: number
   /** Target tick count. The axis lands on round numbers, so this is a hint. */
@@ -38,6 +48,8 @@ export interface BarChartProps {
   axis?: boolean
   /** Drop the legend. Only honoured for a single series — see below. */
   legend?: boolean
+  /** Word for the stacked tooltip's sum — override for non-English apps. */
+  totalLabel?: string
   /** Locale and options for every number shown — ticks and tooltip alike. */
   locale?: string
   format?: Intl.NumberFormatOptions
@@ -63,6 +75,7 @@ const props = withDefaults(defineProps<BarChartProps>(), {
   ticks: 5,
   axis: true,
   legend: true,
+  totalLabel: 'Total',
   unstyled: undefined,
 })
 
@@ -100,9 +113,34 @@ function readValue(datum: BarChartDatum, key: string): SparseValue {
 
 const horizontal = computed(() => props.orientation === 'horizontal')
 
+const isStacked = computed(() => props.stacked && isMulti.value)
+
+/**
+ * Stacked bars reach as far as their running total, so the axis has to be
+ * sized against the sums rather than the individual readings. Positive and
+ * negative parts stack away from zero independently, which is why each
+ * category contributes both.
+ */
+function categoryTotals(datum: BarChartDatum): [number, number] {
+  let positive = 0
+  let negative = 0
+  for (const entry of series.value) {
+    const value = readValue(datum, entry.key)
+    if (value == null)
+      continue
+    if (value >= 0)
+      positive += value
+    else
+      negative += value
+  }
+  return [positive, negative]
+}
+
 const layout = computed(() => cartesianLayout({
   orientation: props.orientation,
-  values: props.data.flatMap(datum => series.value.map(entry => readValue(datum, entry.key))),
+  values: isStacked.value
+    ? props.data.flatMap(categoryTotals)
+    : props.data.flatMap(datum => series.value.map(entry => readValue(datum, entry.key))),
   categories: props.data.length,
   longestLabel: Math.max(...props.data.map(datum => datum.label.length), 1),
   width: width.value,
@@ -125,8 +163,9 @@ const bandWidth = computed(() => layout.value.bandWidth)
  */
 const BAR_SHARE = 0.7
 const groupWidth = computed(() => bandWidth.value * BAR_SHARE)
+// A stack is one bar per category however many series it holds.
 const barWidth = computed(() =>
-  Math.max(2, Math.min(24, groupWidth.value / series.value.length)),
+  Math.max(2, Math.min(24, groupWidth.value / (isStacked.value ? 1 : series.value.length))),
 )
 
 interface Bar {
@@ -136,6 +175,8 @@ interface Bar {
   height: number
   /** Which side of the baseline the bar grows toward. */
   direction: 'up' | 'down' | 'right' | 'left'
+  /** Only the outermost segment of a stack is rounded — see `barPath`. */
+  capped: boolean
   seriesIndex: number
   categoryIndex: number
 }
@@ -146,44 +187,94 @@ const bars = computed<Bar[]>(() => {
 
   const baseline = layout.value.value(0)
   const total = series.value.length
-  // Neighbouring bars in a group need a sliver of surface between them.
-  const gap = total > 1 ? 1 : 0
+  // Neighbouring bars in a group need a sliver of surface between them. A
+  // stack is a single bar, so its gap runs between segments instead — applied
+  // along the value axis in `segmentGap`, not across the band.
+  const gap = total > 1 && !isStacked.value ? 1 : 0
 
-  return props.data.flatMap((datum, categoryIndex) =>
-    series.value.flatMap((entry, seriesIndex) => {
+  return props.data.flatMap((datum, categoryIndex) => {
+    /**
+     * Where the next segment starts, in data units. Positive and negative
+     * parts run away from zero independently, so a stack with both does not
+     * cancel itself into a shorter bar than either side.
+     */
+    let stackUp = 0
+    let stackDown = 0
+
+    // The last segment on each side is the one that gets the rounded cap.
+    const lastPositive = series.value.reduce((last, entry, index) => {
+      const value = readValue(datum, entry.key)
+      return value != null && value >= 0 ? index : last
+    }, -1)
+    const lastNegative = series.value.reduce((last, entry, index) => {
+      const value = readValue(datum, entry.key)
+      return value != null && value < 0 ? index : last
+    }, -1)
+
+    return series.value.flatMap((entry, seriesIndex) => {
       const value = readValue(datum, entry.key)
       if (value == null)
         return []
 
-      const tip = layout.value.value(value)
-      // Group centred on the band, then each bar offset within the group.
-      const groupStart = layout.value.bandCentre(categoryIndex) - (barWidth.value * total) / 2
-      const bandOffset = groupStart + barWidth.value * seriesIndex + gap
+      let from = baseline
+      let tip: number
+
+      if (isStacked.value) {
+        const start = value >= 0 ? stackUp : stackDown
+        const end = start + value
+        from = layout.value.value(start)
+        tip = layout.value.value(end)
+        if (value >= 0)
+          stackUp = end
+        else
+          stackDown = end
+      }
+      else {
+        tip = layout.value.value(value)
+      }
+
+      // Grouped: each series takes its own slice of the band. Stacked: one bar.
+      const span = isStacked.value ? barWidth.value : barWidth.value * total
+      const groupStart = layout.value.bandCentre(categoryIndex) - span / 2
+      const bandOffset = groupStart + (isStacked.value ? 0 : barWidth.value * seriesIndex) + gap
       const thickness = Math.max(barWidth.value - gap * 2, 1)
-      const length = Math.abs(tip - baseline)
+      /**
+       * 2px of surface between stacked segments, so neighbours read as
+       * distinct without a stroke drawn around them. Taken off the far end,
+       * and never enough to swallow a thin segment whole.
+       */
+      const segmentGap = isStacked.value ? Math.min(2, Math.abs(tip - from) / 2) : 0
+      const length = Math.max(Math.abs(tip - from) - segmentGap, 0)
+      // SVG geometry is anchored at the smaller coordinate, which is the tip
+      // end going up or left and the baseline end going down or right.
+      const near = tip < from ? tip + segmentGap : from
+      const capped = !isStacked.value
+        || seriesIndex === (value >= 0 ? lastPositive : lastNegative)
 
       // The band axis and the value axis swap; everything else is the same.
       return [horizontal.value
         ? {
-            x: Math.min(tip, baseline),
+            x: near,
             y: bandOffset,
             width: length,
             height: thickness,
             direction: value >= 0 ? 'right' as const : 'left' as const,
+            capped,
             seriesIndex,
             categoryIndex,
           }
         : {
             x: bandOffset,
-            y: Math.min(tip, baseline),
+            y: near,
             width: thickness,
             height: length,
             direction: value >= 0 ? 'up' as const : 'down' as const,
+            capped,
             seriesIndex,
             categoryIndex,
           }]
-    }),
-  )
+    })
+  })
 })
 
 /**
@@ -193,6 +284,11 @@ const bars = computed<Bar[]>(() => {
 function barPath(bar: Bar): string {
   const { x, y, width: w, height: h } = bar
   const right = x + w
+  // A segment mid-stack is square at both ends: the rounding marks the tip of
+  // the total, and rounding every segment would read as separate bars.
+  if (!bar.capped)
+    return `M${x} ${y} L${right} ${y} L${right} ${y + h} L${x} ${y + h} Z`
+
   const bottom = y + h
   const r = Math.min(4, w / 2, h / 2, bar.direction === 'up' || bar.direction === 'down' ? h : w)
 
@@ -239,19 +335,34 @@ const tooltip = computed(() => {
    * row per measure under the category. Measuring the series name in the
    * single case underestimated the box by half and let it cover the mark.
    */
+  /**
+   * A stack is read as a whole, so the total is the reading the segments add
+   * up to — without it the reader has to do the sum the chart already did.
+   */
+  const total = isStacked.value
+    ? formatValue(categoryTotals(datum).reduce((sum, part) => sum + part, 0))
+    : undefined
+
   const widest = isMulti.value
-    ? Math.max(datum.label.length, ...rows.map(row => row.name.length + row.value.length + 3))
+    ? Math.max(
+        datum.label.length,
+        total ? total.length + 6 : 0,
+        ...rows.map(row => row.name.length + row.value.length + 3),
+      )
     : datum.label.length + rows[0]!.value.length + 2
   const centre = layout.value.bandCentre(hovered.value)
 
   // Horizontal: anchor past the longest bar in the group, at the band's centre.
   if (horizontal.value) {
-    const reach = Math.max(
-      ...series.value.map((entry) => {
-        const value = readValue(datum, entry.key)
-        return value == null ? Number.NEGATIVE_INFINITY : layout.value.value(value)
-      }),
-    )
+    // A stack ends at its running total, not at any one reading.
+    const reach = isStacked.value
+      ? layout.value.value(categoryTotals(datum)[0])
+      : Math.max(
+          ...series.value.map((entry) => {
+            const value = readValue(datum, entry.key)
+            return value == null ? Number.NEGATIVE_INFINITY : layout.value.value(value)
+          }),
+        )
     /**
      * Past the tip rather than over it — the end of the bar is the reading, so
      * covering it defeats the tooltip. Where a long bar leaves no room on the
@@ -266,22 +377,26 @@ const tooltip = computed(() => {
     return {
       label: datum.label,
       rows,
+      total,
       multi: isMulti.value,
       x: clampTooltip(fits ? outside : reach - half - 8, text, width.value),
       y: centre,
     }
   }
 
-  const top = Math.min(
-    ...series.value.map((entry) => {
-      const value = readValue(datum, entry.key)
-      return value == null ? Number.POSITIVE_INFINITY : Math.min(layout.value.value(value), layout.value.value(0))
-    }),
-  )
+  const top = isStacked.value
+    ? layout.value.value(categoryTotals(datum)[0])
+    : Math.min(
+        ...series.value.map((entry) => {
+          const value = readValue(datum, entry.key)
+          return value == null ? Number.POSITIVE_INFINITY : Math.min(layout.value.value(value), layout.value.value(0))
+        }),
+      )
 
   return {
     label: datum.label,
     rows,
+    total,
     multi: isMulti.value,
     x: clampTooltip(centre, 'x'.repeat(widest), width.value),
     y: top,
@@ -417,6 +532,13 @@ function barClass(bar: Bar) {
           </span>
         </template>
         <span v-else :class="slotClass('tooltipValue')">{{ tooltip.rows[0]!.value }}</span>
+
+        <!-- What the segments add up to; a stack is read as a whole. -->
+        <span v-if="tooltip.total" class="flex items-center gap-1.5 border-t border-border pt-1">
+          <span class="size-2 shrink-0" />
+          <span :class="slotClass('tooltipLabel')">{{ props.totalLabel }}</span>
+          <span :class="slotClass('tooltipValue')">{{ tooltip.total }}</span>
+        </span>
       </div>
     </div>
 
