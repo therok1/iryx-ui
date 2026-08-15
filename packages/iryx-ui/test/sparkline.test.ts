@@ -44,8 +44,30 @@ describe('sparkline', () => {
 
   it('keeps strokes immune to the non-uniform stretch', () => {
     const wrapper = mount(Sparkline, { props: { data: [1, 2] } })
-    expect(wrapper.attributes('preserveAspectRatio')).toBe('none')
+    expect(wrapper.get('svg').attributes('preserveAspectRatio')).toBe('none')
     expect(wrapper.get('path').attributes('vector-effect')).toBe('non-scaling-stroke')
+  })
+
+  /**
+   * Regression: marks are centred on their data point, so the end dot sat
+   * exactly on the corner of the box and half of it painted outside — fine
+   * inside a padded card, bleeding into the neighbour in a table cell.
+   */
+  it('reserves room for the end dot inside its own box', () => {
+    const plain = mount(Sparkline, { props: { data: [1, 2], height: 32 } })
+    expect(plain.attributes('style')).toContain('padding: 1px')
+    expect(plain.get('svg').attributes('height')).toBe('30')
+
+    const dotted = mount(Sparkline, { props: { data: [1, 2], height: 32, endDot: true } })
+    // Half the 12px ring on every side, taken out of the drawing, not added
+    // to the outside — the caller's reserved height is still 32px.
+    expect(dotted.attributes('style')).toContain('padding: 6px')
+    expect(dotted.get('svg').attributes('height')).toBe('20')
+  })
+
+  it('never collapses the plot when the height is smaller than the inset', () => {
+    const wrapper = mount(Sparkline, { props: { data: [1, 2], height: 4, endDot: true } })
+    expect(Number(wrapper.get('svg').attributes('height'))).toBeGreaterThan(0)
   })
 
   it('breaks the line at a gap instead of bridging it', () => {
@@ -107,11 +129,11 @@ describe('sparkline', () => {
   })
 
   it('is decorative unless given a label', () => {
-    const bare = mount(Sparkline, { props: { data: [1, 2] } })
+    const bare = mount(Sparkline, { props: { data: [1, 2] } }).get('svg')
     expect(bare.attributes('aria-hidden')).toBe('true')
     expect(bare.attributes('role')).toBeUndefined()
 
-    const described = mount(Sparkline, { props: { data: [1, 2], label: 'Revenue, up 12%' } })
+    const described = mount(Sparkline, { props: { data: [1, 2], label: 'Revenue, up 12%' } }).get('svg')
     expect(described.attributes('role')).toBe('img')
     expect(described.attributes('aria-label')).toBe('Revenue, up 12%')
     expect(described.attributes('aria-hidden')).toBeUndefined()

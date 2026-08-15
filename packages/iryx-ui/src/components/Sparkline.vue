@@ -31,7 +31,7 @@ export interface SparklineProps {
   unstyled?: boolean
   class?: string
   /** Override classes per slot, e.g. `{ line: 'stroke-[3]' }`. */
-  ui?: Partial<Record<'root' | 'line' | 'area' | 'dot' | 'ring', string>>
+  ui?: Partial<Record<'root' | 'plot' | 'line' | 'area' | 'dot' | 'ring', string>>
 }
 
 const props = withDefaults(defineProps<SparklineProps>(), {
@@ -52,6 +52,17 @@ const isUnstyled = computed(() => props.unstyled ?? config.unstyled)
  * the ink — a 2px line stays 2px and a round cap stays circular.
  */
 const BOX = 100
+
+/** Half the widest mark, in px — the ringed end dot at 12px, or the 2px line. */
+const inset = computed(() => (props.endDot ? 6 : 1))
+
+/**
+ * Marks are centred on their data point, so the first and last ones straddle
+ * the edge of the drawing and half of each would paint outside the component.
+ * The plot is inset by the mark's radius and the drawing shrinks to match, so
+ * the box a caller reserves is the box the sparkline actually occupies.
+ */
+const plotHeight = computed(() => Math.max(props.height - inset.value * 2, 1))
 
 interface Point { x: number, y: number }
 
@@ -126,59 +137,64 @@ const endPoint = computed<Point | undefined>(() => {
 
 const theme = computed(() => sparklineTheme({ muted: props.muted }))
 
-function slotClass(slot: 'root' | 'line' | 'area' | 'dot' | 'ring', extra?: string) {
+function slotClass(slot: 'root' | 'plot' | 'line' | 'area' | 'dot' | 'ring', extra?: string) {
   const override = props.ui?.[slot]
   return isUnstyled.value ? [override, extra] : theme.value[slot]({ class: [override, extra] })
 }
 </script>
 
 <template>
-  <svg
-    :viewBox="`0 0 ${BOX} ${BOX}`"
-    preserveAspectRatio="none"
-    :height="props.height"
-    :style="{ height: `${props.height}px` }"
-    :role="props.label ? 'img' : undefined"
-    :aria-label="props.label"
-    :aria-hidden="props.label ? undefined : true"
+  <span
     :class="slotClass('root', props.class)"
+    :style="{ padding: `${inset}px` }"
   >
-    <template v-if="props.variant === 'area'">
+    <svg
+      :viewBox="`0 0 ${BOX} ${BOX}`"
+      preserveAspectRatio="none"
+      :height="plotHeight"
+      :style="{ height: `${plotHeight}px` }"
+      :role="props.label ? 'img' : undefined"
+      :aria-label="props.label"
+      :aria-hidden="props.label ? undefined : true"
+      :class="slotClass('plot')"
+    >
+      <template v-if="props.variant === 'area'">
+        <path
+          v-for="(points, index) in runs"
+          :key="`area-${index}`"
+          :d="toArea(points)"
+          :class="slotClass('area')"
+        />
+      </template>
+
       <path
         v-for="(points, index) in runs"
-        :key="`area-${index}`"
-        :d="toArea(points)"
-        :class="slotClass('area')"
-      />
-    </template>
-
-    <path
-      v-for="(points, index) in runs"
-      :key="`line-${index}`"
-      :d="toLine(points)"
-      vector-effect="non-scaling-stroke"
-      :class="slotClass('line')"
-    />
-
-    <!--
-      A zero-length path with a round cap renders as a circle of the stroke's
-      width, and `non-scaling-stroke` keeps it perfectly round however far the
-      box is stretched. A real <circle> would be squashed into an ellipse.
-      The ring goes first so the dot sits on top of it.
-    -->
-    <template v-if="props.endDot && endPoint">
-      <path
-        :d="`M${endPoint.x} ${endPoint.y} L${endPoint.x} ${endPoint.y}`"
-        stroke-width="12"
+        :key="`line-${index}`"
+        :d="toLine(points)"
         vector-effect="non-scaling-stroke"
-        :class="slotClass('ring')"
+        :class="slotClass('line')"
       />
-      <path
-        :d="`M${endPoint.x} ${endPoint.y} L${endPoint.x} ${endPoint.y}`"
-        stroke-width="8"
-        vector-effect="non-scaling-stroke"
-        :class="slotClass('dot')"
-      />
-    </template>
-  </svg>
+
+      <!--
+        A zero-length path with a round cap renders as a circle of the stroke's
+        width, and `non-scaling-stroke` keeps it perfectly round however far
+        the box is stretched. A real <circle> would be squashed into an
+        ellipse. The ring goes first so the dot sits on top of it.
+      -->
+      <template v-if="props.endDot && endPoint">
+        <path
+          :d="`M${endPoint.x} ${endPoint.y} L${endPoint.x} ${endPoint.y}`"
+          stroke-width="12"
+          vector-effect="non-scaling-stroke"
+          :class="slotClass('ring')"
+        />
+        <path
+          :d="`M${endPoint.x} ${endPoint.y} L${endPoint.x} ${endPoint.y}`"
+          stroke-width="8"
+          vector-effect="non-scaling-stroke"
+          :class="slotClass('dot')"
+        />
+      </template>
+    </svg>
+  </span>
 </template>
