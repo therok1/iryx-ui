@@ -182,6 +182,19 @@ const weeklyVolume = Array.from({ length: 26 }, (_, index) => ({
   value: Math.round(400 + Math.sin(index / 2) * 180 + index * 12),
 }))
 
+// Written out in full: Tailwind scans source text, so a class name assembled
+// at runtime (`text-chart-${n}`) is never generated.
+const chartSlots = [
+  'text-chart-1',
+  'text-chart-2',
+  'text-chart-3',
+  'text-chart-4',
+  'text-chart-5',
+  'text-chart-6',
+  'text-chart-7',
+  'text-chart-8',
+]
+
 const revenueTrend = [4200, 4600, 4100, 5200, 5800, 5400, 6300, 6900, 6600, 7400, 8100, 8600]
 const overdueTrend = [1800, 1720, 1650, 1740, 1500, 1420, 1380, 1290, 1310, 1220, 1180, 1150]
 // A dropped reading mid-series: the line should break, not bridge it.
@@ -915,6 +928,20 @@ function simulateLoad() {
             <ISparkline class="mt-3" :data="gappyTrend" variant="area" end-dot />
           </ICard>
         </div>
+
+        <p class="text-sm text-muted-foreground">
+          The eight categorical slots — identity, assigned in order, never cycled.
+        </p>
+        <ICard>
+          <div class="grid gap-3 sm:grid-cols-4">
+            <div v-for="(slot, index) in chartSlots" :key="slot" class="space-y-1">
+              <ISparkline :data="revenueTrend" variant="area" end-dot :class="slot" />
+              <p class="text-xs text-muted-foreground">
+                chart-{{ index + 1 }}
+              </p>
+            </div>
+          </div>
+        </ICard>
 
         <p class="text-sm text-muted-foreground">
           Edge cases — flat, a single reading, and two pinned to a shared scale.

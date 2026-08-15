@@ -483,6 +483,58 @@ chrome; use `ui` to reach the parts (`root`, `input`, `leading`, `trailing`,
 forwarded to the `<input>` itself. `ref` exposes the element as `.input` for
 focus management.
 
+#### Chart colours
+
+Eight categorical slots, `--iryx-chart-1` … `--iryx-chart-8`, usable as Tailwind
+colours (`text-chart-3`, `fill-chart-5`). They encode **identity** — which
+series a mark belongs to — never magnitude.
+
+```vue
+<!-- One series per slot, assigned in order. -->
+<ISparkline :data="revenue" class="text-chart-1" />
+
+<ISparkline :data="expenses" class="text-chart-2" />
+```
+
+Three rules, and they are not stylistic:
+
+- **Assign in order, never cycle.** A ninth series is not a generated ninth
+  hue — fold it into "Other", or switch to small multiples. A generated colour
+  hasn't been checked for separation against its neighbours.
+- **Status colours are never series colours.** A series that happens to land in
+  slot 4 must not read as a warning. `success`/`warning`/`danger`/`info` stay
+  reserved.
+- **Colour follows the entity, not its rank.** If a filter removes a series,
+  the survivors keep their slots rather than shifting up.
+
+Tailwind scans source text, so a class name assembled at runtime is never
+generated — write the slots out, or reach for the variable:
+
+```vue
+<!-- Silently unstyled: Tailwind never sees this string -->
+<ISparkline :class="`text-chart-${index + 1}`" />
+
+<!-- Either of these works -->
+<ISparkline :class="['text-chart-1', 'text-chart-2'][index]" />
+
+<ISparkline :style="{ color: `var(--iryx-chart-${index + 1})` }" />
+```
+
+The steps are not eyeballed. Each clears a lightness band, a chroma floor, and
+protanopia/deuteranopia separation against its own surface, checked with a
+validator rather than by eye. **Dark has its own steps**, validated against the
+dark background — not an automatic flip of the light ones.
+
+Two caps worth knowing before you design around them:
+
+| Chart form | Max series |
+| --- | --- |
+| Bars, lines, stacks — only neighbours touch | **8** |
+| Scatter, bubble, small multiples — any two marks can sit side by side | **3** |
+
+Past those, the answer is fewer series or facets, not more colours. If you
+re-step any slot, re-run the validator for **both** modes.
+
 #### Line charts
 
 ```vue

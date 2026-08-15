@@ -77,6 +77,30 @@
   --iryx-info-muted: oklch(0.97 0.014 254.604);
   --iryx-info-muted-foreground: oklch(0.488 0.243 264.376);
   --iryx-info-border: oklch(0.882 0.059 254.128);
+
+  /*
+   * Categorical chart series. Identity only — which series a mark belongs to,
+   * never how large it is. Assign in order and never cycle: a ninth series
+   * folds into "Other" or becomes small multiples, because a generated ninth
+   * hue cannot be checked for the separation the first eight were chosen for.
+   *
+   * Status colours are deliberately NOT reused here. A series that happens to
+   * be slot 4 must never be mistaken for a warning.
+   *
+   * These steps are not eyeballed. They clear the lightness band, a chroma
+   * floor of 0.10, protanopia/deuteranopia separation and contrast against the
+   * surface, verified with the dataviz validator. Dark has its own steps,
+   * validated against the dark surface — not an automatic flip. Re-run the
+   * validator before changing any of them.
+   */
+  --iryx-chart-1: oklch(0.59 0.2 277);
+  --iryx-chart-2: oklch(0.68 0.17 50);
+  --iryx-chart-3: oklch(0.62 0.13 175);
+  --iryx-chart-4: oklch(0.75 0.16 90);
+  --iryx-chart-5: oklch(0.68 0.15 350);
+  --iryx-chart-6: oklch(0.52 0.14 145);
+  --iryx-chart-7: oklch(0.55 0.17 240);
+  --iryx-chart-8: oklch(0.58 0.21 25);
 }
 
 .dark {
@@ -116,6 +140,16 @@
   --iryx-info-muted: oklch(0.282 0.091 267.935);
   --iryx-info-muted-foreground: oklch(0.809 0.105 251.813);
   --iryx-info-border: oklch(0.379 0.146 265.522);
+
+  /* Chart series — their own steps, validated against the dark surface. */
+  --iryx-chart-1: oklch(0.62 0.19 277);
+  --iryx-chart-2: oklch(0.66 0.16 50);
+  --iryx-chart-3: oklch(0.62 0.13 175);
+  --iryx-chart-4: oklch(0.65 0.15 90);
+  --iryx-chart-5: oklch(0.65 0.15 350);
+  --iryx-chart-6: oklch(0.58 0.14 145);
+  --iryx-chart-7: oklch(0.6 0.16 240);
+  --iryx-chart-8: oklch(0.6 0.19 25);
 }
 
 @theme inline {
@@ -152,6 +186,14 @@
   --color-info-muted: var(--iryx-info-muted);
   --color-info-muted-foreground: var(--iryx-info-muted-foreground);
   --color-info-border: var(--iryx-info-border);
+  --color-chart-1: var(--iryx-chart-1);
+  --color-chart-2: var(--iryx-chart-2);
+  --color-chart-3: var(--iryx-chart-3);
+  --color-chart-4: var(--iryx-chart-4);
+  --color-chart-5: var(--iryx-chart-5);
+  --color-chart-6: var(--iryx-chart-6);
+  --color-chart-7: var(--iryx-chart-7);
+  --color-chart-8: var(--iryx-chart-8);
   --animate-progress-indeterminate: progress-indeterminate 1.5s ease-in-out infinite;
   --animate-fade-in: fade-in 150ms ease-out;
   --animate-fade-out: fade-out 150ms ease-in;

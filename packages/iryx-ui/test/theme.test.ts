@@ -44,6 +44,39 @@ describe('theme.css tokens', () => {
       expect(mapped).toContain(`var(${token})`)
   })
 
+  /**
+   * The chart slots were chosen against the dataviz validator — lightness
+   * band, chroma floor, protan/deutan separation, contrast on each surface.
+   * These assertions cannot re-run that maths, but they do catch the two ways
+   * the palette silently rots: a slot going missing, and dark quietly becoming
+   * a copy of light instead of its own validated steps.
+   */
+  it('declares eight chart slots per mode, with dark on its own steps', () => {
+    const light = tokensIn(block(':root')).filter(token => token.startsWith('--iryx-chart-'))
+    const dark = tokensIn(block('\\.dark')).filter(token => token.startsWith('--iryx-chart-'))
+
+    const expected = Array.from({ length: 8 }, (_, index) => `--iryx-chart-${index + 1}`)
+    expect(light).toEqual(expected)
+    expect(dark).toEqual(expected)
+
+    for (const slot of expected) {
+      const lightValue = themeCss.match(new RegExp(`${slot}: (oklch\\([^)]+\\))`))![1]
+      const darkValue = [...themeCss.matchAll(new RegExp(`${slot}: (oklch\\([^)]+\\))`, 'g'))][1]![1]
+      // Only slot 3 legitimately shares a step across modes.
+      if (slot !== '--iryx-chart-3')
+        expect(darkValue, `${slot} should have dark-specific steps`).not.toBe(lightValue)
+    }
+  })
+
+  it('keeps status colours out of the chart slots', () => {
+    // A series that happens to be slot 4 must not read as a warning.
+    const chartValues = [...themeCss.matchAll(/--iryx-chart-\d: (oklch\([^)]+\))/g)].map(m => m[1])
+    const statusValues = [...themeCss.matchAll(/--iryx-(?:success|warning|danger|info): (oklch\([^)]+\))/g)].map(m => m[1])
+
+    for (const value of statusValues)
+      expect(chartValues).not.toContain(value)
+  })
+
   it('covers all five roles for each status colour', () => {
     const declared = tokensIn(block(':root'))
     for (const status of ['success', 'warning', 'danger', 'info']) {
