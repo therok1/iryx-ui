@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { CloudUploadIcon, Delete02Icon, File01Icon } from '@hugeicons/core-free-icons'
+import { Delete02Icon, File01Icon, Upload05Icon } from '@hugeicons/core-free-icons'
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useFormField } from '../composables/form'
 import { useIryxUiConfig } from '../config'
 import { fileUploadTheme } from '../theme/file-upload'
+import Button from './Button.vue'
 import Icon from './Icon.vue'
 
 /** Why a file was turned away, so the caller can word its own message. */
@@ -29,6 +30,8 @@ export interface FileUploadProps {
   label?: string
   /** Secondary line under the prompt — good place for the accepted types. */
   hint?: string
+  /** Text on the browse button. */
+  browseLabel?: string
   /** Labels and messages — override for non-English apps. */
   removeLabel?: string
   tooLargeText?: string
@@ -40,14 +43,15 @@ export interface FileUploadProps {
   class?: string
   /** Override classes per slot, e.g. `{ dropzone: 'py-10' }`. */
   ui?: Partial<Record<
-    'root' | 'dropzone' | 'input' | 'icon' | 'label' | 'hint' | 'list' | 'item'
-    | 'thumbnail' | 'placeholder' | 'details' | 'name' | 'meta' | 'remove' | 'error',
+    'root' | 'dropzone' | 'input' | 'icon' | 'label' | 'browse' | 'hint' | 'list'
+    | 'item' | 'thumbnail' | 'placeholder' | 'details' | 'name' | 'meta' | 'remove' | 'error',
     string
   >>
 }
 
 const props = withDefaults(defineProps<FileUploadProps>(), {
-  label: 'Choose a file or drag it here',
+  label: 'Drag and drop a file here',
+  browseLabel: 'Browse files',
   removeLabel: 'Remove',
   tooLargeText: 'is too large',
   wrongTypeText: 'is not an accepted type',
@@ -225,6 +229,11 @@ function slotClass(slot: keyof NonNullable<FileUploadProps['ui']>, extra?: strin
   const override = props.ui?.[slot]
   return isUnstyled.value ? [override, extra] : theme.value[slot]({ class: [override, extra] })
 }
+
+/** Button types `class` as a string, so this slot cannot hand back an array. */
+const browseClass = computed(() =>
+  isUnstyled.value ? props.ui?.browse : theme.value.browse({ class: props.ui?.browse }),
+)
 </script>
 
 <template>
@@ -249,10 +258,22 @@ function slotClass(slot: keyof NonNullable<FileUploadProps['ui']>, extra?: strin
         @change="onSelect"
       >
       <span :class="slotClass('icon')">
-        <Icon :icon="CloudUploadIcon" />
+        <Icon :icon="Upload05Icon" />
       </span>
       <span :class="slotClass('label')">{{ props.label }}</span>
       <span v-if="props.hint" :class="slotClass('hint')">{{ props.hint }}</span>
+      <!--
+        Last, as the call to action — the hint qualifies what is being asked
+        for, so it belongs above the control that acts on it.
+
+        `as="span"`: a real <button> here would sit inside the <label> and
+        swallow the click the label exists to provide, as well as nesting one
+        interactive element in another. The off-screen input stays the control,
+        so the keyboard path is unaffected.
+      -->
+      <Button as="span" variant="outline" size="sm" :class="browseClass">
+        {{ props.browseLabel }}
+      </Button>
     </label>
 
     <p v-for="rejection in rejections" :key="rejection.file.name" :class="slotClass('error')">

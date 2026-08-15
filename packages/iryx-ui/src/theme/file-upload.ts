@@ -18,6 +18,8 @@ export const fileUploadTheme = tv({
      */
     icon: 'flex size-12 items-center justify-center rounded-full bg-muted text-muted-foreground [&_svg]:size-5',
     label: 'text-sm text-foreground',
+    /** Spacing only — the look comes from Button, so it tracks the theme. */
+    browse: 'mt-2',
     hint: 'text-xs text-muted-foreground',
     list: 'flex flex-col gap-2',
     item: 'flex items-center gap-3 rounded-xl border border-border bg-input p-2',

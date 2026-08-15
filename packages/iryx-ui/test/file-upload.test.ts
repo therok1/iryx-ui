@@ -171,11 +171,25 @@ describe('fileUpload', () => {
     vi.restoreAllMocks()
   })
 
+  /**
+   * The label exists to turn a click anywhere in the zone into a picker. A
+   * real <button> would swallow that click and nest one interactive element
+   * inside another, so the browse control is a styled span.
+   */
+  it('renders browse as a span, leaving the label the only control', () => {
+    const wrapper = mount(FileUpload, { props: { browseLabel: 'Browse files' } })
+    const zone = wrapper.get('label')
+
+    expect(zone.text()).toContain('Browse files')
+    expect(zone.findAll('button')).toHaveLength(0)
+  })
+
   it('takes translated labels', () => {
     const wrapper = mount(FileUpload, {
-      props: { label: 'Choisir un fichier', hint: 'PNG ou JPG' },
+      props: { label: 'Déposez un fichier ici', browseLabel: 'Parcourir', hint: 'PNG ou JPG' },
     })
-    expect(wrapper.text()).toContain('Choisir un fichier')
+    expect(wrapper.text()).toContain('Déposez un fichier ici')
+    expect(wrapper.text()).toContain('Parcourir')
     expect(wrapper.text()).toContain('PNG ou JPG')
   })
 })

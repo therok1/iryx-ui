@@ -1071,7 +1071,8 @@ function simulateLoad() {
               v-model="logo"
               accept="image/*"
               :max-size="2 * 1024 * 1024"
-              label="Choose a logo or drag it here"
+              label="Drag your logo here"
+              browse-label="Browse images"
               hint="PNG, JPG or SVG up to 2 MB"
             />
           </div>
@@ -1084,7 +1085,7 @@ function simulateLoad() {
               v-model="attachments"
               multiple
               :max-files="3"
-              label="Add attachments"
+              label="Drag files here"
               hint="Any file type, 3 at most"
             />
           </div>
