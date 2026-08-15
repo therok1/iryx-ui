@@ -1,6 +1,7 @@
 import { mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { Input, Label, Textarea } from '../src'
+import { nextTick } from 'vue'
+import { Input, Label, PasswordInput, Textarea } from '../src'
 
 describe('input', () => {
   it('wraps a text input in the field chrome', () => {
@@ -127,6 +128,108 @@ describe('textarea', () => {
     const wrapper = mount(Textarea, { props: { 'modelValue': '', 'onUpdate:modelValue': () => {} } })
     await wrapper.setValue('note')
     expect(wrapper.emitted('update:modelValue')?.[0]).toEqual(['note'])
+  })
+})
+
+describe('textarea autosize', () => {
+  it('drops the fixed min-height and the drag handle', () => {
+    const wrapper = mount(Textarea, { props: { autosize: true } })
+    expect(wrapper.classes()).toContain('resize-none')
+    expect(wrapper.classes()).not.toContain('min-h-20')
+  })
+
+  it('seeds rows from the min bound instead of the rows prop', () => {
+    const wrapper = mount(Textarea, { props: { autosize: { min: 3 }, rows: 9 } })
+    expect(wrapper.attributes('rows')).toBe('3')
+  })
+
+  it('leaves the fixed height alone when autosize is off', () => {
+    const wrapper = mount(Textarea, { props: { rows: 4 } })
+    expect(wrapper.attributes('rows')).toBe('4')
+    expect(wrapper.classes()).toContain('resize-y')
+    expect(wrapper.element.style.height).toBe('')
+  })
+
+  it('sets an explicit height once mounted with autosize', async () => {
+    const wrapper = mount(Textarea, { props: { autosize: true }, attachTo: document.body })
+    await nextTick()
+    expect(wrapper.element.style.height).toMatch(/px$/)
+  })
+})
+
+describe('passwordInput', () => {
+  it('masks by default and reveals on toggle', async () => {
+    const wrapper = mount(PasswordInput)
+    const input = wrapper.get('input')
+    expect(input.attributes('type')).toBe('password')
+
+    const toggle = wrapper.get('button')
+    expect(toggle.attributes('aria-label')).toBe('Show password')
+
+    await toggle.trigger('click')
+    expect(wrapper.get('input').attributes('type')).toBe('text')
+    expect(wrapper.get('button').attributes('aria-label')).toBe('Hide password')
+  })
+
+  it('can drop the toggle entirely', () => {
+    const wrapper = mount(PasswordInput, { props: { toggle: false } })
+    expect(wrapper.find('button').exists()).toBe(false)
+  })
+
+  it('hides the meter until there is a value', async () => {
+    const wrapper = mount(PasswordInput, {
+      props: { 'strength': true, 'modelValue': '', 'onUpdate:modelValue': () => {} },
+    })
+    expect(wrapper.find('[role="status"]').exists()).toBe(false)
+
+    await wrapper.setProps({ modelValue: 'abc' })
+    expect(wrapper.get('[role="status"]').text()).toBe('Weak')
+  })
+
+  it('scores length and character variety', async () => {
+    const wrapper = mount(PasswordInput, {
+      props: { 'strength': true, 'modelValue': 'abc', 'onUpdate:modelValue': () => {} },
+    })
+    const label = () => wrapper.get('[role="status"]').text()
+    expect(label()).toBe('Weak')
+
+    await wrapper.setProps({ modelValue: 'abcdefgh' })
+    expect(label()).toBe('Weak')
+
+    await wrapper.setProps({ modelValue: 'Abcdefgh1' })
+    expect(label()).toBe('Good')
+
+    await wrapper.setProps({ modelValue: 'Abcdefghijkl1!' })
+    expect(label()).toBe('Strong')
+  })
+
+  it('fills one segment per point of score', async () => {
+    const wrapper = mount(PasswordInput, {
+      props: { 'strength': true, 'modelValue': 'Abcdefgh1', 'onUpdate:modelValue': () => {} },
+    })
+    expect(wrapper.findAll('[data-filled]')).toHaveLength(3)
+
+    await wrapper.setProps({ modelValue: 'Abcdefghijkl1!' })
+    expect(wrapper.findAll('[data-filled]')).toHaveLength(4)
+  })
+
+  it('takes translated labels', async () => {
+    const wrapper = mount(PasswordInput, {
+      props: {
+        'strength': true,
+        'strengthLabels': ['Uno', 'Due', 'Tre', 'Quattro'],
+        'showLabel': 'Mostra',
+        'modelValue': 'abc',
+        'onUpdate:modelValue': () => {},
+      },
+    })
+    expect(wrapper.get('[role="status"]').text()).toBe('Uno')
+    expect(wrapper.get('button').attributes('aria-label')).toBe('Mostra')
+  })
+
+  it('forwards stray attributes to the control', () => {
+    const wrapper = mount(PasswordInput, { attrs: { autocomplete: 'new-password' } })
+    expect(wrapper.get('input').attributes('autocomplete')).toBe('new-password')
   })
 })
 

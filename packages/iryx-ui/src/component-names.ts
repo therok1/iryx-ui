@@ -24,6 +24,7 @@ export const componentNames = [
   'Label',
   'NumberInput',
   'Pagination',
+  'PasswordInput',
   'Progress',
   'RadioGroup',
   'Select',

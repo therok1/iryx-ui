@@ -44,6 +44,13 @@ export const textareaTheme = tv({
     invalid: {
       true: 'border-red-500 focus-visible:ring-red-500/40',
     },
+    /**
+     * The measured height is the whole point, so drop the size variant's
+     * `min-h` floor and the drag handle that would fight it.
+     */
+    autosize: {
+      true: 'min-h-0 resize-none',
+    },
   },
   defaultVariants: {
     size: 'md',

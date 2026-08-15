@@ -290,7 +290,8 @@ app.use(createIryxUi({ unstyled: true }))
 | `IFormField` | Label, description, hint, help and error text around a control |
 | `IInput` | Text field with `sm`/`md`/`lg` sizes, `invalid` state, `v-model`, `leading`/`trailing` slots, `clearable`, `loading`, `debounce` |
 | `INumberInput` | Decimal-safe numeric field — the model is a **string**, with `min`/`max`/`step`, `precision` and locale-aware display |
-| `ITextarea` | Multi-line field with matching sizes and `invalid` state |
+| `IPasswordInput` | Masked field with a show/hide toggle and an optional strength meter |
+| `ITextarea` | Multi-line field with matching sizes, `invalid` state and optional `autosize` |
 | `ILabel` | Field label with optional `required` asterisk |
 | `ICheckbox` | Tri-state checkbox (`true` / `false` / `'indeterminate'`), optional `label` + `description` |
 | `ISelect` | Listbox with keyboard nav and typeahead, driven by an `items` array, with optional groups |
@@ -476,6 +477,55 @@ chrome; use `ui` to reach the parts (`root`, `input`, `leading`, `trailing`,
 `clear`). Stray attributes like `name`, `autocomplete` and `maxlength` are
 forwarded to the `<input>` itself. `ref` exposes the element as `.input` for
 focus management.
+
+#### Passwords
+
+`IPasswordInput` is `IInput` with a reveal toggle in the trailing area, plus an
+optional four-segment strength meter.
+
+```vue
+<IPasswordInput v-model="password" strength />
+
+<!-- Toggle only, no meter -->
+<IPasswordInput v-model="password" />
+
+<!-- No toggle either -->
+<IPasswordInput v-model="password" :toggle="false" />
+```
+
+The score counts length (8 and 12 characters), mixed case, a digit and a
+symbol, capped at four. It is a deliberately transparent nudge toward better
+passwords, **not** a security control — enforce real policy in the `IForm`
+validator, where it can actually reject a value.
+
+Every string is overridable, since components must not bake in English:
+
+```vue
+<IPasswordInput
+  v-model="password"
+  strength
+  show-label="Afficher le mot de passe"
+  hide-label="Masquer le mot de passe"
+  :strength-labels="['Faible', 'Moyen', 'Bon', 'Fort']"
+/>
+```
+
+`class` lands on the wrapper that stacks the field above the meter; `ui` reaches
+`root`, `input`, `toggle`, `meter`, `track`, `segment` and `label`.
+
+#### Autosizing textareas
+
+```vue
+<!-- Grows without limit -->
+<ITextarea v-model="note" autosize />
+
+<!-- Between 2 and 8 rows, then scrolls -->
+<ITextarea v-model="note" :autosize="{ min: 2, max: 8 }" />
+```
+
+`autosize` overrides `rows` and drops the drag handle, since the measured
+height is the point. The field shrinks as well as grows, and re-measures when
+the model changes from outside — a reset or a prefill resizes correctly.
 
 `ISelect` and `IRadioGroup` accept plain strings or `{ label, value, disabled }` objects. Both also take a default slot if you'd rather compose the Reka primitives yourself.
 

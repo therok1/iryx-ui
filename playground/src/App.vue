@@ -161,6 +161,9 @@ function onSignup(event: { data: typeof signup }) {
 const email = ref('')
 const bio = ref('')
 
+const password = ref('')
+const note = ref('')
+
 const search = ref('')
 const domain = ref('')
 const debounced = ref('')
@@ -1045,6 +1048,32 @@ function simulateLoad() {
               Model: <code>{{ JSON.stringify(debounced) }}</code>
             </p>
           </div>
+        </div>
+      </section>
+
+      <section class="space-y-4">
+        <h2 class="font-semibold">
+          Password + autosize
+        </h2>
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div class="space-y-2">
+            <ILabel for="pw">
+              Password with strength meter
+            </ILabel>
+            <IPasswordInput id="pw" v-model="password" strength placeholder="••••••••" />
+          </div>
+          <div class="space-y-2">
+            <ILabel for="pw-plain">
+              Toggle only
+            </ILabel>
+            <IPasswordInput id="pw-plain" placeholder="••••••••" />
+          </div>
+        </div>
+        <div class="space-y-2">
+          <ILabel for="note">
+            Autosize textarea — 2 to 8 rows
+          </ILabel>
+          <ITextarea id="note" v-model="note" :autosize="{ min: 2, max: 8 }" placeholder="Grows as you type…" />
         </div>
       </section>
 
