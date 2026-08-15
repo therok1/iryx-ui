@@ -1,5 +1,25 @@
 # iryx-ui
 
+## 0.7.0
+
+### Minor Changes
+
+- 0e01c7f: Add `IDatePicker` and `IDateRangePicker`, built on Reka's calendar primitives.
+
+  The model is an ISO `YYYY-MM-DD` string (`{ start, end }` for the range), never a `Date`: a `Date` is a timestamp carrying a time zone, so it can render as the previous day west of Greenwich and move a record into the wrong period. Malformed input resolves to "no selection" rather than throwing, since the value often arrives from a URL or a stale draft.
+
+  Both take `min` / `max` / `locale` / `format` / `weekStartsOn` / `clearable`, and every navigation and footer label is a prop. The conversion helpers (`toCalendarDate`, `toIsoDate`, `formatIsoDate`, `isoToday`) are exported too.
+
+  Adds `@internationalized/date` as a direct dependency — it already came in transitively with `reka-ui`, whose calendars require its `DateValue` type.
+
+- 07821f7: `IInput` gains `leading` and `trailing` slots, plus `clearable`, `loading` and `debounce` props.
+
+  **Breaking:** `IInput` now renders its chrome on a wrapper element rather than on the `<input>` itself, so affix content can take real space in the field instead of hiding long values under absolutely positioned padding. `class` lands on that wrapper; reach the inner control with `ui.input`. Stray attributes (`name`, `autocomplete`, `maxlength`) still forward to the `<input>`. Styling that targeted the input element directly needs moving to the wrapper.
+
+- 6e50d4e: Add `IPasswordInput` — `IInput` with a reveal toggle and an optional four-segment strength meter. The score is a transparent nudge (length, mixed case, digit, symbol), not a security control; every user-facing string is overridable via `showLabel`, `hideLabel` and `strengthLabels`.
+
+  `ITextarea` gains `autosize`: `true` grows without limit, `{ min, max }` bounds it in rows and scrolls past the cap. It shrinks as well as grows and re-measures on external model writes, so a reset or prefill resizes correctly.
+
 ## 0.6.0
 
 ### Minor Changes
