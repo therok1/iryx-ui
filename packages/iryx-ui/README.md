@@ -483,6 +483,44 @@ chrome; use `ui` to reach the parts (`root`, `input`, `leading`, `trailing`,
 forwarded to the `<input>` itself. `ref` exposes the element as `.input` for
 focus management.
 
+#### Multiple series
+
+Both charts take plain rows plus a `series` descriptor — the same shape
+`ITable` uses. Omit `series` for the single-measure case.
+
+```vue
+<IBarChart
+  :data="[
+    { label: 'Jan', revenue: 4200, expenses: 3100 },
+    { label: 'Feb', revenue: 5600, expenses: 3400 },
+  ]"
+  :series="[
+    { key: 'revenue', name: 'Revenue', slot: 0 },
+    { key: 'expenses', name: 'Expenses', slot: 1 },
+  ]"
+  label="Cashflow by month"
+/>
+```
+
+Bars group inside their category; lines draw one path each. One hover reports
+**every** series for that category in a single tooltip, so the reader compares
+in one place instead of chasing marks.
+
+**`slot` pins a series to a palette colour.** Without it, colour follows array
+position — so filtering a series out repaints the survivors and the reader has
+to relearn the chart. Pin the slots whenever series can be toggled.
+
+**The legend is mandatory from two series up.** `legend: false` only silences
+the single-series case, where the title already names what is plotted. Colour
+alone is never a dependable identity channel, so this is not configurable.
+
+Past eight series the colours stop identifying anything; the chart warns in
+development and you should fold the tail into "Other" or switch to small
+multiples.
+
+`variant="area"` is ignored for multiple series — overlapping washes muddy into
+a colour that belongs to neither.
+
 #### Chart colours
 
 Eight categorical slots, `--iryx-chart-1` … `--iryx-chart-8`, usable as Tailwind

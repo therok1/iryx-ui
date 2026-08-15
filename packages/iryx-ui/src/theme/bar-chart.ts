@@ -6,7 +6,13 @@ import { tv } from 'tailwind-variants'
  */
 export const barChartTheme = tv({
   slots: {
-    root: 'relative w-full text-primary',
+    root: 'w-full text-primary',
+    /**
+     * The tooltip's coordinates come from the SVG, so the SVG has to be its
+     * positioning context. Anchoring to the root instead shifts it up by the
+     * height of anything above the plot — the legend, most obviously.
+     */
+    plot: 'relative',
     svg: 'block w-full overflow-visible',
     /** Hairline and solid — a dashed grid competes with the marks. */
     grid: 'stroke-border',

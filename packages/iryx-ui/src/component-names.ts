@@ -13,6 +13,7 @@ export const componentNames = [
   'Button',
   'ButtonGroup',
   'Card',
+  'ChartLegend',
   'Checkbox',
   'Combobox',
   'ConfirmDialog',

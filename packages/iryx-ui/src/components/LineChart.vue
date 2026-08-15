@@ -1,20 +1,32 @@
 <script setup lang="ts">
+import type { ChartSeries } from '../composables/cartesian'
 import type { SparseValue } from '../composables/scale'
 import { computed, ref } from 'vue'
-import { AXIS_GAP, cartesianLayout, clampTooltip } from '../composables/cartesian'
+import { AXIS_GAP, cartesianLayout, clampTooltip, seriesColor, slotOf, warnOnSlotOverflow } from '../composables/cartesian'
 import { useElementSize } from '../composables/element-size'
 import { useIryxUiConfig } from '../config'
 import { lineChartTheme } from '../theme/line-chart'
+import ChartLegend from './ChartLegend.vue'
 
+/**
+ * A row. `value` is the single-series shortcut; with `series` set, each entry
+ * reads its own key off the row instead.
+ */
 export interface LineChartDatum {
   label: string
   /** `null` is a missing reading — the line breaks rather than bridging it. */
-  value: SparseValue
+  value?: SparseValue
+  [key: string]: unknown
 }
 
 export interface LineChartProps {
   data?: readonly LineChartDatum[]
-  /** `area` adds a wash beneath the same line. */
+  /** Two or more measures per category. Omit for the single-series case. */
+  series?: readonly ChartSeries[]
+  /**
+   * `area` adds a wash beneath the line. Ignored for multiple series, where
+   * overlapping washes muddy into a colour that belongs to neither.
+   */
   variant?: 'line' | 'area'
   /** Rendered height in px. Width always fills the container. */
   height?: number
@@ -22,6 +34,8 @@ export interface LineChartProps {
   ticks?: number
   /** Drop the value axis and its gridlines. */
   axis?: boolean
+  /** Drop the legend. Only honoured for a single series. */
+  legend?: boolean
   /**
    * Force zero onto the axis. Off by default: a line is read by its shape, and
    * a series hovering around 8,000 flattens into a straight edge once the axis
@@ -52,6 +66,7 @@ const props = withDefaults(defineProps<LineChartProps>(), {
   height: 240,
   ticks: 5,
   axis: true,
+  legend: true,
   zero: false,
   unstyled: undefined,
 })
@@ -67,8 +82,25 @@ function formatValue(value: number): string {
   return formatter.value.format(value)
 }
 
+/** Single series is just the one-entry case, so there is one code path. */
+const series = computed<ChartSeries[]>(() => {
+  const declared = props.series?.length ? [...props.series] : [{ key: 'value' }]
+  warnOnSlotOverflow(declared.length)
+  return declared
+})
+
+const isMulti = computed(() => series.value.length > 1)
+
+/** Mandatory from two series up: colour alone is not a dependable identity. */
+const showLegend = computed(() => isMulti.value || (props.legend && series.value[0]!.name != null))
+
+function readValue(datum: LineChartDatum, key: string): SparseValue {
+  const raw = datum[key]
+  return typeof raw === 'number' && Number.isFinite(raw) ? raw : null
+}
+
 const layout = computed(() => cartesianLayout({
-  values: props.data.map(datum => datum.value),
+  values: props.data.flatMap(datum => series.value.map(entry => readValue(datum, entry.key))),
   categories: props.data.length,
   longestLabel: Math.max(...props.data.map(datum => datum.label.length), 1),
   width: width.value,
@@ -81,44 +113,53 @@ const layout = computed(() => cartesianLayout({
 
 interface Point { x: number, y: number, index: number }
 
-/** Runs of consecutive readings. A gap ends one run and starts the next. */
-const runs = computed<Point[][]>(() => {
-  if (!width.value)
-    return []
-
-  const result: Point[][] = []
-  let current: Point[] = []
-
-  props.data.forEach((datum, index) => {
-    const value = datum.value
-    if (typeof value !== 'number' || !Number.isFinite(value)) {
-      if (current.length)
-        result.push(current)
-      current = []
-      return
-    }
-    current.push({
-      x: round(layout.value.bandCentre(index)),
-      y: round(layout.value.y(value)),
-      index,
-    })
-  })
-
-  if (current.length)
-    result.push(current)
-
-  return result
-})
-
 function round(value: number): number {
   return Math.round(value * 100) / 100
 }
+
+/** Runs of consecutive readings per series. A gap ends one run, starts the next. */
+const lines = computed(() => {
+  if (!width.value)
+    return []
+
+  return series.value.map((entry, seriesIndex) => {
+    const runs: Point[][] = []
+    let current: Point[] = []
+
+    props.data.forEach((datum, index) => {
+      const value = readValue(datum, entry.key)
+      if (value == null) {
+        if (current.length)
+          runs.push(current)
+        current = []
+        return
+      }
+      current.push({
+        x: round(layout.value.bandCentre(index)),
+        y: round(layout.value.y(value)),
+        index,
+      })
+    })
+
+    if (current.length)
+      runs.push(current)
+
+    return { runs, color: seriesColor(slotOf(entry, seriesIndex)), seriesIndex }
+  })
+})
+
+/**
+ * A wash under several lines muddies into a colour belonging to neither, so
+ * only the single-series case gets one. Also gated on there being a measured
+ * line at all — before the first measurement there is nothing to fill under.
+ */
+const showArea = computed(() => props.variant === 'area' && !isMulti.value && lines.value.length > 0)
 
 function toLine(points: Point[]): string {
   return points.map((point, index) => `${index === 0 ? 'M' : 'L'}${point.x} ${point.y}`).join(' ')
 }
 
-/** Closed down to the bottom of the plot, not to zero — the axis may not show it. */
+/** Closed to the bottom of the plot, not to zero — the axis may not show it. */
 function toArea(points: Point[]): string {
   const base = layout.value.plot.top + layout.value.plot.height
   const first = points[0]!
@@ -128,33 +169,51 @@ function toArea(points: Point[]): string {
 
 const hovered = ref<number>()
 
-/** The plotted point under the cursor, if that category has a reading at all. */
-const marker = computed<Point | undefined>(() => {
+/** One marker per series that actually has a reading at the hovered category. */
+const markers = computed(() => {
   if (hovered.value == null)
-    return undefined
-  for (const run of runs.value) {
-    const found = run.find(point => point.index === hovered.value)
-    if (found)
-      return found
-  }
-  return undefined
+    return []
+  return lines.value.flatMap((line) => {
+    for (const run of line.runs) {
+      const found = run.find(point => point.index === hovered.value)
+      if (found)
+        return [{ ...found, color: line.color }]
+    }
+    return []
+  })
 })
+
+const crosshairX = computed(() =>
+  hovered.value == null ? undefined : round(layout.value.bandCentre(hovered.value)),
+)
 
 const tooltip = computed(() => {
   if (hovered.value == null)
     return undefined
   const datum = props.data[hovered.value]
-  if (!datum || typeof datum.value !== 'number')
+  if (!datum)
     return undefined
 
-  const label = datum.label
-  const value = formatValue(datum.value)
+  const rows = series.value
+    .map((entry, index) => ({
+      name: entry.name ?? entry.key,
+      color: seriesColor(slotOf(entry, index)),
+      value: readValue(datum, entry.key),
+    }))
+    .filter(row => row.value != null)
+    .map(row => ({ ...row, value: formatValue(row.value!) }))
+
+  if (!rows.length)
+    return undefined
+
+  const widest = Math.max(...rows.map(row => row.name.length + row.value.length))
 
   return {
-    label,
-    value,
-    x: clampTooltip(layout.value.bandCentre(hovered.value), label + value, width.value),
-    y: layout.value.y(datum.value),
+    label: datum.label,
+    rows,
+    multi: isMulti.value,
+    x: clampTooltip(layout.value.bandCentre(hovered.value), 'x'.repeat(widest), width.value),
+    y: Math.min(...markers.value.map(marker => marker.y), layout.value.plot.top + layout.value.plot.height),
   }
 })
 
@@ -173,106 +232,121 @@ function slotClass(slot: keyof NonNullable<LineChartProps['ui']>, extra?: string
     :aria-label="props.label"
     :class="slotClass('root', props.class)"
   >
-    <svg
-      :width="width"
-      :height="props.height"
-      :viewBox="`0 0 ${width} ${props.height}`"
-      aria-hidden="true"
-      :class="slotClass('svg')"
-    >
-      <template v-if="props.axis">
-        <g v-for="tick in layout.ticks" :key="`tick-${tick}`">
-          <line
-            :x1="layout.plot.left"
-            :y1="layout.y(tick)"
-            :x2="layout.plot.left + layout.plot.width"
-            :y2="layout.y(tick)"
-            stroke-width="1"
-            :class="slotClass('grid')"
+    <ChartLegend v-if="showLegend" :series="series" :unstyled="props.unstyled" />
+
+    <div :class="isUnstyled ? undefined : theme.plot()">
+      <svg
+        :width="width"
+        :height="props.height"
+        :viewBox="`0 0 ${width} ${props.height}`"
+        aria-hidden="true"
+        :class="slotClass('svg')"
+      >
+        <template v-if="props.axis">
+          <g v-for="tick in layout.ticks" :key="`tick-${tick}`">
+            <line
+              :x1="layout.plot.left"
+              :y1="layout.y(tick)"
+              :x2="layout.plot.left + layout.plot.width"
+              :y2="layout.y(tick)"
+              stroke-width="1"
+              :class="slotClass('grid')"
+            />
+            <text
+              :x="layout.plot.left - AXIS_GAP"
+              :y="layout.y(tick)"
+              text-anchor="end"
+              dominant-baseline="middle"
+              :class="slotClass('tick')"
+            >
+              {{ formatValue(tick) }}
+            </text>
+          </g>
+        </template>
+
+        <!-- Behind the line, so the wash never dulls the reading itself. -->
+        <template v-if="showArea">
+          <path
+            v-for="(points, index) in lines[0]!.runs"
+            :key="`area-${index}`"
+            :d="toArea(points)"
+            :style="{ fill: lines[0]!.color }"
+            :class="slotClass('area')"
           />
-          <text
-            :x="layout.plot.left - AXIS_GAP"
-            :y="layout.y(tick)"
-            text-anchor="end"
-            dominant-baseline="middle"
-            :class="slotClass('tick')"
-          >
-            {{ formatValue(tick) }}
-          </text>
-        </g>
-      </template>
+        </template>
 
-      <!-- Behind the line, so the wash never dulls the reading itself. -->
-      <template v-if="props.variant === 'area'">
-        <path
-          v-for="(points, index) in runs"
-          :key="`area-${index}`"
-          :d="toArea(points)"
-          :class="slotClass('area')"
+        <!-- Under the lines: a crosshair drawn on top would cut through them. -->
+        <line
+          v-if="crosshairX != null"
+          :x1="crosshairX"
+          :y1="layout.plot.top"
+          :x2="crosshairX"
+          :y2="layout.plot.top + layout.plot.height"
+          stroke-width="1"
+          :class="slotClass('crosshair')"
         />
-      </template>
 
-      <!-- Under the line too: a crosshair drawn on top would cut through it. -->
-      <line
-        v-if="marker"
-        :x1="marker.x"
-        :y1="layout.plot.top"
-        :x2="marker.x"
-        :y2="layout.plot.top + layout.plot.height"
-        stroke-width="1"
-        :class="slotClass('crosshair')"
-      />
+        <!-- Colour is set inline, not by class: Tailwind cannot generate a class
+           name assembled at runtime, so `stroke-chart-3` would never exist. -->
+        <template v-for="line in lines" :key="`series-${line.seriesIndex}`">
+          <path
+            v-for="(points, index) in line.runs"
+            :key="`line-${line.seriesIndex}-${index}`"
+            :d="toLine(points)"
+            :style="{ stroke: line.color }"
+            :class="slotClass('line')"
+          />
+        </template>
 
-      <path
-        v-for="(points, index) in runs"
-        :key="`line-${index}`"
-        :d="toLine(points)"
-        :class="slotClass('line')"
-      />
-
-      <!--
-        One marker, on the reading under the cursor. A dot on every point is
+        <!--
+        One marker per series at the hovered category. A dot on every point is
         noise, and the axis plus the tooltip already carry the rest.
       -->
-      <template v-if="marker">
-        <circle :cx="marker.x" :cy="marker.y" r="6" :class="slotClass('markerRing')" />
-        <circle :cx="marker.x" :cy="marker.y" r="4" :class="slotClass('marker')" />
-      </template>
+        <template v-for="(marker, index) in markers" :key="`marker-${index}`">
+          <circle :cx="marker.x" :cy="marker.y" r="6" :class="slotClass('markerRing')" />
+          <circle :cx="marker.x" :cy="marker.y" r="4" :style="{ fill: marker.color }" :class="slotClass('marker')" />
+        </template>
 
-      <template v-for="(datum, index) in props.data" :key="`label-${datum.label}-${index}`">
-        <text
-          v-if="index % layout.labelStep === 0"
-          :x="layout.bandCentre(index)"
-          :y="layout.plot.top + layout.plot.height + 14"
-          text-anchor="middle"
-          :class="slotClass('category')"
-        >
-          {{ datum.label }}
-        </text>
-      </template>
+        <template v-for="(datum, index) in props.data" :key="`label-${datum.label}-${index}`">
+          <text
+            v-if="index % layout.labelStep === 0"
+            :x="layout.bandCentre(index)"
+            :y="layout.plot.top + layout.plot.height + 14"
+            text-anchor="middle"
+            :class="slotClass('category')"
+          >
+            {{ datum.label }}
+          </text>
+        </template>
 
-      <!-- Hit targets span the whole band, so a point is no harder to reach
-           than the bar equivalent would be. -->
-      <rect
-        v-for="(datum, index) in props.data"
-        :key="`hit-${datum.label}-${index}`"
-        :x="layout.plot.left + layout.bandWidth * index"
-        :y="layout.plot.top"
-        :width="layout.bandWidth"
-        :height="layout.plot.height"
-        :class="isUnstyled ? undefined : theme.hit()"
-        @pointerenter="hovered = index"
-        @pointerleave="hovered = undefined"
-      />
-    </svg>
+        <rect
+          v-for="(datum, index) in props.data"
+          :key="`hit-${datum.label}-${index}`"
+          :x="layout.plot.left + layout.bandWidth * index"
+          :y="layout.plot.top"
+          :width="layout.bandWidth"
+          :height="layout.plot.height"
+          :class="isUnstyled ? undefined : theme.hit()"
+          @pointerenter="hovered = index"
+          @pointerleave="hovered = undefined"
+        />
+      </svg>
 
-    <div
-      v-if="tooltip"
-      :class="slotClass('tooltip')"
-      :style="{ left: `${tooltip.x}px`, top: `${tooltip.y}px`, transform: 'translate(-50%, -100%) translateY(-12px)' }"
-    >
-      <span :class="slotClass('tooltipLabel')">{{ tooltip.label }}</span>
-      <span :class="slotClass('tooltipValue')">{{ tooltip.value }}</span>
+      <div
+        v-if="tooltip"
+        :class="slotClass('tooltip', tooltip.multi ? 'flex-col items-start gap-1' : undefined)"
+        :style="{ left: `${tooltip.x}px`, top: `${tooltip.y}px`, transform: 'translate(-50%, -100%) translateY(-12px)' }"
+      >
+        <span :class="slotClass('tooltipLabel')">{{ tooltip.label }}</span>
+        <template v-if="tooltip.multi">
+          <span v-for="row in tooltip.rows" :key="row.name" class="flex items-center gap-1.5">
+            <span class="size-2 shrink-0 rounded-full" :style="{ background: row.color }" />
+            <span :class="slotClass('tooltipLabel')">{{ row.name }}</span>
+            <span :class="slotClass('tooltipValue')">{{ row.value }}</span>
+          </span>
+        </template>
+        <span v-else :class="slotClass('tooltipValue')">{{ tooltip.rows[0]!.value }}</span>
+      </div>
     </div>
 
     <!-- The marks are decorative to assistive tech; this carries the data. -->
@@ -282,8 +356,9 @@ function slotClass(slot: keyof NonNullable<LineChartProps['ui']>, extra?: string
         <tr>
           <th scope="col">
             Category
-          </th><th scope="col">
-            Value
+          </th>
+          <th v-for="entry in series" :key="entry.key" scope="col">
+            {{ entry.name ?? 'Value' }}
           </th>
         </tr>
       </thead>
@@ -292,7 +367,9 @@ function slotClass(slot: keyof NonNullable<LineChartProps['ui']>, extra?: string
           <th scope="row">
             {{ datum.label }}
           </th>
-          <td>{{ typeof datum.value === 'number' ? formatValue(datum.value) : '—' }}</td>
+          <td v-for="entry in series" :key="entry.key">
+            {{ readValue(datum, entry.key) == null ? '—' : formatValue(readValue(datum, entry.key)!) }}
+          </td>
         </tr>
       </tbody>
     </table>

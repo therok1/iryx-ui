@@ -173,6 +173,19 @@ const netByMonth = months.slice(0, 6).map((label, index) => ({
   value: [1200, -450, 800, -1100, 300, 1650][index]!,
 }))
 
+// Slots are pinned, so hiding one series never repaints the others.
+const cashflowSeries = [
+  { key: 'revenue', name: 'Revenue', slot: 0 },
+  { key: 'expenses', name: 'Expenses', slot: 1 },
+  { key: 'tax', name: 'Tax set aside', slot: 2 },
+]
+const cashflow = months.slice(0, 8).map((label, index) => ({
+  label,
+  revenue: [4200, 4600, 4100, 5200, 5800, 5400, 6300, 6900][index]!,
+  expenses: [3100, 3300, 2900, 3600, 3900, 3700, 4100, 4400][index]!,
+  tax: [880, 960, 860, 1090, 1220, 1130, 1320, 1450][index]!,
+}))
+
 // A dropped reading mid-series: the line should break, not bridge it.
 const gappyByWeek = [820, 910, 880, null, null, 1040, 1120, 1080, 1190, 1240, 1210, 1284]
   .map((value, index) => ({ label: `W${index + 1}`, value }))
@@ -866,6 +879,13 @@ function simulateLoad() {
         </ICard>
 
         <p class="text-sm text-muted-foreground">
+          Three series — legend, one crosshair, every reading in one tooltip.
+        </p>
+        <ICard>
+          <ILineChart :data="cashflow" :series="cashflowSeries" label="Cashflow by month" :height="220" />
+        </ICard>
+
+        <p class="text-sm text-muted-foreground">
           A gap in the series, and the same data with zero forced onto the axis.
         </p>
         <div class="grid gap-4 lg:grid-cols-2">
@@ -889,6 +909,13 @@ function simulateLoad() {
             locale="de-DE"
             :format="{ style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }"
           />
+        </ICard>
+
+        <p class="text-sm text-muted-foreground">
+          Grouped series — bars split their band, and one hover reports them all.
+        </p>
+        <ICard>
+          <IBarChart :data="cashflow" :series="cashflowSeries" label="Cashflow by month" :height="220" />
         </ICard>
 
         <p class="text-sm text-muted-foreground">

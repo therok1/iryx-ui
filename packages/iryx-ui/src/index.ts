@@ -10,6 +10,7 @@ export type { BreadcrumbItem, BreadcrumbProps } from './components/Breadcrumb.vu
 export type { ButtonProps } from './components/Button.vue'
 export type { ButtonGroupProps } from './components/ButtonGroup.vue'
 export type { CardProps } from './components/Card.vue'
+export type { ChartLegendProps } from './components/ChartLegend.vue'
 export type { CheckboxProps } from './components/Checkbox.vue'
 export type { ComboboxItemGroup, ComboboxItemOption, ComboboxItems, ComboboxProps } from './components/Combobox.vue'
 export type { ConfirmDialogProps } from './components/ConfirmDialog.vue'

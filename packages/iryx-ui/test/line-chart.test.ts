@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { nextTick } from 'vue'
 import { cartesianLayout, LineChart } from '../src'
 
@@ -143,5 +143,116 @@ describe('lineChart', () => {
     const wrapper = await mountChart({ data: [] })
     expect(wrapper.findAll('path')).toHaveLength(0)
     expect(wrapper.findAll('tbody tr')).toHaveLength(0)
+  })
+})
+
+const multi = [
+  { label: 'Jan', revenue: 4200, expenses: 3100 },
+  { label: 'Feb', revenue: 5600, expenses: 3400 },
+]
+const twoSeries = [{ key: 'revenue', name: 'Revenue' }, { key: 'expenses', name: 'Expenses' }]
+
+describe('multi-series charts', () => {
+  it('draws one line per series, each in its own slot colour', async () => {
+    const wrapper = await mountChart({ data: multi, series: twoSeries })
+    const paths = wrapper.findAll('path')
+    expect(paths).toHaveLength(2)
+
+    const colors = paths.map(path => path.attributes('style'))
+    expect(colors[0]).toContain('--iryx-chart-1')
+    expect(colors[1]).toContain('--iryx-chart-2')
+  })
+
+  /**
+   * Colour alone is never a dependable identity channel, so the legend is not
+   * optional once there are two series to tell apart.
+   */
+  it('forces a legend on for two or more series', async () => {
+    const wrapper = await mountChart({ data: multi, series: twoSeries, legend: false })
+    expect(wrapper.get('ul').text()).toContain('Revenue')
+    expect(wrapper.get('ul').text()).toContain('Expenses')
+  })
+
+  it('leaves the legend off for a single unnamed series', async () => {
+    const wrapper = await mountChart()
+    expect(wrapper.find('ul').exists()).toBe(false)
+  })
+
+  it('gives the table a column per series', async () => {
+    const wrapper = await mountChart({ data: multi, series: twoSeries, label: 'Money' })
+    expect(wrapper.findAll('thead th').map(th => th.text())).toEqual(['Category', 'Revenue', 'Expenses'])
+    expect(wrapper.get('tbody tr').text()).toContain('4,200')
+    expect(wrapper.get('tbody tr').text()).toContain('3,100')
+  })
+
+  it('reports every series in one tooltip', async () => {
+    const wrapper = await mountChart({ data: multi, series: twoSeries })
+    await wrapper.findAll('rect')[0]!.trigger('pointerenter')
+
+    const tooltip = wrapper.findAll('div').at(-1)!
+    expect(tooltip.text()).toContain('Revenue')
+    expect(tooltip.text()).toContain('Expenses')
+    expect(tooltip.text()).toContain('4,200')
+  })
+
+  it('marks every series at the hovered category', async () => {
+    const wrapper = await mountChart({ data: multi, series: twoSeries })
+    await wrapper.findAll('rect')[0]!.trigger('pointerenter')
+    // Ring plus dot, per series.
+    expect(wrapper.findAll('circle')).toHaveLength(4)
+  })
+
+  it('skips a series that has no reading at the hovered category', async () => {
+    const wrapper = await mountChart({
+      data: [{ label: 'Jan', revenue: 4200, expenses: null }],
+      series: twoSeries,
+    })
+    await wrapper.findAll('rect')[0]!.trigger('pointerenter')
+    expect(wrapper.findAll('circle')).toHaveLength(2)
+  })
+
+  /** Overlapping washes muddy into a colour that belongs to neither series. */
+  it('drops the area wash once there is more than one series', async () => {
+    const single = await mountChart({ variant: 'area' })
+    expect(single.findAll('path')).toHaveLength(2)
+
+    const many = await mountChart({ data: multi, series: twoSeries, variant: 'area' })
+    expect(many.findAll('path')).toHaveLength(2) // two lines, no washes
+  })
+
+  /**
+   * Colour follows the entity, never its rank. Without a pinned slot the
+   * survivor of a filter inherits the removed series' colour, and the reader
+   * has to relearn the chart every time a filter changes.
+   */
+  it('repaints the survivor when slots are left to position', async () => {
+    const wrapper = await mountChart({ data: multi, series: twoSeries })
+    const before = wrapper.findAll('path')[1]!.attributes('style')
+
+    await wrapper.setProps({ series: [twoSeries[1]!] })
+    expect(wrapper.findAll('path')[0]!.attributes('style')).not.toBe(before)
+  })
+
+  it('holds a pinned slot when another series is filtered out', async () => {
+    const pinned = [
+      { key: 'revenue', name: 'Revenue', slot: 0 },
+      { key: 'expenses', name: 'Expenses', slot: 1 },
+    ]
+    const wrapper = await mountChart({ data: multi, series: pinned })
+    const before = wrapper.findAll('path')[1]!.attributes('style')
+
+    await wrapper.setProps({ series: [pinned[1]!] })
+    expect(wrapper.findAll('path')[0]!.attributes('style')).toBe(before)
+    expect(before).toContain('--iryx-chart-2')
+  })
+
+  it('warns rather than silently reusing a colour past the eighth slot', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const nine = Array.from({ length: 9 }, (_, index) => ({ key: `s${index}`, name: `S${index}` }))
+    const row = Object.fromEntries(nine.map((entry, index) => [entry.key, index + 1]))
+
+    await mountChart({ data: [{ label: 'Jan', ...row }], series: nine })
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('exceeds the 8 categorical slots'))
+    warn.mockRestore()
   })
 })

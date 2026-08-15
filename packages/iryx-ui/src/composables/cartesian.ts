@@ -1,4 +1,5 @@
 import type { SparseValue } from './scale'
+import process from 'node:process'
 import { extent, linearScale, niceTicks } from './scale'
 
 /**
@@ -87,6 +88,58 @@ export function cartesianLayout(input: CartesianInput): CartesianLayout {
     labelStep,
     bandCentre: (index: number) => plot.left + bandWidth * (index + 0.5),
   }
+}
+
+/** One plotted measure. `key` reads a field off each row; `name` labels it. */
+export interface ChartSeries {
+  key: string
+  name?: string
+  /**
+   * Pin this series to a palette slot (0-based), instead of taking its
+   * position in the array.
+   *
+   * Colour has to follow the entity, not its rank: filter a series out of a
+   * chart and the survivors must keep the colours the reader already learned.
+   * Without a pin, removing the first of three repaints the other two.
+   */
+  slot?: number
+}
+
+/** How many categorical slots the palette actually defines. */
+export const SERIES_SLOTS = 8
+
+/**
+ * The colour for a series slot.
+ *
+ * Callers pass the series' pinned `slot` where it has one, and its array
+ * position otherwise — see `ChartSeries.slot` for why that distinction exists.
+ *
+ * Slots are never cycled: a ninth hue has not been checked for separation
+ * against its neighbours, so past eight the answer is folding into "Other" or
+ * splitting into small multiples. Beyond the eighth the last slot repeats and
+ * a warning is emitted, because silently colliding two identities is worse
+ * than saying so.
+ */
+export function seriesColor(index: number): string {
+  return `var(--iryx-chart-${Math.min(Math.max(index, 0), SERIES_SLOTS - 1) + 1})`
+}
+
+/** A series' palette slot: pinned if it has one, otherwise its position. */
+export function slotOf(entry: ChartSeries, index: number): number {
+  return entry.slot ?? index
+}
+
+let warnedSlots = false
+
+export function warnOnSlotOverflow(count: number): void {
+  if (count <= SERIES_SLOTS || warnedSlots || process.env.NODE_ENV === 'production')
+    return
+  warnedSlots = true
+  console.warn(
+    `[iryx-ui] ${count} chart series exceeds the ${SERIES_SLOTS} categorical slots. `
+    + 'Colours past the eighth repeat and stop identifying anything — fold the tail '
+    + 'into "Other", or use small multiples.',
+  )
 }
 
 /**
