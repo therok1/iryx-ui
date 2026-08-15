@@ -25,6 +25,19 @@ export interface SwitchProps extends SwitchRootProps {
   }
 }
 
+/**
+ * Reka's `SwitchRoot` renders the hidden form input as a *sibling* of the
+ * button (reka-ui 2.10 moved it out of the button to fix a `nested-interactive`
+ * violation), so it has two root nodes and Vue cannot auto-inherit attributes
+ * through it. Without this, `<ISwitch data-testid="x" name="y" />` would warn
+ * about extraneous attributes and drop them.
+ *
+ * Binding `$attrs` explicitly also fixes an older inconsistency: with a label
+ * the root was the wrapper `<div>`, so attributes landed on the layout rather
+ * than the control. They now reach the switch in both layouts.
+ */
+defineOptions({ inheritAttrs: false })
+
 const props = withDefaults(defineProps<SwitchProps>(), {
   unstyled: undefined,
 })
@@ -80,7 +93,7 @@ const descriptionClass = computed(() =>
   <div v-if="hasText" :class="wrapperClass">
     <SwitchRoot
       :id="controlId"
-      v-bind="forwarded"
+      v-bind="{ ...forwarded, ...$attrs }"
       :aria-describedby="props.description ? `${controlId}-description` : undefined"
       :class="rootClass"
     >
@@ -99,7 +112,7 @@ const descriptionClass = computed(() =>
     </div>
   </div>
 
-  <SwitchRoot v-else :id="props.id" v-bind="forwarded" :class="rootClass">
+  <SwitchRoot v-else :id="props.id" v-bind="{ ...forwarded, ...$attrs }" :class="rootClass">
     <SwitchThumb :class="thumbClass" />
   </SwitchRoot>
 </template>

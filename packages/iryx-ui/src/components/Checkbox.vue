@@ -28,6 +28,14 @@ export interface CheckboxProps extends CheckboxRootProps {
   }
 }
 
+/**
+ * Reka's `CheckboxRoot` renders the hidden form input as a *sibling* of the
+ * button (reka-ui 2.10 moved it out of the button to fix a `nested-interactive`
+ * violation), so it has two root nodes and Vue cannot auto-inherit attributes
+ * through it. See the matching note in `Switch.vue`.
+ */
+defineOptions({ inheritAttrs: false })
+
 const props = withDefaults(defineProps<CheckboxProps>(), {
   unstyled: undefined,
 })
@@ -84,7 +92,7 @@ const descriptionClass = computed(() =>
   <div v-if="hasText" :class="wrapperClass">
     <CheckboxRoot
       :id="controlId"
-      v-bind="forwarded"
+      v-bind="{ ...forwarded, ...$attrs }"
       :aria-describedby="props.description ? `${controlId}-description` : undefined"
       :class="rootClass"
     >
@@ -108,7 +116,7 @@ const descriptionClass = computed(() =>
     </div>
   </div>
 
-  <CheckboxRoot v-else :id="props.id" v-bind="forwarded" :class="rootClass">
+  <CheckboxRoot v-else :id="props.id" v-bind="{ ...forwarded, ...$attrs }" :class="rootClass">
     <CheckboxIndicator :class="indicatorClass">
       <slot>
         <Icon v-if="props.modelValue === 'indeterminate'" :icon="MinusSignIcon" />
