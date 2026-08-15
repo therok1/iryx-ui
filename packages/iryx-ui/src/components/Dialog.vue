@@ -10,7 +10,7 @@ import {
   DialogTrigger,
   VisuallyHidden,
 } from 'reka-ui'
-import { computed } from 'vue'
+import { computed, useSlots } from 'vue'
 import { useIryxUiConfig } from '../config'
 import { dialogTheme } from '../theme/dialog'
 import Icon from './Icon.vue'
@@ -72,6 +72,17 @@ const titleClass = computed(() =>
 const descriptionClass = computed(() =>
   isUnstyled.value ? props.ui?.description : theme.value.description({ class: props.ui?.description }),
 )
+
+const slots = useSlots()
+
+/**
+ * The literal string, not the value: Reka treats `aria-describedby="undefined"`
+ * as "this dialog deliberately has no description" and stays quiet. Leaving it
+ * unset warns on every description-less dialog.
+ */
+const describedBy = computed(() =>
+  props.description || slots.description ? undefined : 'undefined',
+)
 const bodyClass = computed(() =>
   isUnstyled.value ? props.ui?.body : theme.value.body({ class: props.ui?.body }),
 )
@@ -109,7 +120,12 @@ function close() {
 
     <DialogPortal>
       <DialogOverlay :class="overlayClass" />
-      <DialogContent :class="contentClass">
+      <!--
+        `aria-describedby="undefined"` is Reka's opt-out for a dialog that
+        genuinely has no description. Without it every such dialog warns, which
+        trains people to ignore the warning that matters.
+      -->
+      <DialogContent :class="contentClass" :aria-describedby="describedBy">
         <div v-if="props.title || props.description || $slots.header" :class="headerClass">
           <slot name="header">
             <DialogTitle :class="titleClass">

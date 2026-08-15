@@ -45,9 +45,34 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm test
 
-      - name: Create release PR or publish to npm
+      # `pnpm release` used to do this; publishing directly means the build has
+      # to happen here, or `files` in package.json points at a missing dist.
+      - run: pnpm build
+
+      # Trusted publishing needs a CLI that can present the OIDC token. Node 22
+      # ships npm 10, which cannot; `changeset publish` would route through
+      # `pnpm publish`, which has no OIDC support either — that combination
+      # published with no credential at all and npm answered E404 on the PUT.
+      - run: npm install -g npm@latest
+
+      # No `publish` input: this only opens or updates the version PR.
+      - name: Create release PR
+        id: changesets
         uses: changesets/action@v1
-        with:
-          publish: pnpm release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Reached only once the version PR is merged and no changesets remain.
+      - name: Publish to npm
+        if: steps.changesets.outputs.hasChangesets == 'false'
+        working-directory: packages/iryx-ui
+        run: npm publish --access public --provenance
+
+      - name: Tag the release
+        if: steps.changesets.outputs.hasChangesets == 'false'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION=$(node -p "require('./packages/iryx-ui/package.json').version")
+          git tag "iryx-ui@$VERSION"
+          git push origin "iryx-ui@$VERSION"
