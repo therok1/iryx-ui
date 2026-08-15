@@ -1,6 +1,7 @@
 export * from './alert'
 export * from './badge'
 export * from './banner'
+export * from './bar-chart'
 export * from './breadcrumb'
 export * from './button'
 export * from './button-group'

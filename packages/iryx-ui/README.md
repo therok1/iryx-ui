@@ -291,6 +291,7 @@ app.use(createIryxUi({ unstyled: true }))
 | `IInput` | Text field with `sm`/`md`/`lg` sizes, `invalid` state, `v-model`, `leading`/`trailing` slots, `clearable`, `loading`, `debounce` |
 | `INumberInput` | Decimal-safe numeric field — the model is a **string**, with `min`/`max`/`step`, `precision` and locale-aware display |
 | `ISparkline` | Tiny inline trend chart — pure SVG, no charting dependency |
+| `IBarChart` | Categorical bar chart with a round-number axis, hover tooltip and a table view |
 | `IFileUpload` | Drag-and-drop file field with `accept` / `maxSize` / `maxFiles`, thumbnails and a remove action |
 | `IDatePicker` | Calendar in a popover; the model is an ISO `YYYY-MM-DD` **string** |
 | `IDateRangePicker` | Two-month range calendar; the model is `{ start, end }` ISO strings |
@@ -481,6 +482,51 @@ chrome; use `ui` to reach the parts (`root`, `input`, `leading`, `trailing`,
 `clear`). Stray attributes like `name`, `autocomplete` and `maxlength` are
 forwarded to the `<input>` itself. `ref` exposes the element as `.input` for
 focus management.
+
+#### Bar charts
+
+```vue
+<IBarChart
+  :data="[
+    { label: 'Jan', value: 4200 },
+    { label: 'Feb', value: 5600 },
+    { label: 'Mar', value: null },
+  ]"
+  label="Revenue by month"
+  locale="de-DE"
+  :format="{ style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }"
+/>
+```
+
+| Prop | Effect |
+| --- | --- |
+| `data` | `{ label, value }[]`. `value: null` is a **missing reading** — no bar, which is not a zero |
+| `height` | Rendered height in px (default 240). Width fills the container |
+| `ticks` | Target tick count. A hint — the axis lands on round numbers first |
+| `axis` | Set `false` to drop the value axis and gridlines |
+| `locale` / `format` | `Intl.NumberFormat` settings, applied to ticks and tooltip alike |
+| `label` | Accessible name for the figure |
+
+**The axis picks the domain, not the data.** Values are snapped outwards to a
+1/2/5 step, so an axis reads `0 / 2,000 / 4,000` rather than `0 / 1,726.8`.
+Zero is always included, because bars are compared by length and a truncated
+baseline makes that comparison a lie.
+
+Bars are capped at 24px and never fill their slot — the gap between them is
+what separates them. They're rounded at the data end and square at the
+baseline, so the rounding reads as the tip of the value.
+
+Hovering a bar dims the rest and shows a tooltip; hit targets span the full
+band and plot height, so a short bar is no harder to hit than a tall one.
+
+**Accessibility:** the SVG is `aria-hidden` and the data is exposed as a
+visually-hidden table instead, so a screen reader gets the actual numbers
+rather than a blank graphic. That table renders even before the container has
+been measured — the data is never gated behind layout.
+
+Long category labels thin out to every *n*th rather than rotating or
+colliding. For many categories or long names, that's the honest limit of this
+chart — reach for a table.
 
 #### Sparklines
 

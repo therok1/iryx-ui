@@ -7,6 +7,7 @@ export const componentNames = [
   'Alert',
   'App',
   'Badge',
+  'BarChart',
   'Banner',
   'Breadcrumb',
   'Button',

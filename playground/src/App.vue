@@ -161,6 +161,23 @@ function onSignup(event: { data: typeof signup }) {
 const email = ref('')
 const bio = ref('')
 
+const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+const revenueByMonth = months.map((label, index) => ({
+  label,
+  value: [4200, 4600, 4100, 5200, 5800, 5400, 6300, 6900, 6600, 7400, 8100, 8600][index]!,
+}))
+
+// Net position — some months run negative, so the axis has to span zero.
+const netByMonth = months.slice(0, 6).map((label, index) => ({
+  label,
+  value: [1200, -450, 800, -1100, 300, 1650][index]!,
+}))
+
+const weeklyVolume = Array.from({ length: 26 }, (_, index) => ({
+  label: `W${index + 1}`,
+  value: Math.round(400 + Math.sin(index / 2) * 180 + index * 12),
+}))
+
 const revenueTrend = [4200, 4600, 4100, 5200, 5800, 5400, 6300, 6900, 6600, 7400, 8100, 8600]
 const overdueTrend = [1800, 1720, 1650, 1740, 1500, 1420, 1380, 1290, 1310, 1220, 1180, 1150]
 // A dropped reading mid-series: the line should break, not bridge it.
@@ -813,6 +830,32 @@ function simulateLoad() {
           </ICard>
           <ICard>
             <IStat label="Invoices" value="24" :delta="0" hint="unchanged" />
+          </ICard>
+        </div>
+      </section>
+
+      <section class="space-y-4">
+        <h2 class="font-semibold">
+          Bar chart
+        </h2>
+        <ICard>
+          <IBarChart
+            :data="revenueByMonth"
+            label="Revenue by month"
+            locale="de-DE"
+            :format="{ style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }"
+          />
+        </ICard>
+
+        <p class="text-sm text-muted-foreground">
+          Spanning zero, and enough categories that the labels have to thin out.
+        </p>
+        <div class="grid gap-4 lg:grid-cols-2">
+          <ICard>
+            <IBarChart :data="netByMonth" label="Net position by month" :height="200" />
+          </ICard>
+          <ICard>
+            <IBarChart :data="weeklyVolume" label="Volume by week" :height="200" />
           </ICard>
         </div>
       </section>
