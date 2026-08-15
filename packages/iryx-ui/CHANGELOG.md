@@ -1,5 +1,39 @@
 # iryx-ui
 
+## 0.10.0
+
+### Minor Changes
+
+- d79dd6b: `IBarChart` and `ILineChart` take `#underlay` and `#overlay` scoped slots, both receiving the chart's `CartesianLayout` — `plot`, `value()`, `bandCentre()`, `bandWidth`, `ticks` and `orientation`. Reference lines, target bands and callouts are ordinary markup positioned by the chart's own scales.
+
+  This is the answer to "does it have plugins": no registry. Chart.js needs one because canvas is opaque and an imperative draw hook is the only way in; SVG has no such constraint, so a scoped slot does the job declaratively, reactively and with type-checking. Both slots sit below the hit targets, so hovering keeps working through whatever is drawn.
+
+- 185d276: Add eight categorical chart colours, `--iryx-chart-1` … `--iryx-chart-8`, exposed as Tailwind colours (`text-chart-3`, `fill-chart-5`). They encode series identity, never magnitude, and unblock multi-series charts.
+
+  The steps are computed rather than eyeballed: each clears a lightness band, a chroma floor of 0.10, protanopia/deuteranopia separation and contrast against its own surface. Light and dark are validated separately against their own backgrounds — dark is not a flip. Status colours are deliberately excluded, so a series in slot 4 can never read as a warning.
+
+  Documented caps: 8 series where only neighbours touch (bars, lines, stacks), 3 where any two marks can sit side by side (scatter, bubble, small multiples). Beyond those, fold into "Other" or facet — never generate a ninth hue.
+
+- af8a1a0: `IBarChart` takes `orientation="horizontal"`, running the categories down the side.
+
+  This is the answer to the limitation the vertical chart documents: colliding labels get thinned to every *n*th, which is fine for `Jan` / `Feb` and lossy for `Travel and accommodation`. Turned on its side, the names get real width and none are dropped. Grouped series, the tooltip and the zero-anchored axis all behave as before.
+
+  The tooltip is placed past the bar's tip rather than over it, flipping inside when a long bar leaves no room — the end of the bar is the reading, so covering it defeats the purpose.
+
+- fad185e: Add `ILineChart` — line and area charts sharing `IBarChart`'s axis layer, with a crosshair and a single hover marker rather than a dot on every point. `null` breaks the line instead of bridging it, so a missing reading never draws a slope that didn't happen.
+
+  `zero` is off by default here and always on for bars: a bar is read by length and a truncated baseline lies about the comparison, while a line is read by its shape and a forced zero flattens a high, narrow series into a straight edge.
+
+  The shared plot maths moves into `cartesianLayout` — axis, gutter, plot rectangle, band spacing and label thinning — so the two charts cannot drift apart. It is a pure function, exported and testable without mounting anything.
+
+- 5055080: `IBarChart` and `ILineChart` take multiple series. Rows stay plain objects and a `series` descriptor names the measures, the same shape `ITable` uses; omit it and the single-series behaviour is unchanged.
+
+  Bars group inside their category, lines draw one path each, and one hover reports every series for that category in a single tooltip rather than making the reader chase individual marks. `ChartLegend` is exported and rendered automatically — mandatory from two series up, because colour alone is not a dependable identity channel.
+
+  `ChartSeries.slot` pins a series to a palette colour so filtering one out does not repaint the survivors: colour has to follow the entity, not its position. Past eight series the chart warns in development instead of silently reusing a hue.
+
+  Fixes a tooltip that was positioned against the chart root, so it rode up over anything above the plot.
+
 ## 0.9.0
 
 ### Minor Changes
