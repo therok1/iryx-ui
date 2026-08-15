@@ -1,14 +1,16 @@
 name: Release
 
-# Manual only for now: publishing needs an NPM_TOKEN repo secret, and without
-# one this failed on every push to main. Add the secret (a Granular Access
-# Token scoped to iryx-ui, read/write) and restore the push trigger to go back
-# to automatic releases:
+# A push to main does not publish. While changesets are pending, this opens or
+# updates a "Version Packages" PR holding the bump and changelog; merging that
+# PR leaves no changesets, so the next run publishes. The merge is the release
+# button, and `changeset version` is run for you rather than by hand.
 #
-#   on:
-#     push:
-#       branches: [main]
+# Needs an NPM_TOKEN repo secret (Granular Access Token, read/write on
+# iryx-ui) and "Allow GitHub Actions to create and approve pull requests"
+# enabled under Settings → Actions → General.
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
@@ -33,6 +35,10 @@ jobs:
           registry-url: https://registry.npmjs.org
 
       - run: pnpm install --frozen-lockfile
+
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test
 
       - name: Create release PR or publish to npm
         uses: changesets/action@v1
