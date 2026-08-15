@@ -288,7 +288,7 @@ app.use(createIryxUi({ unstyled: true }))
 | --- | --- |
 | `IForm` | Validating form wrapper — any Standard Schema validator, or your own function |
 | `IFormField` | Label, description, hint, help and error text around a control |
-| `IInput` | Text field with `sm`/`md`/`lg` sizes, `invalid` state, `v-model` |
+| `IInput` | Text field with `sm`/`md`/`lg` sizes, `invalid` state, `v-model`, `leading`/`trailing` slots, `clearable`, `loading`, `debounce` |
 | `INumberInput` | Decimal-safe numeric field — the model is a **string**, with `min`/`max`/`step`, `precision` and locale-aware display |
 | `ITextarea` | Multi-line field with matching sizes and `invalid` state |
 | `ILabel` | Field label with optional `required` asterisk |
@@ -433,6 +433,49 @@ const framework = ref('vue')
   <IRadioGroup v-model="plan" :items="['free', 'pro']" />
 </template>
 ```
+
+#### Input affixes, clearing, loading and debounce
+
+`IInput` renders its chrome on a wrapper element, so `leading` and `trailing`
+slot content sits *inside* the field and takes real space — a long value is
+truncated by the affix rather than sliding underneath it.
+
+```vue
+<IInput v-model="search" clearable placeholder="Search invoices…">
+  <template #leading>
+    <HugeiconsIcon :icon="Search01Icon" />
+  </template>
+</IInput>
+
+<IInput v-model="team" placeholder="your-team">
+  <template #trailing>
+    <span class="text-sm">.example.com</span>
+  </template>
+</IInput>
+
+<!-- Spinner in the trailing area; the field stays editable. -->
+<IInput v-model="slug" :loading="checking" />
+
+<!-- The model updates 500ms after the last keystroke. -->
+<IInput v-model="query" :debounce="500" clearable />
+```
+
+| Prop | Effect |
+| --- | --- |
+| `clearable` | Clear button in the trailing area whenever the field is non-empty |
+| `loading` | Spinner in the trailing area. Does **not** disable the field |
+| `debounce` | Milliseconds to wait after the last keystroke before the model updates. `0` (default) updates on every keystroke |
+| `clearLabel` | Accessible name for the clear button, for non-English apps |
+
+The displayed text always updates on the keystroke — only the model lags. Blur
+and Enter flush a pending update immediately, so a submit never reads a stale
+value, and an external write (a reset or prefill) cancels whatever is queued.
+
+`class` lands on the wrapper, since that is the element carrying the field
+chrome; use `ui` to reach the parts (`root`, `input`, `leading`, `trailing`,
+`clear`). Stray attributes like `name`, `autocomplete` and `maxlength` are
+forwarded to the `<input>` itself. `ref` exposes the element as `.input` for
+focus management.
 
 `ISelect` and `IRadioGroup` accept plain strings or `{ label, value, disabled }` objects. Both also take a default slot if you'd rather compose the Reka primitives yourself.
 

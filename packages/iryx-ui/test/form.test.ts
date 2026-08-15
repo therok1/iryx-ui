@@ -86,7 +86,8 @@ describe('form', () => {
     await flushPromises()
     const input = wrapper.get('input')
     expect(input.attributes('aria-invalid')).toBe('true')
-    expect(input.classes()).toContain('border-red-500')
+    // The red border is on Input's wrapper, which carries the field chrome.
+    expect(input.element.parentElement?.className).toContain('border-red-500')
     const describedBy = input.attributes('aria-describedby')!
     expect(wrapper.get(`#${describedBy}`).text()).toBe('Must be a valid email')
   })

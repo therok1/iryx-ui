@@ -160,6 +160,11 @@ function onSignup(event: { data: typeof signup }) {
 
 const email = ref('')
 const bio = ref('')
+
+const search = ref('')
+const domain = ref('')
+const debounced = ref('')
+const searching = ref(false)
 const terms = ref(false)
 const partial = ref<boolean | 'indeterminate'>('indeterminate')
 const framework = ref('vue')
@@ -996,6 +1001,50 @@ function simulateLoad() {
           />
           <ICheckbox v-model="partial" label="Indeterminate" />
           <ICheckbox disabled label="Disabled" description="This option isn't available on your plan." />
+        </div>
+      </section>
+
+      <section class="space-y-4">
+        <h2 class="font-semibold">
+          Input — affixes, clearable, loading, debounce
+        </h2>
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div class="space-y-2">
+            <ILabel for="search">
+              Leading icon + clearable
+            </ILabel>
+            <IInput id="search" v-model="search" clearable placeholder="Search invoices…">
+              <template #leading>
+                <HugeiconsIcon :icon="Search01Icon" />
+              </template>
+            </IInput>
+          </div>
+          <div class="space-y-2">
+            <ILabel for="domain">
+              Trailing text
+            </ILabel>
+            <IInput id="domain" v-model="domain" placeholder="your-team">
+              <template #trailing>
+                <span class="text-sm">.example.com</span>
+              </template>
+            </IInput>
+          </div>
+          <div class="space-y-2">
+            <ILabel for="loading-input">
+              Loading
+            </ILabel>
+            <IInput id="loading-input" :loading="searching" placeholder="Checking availability…" />
+            <ISwitch v-model="searching" label="Toggle loading" />
+          </div>
+          <div class="space-y-2">
+            <ILabel for="debounced">
+              Debounced 500ms
+            </ILabel>
+            <IInput id="debounced" v-model="debounced" :debounce="500" clearable placeholder="Type quickly…" />
+            <p class="text-sm text-muted-foreground">
+              Model: <code>{{ JSON.stringify(debounced) }}</code>
+            </p>
+          </div>
         </div>
       </section>
 

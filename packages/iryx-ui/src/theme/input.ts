@@ -4,16 +4,28 @@ import { tv } from 'tailwind-variants'
 export const fieldBase
   = 'w-full rounded-xl border border-border bg-input text-foreground transition-colors outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/50 disabled:cursor-not-allowed disabled:opacity-50'
 
+/**
+ * The chrome lives on `root`, not on the `<input>`, so leading and trailing
+ * content can take real space in a flex row. Reserving room with padding
+ * instead would mean guessing the width of arbitrary slot content, and long
+ * values would slide underneath it.
+ */
 export const inputTheme = tv({
-  base: `flex ${fieldBase}`,
+  slots: {
+    root: `flex items-center ${fieldBase} focus-within:ring-2 focus-within:ring-primary/50 has-[input:disabled]:cursor-not-allowed has-[input:disabled]:opacity-50`,
+    input: 'w-full min-w-0 flex-1 bg-transparent outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed',
+    leading: 'flex shrink-0 items-center text-muted-foreground [&_svg]:size-4',
+    trailing: 'flex shrink-0 items-center gap-1.5 text-muted-foreground [&_svg]:size-4',
+    clear: 'flex items-center rounded-md text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary/50 [&_svg]:size-3.5',
+  },
   variants: {
     size: {
-      sm: 'h-8 px-2.5 text-sm',
-      md: 'h-9 px-3 text-sm',
-      lg: 'h-10 px-4 text-base',
+      sm: { root: 'h-8 gap-1.5 px-2.5', input: 'text-sm' },
+      md: { root: 'h-9 gap-2 px-3', input: 'text-sm' },
+      lg: { root: 'h-10 gap-2 px-4', input: 'text-base' },
     },
     invalid: {
-      true: 'border-red-500 focus-visible:ring-red-500/40',
+      true: { root: 'border-red-500 focus-within:ring-red-500/40' },
     },
   },
   defaultVariants: {
@@ -39,4 +51,5 @@ export const textareaTheme = tv({
 })
 
 export type InputVariants = Parameters<typeof inputTheme>[0]
+export type InputSlots = keyof ReturnType<typeof inputTheme>
 export type TextareaVariants = Parameters<typeof textareaTheme>[0]

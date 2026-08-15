@@ -7,8 +7,10 @@ describe('app', () => {
   // ConfigProvider is renderless, so `wrapper.element` is VTU's mount
   // container rather than App's root — assert on the markup instead.
   it('renders no wrapper element by default', () => {
-    const wrapper = mount(App, { slots: { default: () => h(Input) } })
-    expect(wrapper.html()).toMatch(/^<input/)
+    // A bare element rather than a component, so this asserts App's own
+    // renderlessness and not some child's DOM structure.
+    const wrapper = mount(App, { slots: { default: () => h('span', { class: 'child' }) } })
+    expect(wrapper.html()).toMatch(/^<span class="child"/)
   })
 
   it('can own the page shell via as + class', () => {
@@ -46,7 +48,8 @@ describe('app', () => {
       props: { unstyled: true },
       slots: { default: () => h(Input, { unstyled: false }) },
     })
-    expect(wrapper.get('input').attributes('class')).toContain('rounded-xl')
+    // Input's chrome lives on its wrapper, so that is where the classes land.
+    expect(wrapper.get('input').element.parentElement?.className).toContain('rounded-xl')
   })
 
   it('applies a theme preset', () => {
