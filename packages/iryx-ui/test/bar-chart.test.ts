@@ -128,6 +128,35 @@ describe('barChart', () => {
     expect((await mountChart()).findAll('path')).toHaveLength(3)
   })
 
+  /** Width of the first bar, read back out of its path. */
+  function barWidthOf(wrapper: Awaited<ReturnType<typeof mountChart>>): number {
+    const xs = [...wrapper.get('path').attributes('d')!.matchAll(/[ML]([\d.]+) /g)]
+      .map(match => Number(match[1]))
+    return Math.max(...xs) - Math.min(...xs)
+  }
+
+  it('caps bar width so a few categories are not slabs', async () => {
+    expect(barWidthOf(await mountChart())).toBeLessThanOrEqual(24)
+  })
+
+  /**
+   * Regression: the gap used to be a fixed 8px subtracted from the band, which
+   * is fine at wide bands and collapses at narrow ones — 26 categories in a
+   * phone-width card left 2px hairlines. A proportional gap shrinks the bar
+   * and the space beside it together.
+   */
+  it('keeps bars substantial when the band is narrow', async () => {
+    const many = Array.from({ length: 26 }, (_, index) => ({ label: `W${index + 1}`, value: index + 1 }))
+    withWidth(290)
+    const wrapper = mount(BarChart, { props: { data: many }, attachTo: document.body })
+    await nextTick()
+
+    const width = barWidthOf(wrapper)
+    expect(width).toBeGreaterThan(4)
+    // Still leaves air: never the whole band.
+    expect(width).toBeLessThan((290 - 30) / 26)
+  })
+
   it('renders no marks before the container has been measured', () => {
     withWidth(0)
     const wrapper = mount(BarChart, { props: { data } })

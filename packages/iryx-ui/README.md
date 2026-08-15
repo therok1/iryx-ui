@@ -199,21 +199,20 @@ For a static re-brand, plain CSS works too — tokens are just variables:
 
 ### Typeface
 
-The library ships **no webfont** — that would put font files, a licence and a
-network request into every app whether it wanted them or not. It reads one
-variable, defaulting to the system stack. Point it at your own family and
-everything follows, including Tailwind's `font-sans`:
+Set `--iryx-font-sans` and everything follows, including Tailwind's
+`font-sans`. Load the family however you like — a package, a `<link>`, or
+self-hosted:
 
 ```css
-@import "@fontsource-variable/instrument-sans"; /* or a <link>, or self-hosted */
+@import "@fontsource-variable/instrument-sans";
 
 :root {
   --iryx-font-sans: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
 }
 ```
 
-Unlike the colour tokens, this one is not mode-specific — there is no `.dark`
-counterpart to keep in sync.
+Leave it unset to use the system stack. There is no `.dark` counterpart for
+this one.
 
 Available tokens, each usable as a Tailwind color (`bg-primary`,
 `text-muted-foreground`, …):

@@ -97,10 +97,16 @@ const bandWidth = computed(() =>
 )
 
 /**
- * Capped rather than filling the slot: a bar that eats its whole band leaves
- * no air between neighbours, and the gap is what separates them.
+ * A proportion of the band, then capped — never the band minus a fixed gap.
+ *
+ * Subtracting a constant is fine at wide bands and collapses at narrow ones:
+ * at a 10px band an 8px gap leaves a 2px sliver, so adding categories quietly
+ * turns the bars into hairlines. Taking a share of the band shrinks the bar
+ * and its gap together, which is what every charting library does. The 24px
+ * cap then stops a handful of categories rendering as slabs.
  */
-const barWidth = computed(() => Math.min(24, Math.max(bandWidth.value - 8, 1)))
+const BAR_SHARE = 0.7
+const barWidth = computed(() => Math.max(2, Math.min(24, bandWidth.value * BAR_SHARE)))
 
 interface Bar { x: number, y: number, width: number, height: number, up: boolean, datum: BarChartDatum }
 
