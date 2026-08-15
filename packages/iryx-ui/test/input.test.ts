@@ -227,6 +227,13 @@ describe('passwordInput', () => {
     expect(wrapper.get('button').attributes('aria-label')).toBe('Mostra')
   })
 
+  it('suppresses Edge\'s own reveal and clear affordances', () => {
+    // Edge draws them on top of ours, so the field shows two of each there.
+    const classes = mount(PasswordInput).get('input').classes().join(' ')
+    expect(classes).toContain('[&::-ms-reveal]:hidden')
+    expect(classes).toContain('[&::-ms-clear]:hidden')
+  })
+
   it('forwards stray attributes to the control', () => {
     const wrapper = mount(PasswordInput, { attrs: { autocomplete: 'new-password' } })
     expect(wrapper.get('input').attributes('autocomplete')).toBe('new-password')

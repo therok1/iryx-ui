@@ -8,6 +8,12 @@ import { tv } from 'tailwind-variants'
 export const passwordInputTheme = tv({
   slots: {
     root: 'flex w-full flex-col gap-2',
+    /**
+     * Edge draws its own reveal eye on `input[type=password]`, and its own
+     * clear cross once the field is revealed to `type=text`. Both would sit
+     * beside ours, so the field shows two of each in that browser only.
+     */
+    input: '[&::-ms-clear]:hidden [&::-ms-reveal]:hidden',
     toggle: 'flex items-center rounded-md text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary/50 [&_svg]:size-4',
     meter: 'flex items-center gap-2',
     track: 'flex h-1 flex-1 gap-1',

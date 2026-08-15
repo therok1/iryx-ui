@@ -93,6 +93,11 @@ const showMeter = computed(() => props.strength && model.value.length > 0)
 
 const theme = computed(() => passwordInputTheme({ score: score.value }))
 
+/** Passed through to Input, which owns the control's own classes. */
+const inputClass = computed(() =>
+  isUnstyled.value ? props.ui?.input : theme.value.input({ class: props.ui?.input }),
+)
+
 function slotClass(slot: 'root' | 'toggle' | 'meter' | 'track' | 'segment' | 'label', extra?: string) {
   const override = props.ui?.[slot]
   return isUnstyled.value ? [override, extra] : theme.value[slot]({ class: [override, extra] })
@@ -111,7 +116,7 @@ function slotClass(slot: 'root' | 'toggle' | 'meter' | 'track' | 'segment' | 'la
       :required="props.required"
       :invalid="props.invalid"
       :unstyled="props.unstyled"
-      :ui="{ input: props.ui?.input }"
+      :ui="{ input: inputClass }"
       autocomplete="current-password"
       v-bind="$attrs"
     >
