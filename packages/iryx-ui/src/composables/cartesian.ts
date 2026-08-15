@@ -97,10 +97,19 @@ export function cartesianLayout(input: CartesianInput): CartesianLayout {
   // value ticks when horizontal.
   const bottom = horizontal && !input.showAxis ? 0 : CATEGORY_HEIGHT
 
+  /**
+   * Horizontal ticks are centred on their gridline, and the last gridline sits
+   * on the plot's right edge — so half of `20,000` hangs off the chart unless
+   * the plot stops short of it. Vertical needs none of this: its tick labels
+   * live in the left gutter, and the last category label is already half a
+   * band in from the edge.
+   */
+  const rightPad = horizontal && input.showAxis ? Math.ceil(tickWidth / 2) : 0
+
   const plot = {
     left: gutter,
     top: TOP_PAD,
-    width: Math.max(input.width - gutter, 0),
+    width: Math.max(input.width - gutter - rightPad, 0),
     height: Math.max(input.height - TOP_PAD - bottom, 0),
   }
 

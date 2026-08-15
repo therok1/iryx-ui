@@ -51,6 +51,29 @@ describe('cartesianLayout', () => {
     expect(cramped.labelStep).toBeGreaterThan(1)
   })
 
+  /**
+   * Horizontal ticks are centred on their gridline and the last gridline sits
+   * at the plot's right edge, so half of `20,000` hangs off the chart unless
+   * the plot stops short of it.
+   */
+  it('leaves room for the last tick label when horizontal', () => {
+    const vertical = cartesianLayout({ ...base, values: [0, 20000] })
+    const horizontal = cartesianLayout({ ...base, values: [0, 20000], orientation: 'horizontal' })
+
+    expect(vertical.plot.left + vertical.plot.width).toBe(600)
+    expect(horizontal.plot.left + horizontal.plot.width).toBeLessThan(600)
+  })
+
+  it('reserves no right padding when the axis is hidden', () => {
+    const layout = cartesianLayout({
+      ...base,
+      values: [0, 20000],
+      orientation: 'horizontal',
+      showAxis: false,
+    })
+    expect(layout.plot.left + layout.plot.width).toBe(600)
+  })
+
   it('survives a zero width without producing negative geometry', () => {
     const layout = cartesianLayout({ ...base, values: [1, 2], width: 0 })
     expect(layout.plot.width).toBe(0)
