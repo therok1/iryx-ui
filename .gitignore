@@ -5,3 +5,6 @@ coverage/
 .DS_Store
 .eslintcache
 .vite/
+
+# Generated during a release run.
+RELEASE_NOTES.md
