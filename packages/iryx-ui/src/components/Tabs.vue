@@ -44,8 +44,18 @@ const options = computed<TabsItem[]>(() =>
   (props.items ?? []).map(item => (typeof item === 'string' ? { label: item } : item)),
 )
 
-/** The value defaults to the label, so simple string items just work. */
-const valueOf = (item: TabsItem) => item.value ?? item.label
+/**
+ * The value defaults to the label, so simple string items just work.
+ *
+ * Named `itemValue`, not `valueOf`: a template resolves an identifier against
+ * the render context, whose prototype chain includes `Object.prototype`. Under
+ * SSR the lookup found `Object.prototype.valueOf` instead of this binding and
+ * called it with no receiver, so every tab list threw "Cannot convert
+ * undefined or null to object" on the server while working perfectly in the
+ * browser. Avoid `toString`, `hasOwnProperty` and friends here for the same
+ * reason.
+ */
+const itemValue = (item: TabsItem) => item.value ?? item.label
 
 const model = defineModel<string>({ default: undefined })
 
@@ -78,7 +88,7 @@ const contentClass = computed(() =>
 <template>
   <TabsRoot
     v-model="model"
-    :default-value="options[0] ? valueOf(options[0]) : undefined"
+    :default-value="options[0] ? itemValue(options[0]) : undefined"
     :orientation="props.orientation"
     :class="rootClass"
   >
@@ -87,8 +97,8 @@ const contentClass = computed(() =>
       <slot name="list">
         <TabsTrigger
           v-for="item in options"
-          :key="valueOf(item)"
-          :value="valueOf(item)"
+          :key="itemValue(item)"
+          :value="itemValue(item)"
           :disabled="item.disabled"
           :class="triggerClass"
         >
@@ -103,12 +113,12 @@ const contentClass = computed(() =>
     <slot>
       <TabsContent
         v-for="item in options"
-        :key="valueOf(item)"
-        :value="valueOf(item)"
+        :key="itemValue(item)"
+        :value="itemValue(item)"
         :force-mount="props.keepMounted || undefined"
         :class="contentClass"
       >
-        <slot :name="valueOf(item)" :item="item" />
+        <slot :name="itemValue(item)" :item="item" />
       </TabsContent>
     </slot>
   </TabsRoot>
