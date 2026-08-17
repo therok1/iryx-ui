@@ -252,7 +252,7 @@ Tweak a single instance with `class` (conflicts are merged smartly) or per-slot 
 
 ```vue
 <IButton class="rounded-full">
-Pill button
+  Pill button
 </IButton>
 
 <ISwitch :ui="{ thumb: 'bg-zinc-900' }" />
@@ -262,7 +262,7 @@ Or drop all built-in styles and take over completely:
 
 ```vue
 <IButton unstyled class="my-own-button">
-Headless
+  Headless
 </IButton>
 ```
 
@@ -287,22 +287,19 @@ app.use(createIryxUi({ unstyled: true }))
 | --- | --- |
 | `IForm` | Validating form wrapper — any Standard Schema validator, or your own function |
 | `IFormField` | Label, description, hint, help and error text around a control |
+| `ILabel` | Field label with optional `required` asterisk |
 | `IInput` | Text field with `sm`/`md`/`lg` sizes, `invalid` state, `v-model`, `leading`/`trailing` slots, `clearable`, `loading`, `debounce` |
+| `ITextarea` | Multi-line field with matching sizes, `invalid` state and optional `autosize` |
 | `INumberInput` | Decimal-safe numeric field — the model is a **string**, with `min`/`max`/`step`, `precision` and locale-aware display |
-| `ISparkline` | Tiny inline trend chart — pure SVG, no charting dependency |
-| `IBarChart` | Categorical bar chart with a round-number axis, hover tooltip and a table view |
-| `ILineChart` | Line or area chart with a crosshair, hover marker and a table view |
+| `IPasswordInput` | Masked field with a show/hide toggle and an optional strength meter |
 | `IFileUpload` | Drag-and-drop file field with `accept` / `maxSize` / `maxFiles`, thumbnails and a remove action |
 | `IDatePicker` | Calendar in a popover; the model is an ISO `YYYY-MM-DD` **string** |
 | `IDateRangePicker` | Two-month range calendar; the model is `{ start, end }` ISO strings |
-| `IPasswordInput` | Masked field with a show/hide toggle and an optional strength meter |
-| `ITextarea` | Multi-line field with matching sizes, `invalid` state and optional `autosize` |
-| `ILabel` | Field label with optional `required` asterisk |
 | `ICheckbox` | Tri-state checkbox (`true` / `false` / `'indeterminate'`), optional `label` + `description` |
+| `ISwitch` | Accessible toggle, optional `label` + `description` |
+| `IRadioGroup` | Radio list with labels wired up automatically; items take a `description` |
 | `ISelect` | Listbox with keyboard nav and typeahead, driven by an `items` array, with optional groups |
 | `ICombobox` | Searchable select — filters as you type, with optional groups, virtualized rows and a "create from query" row |
-| `IRadioGroup` | Radio list with labels wired up automatically; items take a `description` |
-| `ISwitch` | Accessible toggle, optional `label` + `description` |
 
 **Actions**
 
@@ -312,6 +309,15 @@ app.use(createIryxUi({ unstyled: true }))
 | `IButtonGroup` | Joins any children into a segmented control — split buttons, toolbars, pagers |
 | `IDropdownMenu` | Menu driven by an `items` array, with separators, group labels, danger items and nested submenus |
 
+**Overlays**
+
+| Component | Description |
+| --- | --- |
+| `IDialog` | Modal with header/body/footer slots, `dismissible` and `showClose` |
+| `IDrawer` | Panel or sheet attached to any edge — swipe to dismiss, optional snap points |
+| `IConfirmDialog` | Host for `useConfirm()` — renders the promise-based confirmation |
+| `ITooltip` | Hover/focus tooltip with side, align, delay and optional arrow |
+
 **Feedback**
 
 | Component | Description |
@@ -320,15 +326,11 @@ app.use(createIryxUi({ unstyled: true }))
 | `IBanner` | Page-level announcement — full-bleed, six variants, sticky top or fixed bottom |
 | `IBadge` | Status pill — five variants × three sizes; `dot` moves the colour onto a leading dot |
 | `IToaster` | Host for `useToast()`; six viewport positions, stacking, action buttons |
-| `IDialog` | Modal with header/body/footer slots, `dismissible` and `showClose` |
-| `IDrawer` | Panel or sheet attached to any edge — swipe to dismiss, optional snap points |
-| `IConfirmDialog` | Host for `useConfirm()` — renders the promise-based confirmation |
 | `IProgress` | Determinate or `indeterminate` bar, five variants, `formatValue` |
 | `ISkeleton` | Loading placeholder — `text`/`rect`/`circle`, stackable with `lines` |
 | `IEmptyState` | Icon, title, description and an `actions` slot for empty lists |
-| `ITooltip` | Hover/focus tooltip with side, align, delay and optional arrow |
 
-**Navigation & data display**
+**Navigation**
 
 | Component | Description |
 | --- | --- |
@@ -336,8 +338,22 @@ app.use(createIryxUi({ unstyled: true }))
 | `IBreadcrumb` | Trail from an `items` array; the last crumb is marked as the current page |
 | `IPagination` | Page list with ellipsis, edge pages and prev/next controls; `align` places it, `size` sets the button scale |
 | `IStepper` | Multi-step progress, horizontal or vertical, optional `linear` ordering |
-| `IStat` | KPI tile — label, value, signed delta with trend colour, and a hint |
+
+**Data display**
+
+| Component | Description |
+| --- | --- |
 | `ITable` | Data table — sorting, selection, expansion and per-cell slots, client- or server-driven |
+| `IStat` | KPI tile — label, value, signed delta with trend colour, and a hint |
+
+**Charts** — pure SVG, no charting dependency; see [Charts](#charts)
+
+| Component | Description |
+| --- | --- |
+| `ISparkline` | Tiny inline trend line, sized to whatever box you put it in |
+| `IBarChart` | Bar chart — vertical or horizontal, grouped or stacked, with a round-number axis and a hover tooltip |
+| `ILineChart` | Line or area chart, single or multi-series, with a crosshair and hover marker |
+| `IChartLegend` | Standalone legend; shown automatically from two series up |
 
 Every component supports `unstyled` and a `class` override; multi-part ones take a `ui` prop for per-slot classes.
 
@@ -521,293 +537,6 @@ chrome; use `ui` to reach the parts (`root`, `input`, `leading`, `trailing`,
 `clear`). Stray attributes like `name`, `autocomplete` and `maxlength` are
 forwarded to the `<input>` itself. `ref` exposes the element as `.input` for
 focus management.
-
-#### Multiple series
-
-Both charts take plain rows plus a `series` descriptor — the same shape
-`ITable` uses. Omit `series` for the single-measure case.
-
-```vue
-<IBarChart
-  :data="[
-    { label: 'Jan', revenue: 4200, expenses: 3100 },
-    { label: 'Feb', revenue: 5600, expenses: 3400 },
-  ]"
-  :series="[
-    { key: 'revenue', name: 'Revenue', slot: 0 },
-    { key: 'expenses', name: 'Expenses', slot: 1 },
-  ]"
-  label="Cashflow by month"
-/>
-```
-
-Bars group inside their category; lines draw one path each. One hover reports
-**every** series for that category in a single tooltip, so the reader compares
-in one place instead of chasing marks.
-
-**`slot` pins a series to a palette colour.** Without it, colour follows array
-position — so filtering a series out repaints the survivors and the reader has
-to relearn the chart. Pin the slots whenever series can be toggled.
-
-**The legend is mandatory from two series up.** `legend: false` only silences
-the single-series case, where the title already names what is plotted. Colour
-alone is never a dependable identity channel, so this is not configurable.
-
-Past eight series the colours stop identifying anything; the chart warns in
-development and you should fold the tail into "Other" or switch to small
-multiples.
-
-`variant="area"` is ignored for multiple series — overlapping washes muddy into
-a colour that belongs to neither.
-
-#### Annotations, and why there is no plugin API
-
-Chart.js has plugins because canvas is opaque — once painted you cannot select
-or style anything, so the only way in is an imperative draw hook. SVG has no
-such problem, so these charts hand you the layout and let you write ordinary
-markup into it:
-
-```vue
-<ILineChart :data="revenue" label="Revenue against target">
-  <template #overlay="{ plot, value }">
-    <line
-      :x1="plot.left" :y1="value(7000)"
-      :x2="plot.left + plot.width" :y2="value(7000)"
-      stroke="var(--iryx-warning)" stroke-width="2" stroke-dasharray="4 4"
-    />
-  </template>
-</ILineChart>
-```
-
-`#underlay` renders behind the marks — target bands, shaded regions. `#overlay`
-renders in front — reference lines, callouts. Both sit below the hit targets,
-so hovering keeps working through whatever you draw.
-
-Both receive the `CartesianLayout`:
-
-| Prop | What it gives you |
-| --- | --- |
-| `plot` | `{ left, top, width, height }` of the plot rectangle, in px |
-| `value(n)` | A data value to its pixel on the value axis |
-| `bandCentre(i)` | The centre of category `i`, in px |
-| `bandWidth` | Size of one category slot |
-| `ticks` | The axis values actually drawn |
-| `orientation` | `'vertical'` or `'horizontal'` |
-
-That's strictly more capable than a draw hook: it's declarative, reactive, and
-type-checked, with no lifecycle or registration order to learn.
-
-For a chart type that doesn't exist here, the same primitives are exported —
-`cartesianLayout`, `linearScale`, `niceTicks`, `seriesColor` — so you can build
-one on the same spine rather than starting over.
-
-#### Chart colours
-
-Eight categorical slots, `--iryx-chart-1` … `--iryx-chart-8`, usable as Tailwind
-colours (`text-chart-3`, `fill-chart-5`). They encode **identity** — which
-series a mark belongs to — never magnitude.
-
-```vue
-<!-- One series per slot, assigned in order. -->
-<ISparkline :data="revenue" class="text-chart-1" />
-
-<ISparkline :data="expenses" class="text-chart-2" />
-```
-
-Three rules, and they are not stylistic:
-
-- **Assign in order, never cycle.** A ninth series is not a generated ninth
-  hue — fold it into "Other", or switch to small multiples. A generated colour
-  hasn't been checked for separation against its neighbours.
-- **Status colours are never series colours.** A series that happens to land in
-  slot 4 must not read as a warning. `success`/`warning`/`danger`/`info` stay
-  reserved.
-- **Colour follows the entity, not its rank.** If a filter removes a series,
-  the survivors keep their slots rather than shifting up.
-
-Tailwind scans source text, so a class name assembled at runtime is never
-generated — write the slots out, or reach for the variable:
-
-```vue
-<!-- Silently unstyled: Tailwind never sees this string -->
-<ISparkline :class="`text-chart-${index + 1}`" />
-
-<!-- Either of these works -->
-<ISparkline :class="['text-chart-1', 'text-chart-2'][index]" />
-
-<ISparkline :style="{ color: `var(--iryx-chart-${index + 1})` }" />
-```
-
-The steps are not eyeballed. Each clears a lightness band, a chroma floor, and
-protanopia/deuteranopia separation against its own surface, checked with a
-validator rather than by eye. **Dark has its own steps**, validated against the
-dark background — not an automatic flip of the light ones.
-
-Two caps worth knowing before you design around them:
-
-| Chart form | Max series |
-| --- | --- |
-| Bars, lines, stacks — only neighbours touch | **8** |
-| Scatter, bubble, small multiples — any two marks can sit side by side | **3** |
-
-Past those, the answer is fewer series or facets, not more colours. If you
-re-step any slot, re-run the validator for **both** modes.
-
-#### Line charts
-
-```vue
-<ILineChart
-  :data="[
-    { label: 'Jan', value: 4200 },
-    { label: 'Feb', value: null },
-    { label: 'Mar', value: 5600 },
-  ]"
-  variant="area"
-  label="Revenue by month"
-/>
-```
-
-Same `data`, `height`, `ticks`, `axis`, `locale`, `format` and `label` props as
-`IBarChart`, plus:
-
-| Prop | Effect |
-| --- | --- |
-| `variant` | `line` (default) or `area`, which adds a wash beneath the line |
-| `zero` | Force zero onto the axis. **Off by default** |
-
-**`zero` is off here and always on for bars, deliberately.** A bar is read by
-length, so a truncated baseline lies about the comparison. A line is read by
-its *shape*, and a series hovering around 8,000 flattens into a straight edge
-once the axis starts at nothing. Turn it on when the distance from zero is the
-point.
-
-`null` breaks the line rather than bridging it, so a missing reading never
-draws a slope that didn't happen.
-
-Hovering shows a crosshair and a single ringed marker on the reading under the
-cursor — not a dot on every point, which is noise the axis and tooltip already
-cover.
-
-#### Bar charts
-
-```vue
-<IBarChart
-  :data="[
-    { label: 'Jan', value: 4200 },
-    { label: 'Feb', value: 5600 },
-    { label: 'Mar', value: null },
-  ]"
-  label="Revenue by month"
-  locale="de-DE"
-  :format="{ style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }"
-/>
-```
-
-| Prop | Effect |
-| --- | --- |
-| `data` | `{ label, value }[]`. `value: null` is a **missing reading** — no bar, which is not a zero |
-| `height` | Rendered height in px (default 240). Width fills the container |
-| `ticks` | Target tick count. A hint — the axis lands on round numbers first |
-| `axis` | Set `false` to drop the value axis and gridlines |
-| `locale` / `format` | `Intl.NumberFormat` settings, applied to ticks and tooltip alike |
-| `label` | Accessible name for the figure |
-
-**The axis picks the domain, not the data.** Values are snapped outwards to a
-1/2/5 step, so an axis reads `0 / 2,000 / 4,000` rather than `0 / 1,726.8`.
-Zero is always included, because bars are compared by length and a truncated
-baseline makes that comparison a lie.
-
-Bars are capped at 24px and never fill their slot — the gap between them is
-what separates them. They're rounded at the data end and square at the
-baseline, so the rounding reads as the tip of the value.
-
-Hovering a bar dims the rest and shows a tooltip; hit targets span the full
-band and plot height, so a short bar is no harder to hit than a tall one.
-
-**Accessibility:** the SVG is `aria-hidden` and the data is exposed as a
-visually-hidden table instead, so a screen reader gets the actual numbers
-rather than a blank graphic. That table renders even before the container has
-been measured — the data is never gated behind layout.
-
-**`stacked`** turns grouped series into one bar per category:
-
-```vue
-<IBarChart :data="cashflow" :series="series" stacked label="Cashflow" />
-```
-
-Stacking answers *"what makes up the total"*; grouping answers *"how do these
-compare"*. Only the bottom segment shares a baseline, so segments above it are
-hard to compare across categories — stay with grouped bars when the comparison
-matters more than the total.
-
-The axis is sized against the running totals, only the outermost segment is
-rounded, and the tooltip adds a **Total** row (`totalLabel` to rename it).
-Negative values stack downward from zero rather than cancelling positives out,
-so a mixed stack shows both sides at full length. Stacking is ignored for a
-single series, and works horizontally too.
-
-**`orientation="horizontal"`** runs the categories down the side:
-
-```vue
-<IBarChart :data="spend" orientation="horizontal" label="Spend by category" />
-```
-
-Vertical charts thin colliding labels to every *n*th, which is fine for `Jan`
-/ `Feb` and lossy for `Travel and accommodation`. Turn the chart and the names
-get real width, so nothing is dropped — that's the case horizontal is for.
-Everything else behaves the same: grouped series, the tooltip, the round-number
-axis anchored at zero.
-
-#### Sparklines
-
-A trend at a glance, for a stat tile or a table cell. Plain SVG — no charting
-library, no canvas, nothing to install.
-
-```vue
-<ISparkline
-  :data="[4200, 4600, 4100, 5200, 5800, 6300]"
-  variant="area"
-  end-dot
-  label="Revenue over six months, trending up"
-/>
-```
-
-Because it is SVG, colour comes from `currentColor`: recolour it with a text
-utility, and it follows your theme preset and light/dark automatically with no
-JavaScript. A canvas chart cannot read CSS variables, so it would need a
-re-render on every theme change.
-
-| Prop | Effect |
-| --- | --- |
-| `data` | Values, oldest first. `null` is a **gap**, not a zero — the line breaks |
-| `variant` | `line` (default) or `area`, which adds a wash beneath the line |
-| `endDot` | Marks the most recent point |
-| `baseline` | Lower edge of the `area` wash: `min` (default) or `zero` |
-| `min` / `max` | Pin the domain — set both to put several sparklines on one scale |
-| `muted` | Draw in muted ink, for a de-emphasised trend |
-| `height` | Rendered height in px (default 32). Width always fills the container |
-
-Width is fluid and the stroke never distorts: the drawing stretches via
-`preserveAspectRatio="none"`, while every stroke carries
-`vector-effect="non-scaling-stroke"`, so a 2px line stays 2px and the end dot
-stays circular at any aspect ratio.
-
-`label` sets an accessible description. **Without one the sparkline is hidden
-from assistive tech as decorative** — which is correct when it sits beside a
-value that already states the number, and wrong if it is the only thing
-carrying the information.
-
-Edge cases behave: an empty series draws nothing, a flat series draws through
-the middle rather than collapsing to an edge, and a single reading is a dot.
-
-The scale helpers are exported for building your own marks:
-
-```ts
-import { extent, linearScale } from 'iryx-ui'
-
-extent([3, null, 9, 1]) // [1, 9] — gaps ignored
-linearScale([0, 10], [100, 0])(10) // 0 — ranges may be inverted for SVG's y-axis
-```
 
 #### Files
 
@@ -1335,6 +1064,304 @@ const table = useDataTable({
 })
 // table.pageRows, table.toggleSort, table.headerSelection, …
 ```
+
+### Charts
+
+A small set of chart types done properly, in plain SVG — no charting
+dependency, nothing to register, and no canvas. They inherit the theme the
+same way every other component does, so they follow light/dark and any token
+override for free. For the exotic five percent, reach for Chart.js; that is
+the intended escape hatch, not a gap.
+
+Every chart is `aria-hidden` with a screen-reader table carrying the numbers,
+and that table renders before measurement — the data is never gated behind
+layout.
+
+#### Sparklines
+
+A trend at a glance, for a stat tile or a table cell.
+
+```vue
+<ISparkline
+  :data="[4200, 4600, 4100, 5200, 5800, 6300]"
+  variant="area"
+  end-dot
+  label="Revenue over six months, trending up"
+/>
+```
+
+Because it is SVG, colour comes from `currentColor`: recolour it with a text
+utility, and it follows your theme preset and light/dark automatically with no
+JavaScript. A canvas chart cannot read CSS variables, so it would need a
+re-render on every theme change.
+
+| Prop | Effect |
+| --- | --- |
+| `data` | Values, oldest first. `null` is a **gap**, not a zero — the line breaks |
+| `variant` | `line` (default) or `area`, which adds a wash beneath the line |
+| `endDot` | Marks the most recent point |
+| `baseline` | Lower edge of the `area` wash: `min` (default) or `zero` |
+| `min` / `max` | Pin the domain — set both to put several sparklines on one scale |
+| `muted` | Draw in muted ink, for a de-emphasised trend |
+| `height` | Rendered height in px (default 32). Width always fills the container |
+
+Width is fluid and the stroke never distorts: the drawing stretches via
+`preserveAspectRatio="none"`, while every stroke carries
+`vector-effect="non-scaling-stroke"`, so a 2px line stays 2px and the end dot
+stays circular at any aspect ratio.
+
+`label` sets an accessible description. **Without one the sparkline is hidden
+from assistive tech as decorative** — which is correct when it sits beside a
+value that already states the number, and wrong if it is the only thing
+carrying the information.
+
+Edge cases behave: an empty series draws nothing, a flat series draws through
+the middle rather than collapsing to an edge, and a single reading is a dot.
+
+The scale helpers are exported for building your own marks:
+
+```ts
+import { extent, linearScale } from 'iryx-ui'
+
+extent([3, null, 9, 1]) // [1, 9] — gaps ignored
+linearScale([0, 10], [100, 0])(10) // 0 — ranges may be inverted for SVG's y-axis
+```
+
+#### Line charts
+
+```vue
+<ILineChart
+  :data="[
+    { label: 'Jan', value: 4200 },
+    { label: 'Feb', value: null },
+    { label: 'Mar', value: 5600 },
+  ]"
+  variant="area"
+  label="Revenue by month"
+/>
+```
+
+Same `data`, `height`, `ticks`, `axis`, `locale`, `format` and `label` props as
+`IBarChart`, plus:
+
+| Prop | Effect |
+| --- | --- |
+| `variant` | `line` (default) or `area`, which adds a wash beneath the line |
+| `zero` | Force zero onto the axis. **Off by default** |
+
+**`zero` is off here and always on for bars, deliberately.** A bar is read by
+length, so a truncated baseline lies about the comparison. A line is read by
+its *shape*, and a series hovering around 8,000 flattens into a straight edge
+once the axis starts at nothing. Turn it on when the distance from zero is the
+point.
+
+`null` breaks the line rather than bridging it, so a missing reading never
+draws a slope that didn't happen.
+
+Hovering shows a crosshair and a single ringed marker on the reading under the
+cursor — not a dot on every point, which is noise the axis and tooltip already
+cover.
+
+#### Bar charts
+
+```vue
+<IBarChart
+  :data="[
+    { label: 'Jan', value: 4200 },
+    { label: 'Feb', value: 5600 },
+    { label: 'Mar', value: null },
+  ]"
+  label="Revenue by month"
+  locale="de-DE"
+  :format="{ style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }"
+/>
+```
+
+| Prop | Effect |
+| --- | --- |
+| `data` | `{ label, value }[]`. `value: null` is a **missing reading** — no bar, which is not a zero |
+| `height` | Rendered height in px (default 240). Width fills the container |
+| `ticks` | Target tick count. A hint — the axis lands on round numbers first |
+| `axis` | Set `false` to drop the value axis and gridlines |
+| `locale` / `format` | `Intl.NumberFormat` settings, applied to ticks and tooltip alike |
+| `label` | Accessible name for the figure |
+
+**The axis picks the domain, not the data.** Values are snapped outwards to a
+1/2/5 step, so an axis reads `0 / 2,000 / 4,000` rather than `0 / 1,726.8`.
+Zero is always included, because bars are compared by length and a truncated
+baseline makes that comparison a lie.
+
+Bars are capped at 24px and never fill their slot — the gap between them is
+what separates them. They're rounded at the data end and square at the
+baseline, so the rounding reads as the tip of the value.
+
+Hovering a bar dims the rest and shows a tooltip; hit targets span the full
+band and plot height, so a short bar is no harder to hit than a tall one.
+
+**Accessibility:** the SVG is `aria-hidden` and the data is exposed as a
+visually-hidden table instead, so a screen reader gets the actual numbers
+rather than a blank graphic. That table renders even before the container has
+been measured — the data is never gated behind layout.
+
+**`stacked`** turns grouped series into one bar per category:
+
+```vue
+<IBarChart :data="cashflow" :series="series" stacked label="Cashflow" />
+```
+
+Stacking answers *"what makes up the total"*; grouping answers *"how do these
+compare"*. Only the bottom segment shares a baseline, so segments above it are
+hard to compare across categories — stay with grouped bars when the comparison
+matters more than the total.
+
+The axis is sized against the running totals, only the outermost segment is
+rounded, and the tooltip adds a **Total** row (`totalLabel` to rename it).
+Negative values stack downward from zero rather than cancelling positives out,
+so a mixed stack shows both sides at full length. Stacking is ignored for a
+single series, and works horizontally too.
+
+**`orientation="horizontal"`** runs the categories down the side:
+
+```vue
+<IBarChart :data="spend" orientation="horizontal" label="Spend by category" />
+```
+
+Vertical charts thin colliding labels to every *n*th, which is fine for `Jan`
+/ `Feb` and lossy for `Travel and accommodation`. Turn the chart and the names
+get real width, so nothing is dropped — that's the case horizontal is for.
+Everything else behaves the same: grouped series, the tooltip, the round-number
+axis anchored at zero.
+
+#### Multiple series
+
+Both charts take plain rows plus a `series` descriptor — the same shape
+`ITable` uses. Omit `series` for the single-measure case.
+
+```vue
+<IBarChart
+  :data="[
+    { label: 'Jan', revenue: 4200, expenses: 3100 },
+    { label: 'Feb', revenue: 5600, expenses: 3400 },
+  ]"
+  :series="[
+    { key: 'revenue', name: 'Revenue', slot: 0 },
+    { key: 'expenses', name: 'Expenses', slot: 1 },
+  ]"
+  label="Cashflow by month"
+/>
+```
+
+Bars group inside their category; lines draw one path each. One hover reports
+**every** series for that category in a single tooltip, so the reader compares
+in one place instead of chasing marks.
+
+**`slot` pins a series to a palette colour.** Without it, colour follows array
+position — so filtering a series out repaints the survivors and the reader has
+to relearn the chart. Pin the slots whenever series can be toggled.
+
+**The legend is mandatory from two series up.** `legend: false` only silences
+the single-series case, where the title already names what is plotted. Colour
+alone is never a dependable identity channel, so this is not configurable.
+
+Past eight series the colours stop identifying anything; the chart warns in
+development and you should fold the tail into "Other" or switch to small
+multiples.
+
+`variant="area"` is ignored for multiple series — overlapping washes muddy into
+a colour that belongs to neither.
+
+#### Chart colours
+
+Eight categorical slots, `--iryx-chart-1` … `--iryx-chart-8`, usable as Tailwind
+colours (`text-chart-3`, `fill-chart-5`). They encode **identity** — which
+series a mark belongs to — never magnitude.
+
+```vue
+<!-- One series per slot, assigned in order. -->
+<ISparkline :data="revenue" class="text-chart-1" />
+
+<ISparkline :data="expenses" class="text-chart-2" />
+```
+
+Three rules, and they are not stylistic:
+
+- **Assign in order, never cycle.** A ninth series is not a generated ninth
+  hue — fold it into "Other", or switch to small multiples. A generated colour
+  hasn't been checked for separation against its neighbours.
+- **Status colours are never series colours.** A series that happens to land in
+  slot 4 must not read as a warning. `success`/`warning`/`danger`/`info` stay
+  reserved.
+- **Colour follows the entity, not its rank.** If a filter removes a series,
+  the survivors keep their slots rather than shifting up.
+
+Tailwind scans source text, so a class name assembled at runtime is never
+generated — write the slots out, or reach for the variable:
+
+```vue
+<!-- Silently unstyled: Tailwind never sees this string -->
+<ISparkline :class="`text-chart-${index + 1}`" />
+
+<!-- Either of these works -->
+<ISparkline :class="['text-chart-1', 'text-chart-2'][index]" />
+
+<ISparkline :style="{ color: `var(--iryx-chart-${index + 1})` }" />
+```
+
+The steps are not eyeballed. Each clears a lightness band, a chroma floor, and
+protanopia/deuteranopia separation against its own surface, checked with a
+validator rather than by eye. **Dark has its own steps**, validated against the
+dark background — not an automatic flip of the light ones.
+
+Two caps worth knowing before you design around them:
+
+| Chart form | Max series |
+| --- | --- |
+| Bars, lines, stacks — only neighbours touch | **8** |
+| Scatter, bubble, small multiples — any two marks can sit side by side | **3** |
+
+Past those, the answer is fewer series or facets, not more colours. If you
+re-step any slot, re-run the validator for **both** modes.
+
+#### Annotations, and why there is no plugin API
+
+Chart.js has plugins because canvas is opaque — once painted you cannot select
+or style anything, so the only way in is an imperative draw hook. SVG has no
+such problem, so these charts hand you the layout and let you write ordinary
+markup into it:
+
+```vue
+<ILineChart :data="revenue" label="Revenue against target">
+  <template #overlay="{ plot, value }">
+    <line
+      :x1="plot.left" :y1="value(7000)"
+      :x2="plot.left + plot.width" :y2="value(7000)"
+      stroke="var(--iryx-warning)" stroke-width="2" stroke-dasharray="4 4"
+    />
+  </template>
+</ILineChart>
+```
+
+`#underlay` renders behind the marks — target bands, shaded regions. `#overlay`
+renders in front — reference lines, callouts. Both sit below the hit targets,
+so hovering keeps working through whatever you draw.
+
+Both receive the `CartesianLayout`:
+
+| Prop | What it gives you |
+| --- | --- |
+| `plot` | `{ left, top, width, height }` of the plot rectangle, in px |
+| `value(n)` | A data value to its pixel on the value axis |
+| `bandCentre(i)` | The centre of category `i`, in px |
+| `bandWidth` | Size of one category slot |
+| `ticks` | The axis values actually drawn |
+| `orientation` | `'vertical'` or `'horizontal'` |
+
+That's strictly more capable than a draw hook: it's declarative, reactive, and
+type-checked, with no lifecycle or registration order to learn.
+
+For a chart type that doesn't exist here, the same primitives are exported —
+`cartesianLayout`, `linearScale`, `niceTicks`, `seriesColor` — so you can build
+one on the same spine rather than starting over.
 
 ## License
 
