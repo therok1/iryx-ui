@@ -6,5 +6,9 @@ coverage/
 .eslintcache
 .vite/
 
+# VitePress build output and dep cache. `dist/` above already covers the
+# former, but `cache/` is its own directory.
+docs/.vitepress/cache/
+
 # Generated during a release run.
 RELEASE_NOTES.md

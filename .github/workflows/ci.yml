@@ -25,3 +25,6 @@ jobs:
       # absent so a local `pnpm test` still works without building.
       - run: pnpm build
       - run: pnpm test
+      # The docs prerender every page, so this is a second SSR pass over the
+      # components the docs actually use — and it fails on a dead link.
+      - run: pnpm --filter docs build

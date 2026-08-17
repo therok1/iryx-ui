@@ -1,5 +1,4 @@
 import type { SparseValue } from './scale'
-import process from 'node:process'
 import { extent, linearScale, niceTicks } from './scale'
 
 /**
@@ -184,7 +183,19 @@ export function slotOf(entry: ChartSeries, index: number): number {
 
 let warnedSlots = false
 
+/**
+ * Dev-only warning.
+ *
+ * `process.env.NODE_ENV` is read as a bare global rather than through an
+ * `import process from 'node:process'`, which is what this used to do. That
+ * import shipped a Node builtin in a browser library: bundlers externalise it,
+ * `process` is undefined in a browser, and this line threw the moment a chart
+ * had more than eight series. Every bundler statically replaces the bare form
+ * instead, which also lets the whole branch be dropped from a production
+ * build — the same thing Vue and Reka do.
+ */
 export function warnOnSlotOverflow(count: number): void {
+  // eslint-disable-next-line node/prefer-global/process
   if (count <= SERIES_SLOTS || warnedSlots || process.env.NODE_ENV === 'production')
     return
   warnedSlots = true

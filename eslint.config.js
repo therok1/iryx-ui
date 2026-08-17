@@ -22,4 +22,21 @@ export default antfu(
       'better-tailwindcss/no-unnecessary-whitespace': 'warn',
     },
   },
+  {
+    /*
+     * VitePress markdown is a Vue template with prose around it, so a page is
+     * full of `<template #demo>` and component tags at the top level. The SFC
+     * block rules read those as malformed single-file-component blocks and
+     * demand blank lines and line breaks inside what is really body copy.
+     *
+     * The code *samples* in these files are fenced blocks, which antfu's config
+     * still lints as their own virtual files — so the code readers copy is
+     * checked, while the page around it is left as prose.
+     */
+    files: ['docs/**/*.md', 'docs/**/*.md/**'],
+    rules: {
+      'vue/block-tag-newline': 'off',
+      'vue/padding-line-between-blocks': 'off',
+    },
+  },
 )

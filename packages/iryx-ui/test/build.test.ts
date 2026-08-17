@@ -82,13 +82,27 @@ describe.skipIf(!built)('build output', () => {
     expect([...found]).toEqual(expect.arrayContaining(['vue', 'reka-ui']))
 
     const undeclared = [...found].filter((name) => {
-      if (name.startsWith('node:'))
-        return false
       // Deep imports belong to whichever package they start with.
       return ![...allowed].some(dep => name === dep || name.startsWith(`${dep}/`))
     })
 
     expect(undeclared).toEqual([])
+  })
+
+  /*
+   * This is a browser library. A Node builtin in the bundle is externalised by
+   * every browser bundler, so the import resolves to nothing and the first line
+   * to touch it throws.
+   *
+   * It happened: `cartesian.ts` imported `node:process` for a dev-only
+   * `NODE_ENV` check, which meant any chart with more than eight series threw
+   * in the browser. An earlier version of the test above skipped `node:`
+   * specifiers outright, so it shipped. Read as a bare global instead —
+   * bundlers replace it statically.
+   */
+  it('imports no Node builtins', () => {
+    const builtins = [...new Set(bareImports())].filter(name => name.startsWith('node:'))
+    expect(builtins).toEqual([])
   })
 
   it('keeps each component in its own module so consumers can tree-shake', () => {

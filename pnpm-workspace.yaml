@@ -5,3 +5,4 @@ trustPolicy: no-downgrade
 packages:
   - packages/*
   - playground
+  - docs

@@ -1,0 +1,196 @@
+@import "tailwindcss";
+@import "../../../packages/iryx-ui/theme.css";
+
+/*
+ * The docs alias `iryx-ui` to the library source (see config.ts), so Tailwind
+ * has to scan the source as well as the `dist` that theme.css already covers.
+ */
+@source "../../../packages/iryx-ui/src";
+
+:root {
+  --iryx-font-sans: "Switzer", ui-sans-serif, system-ui, sans-serif;
+}
+
+/*
+ * `IApp` paints the background, but it stops at the end of the layout — an
+ * overscroll bounce, or a page shorter than the viewport, shows whatever is
+ * behind it. The body has to carry the colour too.
+ */
+body {
+  @apply bg-background text-foreground;
+}
+
+/*
+ * Prose. Markdown output has no classes to hook, so the content column styles
+ * its own elements.
+ *
+ * Hand-written rather than @tailwindcss/typography on purpose: typography ships
+ * its own greyscale and rhythm, which would sit alongside the library's tokens
+ * instead of using them — two type systems in the shopfront for the type
+ * system. Everything below resolves to an --iryx-* token.
+ */
+@layer components {
+  .prose {
+    @apply text-[0.9375rem]/7 text-foreground;
+  }
+
+  .prose > * + * {
+    @apply mt-5;
+  }
+
+  .prose h1 {
+    @apply text-3xl font-semibold tracking-tight;
+  }
+
+  .prose h2 {
+    @apply mt-12 border-t border-border pt-8 text-xl font-semibold tracking-tight;
+  }
+
+  .prose h3 {
+    @apply mt-8 text-base font-semibold;
+  }
+
+  /* The anchor VitePress injects into every heading. */
+  .prose :is(h1, h2, h3) .header-anchor {
+    @apply ml-2 text-muted-foreground opacity-0 transition-opacity;
+  }
+
+  .prose :is(h1, h2, h3):hover .header-anchor,
+  .prose .header-anchor:focus-visible {
+    @apply opacity-100;
+  }
+
+  .prose p {
+    @apply text-muted-foreground;
+  }
+
+  /* Lead paragraph: the one directly after the page title. */
+  .prose h1 + p {
+    @apply text-base/7;
+  }
+
+  .prose :is(ul, ol) {
+    @apply flex list-outside flex-col gap-2 pl-5 text-muted-foreground;
+  }
+
+  .prose ul {
+    @apply list-disc;
+  }
+
+  .prose ol {
+    @apply list-decimal;
+  }
+
+  .prose li::marker {
+    @apply text-border;
+  }
+
+  .prose a:not(.header-anchor) {
+    @apply font-medium text-foreground underline decoration-border underline-offset-4 transition-colors hover:decoration-foreground;
+  }
+
+  .prose strong {
+    @apply font-semibold text-foreground;
+  }
+
+  /* Inline code. The fenced-block rule below resets its own. */
+  .prose :not(pre) > code {
+    @apply rounded-md border border-border bg-muted px-1.5 py-0.5 text-[0.85em] text-foreground;
+  }
+
+  .prose blockquote {
+    @apply border-l-2 border-border pl-4 text-muted-foreground italic;
+  }
+
+  .prose table {
+    @apply block w-full overflow-x-auto text-left text-sm;
+  }
+
+  .prose :is(th, td) {
+    @apply border-b border-border px-3 py-2.5 align-top first:pl-0 last:pr-0;
+  }
+
+  .prose th {
+    @apply font-medium whitespace-nowrap text-foreground;
+  }
+
+  .prose td {
+    @apply text-muted-foreground;
+  }
+
+  .prose td code {
+    @apply whitespace-nowrap;
+  }
+
+  .prose hr {
+    @apply border-border;
+  }
+
+  /*
+   * Markdown containers (`::: tip`). VitePress emits the classes; the default
+   * theme's styling for them is not imported, so they are defined here.
+   *
+   * Colour goes in the left rule and the title, never a filled surface —
+   * the same rule the components follow. See the theming guide.
+   */
+  .prose .custom-block {
+    @apply rounded-lg border border-border border-l-2 px-4 py-3 text-sm;
+  }
+
+  .prose .custom-block > * + * {
+    @apply mt-2;
+  }
+
+  .prose .custom-block p {
+    @apply text-sm;
+  }
+
+  .prose .custom-block .custom-block-title {
+    @apply font-semibold text-foreground;
+  }
+
+  .prose .custom-block.tip {
+    @apply border-l-primary;
+  }
+
+  .prose .custom-block.warning {
+    @apply border-l-warning;
+  }
+
+  .prose .custom-block.danger {
+    @apply border-l-danger;
+  }
+}
+
+/*
+ * Code blocks. Shiki emits inline colours for the tokens themselves and two
+ * stacked `<pre>`s — one per theme — so all that is needed here is the frame
+ * and picking which of the two is visible.
+ */
+@layer components {
+  .prose div[class*="language-"] {
+    @apply relative overflow-hidden rounded-xl border border-border bg-muted/40;
+  }
+
+  .prose div[class*="language-"] > span.lang {
+    @apply absolute top-2.5 right-3 text-xs text-muted-foreground select-none;
+  }
+
+  .prose div[class*="language-"] pre {
+    @apply overflow-x-auto p-4 text-[0.8125rem]/6;
+  }
+
+  .prose div[class*="language-"] code {
+    @apply font-mono;
+  }
+
+  .prose .vp-code span.line.diff.remove {
+    @apply opacity-60;
+  }
+
+  /* Shiki's dual themes: show one, hide the other. */
+  html:not(.dark) .vp-code .shiki.vp-code-dark,
+  html.dark .vp-code .shiki.vp-code-light {
+    @apply hidden;
+  }
+}

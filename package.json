@@ -6,6 +6,8 @@
   "scripts": {
     "build": "pnpm --filter iryx-ui build",
     "dev": "pnpm --filter playground dev",
+    "docs": "pnpm --filter docs dev",
+    "docs:build": "pnpm --filter docs build",
     "test": "pnpm --filter iryx-ui test",
     "typecheck": "pnpm --filter iryx-ui typecheck",
     "lint": "eslint .",
