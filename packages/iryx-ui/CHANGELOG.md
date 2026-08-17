@@ -1,5 +1,27 @@
 # iryx-ui
 
+## 0.12.0
+
+### Minor Changes
+
+- e935913: Add `IDrawer` — a panel or sheet attached to any viewport edge, built on Reka's drawer primitive.
+
+  `side` picks the edge (`right`, `left`, `top`, `bottom`) and doubles as the direction you drag to dismiss; `size` reads as a width on a side drawer and a maximum height on a sheet. Sheets get a drag handle by default, and `snapPoints` with `v-model:snapPoint` gives a sheet that rests part-way and can be dragged to full. `modal` accepts `'trap-focus'` for a side panel that leaves the page interactive. Slots, `dismissible`, `showClose` and `closeLabel` match `IDialog`.
+
+  This bumps `reka-ui` to `^2.10.3`, which moves the hidden form input in `Checkbox` and `Switch` from inside the control to a sibling of it, fixing a `nested-interactive` accessibility violation. Both components now bind `$attrs` explicitly so attributes still reach the control — and in the labelled layout they reach the control rather than the wrapper, which they did not before.
+
+### Patch Changes
+
+- dceecef: Attributes now reach the control they belong to in `INumberInput`, `ISelect`, `ICombobox` and `IProgress`. Each of these renders a wrapper — or, for `ISelect` and `ICombobox`, a renderless or `display: contents` root — and an attribute left to fall through landed there instead of on the field. An `aria-label` therefore never named anything, so a component with no visible label had no accessible name.
+
+  `IProgress`'s `label` prop now also names the bar for assistive tech. It rendered visible text but was never associated with the `progressbar` element, so a labelled bar still announced as an unnamed one.
+
+  Stop inlining declared dependencies into the bundle. `@hugeicons/core-free-icons`, `@hugeicons/vue` and `@internationalized/date` were listed as dependencies _and_ copied into `dist`, so consumers installed them and then received a second private copy — around 38 kB of duplicate code, and two module instances of `@internationalized/date`, which is enough to break an `instanceof CalendarDate` check across the boundary.
+
+- 3e480ba: Fix `ITabs` throwing on the server. Its internal helper was named `valueOf`, and a template resolves an identifier against the render context — whose prototype chain includes `Object.prototype`. Under SSR the lookup found `Object.prototype.valueOf` rather than the component's own binding and called it with no receiver, so every tab list failed with "Cannot convert undefined or null to object" on the server while working perfectly in the browser.
+
+  Narrow `reka-ui` to `~2.10.3`. `IDrawer` is built on Reka's drawer primitive, which is marked Alpha, so its API can still change in a minor release. A patch range keeps upstream fixes flowing without letting an Alpha API change reach consumers unannounced.
+
 ## 0.11.0
 
 ### Minor Changes
