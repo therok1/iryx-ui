@@ -883,6 +883,20 @@ The control inside a field automatically inherits its `id`, invalid styling and 
 
 Use the `#label` / `#description` slots instead of the props when you need markup (a link, a badge) inside the text.
 
+Where a component has no visible label — a search field, a bare select — put `aria-label` on it directly. Attributes always land on the control the label belongs to, not on whatever wrapper the component happens to render around it:
+
+```vue
+<template>
+  <IInput v-model="q" aria-label="Search invoices" />
+  <ISelect v-model="status" :items="statuses" aria-label="Filter by status" />
+  <INumberInput v-model="amount" aria-label="Amount" />
+</template>
+```
+
+The same holds for `name`, `autocomplete`, `maxlength` and `data-*`. `IProgress` is the one that needs saying twice: its `label` prop renders visible text *and* names the bar for assistive tech, so pass `aria-label` only when there is no visible label to use.
+
+An automated axe sweep runs over every component on each commit. It is a floor rather than a guarantee — it catches roughly a third of real barriers, and contrast rules need a real browser — but nothing ships with an unlabelled control or a nested interactive element.
+
 ### Alerts and banners
 
 They look similar and do different jobs, so they're separate components.

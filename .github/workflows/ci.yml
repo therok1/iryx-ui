@@ -21,5 +21,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
       - run: pnpm typecheck
-      - run: pnpm test
+      # Build first: test/build.test.ts inspects dist, and skips when it is
+      # absent so a local `pnpm test` still works without building.
       - run: pnpm build
+      - run: pnpm test

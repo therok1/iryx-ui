@@ -56,6 +56,15 @@ export interface SelectProps extends SelectRootProps {
   }
 }
 
+/**
+ * `SelectRoot` is renderless, so an attribute left to fall through never
+ * reached a real element — a `<ISelect aria-label="…">` produced a trigger
+ * with no accessible name, which the axe sweep caught. Attributes go to the
+ * trigger, which is the button the user actually operates and the element
+ * `IFormField` already targets.
+ */
+defineOptions({ inheritAttrs: false })
+
 const props = withDefaults(defineProps<SelectProps>(), {
   unstyled: undefined,
 })
@@ -131,7 +140,7 @@ const groupLabelClass = computed(() =>
 
 <template>
   <SelectRoot v-bind="forwarded">
-    <SelectTrigger :class="triggerClass">
+    <SelectTrigger v-bind="$attrs" :class="triggerClass">
       <SelectValue :placeholder="props.placeholder" />
       <SelectIcon as-child>
         <Icon :icon="ArrowDown01Icon" />

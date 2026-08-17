@@ -54,6 +54,15 @@ export interface NumberInputProps {
   }
 }
 
+/**
+ * The root is the wrapper carrying the field chrome, so an attribute left to
+ * fall through landed there instead of on the `<input>` — including
+ * `aria-label`, which meant a `INumberInput` with no visible label had no
+ * accessible name at all. `IInput` already does this; the axe sweep found that
+ * this one had been missed.
+ */
+defineOptions({ inheritAttrs: false })
+
 const props = withDefaults(defineProps<NumberInputProps>(), {
   step: '1',
   stepper: true,
@@ -170,6 +179,7 @@ function slotClass(slot: 'root' | 'input' | 'stepper' | 'step', extra?: string) 
     <input
       :id="inputId"
       v-model="display"
+      v-bind="$attrs"
       type="text"
       inputmode="decimal"
       autocomplete="off"

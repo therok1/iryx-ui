@@ -86,6 +86,14 @@ export interface ComboboxProps extends ComboboxRootProps {
   }
 }
 
+/**
+ * `ComboboxRoot` is a `display: contents` wrapper, so an attribute left to
+ * fall through landed on a box that generates nothing — a
+ * `<ICombobox aria-label="…">` left the input unlabelled. Attributes go to the
+ * input, which is what `IFormField` and `ILabel` already point at.
+ */
+defineOptions({ inheritAttrs: false })
+
 const props = withDefaults(defineProps<ComboboxProps>(), {
   emptyText: 'No results found.',
   createLabel: (query: string) => `Create "${query}"`,
@@ -291,6 +299,7 @@ const itemIndicatorClass = computed(() => (isUnstyled.value ? undefined : theme.
       <ComboboxInput
         :id="inputId"
         v-model="query"
+        v-bind="$attrs"
         :placeholder="props.placeholder"
         :display-value="displayValue"
         :aria-invalid="isInvalid || undefined"

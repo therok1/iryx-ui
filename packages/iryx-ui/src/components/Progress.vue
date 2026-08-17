@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ProgressIndicator, ProgressRoot } from 'reka-ui'
-import { computed } from 'vue'
+import { ProgressIndicator, ProgressRoot, useId } from 'reka-ui'
+import { computed, useSlots } from 'vue'
 import { useIryxUiConfig } from '../config'
 import { progressTheme } from '../theme/progress'
 
@@ -35,10 +35,29 @@ export interface ProgressProps {
   }
 }
 
+/**
+ * The root is a plain wrapper; the element carrying `role="progressbar"` is
+ * the track inside it. An attribute left to fall through landed on the
+ * wrapper, so a consumer's `aria-label` never reached the thing being
+ * described.
+ */
+defineOptions({ inheritAttrs: false })
+
 const props = withDefaults(defineProps<ProgressProps>(), {
   max: 100,
   unstyled: undefined,
 })
+
+const slots = useSlots()
+
+/**
+ * `label` renders visible text above the track, but nothing ever tied it to
+ * the progressbar — so a labelled bar still announced as an unnamed one, which
+ * the axe sweep caught. Point `aria-labelledby` at that text when it exists,
+ * and otherwise let a caller's own `aria-label` through `$attrs`.
+ */
+const labelId = useId()
+const hasLabel = computed(() => Boolean(props.label || slots.label))
 
 const isIndeterminate = computed(() => props.indeterminate || props.modelValue == null)
 
@@ -102,7 +121,7 @@ const indicatorStyle = computed(() =>
 <template>
   <div :class="rootClass">
     <div v-if="hasHeader" :class="headerClass">
-      <span v-if="props.label || $slots.label" :class="labelClass">
+      <span v-if="hasLabel" :id="labelId" :class="labelClass">
         <slot name="label">
           {{ props.label }}
         </slot>
@@ -118,6 +137,8 @@ const indicatorStyle = computed(() =>
       :model-value="value"
       :max="props.max"
       :get-value-label="() => formatted ?? ''"
+      :aria-labelledby="hasLabel ? labelId : undefined"
+      v-bind="$attrs"
       :class="trackClass"
     >
       <ProgressIndicator :class="indicatorClass" :style="indicatorStyle" />
