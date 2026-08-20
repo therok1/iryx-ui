@@ -34,6 +34,7 @@ export interface SidebarProps {
     linkBadge?: string
     groupIcon?: string
     groupContent?: string
+    groupInner?: string
   }
 }
 
@@ -121,26 +122,28 @@ const nameOf = (link: SidebarLink) => link.label
               </CollapsibleTrigger>
 
               <CollapsibleContent :class="slotClass('groupContent')">
-                <component
-                  :is="tagOf(child)"
-                  v-for="child in link.items"
-                  :key="child.label"
-                  :href="child.href"
-                  :type="child.href ? undefined : 'button'"
-                  :aria-label="nameOf(child)"
-                  :aria-current="child.active ? 'page' : undefined"
-                  :aria-disabled="child.disabled || undefined"
-                  :data-active="child.active ? '' : undefined"
-                  :data-disabled="child.disabled ? '' : undefined"
-                  :class="slotClass('link')"
-                  @click="(event: Event) => onSelect(child, event)"
-                >
-                  <Icon v-if="child.icon" :icon="child.icon" />
-                  <span :class="slotClass('linkLabel')">{{ child.label }}</span>
-                  <span v-if="child.badge !== undefined" :class="slotClass('linkBadge')">
-                    {{ child.badge }}
-                  </span>
-                </component>
+                <div :class="slotClass('groupInner')">
+                  <component
+                    :is="tagOf(child)"
+                    v-for="child in link.items"
+                    :key="child.label"
+                    :href="child.href"
+                    :type="child.href ? undefined : 'button'"
+                    :aria-label="nameOf(child)"
+                    :aria-current="child.active ? 'page' : undefined"
+                    :aria-disabled="child.disabled || undefined"
+                    :data-active="child.active ? '' : undefined"
+                    :data-disabled="child.disabled ? '' : undefined"
+                    :class="slotClass('link')"
+                    @click="(event: Event) => onSelect(child, event)"
+                  >
+                    <Icon v-if="child.icon" :icon="child.icon" />
+                    <span :class="slotClass('linkLabel')">{{ child.label }}</span>
+                    <span v-if="child.badge !== undefined" :class="slotClass('linkBadge')">
+                      {{ child.badge }}
+                    </span>
+                  </component>
+                </div>
               </CollapsibleContent>
             </CollapsibleRoot>
 

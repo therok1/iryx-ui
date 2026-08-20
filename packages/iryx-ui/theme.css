@@ -213,6 +213,33 @@
   --animate-drawer-out-top: drawer-out-top 300ms var(--iryx-drawer-ease);
   --animate-drawer-in-bottom: drawer-in-bottom 300ms var(--iryx-drawer-ease);
   --animate-drawer-out-bottom: drawer-out-bottom 300ms var(--iryx-drawer-ease);
+  /*
+   * Collapsible unroll. Same curve as the drawer, under its own name: it
+   * decelerates hard at the end, so the panel settles instead of stopping.
+   * Closing is quicker than opening — a slow exit reads as lag.
+   */
+  --iryx-collapsible-ease: cubic-bezier(0.32, 0.72, 0, 1);
+  --animate-collapsible-down: collapsible-down 240ms var(--iryx-collapsible-ease);
+  --animate-collapsible-up: collapsible-up 180ms var(--iryx-collapsible-ease);
+  /*
+   * The rows lift and fade as two animations, not one keyframe set, because
+   * they want different curves. On the shared emphasized ease the opacity is
+   * already at ~1 within a couple of frames — the fade is technically there and
+   * perceptually absent. Its own ease-out, held back briefly so the panel has
+   * started moving first, is what makes it read.
+   *
+   * The fade finishes well before the lift on purpose: the rows are legible for
+   * the back half of the unroll, so the motion settles rather than the content
+   * still arriving as it stops.
+   *
+   * `both` matters: the fade is delayed, and without it the rows would paint at
+   * full opacity for those first 40ms and then start fading in from visible.
+   */
+  --animate-collapsible-content-in:
+    collapsible-lift-in 260ms var(--iryx-collapsible-ease),
+    collapsible-fade-in 220ms 40ms ease-out both;
+  --animate-collapsible-content-out:
+    collapsible-fade-out 140ms ease-in both;
 }
 
 /* Indeterminate Progress: slide a short bar back and forth across the track. */
@@ -254,6 +281,60 @@
   to {
     opacity: 0;
     transform: scale(0.96);
+  }
+}
+
+/*
+ * Collapsible open/close.
+ *
+ * `height: auto` is not tweenable, so Reka measures the panel and publishes it
+ * as --reka-collapsible-content-height; these keyframes animate to that.
+ *
+ * The height animation has to own the element Reka sets the variable on, and
+ * that element must carry no margin, padding or border of its own — margin is
+ * not part of the animated height, so it would survive the close as a visible
+ * gap under a panel that is supposedly shut. The indent, rule and row spacing
+ * live on an inner wrapper instead.
+ */
+@keyframes collapsible-down {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--reka-collapsible-content-height);
+  }
+}
+
+@keyframes collapsible-up {
+  from {
+    height: var(--reka-collapsible-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
+/*
+ * The rows lift into place while the panel unrolls, so they arrive under their
+ * own steam rather than being uncovered by a moving mask. This animates the
+ * independent `translate` property, not `transform`, so it cannot compose with
+ * a transform an app puts on the same element.
+ */
+@keyframes collapsible-lift-in {
+  from {
+    translate: 0 -0.5rem;
+  }
+}
+
+@keyframes collapsible-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes collapsible-fade-out {
+  to {
+    opacity: 0;
   }
 }
 
@@ -322,6 +403,37 @@
 @keyframes drawer-out-bottom {
   to {
     translate: 0 100%;
+  }
+}
+
+/*
+ * Sidebar submenu indent.
+ *
+ * Two alignments have to hold at once, and both are derived from the parent
+ * row's icon column rather than chosen:
+ *
+ * - the rule sits on the centre of the parent's icon, so it reads as descending
+ *   from that row instead of floating between columns;
+ * - a child's label lands in the same column as its parent's label, so the
+ *   submenu reads as one list rather than a slightly shifted copy of one.
+ *
+ * Picked by hand these land a few pixels out, which is worse than either a
+ * clean alignment or an obvious indent — it just looks like a mistake. Doing
+ * it as arithmetic keeps the two in step if the row metrics ever change.
+ */
+@layer components {
+  .iryx-sidebar-submenu {
+    /* Mirrors the row: `size-4` icon, `gap-3` to the label, `px-2` inset. */
+    --iryx-sidebar-icon: --spacing(4);
+    --iryx-sidebar-gap: --spacing(3);
+    --iryx-sidebar-inset: --spacing(2);
+
+    margin-left: calc(var(--iryx-sidebar-inset) + var(--iryx-sidebar-icon) / 2);
+    /* The child row contributes its own `px-2`, so that comes back off here. */
+    padding-left: calc(
+      var(--iryx-sidebar-icon) / 2 + var(--iryx-sidebar-gap) - 1px -
+        var(--iryx-sidebar-inset)
+    );
   }
 }
 

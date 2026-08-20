@@ -118,6 +118,44 @@ describe('sidebar', () => {
     expect(wrapper.get('a[href="/invoices/drafts"]').text()).toContain('Drafts')
   })
 
+  /*
+   * `data-state` lives on the trigger, not on the icon inside it, so a bare
+   * `data-[state=open]:rotate-90` on the chevron matched nothing and silently
+   * never rotated. It has to read the trigger's `group/link`.
+   *
+   * The transition has to name `rotate` too: Tailwind v4's `rotate-*` sets the
+   * independent `rotate` property, which `transition-transform` does not cover.
+   */
+  it('rotates the group chevron off the trigger group, not its own state', () => {
+    const wrapper = mount(Sidebar, { props: { items } })
+    const trigger = wrapper.findAll('button').find(button => button.text().includes('Invoices'))!
+    expect(trigger.attributes('class')).toContain('group/link')
+
+    const chevron = trigger.findAll('svg').at(-1)!
+    const cls = chevron.attributes('class')!
+    expect(cls).toContain('group-data-[state=open]/link:rotate-90')
+    expect(cls).toContain('transition-[rotate]')
+  })
+
+  /*
+   * The height keyframes animate the element Reka publishes
+   * --reka-collapsible-content-height on, and margin is not part of an animated
+   * height — left on that element it survives the close as a gap under a panel
+   * that is supposedly shut. Hence the bare outer and the spacing on an inner.
+   */
+  it('keeps the animated height box free of the spacing that would outlive it', () => {
+    const wrapper = mount(Sidebar, { props: { items } })
+    const inner = wrapper.get('.iryx-sidebar-submenu')
+    const outer = inner.element.parentElement!
+
+    expect(outer.className).toContain('overflow-hidden')
+    expect(outer.className).toContain('data-[state=open]:animate-collapsible-down')
+    expect(outer.className).toContain('data-[state=closed]:animate-collapsible-up')
+    expect(outer.className).not.toMatch(/\b[mp][tblrxy]?-\d/)
+
+    expect(inner.attributes('class')).toContain('mt-1')
+  })
+
   it('keeps a group closed unless asked', () => {
     const wrapper = mount(Sidebar, {
       props: { items: [{ label: 'Invoices', items: [{ label: 'Drafts', href: '/d' }] }] },

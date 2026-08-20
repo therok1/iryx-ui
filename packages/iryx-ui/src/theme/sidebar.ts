@@ -26,10 +26,22 @@ export const sidebarTheme = tv({
     linkLabel: 'flex-1 truncate text-left',
     /** Count or status at the trailing edge. Hidden when collapsed. */
     linkBadge: 'ml-auto shrink-0',
-    /** Rotates when its group is open. */
-    groupIcon: 'ml-auto size-4 shrink-0 transition-transform duration-200 data-[state=open]:rotate-90',
+    /**
+     * Rotates when its group is open. The state lives on the trigger, not on
+     * the icon, so this reads it through the trigger's `group/link` — a plain
+     * `data-[state=open]:` here matches nothing and silently never rotates.
+     *
+     * Tailwind v4's `rotate-*` sets the independent `rotate` property rather
+     * than `transform`, so `transition-transform` would not tween it either.
+     */
+    groupIcon: 'ml-auto size-4 shrink-0 transition-[rotate] duration-200 ease-out group-data-[state=open]/link:rotate-90',
+    /**
+     * The animated height box. Deliberately bare — see the keyframe comment in
+     * `theme.css` for why margin and padding cannot live here.
+     */
+    groupContent: 'group/collapsible overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down',
     /** Nested links, indented under a rule that traces the parent. */
-    groupContent: 'mt-1 ml-4 flex flex-col gap-1 overflow-hidden border-l border-border pl-2 data-[state=closed]:animate-fade-out data-[state=open]:animate-fade-in',
+    groupInner: 'iryx-sidebar-submenu mt-1 flex flex-col gap-1 border-l border-border group-data-[state=closed]/collapsible:animate-collapsible-content-out group-data-[state=open]/collapsible:animate-collapsible-content-in',
   },
   variants: {
     side: {

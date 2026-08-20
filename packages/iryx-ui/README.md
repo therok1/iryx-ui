@@ -449,6 +449,11 @@ const sections = [
 
 The heading key is `section`, not `label`, because a collapsible group carries `items` too — sharing one key would mean guessing which of the two an entry is, and an icon-less group would quietly render as a heading.
 
+A group animates open by height rather than fading in place, using the measurement Reka publishes as `--reka-collapsible-content-height` — `height: auto` cannot be tweened. The rows lift and fade in on their own, slightly slower curve, so they arrive under their own steam instead of being uncovered by a moving mask. Two consequences worth knowing before restyling it:
+
+- The animated element carries **no margin or padding** — those live on an inner wrapper reached through `ui.groupInner`. Margin is not part of an animated height, so left on the outer it survives the close as a gap under a shut panel.
+- Child rows are indented by arithmetic, not a chosen value: the rule sits on the centre of the parent's icon and a child's label lands in the parent's label column. Hand-picked padding lands a few pixels out, which reads as a mistake rather than as either alignment.
+
 `v-model:collapsed` switches to icons only. It narrows rather than hides, because a sidebar that vanishes costs the reader their place in the hierarchy; on small screens the answer is `IDrawer`, not a narrower sidebar. Labels are `hidden` in that state rather than visually hidden, so they surrender their width and the icons actually centre — every link carries an `aria-label`, so nothing is lost to screen readers.
 
 `IPageHeader` puts the title and the action row on one line from `sm` up and stacks them below it, and `IContainer` is the shared reading measure — `size` from `sm` to `full`, `gutter` for the horizontal padding.
