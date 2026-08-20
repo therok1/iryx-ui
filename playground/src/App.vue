@@ -61,6 +61,21 @@ const marks = ref<string[]>(['Bold'])
 
 const toast = useToast()
 
+const navItems = [
+  { label: 'Overview', href: '#', icon: Home01Icon, active: true },
+  {
+    label: 'Product',
+    items: [
+      { label: 'Invoicing', href: '#', icon: SentIcon, description: 'Send and track invoices.' },
+      { label: 'Inbox', href: '#', icon: InboxIcon, description: 'Everything waiting on you.' },
+      { label: 'Search', href: '#', icon: Search01Icon, description: 'Find anything, fast.' },
+      { label: 'Exports', href: '#', icon: Download01Icon, description: 'CSV and PDF downloads.' },
+    ],
+  },
+  { label: 'Support', items: [{ label: 'Help centre', href: '#', icon: HelpCircleIcon, description: 'Guides and answers.' }], columns: 1 },
+  { label: 'Contact', onSelect: () => toast.info('Contact clicked') },
+]
+
 // Secondary actions for the split button — each does something, rather than
 // changing what the main button says.
 const saveActions: DropdownMenuEntry[] = [
@@ -317,6 +332,16 @@ function simulateLoad() {
           >
             {{ mode }}
           </IButton>
+        </div>
+      </section>
+
+      <section class="space-y-3">
+        <h2 class="font-semibold">
+          Navigation menu
+        </h2>
+        <div class="flex flex-wrap items-start gap-6">
+          <INavigationMenu :items="navItems" :columns="2" label="Main" />
+          <INavigationMenu :items="navItems" orientation="vertical" label="Side" class="w-48" />
         </div>
       </section>
 

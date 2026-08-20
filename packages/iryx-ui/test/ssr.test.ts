@@ -37,6 +37,7 @@ const props: Record<string, Record<string, unknown>> = {
   DropdownMenu: { items: [{ label: 'Rename' }] },
   EmptyState: { title: 'Nothing here' },
   LineChart: { data: [{ label: 'Jan', value: 3 }] },
+  NavigationMenu: { items: [{ label: 'Product', items: [{ label: 'Overview', href: '/overview' }] }] },
   Pagination: { total: 100 },
   Progress: { modelValue: 40, label: 'Uploading' },
   RadioGroup: { items: [{ label: 'A', value: 'a' }] },

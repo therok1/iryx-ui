@@ -334,6 +334,7 @@ app.use(createIryxUi({ unstyled: true }))
 
 | Component | Description |
 | --- | --- |
+| `INavigationMenu` | App nav bar with hover-opened panels sharing one animated viewport, horizontal or vertical |
 | `ITabs` | `solid` or `line` variants with an animated indicator, horizontal or vertical |
 | `IBreadcrumb` | Trail from an `items` array; the last crumb is marked as the current page |
 | `IPagination` | Page list with ellipsis, edge pages and prev/next controls; `align` places it, `size` sets the button scale |
@@ -394,6 +395,35 @@ const items = [
   { label: 'Delete', icon: Trash2, danger: true, onSelect: () => remove() },
 ]
 ```
+
+### Navigation menus
+
+`INavigationMenu` is the app's top-level nav bar. Entries are data, and the same rule `IDropdownMenu` uses decides the shape: an entry with its own `items` becomes a panel trigger, everything else is a plain link.
+
+```vue
+<script setup lang="ts">
+const items = [
+  { label: 'Overview', href: '/', active: true },
+  {
+    label: 'Product',
+    columns: 2,
+    items: [
+      { label: 'Invoicing', href: '/invoicing', icon: FileIcon, description: 'Send and track invoices.' },
+      { label: 'Reporting', href: '/reporting', icon: ChartIcon, description: 'Revenue over time.' },
+    ],
+  },
+  { label: 'Docs', href: 'https://example.com/docs', target: '_blank' },
+]
+</script>
+
+<template>
+  <INavigationMenu :items="items" label="Main" />
+</template>
+```
+
+Every panel shares one viewport, so moving between triggers resizes and slides a single surface rather than swapping popups. `columns` widens a panel's grid — set it on the menu for all panels, or on one entry to override it there.
+
+An entry without `href` renders a `<button>` and calls `onSelect`, which is what a router link wants; `active` marks the current page for both styling and `aria-current`. Set `orientation="vertical"` to stack the entries and open panels to the side, and `disable-hover-trigger` to require a click on touch-first apps.
 
 ### Toasts and confirmations
 
