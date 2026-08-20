@@ -10,6 +10,16 @@ export default defineConfig({
     // pin the dev server to an assigned port. Falls back to Vite's default.
     port: process.env.PORT ? Number(process.env.PORT) : undefined,
   },
+  build: {
+    rollupOptions: {
+      // The app shell owns the viewport, so it gets its own page rather than
+      // living inside the scrolling component playground.
+      input: {
+        main: resolve(__dirname, 'index.html'),
+        shell: resolve(__dirname, 'shell.html'),
+      },
+    },
+  },
   plugins: [vue(), tailwindcss()],
   resolve: {
     alias: {

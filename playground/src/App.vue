@@ -316,6 +316,10 @@ function simulateLoad() {
         <p class="text-muted-foreground">
           Components render below, straight from <code>packages/iryx-ui/src</code>.
         </p>
+        <p class="text-muted-foreground">
+          The app shell owns the viewport, so it has its own page:
+          <a class="underline" href="/shell.html">/shell.html</a>.
+        </p>
       </header>
 
       <section class="space-y-3">

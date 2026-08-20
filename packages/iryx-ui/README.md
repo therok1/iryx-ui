@@ -279,6 +279,10 @@ app.use(createIryxUi({ unstyled: true }))
 | --- | --- |
 | `IApp` | Root wrapper — reactive global config, theme, appearance, RTL/locale |
 | `ICard` | Panel with `outline`/`soft` variants, four paddings, header and footer slots |
+| `IAppShell` | Page frame — header, sidebar, main and footer slots; scrolls the main column or the page |
+| `ISidebar` | App sidebar — sections, collapsible groups, badges, and a collapse-to-icons mode |
+| `IPageHeader` | Page title, description, breadcrumb slot and a right-aligned action row |
+| `IContainer` | Centred max-width wrapper — five widths, four gutters |
 | `ISeparator` | Horizontal or vertical rule, optionally with a centred label |
 
 **Forms**
@@ -395,6 +399,59 @@ const items = [
   { label: 'Delete', icon: Trash2, danger: true, onSelect: () => remove() },
 ]
 ```
+
+### Page layout
+
+`IAppShell` is a frame and nothing more: it owns the scroll and stacking behaviour, and every region is a slot, so the sidebar, top bar and footer stay yours.
+
+```vue
+<template>
+  <IAppShell>
+    <template #header>
+      <header class="flex h-14 items-center border-b border-border px-4">
+        <INavigationMenu :items="nav" />
+      </header>
+    </template>
+
+    <template #sidebar>
+      <ISidebar v-model:collapsed="collapsed" :items="sections" />
+    </template>
+
+    <IContainer class="py-8">
+      <IPageHeader title="Invoices" description="Everything you have sent this year." bordered>
+        <template #actions>
+          <IButton>New invoice</IButton>
+        </template>
+      </IPageHeader>
+    </IContainer>
+  </IAppShell>
+</template>
+```
+
+`scroll` picks between the two layouts, and they are genuinely different rather than cosmetic. The default, `"main"`, pins the shell to the viewport and scrolls only the content column — the header and sidebar never move, which is what a data-heavy app wants. `scroll="page"` scrolls the document instead, with a sticky header and sidebar; that is the one anchor links and the browser's own scroll restoration work with, so content and marketing pages want it. `sidebar-position="right"` flips the columns without touching the slot order.
+
+`ISidebar` takes links, optionally grouped into sections. A section carries its heading under `section`; a link with its own `items` becomes a collapsible group:
+
+```ts
+const sections = [
+  { section: 'Workspace', items: [
+    { label: 'Overview', href: '/', icon: HomeIcon, active: true },
+    { label: 'Inbox', href: '/inbox', icon: InboxIcon, badge: 12 },
+  ] },
+  { section: 'Billing', items: [
+    { label: 'Invoices', icon: FileIcon, defaultOpen: true, items: [
+      { label: 'Drafts', href: '/invoices/drafts' },
+      { label: 'Sent', href: '/invoices/sent' },
+    ] },
+  ] },
+]
+```
+
+The heading key is `section`, not `label`, because a collapsible group carries `items` too — sharing one key would mean guessing which of the two an entry is, and an icon-less group would quietly render as a heading.
+
+`v-model:collapsed` switches to icons only. It narrows rather than hides, because a sidebar that vanishes costs the reader their place in the hierarchy; on small screens the answer is `IDrawer`, not a narrower sidebar. Labels are `hidden` in that state rather than visually hidden, so they surrender their width and the icons actually centre — every link carries an `aria-label`, so nothing is lost to screen readers.
+
+`IPageHeader` puts the title and the action row on one line from `sm` up and stacks them below it, and `IContainer` is the shared reading measure — `size` from `sm` to `full`, `gutter` for the horizontal padding.
 
 ### Navigation menus
 
