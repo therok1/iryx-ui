@@ -7,7 +7,6 @@ import { tv } from 'tailwind-variants'
 export const statTheme = tv({
   slots: {
     root: 'flex flex-col gap-2',
-    /** Small, uppercase and tracked out, so the value carries the weight. */
     label: 'text-xs font-medium tracking-wide text-muted-foreground uppercase',
     value: 'font-semibold tracking-tight text-foreground tabular-nums',
     /*

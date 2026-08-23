@@ -33,7 +33,6 @@ export const fileUploadTheme = tv({
     error: 'text-xs text-danger',
   },
   variants: {
-    /** Held during a drag, so the target is unmistakable while dragging. */
     dragging: {
       true: { dropzone: 'border-primary bg-accent' },
     },

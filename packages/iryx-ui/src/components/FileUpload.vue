@@ -72,7 +72,6 @@ const emit = defineEmits<{
  */
 const model = defineModel<File[]>({ default: () => [] })
 
-// Inherit id / invalid / aria-describedby when inside a FormField.
 const field = useFormField()
 const inputId = computed(() => props.id ?? field?.id.value)
 const isInvalid = computed(() => props.invalid ?? field?.invalid.value ?? false)

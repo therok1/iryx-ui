@@ -76,7 +76,6 @@ const model = defineModel<string | null>({ default: null })
 
 const open = ref(false)
 
-// Inherit id / invalid / aria-describedby when inside a FormField.
 const field = useFormField()
 const triggerId = computed(() => props.id ?? field?.id.value)
 const isInvalid = computed(() => props.invalid ?? field?.invalid.value ?? false)

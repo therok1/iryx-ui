@@ -13,11 +13,8 @@ export const lineChartTheme = tv({
     grid: 'stroke-border',
     tick: 'fill-muted-foreground text-xs [font-variant-numeric:tabular-nums]',
     category: 'fill-muted-foreground text-xs',
-    /** 2px, round join and cap, per the shared line-mark spec. */
     line: 'fill-none stroke-current stroke-2 [stroke-linecap:round] [stroke-linejoin:round]',
-    /** A wash at ~10%, never a saturated block competing with the line. */
     area: 'fill-current stroke-none opacity-10',
-    /** Recessive: it locates the reading, it is not a reading itself. */
     crosshair: 'stroke-border',
     marker: 'fill-current',
     /** Keeps the marker legible where it sits on top of the line. */

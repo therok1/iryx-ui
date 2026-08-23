@@ -86,7 +86,6 @@ const model = defineModel<DateRange>({ default: () => ({ start: null, end: null 
 
 const open = ref(false)
 
-// Inherit id / invalid / aria-describedby when inside a FormField.
 const field = useFormField()
 const triggerId = computed(() => props.id ?? field?.id.value)
 const isInvalid = computed(() => props.invalid ?? field?.invalid.value ?? false)

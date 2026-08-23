@@ -36,8 +36,12 @@ export const datePickerTheme = tv({
      * competing pill over the solid endpoint fill.
      *
      * Selection colour is added by the `range` variant, which differs per mode.
+     *
+     * `tabular-nums`: a proportional `1` is narrower than a `0`, so day numbers
+     * sit off-centre in their pill and the columns of a month no longer line
+     * up vertically — visible as a wobble down the week columns.
      */
-    cellTrigger: 'flex h-8 w-full min-w-8 items-center justify-center rounded-lg text-sm transition-colors outline-none not-data-[selected]:hover:bg-accent not-data-[selected]:hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-primary/50 data-[disabled]:pointer-events-none data-[disabled]:opacity-30 data-[outside-view]:text-muted-foreground/50 data-[today]:font-semibold data-[today]:text-primary data-[unavailable]:pointer-events-none data-[unavailable]:line-through data-[unavailable]:opacity-40',
+    cellTrigger: 'flex h-8 w-full min-w-8 items-center justify-center rounded-lg text-sm tabular-nums transition-colors outline-none not-data-[selected]:hover:bg-accent not-data-[selected]:hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-primary/50 data-[disabled]:pointer-events-none data-[disabled]:opacity-30 data-[outside-view]:text-muted-foreground/50 data-[today]:font-semibold data-[today]:text-primary data-[unavailable]:pointer-events-none data-[unavailable]:line-through data-[unavailable]:opacity-40',
     footer: 'flex items-center justify-between gap-2 pt-3',
     action: 'rounded-lg px-2 py-1 text-sm text-muted-foreground transition-colors outline-none hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-primary/50',
   },

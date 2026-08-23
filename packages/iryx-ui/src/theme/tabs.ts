@@ -16,7 +16,6 @@ export const tabsTheme = tv({
   },
   variants: {
     variant: {
-      /** Pill sliding along a muted track. */
       solid: {
         list: 'rounded-xl bg-muted p-1',
         indicator: 'top-1 h-[calc(100%---spacing(2))] rounded-lg bg-background shadow-sm',

@@ -476,3 +476,112 @@
     transition-duration: 0ms;
   }
 }
+
+
+/*
+ * `ITable`'s refresh indicator — an indeterminate bar running along the rule
+ * between the header and the first row, which is where a table conventionally
+ * reports progress. Shown on every load after the first; the initial load has
+ * no rows yet and uses skeletons instead.
+ *
+ * Plain CSS rather than utilities for the same reason as the drawer's drag
+ * plumbing: it is a keyframed `background-position` on a pseudo-element, and
+ * there is no class name for Tailwind to generate.
+ *
+ * `position: relative` on `<thead>` is what anchors the bar to the header's own
+ * box, so it lands on the divider at any header height and follows the table
+ * when it scrolls sideways.
+ */
+@layer components {
+  .iryx-table-loading {
+    position: relative;
+  }
+
+  .iryx-table-loading::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    /* Sits on the header's 1px bottom rule rather than below it. */
+    bottom: -1px;
+    height: 2px;
+    background-image: linear-gradient(
+      90deg,
+      transparent 0%,
+      var(--iryx-primary) 50%,
+      transparent 100%
+    );
+    background-repeat: no-repeat;
+    background-size: 40% 100%;
+    animation: iryx-table-loading 1.3s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  @keyframes iryx-table-loading {
+    from {
+      background-position: -40% 0;
+    }
+    to {
+      background-position: 140% 0;
+    }
+  }
+
+  /*
+   * `animation: none` is safe here, unlike on the dialog and drawer: nothing
+   * waits on `animationend`, so removing the animation cannot strand a Presence
+   * unmount. A steady rule still reports "busy" without the motion.
+   */
+  @media (prefers-reduced-motion: reduce) {
+    .iryx-table-loading::after {
+      animation: none !important;
+      background-image: none;
+      background-color: color-mix(in oklab, var(--iryx-primary) 50%, transparent);
+    }
+  }
+}
+
+/*
+ * Reduced motion.
+ *
+ * A reader who has asked their OS to reduce motion has asked for it once, for
+ * everything — so this is a blanket rule rather than a per-component prop.
+ * It lives in `theme.css`, which an app opts into by importing, and it takes
+ * effect only under that explicit preference.
+ *
+ * **Near-zero durations, never `animation: none`.** Reka's `Presence` unmounts
+ * a dialog, drawer, popover or toast when its exit animation raises
+ * `animationend`. Remove the animation outright and that event never fires, so
+ * the element stays mounted forever and the overlay can never be closed twice.
+ * `0.01ms` finishes imperceptibly *and* still fires the event.
+ *
+ * `animation-iteration-count: 1` stops an infinite loop from repainting
+ * forever at 0.01ms a cycle. The two loaders that rely on looping are handled
+ * below, because "run once instantly" would park them where their last
+ * keyframe leaves them — which for the indeterminate progress bar is off the
+ * end of its own track.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0s !important;
+    scroll-behavior: auto !important;
+  }
+
+  /*
+   * The indeterminate progress bar travels from -100% to 300%, so running it
+   * once and stopping leaves the indicator outside the track and the component
+   * reads as empty. Parked at the start instead: a short static bar still says
+   * "working, length unknown", which is the whole message.
+   *
+   * Safe to remove outright — unlike the overlays above, nothing is waiting on
+   * `animationend` here.
+   */
+  .iryx-progress-indeterminate {
+    animation: none !important;
+    transform: none !important;
+  }
+}

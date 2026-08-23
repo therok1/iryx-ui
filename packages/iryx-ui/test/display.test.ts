@@ -64,6 +64,34 @@ describe('skeleton', () => {
     expect(mount(Skeleton, { props: { variant: 'circle' } }).attributes('class'))
       .toContain('rounded-full')
   })
+
+  /*
+   * `class` belongs on whichever element is the root — the line itself when
+   * there is one, the wrapper when there are several. It used to land on every
+   * line instead, so a width cap sized each line rather than the stack and the
+   * whole block sat left-aligned inside a wrapper that stayed full width.
+   */
+  it('puts class on the wrapper when there are several lines', () => {
+    const wrapper = mount(Skeleton, { props: { lines: 3, variant: 'text', class: 'max-w-md' } })
+
+    expect(wrapper.attributes('class')).toContain('max-w-md')
+    for (const line of wrapper.findAll('[aria-hidden="true"]'))
+      expect(line.attributes('class')).not.toContain('max-w-md')
+  })
+
+  it('puts class on the line itself when there is only one', () => {
+    expect(mount(Skeleton, { props: { variant: 'rect', class: 'h-24' } }).attributes('class'))
+      .toContain('h-24')
+  })
+
+  it('still gives every stacked line its variant classes', () => {
+    const lines = mount(Skeleton, { props: { lines: 2, variant: 'text' } })
+      .findAll('[aria-hidden="true"]')
+
+    expect(lines).toHaveLength(2)
+    for (const line of lines)
+      expect(line.attributes('class')).toContain('animate-pulse')
+  })
 })
 
 describe('stat', () => {

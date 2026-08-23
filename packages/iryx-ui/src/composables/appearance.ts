@@ -23,7 +23,15 @@ function resolveDark(): boolean {
  */
 function applyWithoutTransitions(dark: boolean): void {
   const style = document.createElement('style')
-  style.textContent = '*,*::before,*::after{transition:none !important;animation:none !important}'
+  /*
+   * Near-zero durations, not `animation: none`. Reka's `Presence` unmounts an
+   * overlay when its exit animation raises `animationend`; with the animation
+   * removed that event never fires, so a dialog closed during the switch stays
+   * mounted forever. The same reasoning as the reduced-motion guard in
+   * theme.css.
+   */
+  style.textContent
+    = '*,*::before,*::after{transition-duration:0s !important;animation-duration:0.01ms !important}'
   document.head.appendChild(style)
 
   document.documentElement.classList.toggle('dark', dark)
@@ -32,7 +40,24 @@ function applyWithoutTransitions(dark: boolean): void {
   // transitions are still suppressed.
   void document.body?.offsetHeight
 
-  requestAnimationFrame(() => style.remove())
+  /*
+   * `requestAnimationFrame` never fires in a background tab, and a switch can
+   * absolutely happen there — a system appearance change fires the media query
+   * listener whether or not anyone is looking. Without the timer the guard
+   * outlives the switch and every transition and animation on the page stays
+   * suppressed until reload; found exactly that way, in a hidden tab, with the
+   * suppressor still sitting in `<head>` minutes later.
+   */
+  let removed = false
+  const remove = (): void => {
+    if (removed)
+      return
+    removed = true
+    style.remove()
+  }
+
+  requestAnimationFrame(remove)
+  setTimeout(remove, 100)
 }
 
 function start(): void {

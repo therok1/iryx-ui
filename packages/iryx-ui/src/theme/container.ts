@@ -1,10 +1,5 @@
 import { tv } from 'tailwind-variants'
 
-/*
- * `mx-auto` plus a max width, nothing more. It exists so that every page in an
- * app agrees on its reading measure without each one re-deciding — the value of
- * the component is the shared default, not the CSS.
- */
 export const containerTheme = tv({
   slots: {
     root: 'mx-auto w-full',
@@ -22,7 +17,6 @@ export const containerTheme = tv({
       /** Full bleed. Still centres and still takes the gutter. */
       full: { root: 'max-w-none' },
     },
-    /** Horizontal gutter. `none` leaves it to you. */
     gutter: {
       none: {},
       sm: { root: 'px-4' },

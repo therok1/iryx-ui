@@ -5,7 +5,6 @@ export const numberInputTheme = tv({
   slots: {
     root: 'relative inline-flex w-full items-stretch',
     input: `flex w-full text-right tabular-nums ${fieldBase}`,
-    /** Stacked +/- controls pinned inside the trailing edge of the field. */
     stepper: 'absolute inset-y-px end-px flex flex-col justify-center overflow-hidden rounded-e-xl border-s border-border',
     step: 'flex flex-1 items-center justify-center px-1.5 text-muted-foreground transition-colors outline-none hover:bg-accent hover:text-accent-foreground focus-visible:bg-accent disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-3',
   },

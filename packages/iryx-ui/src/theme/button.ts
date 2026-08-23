@@ -38,7 +38,6 @@ export const buttonTheme = tv({
       lg: 'h-10 px-5 text-base has-[[data-icon=inline-end]]:pr-4 has-[[data-icon=inline-start]]:pl-4 [&_svg]:size-5',
       xl: 'h-12 px-6 text-base has-[[data-icon=inline-end]]:pr-5 has-[[data-icon=inline-start]]:pl-5 [&_svg]:size-5',
     },
-    /** Icon-only: square, no horizontal padding. */
     square: { true: '', false: '' },
     block: {
       true: 'w-full',

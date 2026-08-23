@@ -43,7 +43,15 @@ const groupId = useId()
 const config = useIryxUiConfig()
 const isUnstyled = computed(() => props.unstyled ?? config.unstyled)
 
-const slots = computed(() => radioGroupTheme({ size: props.size }))
+/*
+ * `orientation` is read here *and* left in the forwarded props: Reka needs it
+ * for arrow-key direction, and the theme needs it for the layout. Destructuring
+ * it out of `rootProps` would fix the look and break the keyboard.
+ */
+const slots = computed(() => radioGroupTheme({
+  size: props.size,
+  orientation: props.orientation ?? 'vertical',
+}))
 
 const rootClass = computed(() =>
   isUnstyled.value

@@ -168,6 +168,18 @@ const theme = computed(() =>
   }),
 )
 
+/**
+ * `class` goes on the root, not on the `<input>`.
+ *
+ * The stepper is positioned against the root and the input is `w-full` inside
+ * it, so a width written on the input left the root at its full width and the
+ * arrows pinned to *that* edge — floating in space beside a narrow field.
+ * Sizing the box that defines the field is the only placement where the two
+ * cannot come apart. `ui.input` still reaches the input itself.
+ *
+ * Note the template keeps a single root element: a leading comment node would
+ * make this a fragment, and Vue then has no root to fall attributes through to.
+ */
 function slotClass(slot: 'root' | 'input' | 'stepper' | 'step', extra?: string) {
   const override = props.ui?.[slot]
   return isUnstyled.value ? [override, extra] : theme.value[slot]({ class: [override, extra] })
@@ -175,7 +187,7 @@ function slotClass(slot: 'root' | 'input' | 'stepper' | 'step', extra?: string) 
 </script>
 
 <template>
-  <div :class="slotClass('root')">
+  <div :class="isUnstyled ? [props.ui?.root, props.class] : theme.root({ class: [props.ui?.root, props.class] })">
     <input
       :id="inputId"
       v-model="display"
@@ -192,7 +204,7 @@ function slotClass(slot: 'root' | 'input' | 'stepper' | 'step', extra?: string) 
       :required="props.required"
       :aria-invalid="isInvalid || undefined"
       :aria-describedby="field?.describedBy.value"
-      :class="isUnstyled ? [props.ui?.input, props.class] : theme.input({ class: [props.ui?.input, props.class] })"
+      :class="slotClass('input')"
       @focus="onFocus"
       @blur="onBlur"
       @keydown.up.prevent="nudge(1)"

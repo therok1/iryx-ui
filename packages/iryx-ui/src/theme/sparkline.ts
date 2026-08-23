@@ -10,9 +10,7 @@ export const sparklineTheme = tv({
     /** Carries the inset that keeps every mark inside the component's box. */
     root: 'block w-full text-primary',
     plot: 'block w-full overflow-visible',
-    /** 2px, round join and cap, per the shared line-mark spec. */
     line: 'fill-none stroke-current stroke-2 [stroke-linecap:round] [stroke-linejoin:round]',
-    /** A wash at ~10%, never a saturated block competing with the line. */
     area: 'fill-current stroke-none opacity-10',
     dot: 'stroke-current [stroke-linecap:round]',
     /** Keeps the end dot legible where it sits on top of the line. */

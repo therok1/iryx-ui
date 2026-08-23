@@ -57,7 +57,6 @@ const model = defineModel<string | number | null>()
 
 const slots = useSlots()
 
-// Inherit id / invalid / aria-describedby when inside a FormField.
 const field = useFormField()
 const inputId = computed(() => props.id ?? field?.id.value)
 const isInvalid = computed(() => props.invalid ?? field?.invalid.value ?? false)

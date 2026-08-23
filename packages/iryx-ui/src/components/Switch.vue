@@ -10,6 +10,7 @@ export interface SwitchProps extends SwitchRootProps {
   label?: string
   /** Secondary text under the label, e.g. what the setting does. */
   description?: string
+  size?: 'sm' | 'md' | 'lg'
   id?: string
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
@@ -47,6 +48,8 @@ const rootProps = computed(() => {
   const {
     label: _label,
     description: _description,
+    // Ours, not Reka's — forwarding it would land `size` on the DOM node.
+    size: _size,
     id: _id,
     unstyled: _unstyled,
     class: _class,
@@ -65,27 +68,27 @@ const hasText = computed(() => Boolean(props.label || props.description))
 const config = useIryxUiConfig()
 const isUnstyled = computed(() => props.unstyled ?? config.unstyled)
 
-const slots = switchTheme()
+const slots = computed(() => switchTheme({ size: props.size, withText: hasText.value }))
 
 const wrapperClass = computed(() =>
-  isUnstyled.value ? props.ui?.wrapper : slots.wrapper({ class: props.ui?.wrapper }),
+  isUnstyled.value ? props.ui?.wrapper : slots.value.wrapper({ class: props.ui?.wrapper }),
 )
 const rootClass = computed(() =>
   isUnstyled.value
     ? [props.ui?.root, props.class]
-    : slots.root({ class: [props.ui?.root, props.class] }),
+    : slots.value.root({ class: [props.ui?.root, props.class] }),
 )
 const thumbClass = computed(() =>
-  isUnstyled.value ? props.ui?.thumb : slots.thumb({ class: props.ui?.thumb }),
+  isUnstyled.value ? props.ui?.thumb : slots.value.thumb({ class: props.ui?.thumb }),
 )
 const contentClass = computed(() =>
-  isUnstyled.value ? props.ui?.content : slots.content({ class: props.ui?.content }),
+  isUnstyled.value ? props.ui?.content : slots.value.content({ class: props.ui?.content }),
 )
 const labelClass = computed(() =>
-  isUnstyled.value ? props.ui?.label : slots.label({ class: props.ui?.label }),
+  isUnstyled.value ? props.ui?.label : slots.value.label({ class: props.ui?.label }),
 )
 const descriptionClass = computed(() =>
-  isUnstyled.value ? props.ui?.description : slots.description({ class: props.ui?.description }),
+  isUnstyled.value ? props.ui?.description : slots.value.description({ class: props.ui?.description }),
 )
 </script>
 

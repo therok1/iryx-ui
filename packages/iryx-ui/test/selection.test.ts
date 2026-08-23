@@ -315,6 +315,24 @@ describe('radioGroup', () => {
     expect(wrapper.text()).toContain('Large')
   })
 
+  /*
+   * `orientation` reaches Reka's roving focus on its own, so the arrow keys
+   * followed it while the layout stayed a single column — the prop looked
+   * implemented and was only half-wired. The layout has to move with it.
+   */
+  it('lays the options out along the orientation', () => {
+    const vertical = mount(RadioGroup, { props: { items: ['a', 'b'] } })
+    expect(vertical.attributes('class')).toContain('grid')
+    expect(vertical.attributes('class')).not.toContain('flex-wrap')
+
+    const horizontal = mount(RadioGroup, { props: { items: ['a', 'b'], orientation: 'horizontal' } })
+    expect(horizontal.attributes('class')).toContain('flex-wrap')
+    expect(horizontal.attributes('class')).not.toContain('grid')
+
+    // Reka still needs it for the keyboard, so it must survive on the root.
+    expect(horizontal.attributes('aria-orientation')).toBe('horizontal')
+  })
+
   // Same reasoning as the checkbox and switch: clicking a radio should ring it.
   it('rings on focus, however focus arrived', () => {
     const classes = mount(RadioGroup, { props: { items: ['a'] } })

@@ -89,4 +89,47 @@ describe('switch', () => {
       expect(control(wrapper).attributes('data-testid')).toBe('toggle')
     },
   )
+
+  /*
+   * Track, thumb and travel are one measurement split across three classes:
+   * the checked offset must equal `track − thumb − 2px` so the thumb rests 2px
+   * inside the far edge exactly as it starts 2px inside the near one. Nothing
+   * else notices when one of the three is changed without the others — the
+   * switch just looks subtly wrong at one size.
+   */
+  it.each([
+    { size: 'sm' as const, track: 'w-7', thumb: 'size-3', travel: 'translate-x-3.5' },
+    { size: 'md' as const, track: 'w-9', thumb: 'size-4', travel: 'translate-x-4.5' },
+    { size: 'lg' as const, track: 'w-11', thumb: 'size-5', travel: 'translate-x-5.5' },
+  ])('sizes the $size track, thumb and travel together', ({ size, track, thumb, travel }) => {
+    const wrapper = mount(Switch, { props: { size } })
+    const root = control(wrapper)
+
+    expect(root.classes()).toContain(track)
+
+    const thumbClasses = wrapper.get('[role="switch"] > *').classes()
+    expect(thumbClasses).toContain(thumb)
+    expect(thumbClasses).toContain(`data-[state=checked]:${travel}`)
+    // The resting inset is shared across sizes.
+    expect(thumbClasses).toContain('data-[state=unchecked]:translate-x-0.5')
+  })
+
+  it('defaults to md and keeps size off the DOM node', () => {
+    const wrapper = mount(Switch, { props: { size: 'lg' } })
+    expect(control(wrapper).attributes('size')).toBeUndefined()
+    expect(control(mount(Switch)).classes()).toContain('w-9')
+  })
+
+  /*
+   * A 16px `sm` track against the label's 20px line box needs the nudge to
+   * centre; `md` already matches it and `lg` is taller, so a nudge there would
+   * push the track below the text instead of centring it.
+   */
+  it('nudges only the sm track down when there is a label', () => {
+    expect(mount(Switch, { props: { size: 'sm', label: 'On' } }).get('[role="switch"]').classes()).toContain('mt-0.5')
+    expect(mount(Switch, { props: { size: 'md', label: 'On' } }).get('[role="switch"]').classes()).not.toContain('mt-0.5')
+    expect(mount(Switch, { props: { size: 'lg', label: 'On' } }).get('[role="switch"]').classes()).not.toContain('mt-0.5')
+    // No label, no line box to centre against.
+    expect(mount(Switch, { props: { size: 'sm' } }).get('[role="switch"]').classes()).not.toContain('mt-0.5')
+  })
 })

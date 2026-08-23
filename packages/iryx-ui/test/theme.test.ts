@@ -3,7 +3,7 @@ import { resolve } from 'node:path'
 import process from 'node:process'
 import { describe, expect, it } from 'vitest'
 import { nextTick } from 'vue'
-import { applyTheme, clearTheme, themes, useAppearance } from '../src'
+import { applyTheme, clearTheme, progressTheme, themes, useAppearance } from '../src'
 
 // Resolved from the package root: under happy-dom `import.meta.url` is an
 // http URL, so it can't be turned into a file path.
@@ -135,7 +135,7 @@ describe('useAppearance', () => {
   it('suppresses transitions while switching, then restores them', async () => {
     const { setAppearance } = useAppearance()
     const suppressing = () => [...document.head.querySelectorAll('style')]
-      .some(s => s.textContent?.includes('transition:none'))
+      .some(s => s.textContent?.includes('transition-duration:0s'))
 
     setAppearance('dark')
     await nextTick()
@@ -161,5 +161,81 @@ describe('useAppearance', () => {
     toggleAppearance()
     await nextTick()
     expect(isDark.value).toBe(true)
+  })
+})
+
+/*
+ * The reduced-motion guard is CSS, so nothing else in the suite would notice
+ * it disappearing — or, worse, being "tidied" into `animation: none`, which
+ * strands every Reka `Presence` that unmounts on `animationend`.
+ */
+describe('reduced motion', () => {
+  const guard = themeCss.slice(themeCss.indexOf('@media (prefers-reduced-motion: reduce)'))
+
+  it('ships a guard at all', () => {
+    expect(themeCss).toContain('@media (prefers-reduced-motion: reduce)')
+  })
+
+  it('shortens animations rather than removing them', () => {
+    expect(guard).toContain('animation-duration: 0.01ms !important')
+    expect(guard).toContain('transition-duration: 0.01ms !important')
+  })
+
+  it('does not disable animation globally, which would strand Presence', () => {
+    const blanket = guard.slice(guard.indexOf('*,'), guard.indexOf('.iryx-progress-indeterminate'))
+    expect(blanket).not.toContain('animation: none')
+  })
+
+  it('parks the indeterminate progress bar instead of running it once', () => {
+    expect(guard).toContain('.iryx-progress-indeterminate')
+    expect(progressTheme({ indeterminate: true }).indicator())
+      .toContain('iryx-progress-indeterminate')
+  })
+
+  it('keeps the table loading bar visible as a steady rule', () => {
+    expect(themeCss).toContain('animation: none !important')
+  })
+})
+
+/*
+ * The switch guard is removed on the next frame — except there is no next
+ * frame in a background tab, and a system appearance change fires there just
+ * the same. Found in the wild: the suppressor still in `<head>` minutes after
+ * the switch, with every transition and animation on the page dead.
+ */
+describe('appearance switch guard', () => {
+  it('removes itself without a frame', async () => {
+    const { setAppearance } = useAppearance()
+    const suppressing = () => [...document.head.querySelectorAll('style')]
+      .some(s => s.textContent?.includes('transition-duration:0s'))
+
+    const raf = window.requestAnimationFrame
+    // A hidden tab: the callback is registered and never invoked.
+    window.requestAnimationFrame = (() => 0) as typeof window.requestAnimationFrame
+
+    try {
+      setAppearance(document.documentElement.classList.contains('dark') ? 'light' : 'dark')
+      await nextTick()
+      expect(suppressing()).toBe(true)
+
+      await new Promise(resolve => setTimeout(resolve, 150))
+      expect(suppressing()).toBe(false)
+    }
+    finally {
+      window.requestAnimationFrame = raf
+    }
+  })
+
+  it('shortens animations rather than removing them, so animationend still fires', async () => {
+    const { setAppearance } = useAppearance()
+    setAppearance(document.documentElement.classList.contains('dark') ? 'light' : 'dark')
+    await nextTick()
+
+    const guard = [...document.head.querySelectorAll('style')]
+      .map(s => s.textContent ?? '')
+      .find(text => text.includes('animation-duration'))
+
+    expect(guard).toBeDefined()
+    expect(guard).not.toContain('animation:none')
   })
 })

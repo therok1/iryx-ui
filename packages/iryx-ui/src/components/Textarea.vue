@@ -34,7 +34,6 @@ const props = withDefaults(defineProps<TextareaProps>(), {
 
 const model = defineModel<string | null>()
 
-// Inherit id / invalid / aria-describedby when inside a FormField.
 const field = useFormField()
 const inputId = computed(() => props.id ?? field?.id.value)
 const isInvalid = computed(() => props.invalid ?? field?.invalid.value ?? false)

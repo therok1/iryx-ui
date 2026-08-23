@@ -1,5 +1,5 @@
 import type { DateValue } from '@internationalized/date'
-import { CalendarDate, DateFormatter, getLocalTimeZone, parseDate, today } from '@internationalized/date'
+import { CalendarDate, DateFormatter, getLocalTimeZone, parseDate, Time, today } from '@internationalized/date'
 
 /**
  * The model is always an ISO `YYYY-MM-DD` **string**, never a `Date`.
@@ -56,5 +56,33 @@ export function formatIsoDate(
   return new DateFormatter(locale ?? 'en-US', options).format(date.toDate(getLocalTimeZone()))
 }
 
-export { CalendarDate }
+/** `HH:mm` or `HH:mm:ss`, on a 24-hour clock. */
+const ISO_TIME = /^(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d)?$/
+
+/**
+ * Parse a `HH:mm` (or `HH:mm:ss`) string, or `undefined` if it is absent or
+ * malformed. Same bargain as {@link toCalendarDate}: bad input means "no
+ * selection" rather than a thrown render.
+ */
+export function toTime(value: string | null | undefined): Time | undefined {
+  if (!value || !ISO_TIME.test(value))
+    return undefined
+  const [hour, minute, second] = value.split(':').map(Number)
+  return new Time(hour, minute, second ?? 0)
+}
+
+/**
+ * Back to `HH:mm`, or `HH:mm:ss` when there are seconds to keep. Padded, so
+ * the result sorts and compares as a string — which is most of the reason to
+ * hold a time as one.
+ */
+export function toIsoTime(time: { hour: number, minute: number, second?: number } | null | undefined): string | null {
+  if (!time)
+    return null
+  const pad = (n: number) => String(n).padStart(2, '0')
+  const base = `${pad(time.hour)}:${pad(time.minute)}`
+  return time.second ? `${base}:${pad(time.second)}` : base
+}
+
+export { CalendarDate, Time }
 export type { DateValue }

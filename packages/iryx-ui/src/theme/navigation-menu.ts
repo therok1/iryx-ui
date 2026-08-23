@@ -32,7 +32,6 @@ export const navigationMenuTheme = tv({
      * top-level entry read as one row. `group` is here for the chevron.
      */
     link: 'group inline-flex cursor-pointer items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium whitespace-nowrap text-muted-foreground no-underline transition-colors outline-none select-none hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-primary/50 data-[active]:text-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[state=open]:bg-accent data-[state=open]:text-accent-foreground [&_svg]:size-4 [&_svg]:shrink-0',
-    /** Pushed to the trailing edge and flipped while the panel is open. */
     triggerIcon: 'transition-transform duration-200 group-data-[state=open]:rotate-180',
     /**
      * Spans the root so the viewport has a stable origin; Reka's -left/-top
@@ -47,7 +46,6 @@ export const navigationMenuTheme = tv({
      * sized by it. `w-max` lets the grid decide its own width.
      */
     content: 'absolute top-0 left-0 grid w-max gap-1 p-2',
-    /** One row inside a panel: label on top, optional description under it. */
     panelLink: 'flex cursor-pointer items-start gap-3 rounded-lg p-2 text-sm no-underline transition-colors outline-none select-none hover:bg-accent hover:text-accent-foreground focus-visible:bg-accent focus-visible:text-accent-foreground data-[active]:bg-accent data-[active]:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0',
     panelLabel: 'block font-medium text-foreground',
     panelDescription: 'mt-0.5 block text-xs leading-snug text-muted-foreground',

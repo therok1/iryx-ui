@@ -74,6 +74,27 @@ describe('stepper', () => {
     expect(wrapper.text()).toContain('Who it is for')
   })
 
+  /*
+   * The separator is a child of its item, so an item is "trigger plus the rule
+   * after it" — and the layout has to reflect that in both directions.
+   *
+   * Vertical left as a row put the rule to the *right* of each step instead of
+   * running down between them; and the last item keeping an equal share of a
+   * horizontal row left a step-wide gap at the end, which read as the whole
+   * stepper being shifted left.
+   */
+  it('lays the item out along the orientation', () => {
+    const horizontal = mount(Stepper, { props: { items } })
+    const hItem = horizontal.findAll('[data-state]')[0]!.attributes('class') ?? ''
+    expect(hItem).toContain('flex-1')
+    expect(hItem).toContain('last:flex-none')
+    expect(hItem).not.toContain('flex-col')
+
+    const vertical = mount(Stepper, { props: { items, orientation: 'vertical' } })
+    const vItem = vertical.findAll('[data-state]')[0]!.attributes('class') ?? ''
+    expect(vItem).toContain('flex-col')
+  })
+
   it('marks the current step as active', () => {
     const wrapper = mount(Stepper, { props: { items, modelValue: 2 } })
     expect(wrapper.find('[data-state="active"]').exists()).toBe(true)

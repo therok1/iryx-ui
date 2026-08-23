@@ -3,9 +3,7 @@ export interface ThemeColors {
   foreground?: string
   primary?: string
   primaryForeground?: string
-  /** Top stop of the solid button's vertical gradient. */
   primaryFrom?: string
-  /** Bottom stop of the solid button's vertical gradient. */
   primaryTo?: string
   accent?: string
   accentForeground?: string

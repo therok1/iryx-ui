@@ -1,19 +1,9 @@
 import { tv } from 'tailwind-variants'
 
 /*
- * Two layouts, because apps genuinely want both and neither can fake the
- * other:
- *
- * - `main` (default) pins the shell to the viewport and scrolls only the
- *   content column. The header and sidebar never move, which is what a data
- *   app wants, and the sidebar needs no sticky positioning at all.
- * - `page` scrolls the document, with a sticky header. Marketing and content
- *   pages want this, and it is the only one that works with anchor links and
- *   the browser's own scroll restoration.
- *
- * `min-h-0` on the body and main is load-bearing in `main` mode: a flex/grid
- * child defaults to `min-height: auto`, so the content column refuses to
- * shrink below its content and the page grows a second scrollbar instead of
+ * `min-h-0` on the body and main is load-bearing in `main` mode: a flex child
+ * defaults to `min-height: auto`, so the content column refuses to shrink
+ * below its content and the page grows a second scrollbar instead of
  * scrolling inside.
  */
 export const appShellTheme = tv({

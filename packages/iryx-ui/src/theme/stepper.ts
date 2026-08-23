@@ -3,7 +3,13 @@ import { tv } from 'tailwind-variants'
 export const stepperTheme = tv({
   slots: {
     root: 'flex w-full',
-    item: 'group relative flex flex-1 items-center gap-3',
+    /*
+     * The separator is a child of the item, so an item is "trigger + the rule
+     * that follows it". The last item has no separator, which is why it must
+     * not also claim an equal share of the row — otherwise the track ends in a
+     * gap the width of a step and the whole stepper reads as shifted left.
+     */
+    item: 'group relative flex flex-1 items-center gap-3 last:flex-none',
     trigger: 'flex items-center gap-3 rounded-xl text-left outline-none focus-visible:ring-2 focus-visible:ring-primary/50 disabled:pointer-events-none disabled:opacity-50',
     /*
      * The numbered circle, filled once the step is active or done.
@@ -22,9 +28,18 @@ export const stepperTheme = tv({
   variants: {
     orientation: {
       horizontal: {},
+      /*
+       * The item has to become a column here. Left as a row it lays the
+       * trigger and the separator out side by side, so the rule appears to the
+       * *right* of each step rather than running down between them.
+       *
+       * `ml-4` is half the 32px indicator, which lines the rule up with the
+       * centre of the circle above it. Change the indicator size and this has
+       * to follow.
+       */
       vertical: {
         root: 'flex-col gap-2',
-        item: 'flex-none items-start',
+        item: 'flex-none flex-col items-stretch gap-2',
         separator: 'ml-4 h-6 w-px flex-none',
       },
     },

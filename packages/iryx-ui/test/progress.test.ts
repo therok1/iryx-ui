@@ -77,3 +77,63 @@ describe('progress', () => {
     expect(wrapper.attributes('class')).toBe('mine')
   })
 })
+
+describe('stacked segments', () => {
+  const segments = [
+    { value: 40, label: 'Documents', variant: 'primary' as const },
+    { value: 25, label: 'Images', variant: 'success' as const },
+    { value: 10, label: 'Other' },
+  ]
+
+  it('renders one run per segment, sized by value', () => {
+    const wrapper = mount(Progress, { props: { segments } })
+    const runs = wrapper.findAll('[role="progressbar"] > div > div')
+    expect(runs).toHaveLength(3)
+    expect(runs[0]!.attributes('style')).toContain('width: 40%')
+    expect(runs[1]!.attributes('style')).toContain('width: 25%')
+  })
+
+  it('reports the sum as the accessible value', () => {
+    const wrapper = mount(Progress, { props: { segments } })
+    expect(wrapper.get('[role="progressbar"]').attributes('aria-valuenow')).toBe('75')
+  })
+
+  /*
+   * Segments come from somewhere else and can sum past `max` — a disk that
+   * grew, a budget overspent. Painting outside the track is never right.
+   */
+  it('clamps runs cumulatively so they cannot overflow the track', () => {
+    const wrapper = mount(Progress, {
+      props: { segments: [{ value: 80 }, { value: 60 }] },
+    })
+    const runs = wrapper.findAll('[role="progressbar"] > div > div')
+    expect(runs[0]!.attributes('style')).toContain('width: 80%')
+    expect(runs[1]!.attributes('style')).toContain('width: 20%')
+    expect(wrapper.get('[role="progressbar"]').attributes('aria-valuenow')).toBe('100')
+  })
+
+  it('is never indeterminate, whatever modelValue says', () => {
+    const wrapper = mount(Progress, { props: { segments, modelValue: null } })
+    expect(wrapper.find('.iryx-progress-indeterminate').exists()).toBe(false)
+    expect(wrapper.get('[role="progressbar"]').attributes('aria-valuenow')).toBe('75')
+  })
+
+  it('lists named runs in a legend, and renders none when unnamed', () => {
+    const named = mount(Progress, { props: { segments } })
+    expect(named.findAll('li')).toHaveLength(3)
+
+    const bare = mount(Progress, { props: { segments: [{ value: 30 }, { value: 20 }] } })
+    expect(bare.findAll('li')).toHaveLength(0)
+  })
+
+  it('formats legend values with formatValue when given', () => {
+    const wrapper = mount(Progress, {
+      props: {
+        segments: [{ value: 40, label: 'Documents' }],
+        max: 200,
+        formatValue: (value: number) => `${value} GB`,
+      },
+    })
+    expect(wrapper.get('li').text()).toContain('40 GB')
+  })
+})

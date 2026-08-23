@@ -40,7 +40,6 @@ export const sidebarTheme = tv({
      * `theme.css` for why margin and padding cannot live here.
      */
     groupContent: 'group/collapsible overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down',
-    /** Nested links, indented under a rule that traces the parent. */
     groupInner: 'iryx-sidebar-submenu mt-1 flex flex-col gap-1 border-l border-border group-data-[state=closed]/collapsible:animate-collapsible-content-out group-data-[state=open]/collapsible:animate-collapsible-content-in',
   },
   variants: {

@@ -220,6 +220,22 @@ describe('numberInput', () => {
 
   it('drops built-in classes when unstyled', () => {
     const wrapper = mount(NumberInput, { props: { unstyled: true, class: 'mine' } })
-    expect(wrapper.get('input').attributes('class')).toBe('mine')
+    expect(wrapper.element.getAttribute('class')).toBe('mine')
+  })
+
+  /*
+   * The stepper is positioned against the root and the input fills it, so a
+   * width written on the input left the root full-width and the arrows pinned
+   * to that edge, floating beside a narrow field.
+   */
+  it('puts class on the root, which is what the stepper is positioned against', () => {
+    const wrapper = mount(NumberInput, { props: { stepper: true, class: 'w-32' } })
+    expect(wrapper.element.getAttribute('class')).toContain('w-32')
+    expect(wrapper.get('input').attributes('class')).not.toContain('w-32')
+  })
+
+  it('still reaches the input through ui.input', () => {
+    const wrapper = mount(NumberInput, { props: { ui: { input: 'font-bold' } } })
+    expect(wrapper.get('input').attributes('class')).toContain('font-bold')
   })
 })
