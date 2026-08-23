@@ -1,0 +1,26 @@
+{
+  "name": "Iryx UI",
+  "short_name": "Iryx UI",
+  "description": "A Vue 3 component library built on Reka UI and Tailwind CSS v4.",
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "theme_color": "#9060fb",
+  "background_color": "#9060fb",
+  "display": "standalone",
+  "start_url": "/"
+}
