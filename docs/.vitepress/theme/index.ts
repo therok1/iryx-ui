@@ -1,6 +1,7 @@
 import type { Theme } from 'vitepress'
 import { createIryxUi } from 'iryx-ui'
 import Demo from './components/Demo.vue'
+import InstallCommand from './components/InstallCommand.vue'
 import Layout from './Layout.vue'
 import './style.css'
 
@@ -17,5 +18,6 @@ export default {
     // way a consumer does.
     app.use(createIryxUi())
     app.component('Demo', Demo)
+    app.component('InstallCommand', InstallCommand)
   },
 } satisfies Theme

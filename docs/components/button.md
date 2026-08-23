@@ -1,8 +1,12 @@
+---
+eyebrow: Actions
+---
+
 <script setup lang="ts">
 import { withBase } from 'vitepress'
 </script>
 
-# Button
+# IButton
 
 The standard action control. Four variants, five sizes, and polymorphic — it can render as an anchor, a router link, or anything else.
 
@@ -67,6 +71,17 @@ The standard action control. Four variants, five sizes, and polymorphic — it c
 <Demo stack>
 <template #demo>
 <IButton block>Continue</IButton>
+<div class="flex justify-center gap-2">
+<IButton square aria-label="Settings">
+<svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z" /></svg>
+</IButton>
+<IButton square variant="outline" aria-label="Delete">
+<svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" /></svg>
+</IButton>
+<IButton square variant="ghost" aria-label="More">
+<svg class="size-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.6" /><circle cx="12" cy="12" r="1.6" /><circle cx="19" cy="12" r="1.6" /></svg>
+</IButton>
+</div>
 </template>
 
 ```vue
@@ -75,8 +90,16 @@ The standard action control. Four variants, five sizes, and polymorphic — it c
 <IButton square aria-label="Settings">
   <SettingsIcon />
 </IButton>
+<IButton square variant="outline" aria-label="Delete">
+  <DeleteIcon />
+</IButton>
+<IButton square variant="ghost" aria-label="More">
+  <MoreIcon />
+</IButton>
 ```
 </Demo>
+
+`aria-label` is the only thing naming a `square` button, so give every one of them a label.
 
 ## Polymorphic
 
@@ -100,7 +123,7 @@ The standard action control. Four variants, five sizes, and polymorphic — it c
 
 ## Overriding styles
 
-`class` is merged rather than concatenated, so a conflicting utility wins instead of fighting:
+`class` is merged with the built-in classes, so a conflicting utility replaces the built-in one rather than sitting beside it:
 
 <Demo>
 <template #demo>
@@ -109,9 +132,8 @@ The standard action control. Four variants, five sizes, and polymorphic — it c
 </template>
 
 ```vue
-<IButton class="rounded-full">
-  Pill button
-</IButton>
+<IButton class="rounded-full">Pill button</IButton>
+<IButton variant="outline" class="border-dashed">Dashed</IButton>
 ```
 </Demo>
 
@@ -133,4 +155,16 @@ The standard action control. Four variants, five sizes, and polymorphic — it c
 
 `size` is inherited from an enclosing `IButtonGroup` when it isn't set explicitly.
 
-For an icon *beside* a label rather than alone, mark the icon with `data-icon="inline-start"` or `data-icon="inline-end"` — the padding then tightens on that side, instead of using `square`.
+For an icon beside a label, mark it with `data-icon` and the padding tightens on that side:
+
+```vue
+<IButton>
+  <SendIcon data-icon="inline-start" />
+  Send invoice
+</IButton>
+
+<IButton variant="outline">
+  Next
+  <ArrowRightIcon data-icon="inline-end" />
+</IButton>
+```

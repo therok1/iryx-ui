@@ -1,3 +1,7 @@
+---
+eyebrow: Guide
+---
+
 <script setup lang="ts">
 import { useAppearance } from 'iryx-ui'
 
@@ -6,7 +10,7 @@ const { toggleAppearance } = useAppearance()
 
 # Theming
 
-Every colour, radius and font in the library resolves to a CSS variable under the `--iryx-` prefix. There is no plugin, no config file and no build step involved — changing a token at runtime restyles the app immediately.
+Every colour, radius and font in the library resolves to a CSS variable under the `--iryx-` prefix. Change one at runtime and the app restyles immediately.
 
 ## Presets
 
@@ -69,7 +73,7 @@ const { isDark, appearance, setAppearance, toggleAppearance } = useAppearance()
 
 The class is applied with transitions suppressed for one frame. Without that, the light and dark border tokens — opaque grey against white at 10% alpha — interpolate through a near-white translucent border, which reads as a flash around every bordered element on the page.
 
-If you server-render, set the class before first paint or dark-mode readers get a white flash on every navigation. These docs do it with a small inline script that reads the same storage key:
+If you server-render, set the class before first paint — otherwise anyone on the dark theme gets a white flash on every navigation. These docs do it with a small inline script that reads the same storage key:
 
 ```ts
 head: [
@@ -122,3 +126,18 @@ This is deliberate. A saturated surface shouts before it is read, and several of
 ```ts
 app.use(createIryxUi({ unstyled: true }))
 ```
+
+## Motion
+
+Every animation and transition in the library shortens to almost nothing when the reader's system asks for reduced motion. The guard ships in `theme.css`, so importing it is the whole setup: the preference is set once, for everything.
+
+```css
+@import "tailwindcss";
+@import "iryx-ui/theme.css"; /* the guard comes with it */
+```
+
+Shortened rather than removed, and the difference matters. Reka unmounts a dialog, drawer, popover or toast when its exit animation raises `animationend`; with `animation: none` that event never fires, so the overlay stays mounted forever with nothing on screen to close. A `0.01ms` duration finishes imperceptibly and still fires the event.
+
+The two looping indicators are handled separately, because "run once, instantly" leaves an animation wherever its last keyframe lands. The indeterminate [`IProgress`](/components/progress) bar travels past the end of its own track, so it is parked at the start instead; [`ITable`](/components/table)'s loading bar becomes a steady rule. Both still read as busy without moving.
+
+If you animate your own components, the same rule is worth following — shorten, don't remove, anything an unmount is waiting on.

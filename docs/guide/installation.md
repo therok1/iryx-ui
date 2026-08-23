@@ -1,10 +1,12 @@
+---
+eyebrow: Guide
+---
+
 # Installation
 
-```bash
-pnpm add iryx-ui
-```
+<InstallCommand />
 
-Tailwind CSS v4 is required. The library ships no CSS bundle — `theme.css` declares the tokens and points Tailwind at the package so your build generates only the utilities you actually use.
+Tailwind CSS v4 is required. Importing `theme.css` alongside it brings in the tokens and points Tailwind's scanner at the package.
 
 ## Vue 3 with Vite
 
@@ -31,7 +33,7 @@ import { createIryxUi } from 'iryx-ui'
 app.use(createIryxUi({ prefix: 'Ui', appearance: 'system', theme: 'violet' }))
 ```
 
-Prefer importing components directly if you'd rather not register 42 of them globally — the build is per-module, so only what you import is bundled:
+If you prefer local imports, import components directly instead. The build is per-module, so only what you import is bundled:
 
 ```vue
 <script setup lang="ts">
@@ -70,32 +72,23 @@ export default defineNuxtConfig({
 
 ## First component
 
-```vue
-<template>
-  <IButton variant="outline" size="lg">
-    Click me
-  </IButton>
-  <ISwitch v-model="enabled" />
-</template>
-```
-
-<Demo title="The above, rendered">
+<Demo>
 <template #demo>
 <IButton variant="outline" size="lg">Click me</IButton>
-<ISwitch />
+<ISwitch label="Send reminders" />
 </template>
 
 ```vue
 <IButton variant="outline" size="lg">
   Click me
 </IButton>
-<ISwitch v-model="enabled" />
+<ISwitch v-model="enabled" label="Send reminders" />
 ```
 </Demo>
 
 ## Typeface
 
-The library ships no webfont — that would put font files, a licence and a network request into every consumer's bundle. It reads `--iryx-font-sans` instead, which defaults to the system stack:
+Typography follows the `--iryx-font-sans` token, which defaults to the system stack. Load any family you like and point the token at it:
 
 ```css
 :root {

@@ -2,30 +2,35 @@
 import { ref } from 'vue'
 
 defineProps<{
-  /** Sits above the preview when the example needs a word of setup. */
   title?: string
-  /** Lay the preview out as a column rather than a wrapping row. */
+  /** Lays the preview out as a column rather than a wrapping row. */
   stack?: boolean
 }>()
 
-/**
- * The source is the page's own fenced code block, passed as the default slot,
- * so the code shown is markdown the author wrote rather than a stringified
- * render — there is no way for the two to drift apart *silently*, which is
- * what every "extract the source automatically" approach ends up doing.
- */
+// The code shown is the page's own fenced block, passed as the default slot.
 const open = ref(false)
 </script>
 
 <template>
-  <figure class="not-prose my-6 overflow-hidden rounded-xl border border-border">
-    <figcaption v-if="title" class="border-b border-border bg-muted/40 px-4 py-2 text-xs text-muted-foreground">
+  <figure class="not-prose my-7 overflow-hidden rounded-xl border border-border">
+    <figcaption v-if="title" class="border-b border-border px-4 py-2 font-mono text-xs tracking-[0.12em] text-muted-foreground uppercase">
       {{ title }}
     </figcaption>
 
+    <!--
+      The specimen stage. A faint dot grid rather than a flat fill: it reads as
+      a surface the component is set *on*, which is what stops a bordered
+      component from looking like a second card inside a card.
+    -->
+    <!--
+      Centred on both axes, stacked or not. A stacked demo centres its children
+      rather than stretching them, so a narrow control sits in the middle of the
+      canvas instead of pinned to the left edge; anything that should span the
+      stage says so with `w-full`.
+    -->
     <div
-      class="flex gap-3 p-6"
-      :class="stack ? 'flex-col items-stretch' : 'flex-wrap items-center'"
+      class="demo-stage flex justify-center gap-3 px-6 py-10"
+      :class="stack ? 'flex-col items-center' : 'flex-wrap items-center'"
     >
       <slot name="demo" />
     </div>
@@ -63,6 +68,18 @@ const open = ref(false)
 </template>
 
 <style>
+/*
+ * Dot grid, drawn from the token so it follows the theme. Note `--iryx-border`
+ * and not `--color-border`: theme.css declares the Tailwind bridge as
+ * `@theme inline`, which substitutes values at build time instead of emitting
+ * `--color-*` custom properties, so the Tailwind name does not exist at runtime
+ * and this would silently paint nothing.
+ */
+.demo-stage {
+  background-image: radial-gradient(circle at 1px 1px, var(--iryx-border) 1px, transparent 0);
+  background-size: 16px 16px;
+}
+
 .demo-source div[class*="language-"] {
   border: 0;
   border-radius: 0;

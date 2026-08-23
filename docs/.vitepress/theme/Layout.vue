@@ -1,14 +1,52 @@
 <script setup lang="ts">
-import { Content, useData, useRoute, withBase } from 'vitepress'
-import { computed, ref, watch } from 'vue'
+import { Content, useData, useRoute, useRouter, withBase } from 'vitepress'
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import AppearanceToggle from './components/AppearanceToggle.vue'
 import SidebarNav from './components/SidebarNav.vue'
 
 const { frontmatter, theme, site } = useData()
 const route = useRoute()
 
-/** `layout: home` opts a page out of the sidebar and the content column. */
 const isHome = computed(() => frontmatter.value.layout === 'home')
+
+const router = useRouter()
+
+/*
+ * VitePress scrolls one tick after the route changes, before this theme's
+ * async page component has rendered the heading — hence `route.component`,
+ * which is assigned when the module resolves. `hashchange` catches the rest:
+ * anchors on the page already open, and back or forward between two hashes.
+ */
+function scrollToHash() {
+  if (!location.hash)
+    return
+
+  nextTick(() => {
+    document.getElementById(decodeURIComponent(location.hash).slice(1))?.scrollIntoView({ block: 'start' })
+  })
+}
+
+watch(() => route.component, scrollToHash)
+
+onMounted(() => window.addEventListener('hashchange', scrollToHash))
+onUnmounted(() => window.removeEventListener('hashchange', scrollToHash))
+
+// Titles only, sourced from the sidebar so there is no second index to keep in step.
+const searchOpen = ref(false)
+
+const searchItems = computed(() =>
+  (theme.value.sidebar ?? []).map((section: any) => ({
+    label: section.title,
+    items: section.items.map((item: any) => ({
+      label: item.text,
+      href: withBase(item.link),
+      // The component name is what a reader knows: someone hunting ISwitch
+      // types "iswitch", not "switch".
+      keywords: [`I${item.text.replace(/\s+/g, '')}`, section.title],
+      onSelect: () => router.go(withBase(item.link)),
+    })),
+  })),
+)
 
 const mobileNavOpen = ref(false)
 watch(() => route.path, () => {
@@ -17,7 +55,17 @@ watch(() => route.path, () => {
 </script>
 
 <template>
-  <IApp class="min-h-dvh bg-background text-foreground">
+  <!--
+    A column, so the footer can be pushed to the bottom of the viewport: on a
+    short page it otherwise sat directly under the content with the rest of the
+    screen left blank beneath it.
+
+    `as="div"` is load-bearing. `IApp` renders `as="template"` by default —
+    no element at all — so a `class` on it falls through to whatever the first
+    child happens to be, which here was the visually-hidden skip link. Every
+    layout class written here was silently landing on that anchor.
+  -->
+  <IApp as="div" class="flex min-h-dvh flex-col bg-background text-foreground">
     <a
       href="#content"
       class="sr-only rounded-lg bg-background px-4 py-2 text-sm font-medium ring-2 ring-primary focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-50"
@@ -25,37 +73,59 @@ watch(() => route.path, () => {
       Skip to content
     </a>
 
-    <header class="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur">
-      <div class="mx-auto flex h-14 max-w-[90rem] items-center gap-3 px-4 sm:px-6">
+    <!--
+      The masthead of a specimen book, not an app bar: a hairline rule, no
+      filled surface, no shadow. The apparatus stays small so the components
+      below are the largest thing on the page.
+    -->
+    <header class="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur">
+      <div class="mx-auto flex h-16 max-w-[90rem] items-center gap-6 px-5 sm:px-8">
         <button
           type="button"
-          class="grid size-9 shrink-0 place-items-center rounded-lg text-muted-foreground transition-colors outline-none hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-primary/50 lg:hidden"
+          class="-ml-2 grid size-9 shrink-0 place-items-center rounded-lg text-muted-foreground transition-colors outline-none hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-primary/50 lg:hidden"
           aria-label="Open navigation"
           @click="mobileNavOpen = true"
         >
-          <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true">
+          <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
             <path d="M4 7h16M4 12h16M4 17h16" />
           </svg>
         </button>
 
-        <a :href="withBase('/')" class="flex items-center gap-2 font-semibold tracking-tight">
-          <span
-            class="grid size-6 place-items-center rounded-md bg-primary text-[0.7rem] font-bold text-primary-foreground"
-            aria-hidden="true"
-          >I</span>
+        <a
+          :href="withBase('/')"
+          class="flex items-center gap-2.5 text-[1.0625rem] font-semibold tracking-[-0.03em] transition-opacity hover:opacity-70"
+        >
+          <img :src="withBase('/logo.svg')" alt="" class="h-4 w-auto">
           {{ site.title }}
         </a>
 
-        <nav class="ml-4 hidden items-center gap-1 text-sm sm:flex" aria-label="Main">
+        <nav class="hidden items-center gap-5 sm:flex" aria-label="Main">
           <a
             v-for="item in theme.nav"
             :key="item.link"
             :href="withBase(item.link)"
-            class="rounded-md px-2.5 py-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+            class="text-xs font-medium tracking-[0.12em] text-muted-foreground uppercase transition-colors hover:text-foreground"
           >{{ item.text }}</a>
         </nav>
 
         <div class="ml-auto flex items-center gap-1">
+          <span class="mr-2 hidden font-mono text-xs tracking-[0.06em] text-muted-foreground sm:inline">
+            v{{ theme.version }}
+          </span>
+          <button
+            type="button"
+            class="mr-1 hidden items-center gap-2 rounded-lg border border-border px-2.5 py-1.5 text-xs text-muted-foreground transition-colors outline-none hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-primary/50 sm:flex"
+            @click="searchOpen = true"
+          >
+            <svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+              <circle cx="11" cy="11" r="7" />
+              <path d="m20 20-3.5-3.5" />
+            </svg>
+            Search
+            <!-- `mod`, not a hard-coded ⌘: most readers here are not on a Mac. -->
+            <IKbd keys="mod+k" size="xs" />
+          </button>
+
           <AppearanceToggle />
           <a
             :href="theme.repo"
@@ -78,29 +148,70 @@ watch(() => route.path, () => {
       <SidebarNav />
     </IDrawer>
 
-    <div v-if="isHome" id="content">
+    <!--
+      `overflow-x-clip` belongs here, on the full-width wrapper, and nowhere
+      higher: the hero's grid is a 100vw child of a centred column, so it
+      overhangs the viewport by a scrollbar's width. Clipping on `html` or
+      `body` also works — and breaks `position: sticky` for every descendant,
+      which silently killed the sticky header site-wide.
+    -->
+    <div v-if="isHome" id="content" class="flex-1 overflow-x-clip">
       <Content />
     </div>
 
-    <div v-else class="mx-auto flex max-w-[90rem] gap-10 px-4 sm:px-6">
-      <aside class="hidden w-56 shrink-0 lg:block">
-        <div class="sticky top-14 max-h-[calc(100dvh-3.5rem)] overflow-y-auto py-8 pr-2">
+    <!--
+      Inner pages: a margin index rather than a sidebar. It sits in the gutter
+      at the same optical weight as a running head, so the specimen sheet keeps
+      the page.
+    -->
+    <div v-else class="mx-auto flex w-full max-w-[90rem] flex-1 gap-12 px-5 sm:px-8">
+      <aside class="hidden w-52 shrink-0 lg:block">
+        <!-- The library's own fade, so the index shows when it has more to scroll. -->
+        <IScrollFade size="3rem" class="sticky top-16 max-h-[calc(100dvh-4rem)] py-12 pr-2">
           <SidebarNav />
-        </div>
+        </IScrollFade>
       </aside>
 
-      <main id="content" class="prose min-w-0 flex-1 py-10 lg:max-w-3xl">
+      <main id="content" class="prose min-w-0 flex-1 py-14 lg:max-w-[46rem]">
+        <!--
+          The running head of a specimen sheet. It has to live outside
+          `<Content>` because markdown always emits the `h1` first, and this
+          sits above it.
+        -->
+        <p
+          v-if="frontmatter.eyebrow"
+          class="font-mono text-xs tracking-[0.14em] text-muted-foreground uppercase"
+        >
+          {{ frontmatter.eyebrow }}
+        </p>
         <Content />
       </main>
     </div>
 
-    <footer class="mt-16 border-t border-border">
-      <div class="mx-auto flex max-w-[90rem] flex-wrap items-center justify-between gap-2 px-4 py-6 text-sm text-muted-foreground sm:px-6">
-        <span>Released under the MIT License.</span>
-        <a :href="theme.repo" target="_blank" rel="noreferrer" class="hover:text-foreground">
+    <footer class="border-t border-border">
+      <div class="mx-auto flex max-w-[90rem] flex-wrap items-center justify-between gap-3 px-5 py-8 font-mono text-xs tracking-[0.06em] text-muted-foreground sm:px-8">
+        <span>MIT · {{ theme.componentCount }} components · v{{ theme.version }}</span>
+        <a :href="theme.repo" target="_blank" rel="noreferrer" class="transition-colors hover:text-foreground">
           github.com/therok1/iryx-ui
         </a>
       </div>
     </footer>
+
+    <!--
+      The hosts for `useToast()` and `useConfirm()`, mounted once for the whole
+      site exactly as a consuming app mounts them. Without these the demos on
+      the toast and confirm pages call into a store nothing is rendering, and
+      nothing appears.
+    -->
+    <ICommandPalette
+      v-model:open="searchOpen"
+      :items="searchItems"
+      placeholder="Search the documentation…"
+      empty-text="Nothing here by that name."
+      label="Search"
+    />
+
+    <IToaster />
+    <IConfirmDialog />
   </IApp>
 </template>

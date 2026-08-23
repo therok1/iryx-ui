@@ -1,3 +1,7 @@
+---
+eyebrow: Forms
+---
+
 <script setup lang="ts">
 import { ref } from 'vue'
 
@@ -5,7 +9,7 @@ const value = ref('')
 const debounced = ref('')
 </script>
 
-# Input
+# IInput
 
 A text field with three sizes, an `invalid` state, affix slots, and optional clearing, loading and debouncing.
 
@@ -15,7 +19,7 @@ A text field with three sizes, an `invalid` state, affix slots, and optional cle
 </template>
 
 ```vue
-<IInput v-model="value" placeholder="Reference or name" />
+<IInput v-model="value" placeholder="Reference or name" aria-label="Search" />
 ```
 </Demo>
 
@@ -29,15 +33,15 @@ A text field with three sizes, an `invalid` state, affix slots, and optional cle
 </template>
 
 ```vue
-<IInput size="sm" placeholder="Small" />
-<IInput size="md" placeholder="Medium" />
-<IInput size="lg" placeholder="Large" />
+<IInput size="sm" placeholder="Small" aria-label="Small" />
+<IInput size="md" placeholder="Medium" aria-label="Medium" />
+<IInput size="lg" placeholder="Large" aria-label="Large" />
 ```
 </Demo>
 
 ## Affixes
 
-The `leading` and `trailing` slots take real space in the field rather than sitting on top of it, so a long value is never hidden underneath an icon.
+The `leading` and `trailing` slots take real space in the field rather than sitting on top of it, so a long value is never hidden under an icon.
 
 <Demo stack>
 <template #demo>
@@ -48,12 +52,12 @@ The `leading` and `trailing` slots take real space in the field rather than sitt
 </template>
 
 ```vue
-<IInput placeholder="0.00">
+<IInput placeholder="0.00" aria-label="Amount">
   <template #leading>
-    €
+    <span class="text-muted-foreground">€</span>
   </template>
   <template #trailing>
-    EUR
+    <span class="text-sm text-muted-foreground">EUR</span>
   </template>
 </IInput>
 ```
@@ -61,7 +65,7 @@ The `leading` and `trailing` slots take real space in the field rather than sitt
 
 ## Clearable and loading
 
-`clearable` adds a clear button whenever the field is non-empty. `loading` shows a spinner in the trailing area — it does **not** disable the field, since a search that is still resolving should stay typeable.
+`clearable` adds a clear button whenever the field is non-empty. `loading` shows a spinner in the trailing area and leaves the field typeable.
 
 <Demo stack>
 <template #demo>
@@ -70,14 +74,14 @@ The `leading` and `trailing` slots take real space in the field rather than sitt
 </template>
 
 ```vue
-<IInput v-model="value" clearable />
-<IInput loading />
+<IInput v-model="value" clearable placeholder="Type something, then clear it" aria-label="Clearable" />
+<IInput loading placeholder="Searching…" aria-label="Loading" />
 ```
 </Demo>
 
 ## Debounce
 
-`debounce` delays the *model* update, never the displayed text — typing always feels immediate. Blur and Enter flush a pending update, so a submit can't read a stale value, and an external write cancels whatever is queued.
+`debounce` delays the model update, never the displayed text. Blur and Enter flush a pending update, and an external write cancels whatever is queued.
 
 <Demo stack>
 <template #demo>
@@ -86,7 +90,7 @@ The `leading` and `trailing` slots take real space in the field rather than sitt
 </template>
 
 ```vue
-<IInput v-model="query" :debounce="500" />
+<IInput v-model="query" :debounce="500" placeholder="Model updates 500ms after you stop" aria-label="Debounced" />
 ```
 </Demo>
 
@@ -98,18 +102,24 @@ The `leading` and `trailing` slots take real space in the field rather than sitt
 </template>
 
 ```vue
-<IInput v-model="email" invalid />
+<IInput v-model="email" invalid aria-label="Invalid example" />
+<!-- Inside an IFormField this is set for you. -->
 ```
 </Demo>
 
-Inside an `IFormField`, `invalid` is inferred from the field's own state — you rarely set it by hand.
+Inside an [`IFormField`](/components/form-field), `invalid` is inferred from the field's own state.
 
 ## Props
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
 | `modelValue` | `string` | `''` | `v-model` |
+| `type` | `string` | `'text'` | Any native input type |
 | `size` | `'sm' \| 'md' \| 'lg'` | `'md'` | Control scale |
+| `placeholder` | `string` | — | |
+| `disabled` | `boolean` | `false` | |
+| `required` | `boolean` | `false` | |
+| `id` | `string` | generated | Useful when an external `ILabel` targets it |
 | `invalid` | `boolean` | inherited | Error styling; inferred inside `IFormField` |
 | `clearable` | `boolean` | `false` | Clear button while non-empty |
 | `loading` | `boolean` | `false` | Trailing spinner. Does not disable the field |
@@ -119,6 +129,6 @@ Inside an `IFormField`, `invalid` is inferred from the field's own state — you
 | `class` | `string` | — | Lands on the **wrapper**, which carries the field chrome |
 | `ui` | `object` | — | `root`, `input`, `leading`, `trailing`, `clear` |
 
-The chrome lives on a wrapper element rather than the `<input>`, which is what lets affixes take real space. `class` therefore targets the wrapper; reach the input itself with `ui.input`.
+The field chrome lives on a wrapper element rather than the `<input>`, so `class` targets the wrapper; reach the input itself with `ui.input`.
 
-Stray attributes — `name`, `autocomplete`, `maxlength`, `aria-label` — are forwarded to the `<input>`. `ref` exposes the element as `.input` for focus management.
+Attributes such as `name`, `autocomplete`, `maxlength` and `aria-label` are forwarded to the `<input>`, and `ref` exposes the element as `.input` for focus management.

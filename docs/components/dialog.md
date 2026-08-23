@@ -1,3 +1,7 @@
+---
+eyebrow: Overlays
+---
+
 <script setup lang="ts">
 import { ref } from 'vue'
 
@@ -5,7 +9,7 @@ const open = ref(false)
 const blocking = ref(false)
 </script>
 
-# Dialog
+# IDialog
 
 A modal, with header, body and footer slots. It portals to the body, traps focus, and closes on Escape or an overlay click unless you say otherwise.
 
@@ -27,11 +31,15 @@ const open = ref(false)
 </script>
 
 <template>
-  <IButton @click="open = true">
+  <IButton variant="outline" @click="open = true">
     Open dialog
   </IButton>
 
-  <IDialog v-model:open="open" title="Edit invoice" description="Change the details.">
+  <IDialog
+    v-model:open="open"
+    title="Edit invoice"
+    description="Escape, the overlay and the corner button all close this."
+  >
     <p>Body content goes in the default slot.</p>
 
     <template #footer="{ close }">
@@ -51,9 +59,7 @@ The `footer` slot receives `close`, so the common case needs no state handling o
 
 ## Forcing a choice
 
-`dismissible: false` refuses Escape and the overlay. Pair it with `showClose: false` when the point is that one of the buttons must be chosen.
-
-The guard sits on the state change rather than on the individual events, so a dismissal route added upstream is refused by default rather than silently working.
+`:dismissible="false"` refuses Escape and the overlay. Pair it with `:show-close="false"` when one of the buttons has to be chosen.
 
 <Demo>
 <template #demo>
@@ -69,12 +75,13 @@ The guard sits on the state change rather than on the individual events, so a di
 <IDialog
   v-model:open="open"
   title="Make a choice"
+  description="Escape and the overlay won't close this one."
   :dismissible="false"
   :show-close="false"
   size="sm"
 >
   <template #footer="{ close }">
-    <IButton @click="close()">
+    <IButton variant="outline" @click="close()">
       Got it
     </IButton>
   </template>
@@ -84,15 +91,15 @@ The guard sits on the state change rather than on the individual events, so a di
 
 ## Sizes
 
-`sm`, `md` (default), `lg` and `xl` cap the width from the `sm` breakpoint up. Below it the dialog is always full-width minus a margin, so a phone is never given a squeezed column.
+`sm`, `md` (default), `lg` and `xl` cap the width from the `sm` breakpoint up. Below it the dialog is full-width minus a margin.
 
 ## Scrolling
 
-The body scrolls on its own, so the header and footer stay put on a short screen. It also carries a little padding and a matching negative margin, so a focus ring on a control inside isn't clipped by the scroll container.
+The body scrolls on its own, so the header and footer stay put on a short screen.
 
 ## Confirmations
 
-For a yes/no question, `useConfirm()` is less ceremony than a dialog you have to wire up. Mount `<IConfirmDialog />` once, then call it from anywhere — including plain functions outside a component:
+For a yes/no question, use [`useConfirm()`](/composables/use-confirm). Mount `<IConfirmDialog />` once, then call it from anywhere, including plain functions outside a component:
 
 ```ts
 const { confirm } = useConfirm()
@@ -118,4 +125,4 @@ if (await confirm({ title: 'Delete this draft?', danger: true }))
 
 Slots: `trigger`, `header`, `title`, `description`, default (body), and `footer` (receives `close`).
 
-The corner button closes even when `dismissible` is `false` — it is an explicit action, not a dismissal.
+The corner button closes the dialog even when `dismissible` is `false`; hide it with `:show-close="false"`.

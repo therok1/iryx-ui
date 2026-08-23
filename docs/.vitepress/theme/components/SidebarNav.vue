@@ -22,18 +22,24 @@ function normalise(path: string) {
 const current = computed(() => normalise(route.path))
 </script>
 
+<!--
+  A margin index, not a sidebar. The current page is marked by weight and
+  colour alone — no pill, no rule in the gutter. Any marker here competes with
+  the specimen it sits beside, and a left rule also reads inconsistently
+  between the drawer and the desktop gutter, where it has no column to align to.
+-->
 <template>
   <nav aria-label="Documentation">
-    <div v-for="group in groups" :key="group.title" class="mb-7">
-      <h2 class="mb-2 text-xs font-semibold tracking-wide text-foreground uppercase">
+    <div v-for="group in groups" :key="group.title" class="mb-9">
+      <h2 class="mb-3 font-mono text-xs font-medium tracking-[0.14em] text-muted-foreground uppercase">
         {{ group.title }}
       </h2>
-      <ul class="flex flex-col gap-0.5 text-sm">
+      <ul class="flex flex-col text-base">
         <li v-for="item in group.items" :key="item.link">
           <a
             :href="withBase(item.link)"
             :aria-current="normalise(item.link) === current ? 'page' : undefined"
-            class="block rounded-md px-2 py-1 text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground aria-[current=page]:bg-accent aria-[current=page]:font-medium aria-[current=page]:text-accent-foreground"
+            class="block py-1 text-muted-foreground transition-colors hover:text-foreground aria-[current=page]:font-medium aria-[current=page]:text-foreground"
           >
             {{ item.text }}
           </a>

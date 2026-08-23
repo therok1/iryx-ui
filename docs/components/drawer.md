@@ -1,3 +1,7 @@
+---
+eyebrow: Overlays
+---
+
 <script setup lang="ts">
 import type { DrawerSide, DrawerSnapPoint } from 'iryx-ui'
 import { ref } from 'vue'
@@ -13,9 +17,9 @@ function openAt(value: DrawerSide) {
 }
 </script>
 
-# Drawer
+# IDrawer
 
-A panel attached to an edge of the viewport. It shares `IDialog`'s slots and dismissal behaviour, and adds the thing a drawer is actually for: you can drag it away.
+A panel attached to an edge of the viewport. It shares [`IDialog`](/components/dialog)'s slots and dismissal behaviour, and can be dragged away.
 
 <Demo>
 <template #demo>
@@ -33,8 +37,13 @@ A panel attached to an edge of the viewport. It shares `IDialog`'s slots and dis
 </template>
 
 ```vue
-<IDrawer v-model:open="open" side="right" title="Filters" description="Narrow the list down.">
-  <IInput v-model="search" placeholder="Reference or name" clearable />
+<IDrawer
+  v-model:open="open"
+  side="right"
+  title="Filters"
+  description="Narrow the list down to what you are looking for."
+>
+  <p>Drag the panel towards its own edge to dismiss it.</p>
 
   <template #footer="{ close }">
     <IButton variant="outline" @click="close()">
@@ -52,9 +61,7 @@ A panel attached to an edge of the viewport. It shares `IDialog`'s slots and dis
 
 ## Size means different things per edge
 
-On a `left` or `right` drawer, `size` is a width. On a `top` or `bottom` sheet, it is a *maximum* height, so a short sheet hugs its content instead of leaving a gap under the footer. `sm` through `xl` and `full` read naturally either way.
-
-Below the `sm` breakpoint a side drawer takes the full screen — a phone is never given a narrow column with wasted space beside it.
+On a `left` or `right` drawer, `size` is a width. On a `top` or `bottom` sheet it is a *maximum* height, so a short sheet hugs its content. Below the `sm` breakpoint a side drawer takes the full screen.
 
 ## Snap points
 
@@ -78,11 +85,18 @@ Below the `sm` breakpoint a side drawer takes the full screen — a phone is nev
   side="bottom"
   :snap-points="[0.45, 1]"
   title="Payment method"
-/>
+  description="Drag the sheet up to see the whole list."
+>
+  <p>Resting at snap point {{ snap }}.</p>
+
+  <ICard v-for="method in methods" :key="method">
+    {{ method }}
+  </ICard>
+</IDrawer>
 ```
 </Demo>
 
-Snap points position the panel by translating it rather than resizing it, so `size` stops capping the height when they are set — otherwise the fully expanded state would be clipped instead of parked below the fold.
+With snap points set, `size` no longer caps the height: the panel is translated between resting positions rather than resized.
 
 ## Modality
 
@@ -94,11 +108,11 @@ Snap points position the panel by translating it rather than resizing it, so `si
 
 ## The handle
 
-Sheets get a drag handle by default and side drawers don't, on the grounds that a sheet needs the affordance more. `handle` overrides that in both directions. It is decorative — the whole panel is the drag target, not just the handle.
+Sheets get a drag handle by default and side drawers do not; `handle` overrides that in both directions. The whole panel is the drag target, not just the handle.
 
 ## Dismissal
 
-`dismissible: false` refuses the swipe along with Escape and the overlay. The corner button still closes, because that is an explicit action rather than a dismissal.
+`:dismissible="false"` refuses the swipe along with Escape and the overlay. The corner button still closes; hide it with `:show-close="false"`.
 
 ## Props
 
@@ -122,6 +136,6 @@ Sheets get a drag handle by default and side drawers don't, on the grounds that 
 
 Slots match `IDialog`: `trigger`, `header`, `title`, `description`, default (body), and `footer` (receives `close`).
 
-::: tip
-The mobile navigation on this site is an `IDrawer`. Narrow your window and open it — if the component regresses, these docs stop navigating on a phone.
-:::
+<IAlert variant="info" title="This site uses one" class="not-prose my-6">
+The mobile navigation here is an <code>IDrawer</code>. Narrow your window and open it — if the component regresses, these docs stop navigating on a phone.
+</IAlert>

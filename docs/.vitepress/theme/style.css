@@ -28,156 +28,235 @@ body {
  * its own greyscale and rhythm, which would sit alongside the library's tokens
  * instead of using them — two type systems in the shopfront for the type
  * system. Everything below resolves to an --iryx-* token.
+ *
+ * TWO RULES FOR EVERYTHING IN THIS LAYER.
+ *
+ * 1. Every selector ends in `:not(.not-prose *)`, which `<Demo>`'s figure
+ *    carries. Without it these rules reach inside the demo stage and restyle
+ *    real components: `.prose table { display: block }` stopped `ITable`
+ *    distributing width to its columns, and `.prose h3` restyled `ICard`'s
+ *    title. Note that `.not-prose` is inert on its own — it is a
+ *    @tailwindcss/typography class and this theme does not use that plugin —
+ *    so it works only because these selectors opt out of it explicitly.
+ *
+ * 2. These are descendant selectors, never `.prose > *`. VitePress 2 nests all
+ *    markdown inside two unclassed wrapper divs, so `.prose` has just two
+ *    element children and a child combinator matches almost nothing. Under a
+ *    child rule every paragraph, list, table and code block had zero top
+ *    margin, and only the headings looked right — because their `mt-*` was
+ *    never a child selector.
+ *
+ * Specificity: the generic flow sits at (0,2,0) and every per-element rule at
+ * (0,2,1), so the headings' larger gaps win outright. The heading rules and the
+ * "tight after a heading" pair rule tie at (0,2,1), which is the one place
+ * source order decides — hence the pair rule is written after them.
  */
 @layer components {
   .prose {
     @apply text-[0.9375rem]/7 text-foreground;
   }
 
-  .prose > * + * {
+  /* Generic flow. (0,2,0) — every rule below outranks it. */
+  .prose
+    :where(p, ul, ol, table, blockquote, hr, figure, div[class*="language-"]):not(
+      .not-prose *
+    ) {
     @apply mt-5;
   }
 
-  .prose h1 {
-    @apply text-3xl font-semibold tracking-tight;
+  /*
+   * The specimen scale. A specimen sheet sets the subject enormous and keeps
+   * the apparatus small — so the page title is display-sized and the section
+   * headings shrink to mono labels rather than growing bold rules across the
+   * column. Getting this backwards is what made the first pass generic.
+   */
+  .prose h1:not(.not-prose *) {
+    @apply text-[clamp(2.5rem,1.6rem+3.6vw,4rem)]/[0.95] font-semibold tracking-[-0.045em];
   }
 
-  .prose h2 {
-    @apply mt-12 border-t border-border pt-8 text-xl font-semibold tracking-tight;
+  /* `scroll-mt` keeps a heading jumped to by its anchor clear of the sticky header. */
+  .prose :is(h1, h2, h3):not(.not-prose *) {
+    @apply scroll-mt-24;
   }
 
-  .prose h3 {
-    @apply mt-8 text-base font-semibold;
+  .prose h2:not(.not-prose *) {
+    @apply mt-16 font-mono text-xs font-medium tracking-[0.14em] text-muted-foreground uppercase;
+  }
+
+  .prose h3:not(.not-prose *) {
+    @apply mt-10 text-[0.9375rem] font-semibold tracking-[-0.01em];
+  }
+
+  /*
+   * Tight gap after a heading. Written after the heading rules deliberately:
+   * it ties with them at (0,2,1), so an `h3` directly under an `h2` takes this
+   * gap rather than its own larger one.
+   */
+  .prose :is(h2, h3) + *:not(.not-prose *) {
+    @apply mt-3;
+  }
+
+  /* Nothing pushes the top of the column down, at any wrapper depth. */
+  .prose > :first-child:not(.not-prose *),
+  .prose div:not([class]) > :first-child:not(.not-prose *) {
+    @apply mt-0;
   }
 
   /* The anchor VitePress injects into every heading. */
-  .prose :is(h1, h2, h3) .header-anchor {
+  .prose :is(h1, h2, h3) .header-anchor:not(.not-prose *) {
     @apply ml-2 text-muted-foreground opacity-0 transition-opacity;
   }
 
-  .prose :is(h1, h2, h3):hover .header-anchor,
-  .prose .header-anchor:focus-visible {
+  .prose :is(h1, h2, h3):hover .header-anchor:not(.not-prose *),
+  .prose .header-anchor:focus-visible:not(.not-prose *) {
     @apply opacity-100;
   }
 
-  .prose p {
+  .prose p:not(.not-prose *) {
     @apply text-muted-foreground;
   }
 
   /* Lead paragraph: the one directly after the page title. */
-  .prose h1 + p {
-    @apply text-base/7;
+  .prose h1 + p:not(.not-prose *) {
+    @apply mt-6 text-[1.0625rem]/7;
   }
 
-  .prose :is(ul, ol) {
+  .prose :is(ul, ol):not(.not-prose *) {
     @apply flex list-outside flex-col gap-2 pl-5 text-muted-foreground;
   }
 
-  .prose ul {
+  .prose ul:not(.not-prose *) {
     @apply list-disc;
   }
 
-  .prose ol {
+  .prose ol:not(.not-prose *) {
     @apply list-decimal;
   }
 
-  .prose li::marker {
+  /*
+   * The guard goes on `li`, not after `::marker`. A pseudo-class cannot follow
+   * a pseudo-element, so `li::marker:not(…)` is invalid and the whole rule is
+   * dropped — silently, since one dead rule just leaves default bullets.
+   */
+  .prose li:not(.not-prose *)::marker {
     @apply text-border;
   }
 
-  .prose a:not(.header-anchor) {
+  .prose a:not(.header-anchor):not(.not-prose *) {
     @apply font-medium text-foreground underline decoration-border underline-offset-4 transition-colors hover:decoration-foreground;
   }
 
-  .prose strong {
+  .prose strong:not(.not-prose *) {
     @apply font-semibold text-foreground;
   }
 
-  /* Inline code. The fenced-block rule below resets its own. */
-  .prose :not(pre) > code {
+  /* Inline code. The fenced-block layer below resets its own. */
+  .prose :not(pre) > code:not(.not-prose *) {
     @apply rounded-md border border-border bg-muted px-1.5 py-0.5 text-[0.85em] text-foreground;
   }
 
-  .prose blockquote {
+  .prose blockquote:not(.not-prose *) {
     @apply border-l-2 border-border pl-4 text-muted-foreground italic;
   }
 
-  .prose table {
-    @apply block w-full overflow-x-auto text-left text-sm;
+  .prose table:not(.not-prose *) {
+    @apply w-full table-auto text-left text-sm;
   }
 
-  .prose :is(th, td) {
+  .prose :is(th, td):not(.not-prose *) {
     @apply border-b border-border px-3 py-2.5 align-top first:pl-0 last:pr-0;
   }
 
-  .prose th {
+  .prose th:not(.not-prose *) {
     @apply font-medium whitespace-nowrap text-foreground;
   }
 
-  .prose td {
+  .prose td:not(.not-prose *) {
     @apply text-muted-foreground;
   }
 
-  .prose td code {
+  .prose td code:not(.not-prose *) {
+    @apply break-words;
+  }
+
+  /* The narrow columns stay on one line; the type column wraps. */
+  .prose :is(td:first-child, td:last-child) code:not(.not-prose *) {
     @apply whitespace-nowrap;
   }
 
-  .prose hr {
-    @apply border-border;
-  }
-
   /*
-   * Markdown containers (`::: tip`). VitePress emits the classes; the default
-   * theme's styling for them is not imported, so they are defined here.
-   *
-   * Colour goes in the left rule and the title, never a filled surface —
-   * the same rule the components follow. See the theming guide.
+   * Below the small breakpoint there is not enough width to wrap a union type
+   * without one word per line, so the table scrolls instead.
    */
-  .prose .custom-block {
-    @apply rounded-lg border border-border border-l-2 px-4 py-3 text-sm;
+  @media (width < 40rem) {
+    .prose table:not(.not-prose *) {
+      @apply block overflow-x-auto;
+    }
+
+    .prose td code:not(.not-prose *) {
+      @apply whitespace-nowrap;
+    }
   }
 
-  .prose .custom-block > * + * {
-    @apply mt-2;
-  }
-
-  .prose .custom-block p {
-    @apply text-sm;
-  }
-
-  .prose .custom-block .custom-block-title {
-    @apply font-semibold text-foreground;
-  }
-
-  .prose .custom-block.tip {
-    @apply border-l-primary;
-  }
-
-  .prose .custom-block.warning {
-    @apply border-l-warning;
-  }
-
-  .prose .custom-block.danger {
-    @apply border-l-danger;
+  .prose hr:not(.not-prose *) {
+    @apply border-border;
   }
 }
 
 /*
- * Code blocks. Shiki emits inline colours for the tokens themselves and two
- * stacked `<pre>`s — one per theme — so all that is needed here is the frame
- * and picking which of the two is visible.
+ * Code blocks. VitePress 2 emits a single `<pre>` per block; the frame is
+ * defined here and the token colours come from Shiki's dual-theme custom
+ * properties, mapped at the bottom of this block.
  */
 @layer components {
   .prose div[class*="language-"] {
     @apply relative overflow-hidden rounded-xl border border-border bg-muted/40;
   }
 
+  /*
+   * The language label is dropped: the code says what it is, and the corner
+   * is worth more as the copy button's home.
+   */
   .prose div[class*="language-"] > span.lang {
-    @apply absolute top-2.5 right-3 text-xs text-muted-foreground select-none;
+    @apply hidden;
+  }
+
+  /*
+   * VitePress emits this button as an empty `inline-block` in normal flow, so
+   * it reserved a blank line above every code block while being invisible.
+   * Taking it out of flow is what removes that gap; the icon is a mask so it
+   * follows `currentColor` in both themes.
+   */
+  .prose div[class*="language-"] > button.copy {
+    @apply absolute top-2 right-2 z-10 grid size-7 place-items-center rounded-lg border border-transparent text-muted-foreground opacity-0 transition-[opacity,color,background-color,border-color];
+  }
+
+  .prose div[class*="language-"]:hover > button.copy,
+  .prose div[class*="language-"] > button.copy:focus-visible {
+    @apply border-border bg-background opacity-100;
+  }
+
+  .prose div[class*="language-"] > button.copy:hover {
+    @apply text-foreground;
+  }
+
+  .prose div[class*="language-"] > button.copy::after {
+    content: "";
+    @apply block size-3.5 bg-current;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='9' y='9' width='13' height='13' rx='2'/%3E%3Cpath d='M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1'/%3E%3C/svg%3E") center / contain no-repeat;
+  }
+
+  /* VitePress adds `.copied` for a moment after a successful copy. */
+  .prose div[class*="language-"] > button.copy.copied {
+    @apply text-success opacity-100;
+  }
+
+  .prose div[class*="language-"] > button.copy.copied::after {
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E");
   }
 
   .prose div[class*="language-"] pre {
-    @apply overflow-x-auto p-4 text-[0.8125rem]/6;
+    @apply overflow-x-auto p-4 text-sm/7;
   }
 
   .prose div[class*="language-"] code {
@@ -188,9 +267,383 @@ body {
     @apply opacity-60;
   }
 
-  /* Shiki's dual themes: show one, hide the other. */
-  html:not(.dark) .vp-code .shiki.vp-code-dark,
-  html.dark .vp-code .shiki.vp-code-light {
-    @apply hidden;
+  /*
+   * Syntax colour.
+   *
+   * VitePress 2 renders Shiki in dual-theme mode: one `<pre>`, with every
+   * token carrying `--shiki-light` / `--shiki-dark` as inline custom
+   * properties and *no* colour of its own. Nothing here read those variables,
+   * so every token inherited the prose foreground and the blocks rendered
+   * flat — highlighting was configured and simply never shown.
+   *
+   * This replaces the old rule, which hid one of two stacked `<pre>`s. That
+   * was the shape Shiki emitted under VitePress 1; the elements it targeted
+   * do not exist any more, so it had quietly become dead CSS.
+   */
+  .prose .shiki,
+  .prose .shiki span {
+    color: var(--shiki-light);
+  }
+
+  html.dark .prose .shiki,
+  html.dark .prose .shiki span {
+    color: var(--shiki-dark);
+  }
+}
+
+/*
+ * The hero's ground: a faint square grid, ruled from the top-left corner and
+ * fading out diagonally.
+ *
+ * It belongs to the hero rather than the page — absolutely positioned inside
+ * that section, so it scrolls away with it instead of following the reader
+ * down past content it has nothing to do with.
+ *
+ * The ruling starts at `0 0` so the first line is the corner itself: anchored
+ * to where the eye starts, not centred on a box whose width nobody can see.
+ * `--iryx-border` is the same token the component borders use, so it follows
+ * light and dark without a second rule.
+ */
+.home-grid {
+  position: absolute;
+  /*
+   * Bleeds past the hero on both edges — up behind the header and a little
+   * below the section's own boundary — so the ruling ends where the fade
+   * runs out rather than where a container happens to stop.
+   */
+  top: -4rem;
+  bottom: -5rem;
+  /*
+   * Full-bleed, breaking out of the centred content column. Inside it, the
+   * ruling stopped dead at the column's left edge on a wide screen — a hard
+   * vertical seam with nothing on the page to justify it.
+   */
+  left: 50%;
+  width: 100vw;
+  transform: translateX(-50%);
+  z-index: -10;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, var(--iryx-border) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--iryx-border) 1px, transparent 1px);
+  background-size: 72px 72px;
+  background-position: 0 0;
+  opacity: 0.6;
+  /*
+   * One radial fade, seated near the top-left where the eye starts. Being
+   * radial it thins in every direction — including back toward the left edge —
+   * so the grid ends by fading out rather than by being cut off, whatever the
+   * viewport is doing.
+   */
+  mask-image: radial-gradient(115% 130% at 14% 0%, black 0%, black 28%, transparent 78%);
+}
+
+/*
+ * The canvas inside a landing card: the surface a card's illustration sits on,
+ * ruled with the same faint grid as the hero so the two read as one system.
+ * Inset rather than full-bleed, so the card's own padding still frames it.
+ */
+/*
+ * The stage each card's demonstration sits on.
+ *
+ * It used to repeat the hero's ruled grid. Four cards of the same texture
+ * turned a signature into wallpaper, and at card scale the ruling competed
+ * with the thing it was meant to sit behind. This is quieter on purpose: a
+ * recessed surface, lit from above, with nothing in it to read.
+ */
+.card-canvas {
+  position: relative;
+  border-radius: 0.75rem;
+  border: 1px solid color-mix(in oklab, var(--iryx-border) 65%, transparent);
+  background:
+    radial-gradient(
+      100% 75% at 50% -15%,
+      color-mix(in oklab, var(--iryx-primary) 10%, transparent),
+      transparent 65%
+    ),
+    color-mix(in oklab, var(--iryx-muted) 40%, transparent);
+  overflow: hidden;
+}
+
+/* A hairline along the top edge, so the surface reads as lit rather than flat. */
+.card-canvas::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    color-mix(in oklab, var(--iryx-foreground) 14%, transparent),
+    transparent
+  );
+  pointer-events: none;
+}
+
+.card-canvas > * {
+  position: relative;
+  z-index: 1;
+}
+
+/*
+ * The cards themselves. Flat panels in a flat grid read as a spec sheet, so
+ * each one gets a faint top-lit edge and a border that lights up under the
+ * cursor — the card reacts to where the pointer actually is, rather than
+ * flipping a single hover state on and off.
+ */
+/* `z-index` here is what gives the bloom below something to sit behind. */
+.home-card {
+  position: relative;
+  z-index: 0;
+}
+
+/*
+ * The bloom around the lit edge.
+ *
+ * Deliberately *behind* the card: the card's own background is opaque, so
+ * only the part spilling past the edge shows — which is what makes it read
+ * as light escaping rather than a wash over the content.
+ */
+.home-card::before {
+  content: '';
+  position: absolute;
+  inset: -1.75rem;
+  z-index: -1;
+  border-radius: inherit;
+  /*
+   * Offset by the inset: the coordinates are measured against the card's own
+   * box, and this element starts 1.75rem outside it.
+   */
+  background: radial-gradient(
+    18rem circle at calc(var(--glow-x, -100%) + 1.75rem) calc(var(--glow-y, -100%) + 1.75rem),
+    color-mix(in oklab, var(--iryx-primary) 38%, transparent),
+    transparent 62%
+  );
+  filter: blur(1.25rem);
+  opacity: var(--glow-opacity, 0);
+  transition: opacity 220ms ease;
+  pointer-events: none;
+}
+
+/*
+ * The travelling border light.
+ *
+ * A gradient fills the whole card, then a two-layer mask subtracts the
+ * content box — leaving only the 1px frame lit.
+ *
+ * All three variables come from a pointermove handler on the grid: the
+ * bright spot follows the cursor, and `--glow-opacity` fades with distance
+ * so cards light up as it approaches rather than only once it is over one.
+ * Unset, the light parks off-card at zero opacity.
+ */
+.home-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: radial-gradient(
+    14rem circle at var(--glow-x, -100%) var(--glow-y, -100%),
+    color-mix(in oklab, var(--iryx-primary) 70%, transparent),
+    transparent 55%
+  );
+  /* `exclude` is what turns a filled rectangle into a ring. */
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  opacity: var(--glow-opacity, 0);
+  transition: opacity 220ms ease;
+  pointer-events: none;
+}
+
+
+
+/*
+ * The hero's ground: a faint square grid, ruled from the top-left corner and
+ * fading out diagonally.
+ *
+ * It belongs to the hero rather than the page — absolutely positioned inside
+ * that section, so it scrolls away with it instead of following the reader
+ * down past content it has nothing to do with.
+ *
+ * The ruling starts at `0 0` so the first line is the corner itself: anchored
+ * to where the eye starts, not centred on a box whose width nobody can see.
+ * `--iryx-border` is the same token the component borders use, so it follows
+ * light and dark without a second rule.
+ */
+.home-grid {
+  position: absolute;
+  /*
+   * Bleeds past the hero on both edges — up behind the header and a little
+   * below the section's own boundary — so the ruling ends where the fade
+   * runs out rather than where a container happens to stop.
+   */
+  top: -4rem;
+  bottom: -5rem;
+  /*
+   * Full-bleed, breaking out of the centred content column. Inside it, the
+   * ruling stopped dead at the column's left edge on a wide screen — a hard
+   * vertical seam with nothing on the page to justify it.
+   */
+  left: 50%;
+  width: 100vw;
+  transform: translateX(-50%);
+  z-index: -10;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, var(--iryx-border) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--iryx-border) 1px, transparent 1px);
+  background-size: 72px 72px;
+  background-position: 0 0;
+  opacity: 0.6;
+  /*
+   * One radial fade, seated near the top-left where the eye starts. Being
+   * radial it thins in every direction — including back toward the left edge —
+   * so the grid ends by fading out rather than by being cut off, whatever the
+   * viewport is doing.
+   */
+  mask-image: radial-gradient(115% 130% at 14% 0%, black 0%, black 28%, transparent 78%);
+}
+
+/*
+ * The canvas inside a landing card: the surface a card's illustration sits on,
+ * ruled with the same faint grid as the hero so the two read as one system.
+ * Inset rather than full-bleed, so the card's own padding still frames it.
+ */
+/*
+ * The stage each card's demonstration sits on.
+ *
+ * It used to repeat the hero's ruled grid. Four cards of the same texture
+ * turned a signature into wallpaper, and at card scale the ruling competed
+ * with the thing it was meant to sit behind. This is quieter on purpose: a
+ * recessed surface, lit from above, with nothing in it to read.
+ */
+.card-canvas {
+  position: relative;
+  border-radius: 0.75rem;
+  border: 1px solid color-mix(in oklab, var(--iryx-border) 65%, transparent);
+  background:
+    radial-gradient(
+      100% 75% at 50% -15%,
+      color-mix(in oklab, var(--iryx-primary) 10%, transparent),
+      transparent 65%
+    ),
+    color-mix(in oklab, var(--iryx-muted) 40%, transparent);
+  overflow: hidden;
+}
+
+/* A hairline along the top edge, so the surface reads as lit rather than flat. */
+.card-canvas::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    color-mix(in oklab, var(--iryx-foreground) 14%, transparent),
+    transparent
+  );
+  pointer-events: none;
+}
+
+.card-canvas > * {
+  position: relative;
+  z-index: 1;
+}
+
+/*
+ * The cards themselves. Flat panels in a flat grid read as a spec sheet, so
+ * each one gets a faint top-lit edge and a border that lights up under the
+ * cursor — the card reacts to where the pointer actually is, rather than
+ * flipping a single hover state on and off.
+ */
+/* `z-index` here is what gives the bloom below something to sit behind. */
+.home-card {
+  position: relative;
+  z-index: 0;
+}
+
+/*
+ * The bloom around the lit edge.
+ *
+ * Deliberately *behind* the card: the card's own background is opaque, so
+ * only the part spilling past the edge shows — which is what makes it read
+ * as light escaping rather than a wash over the content.
+ */
+.home-card::before {
+  content: '';
+  position: absolute;
+  inset: -1.75rem;
+  z-index: -1;
+  border-radius: inherit;
+  /*
+   * Offset by the inset: the coordinates are measured against the card's own
+   * box, and this element starts 1.75rem outside it.
+   */
+  background: radial-gradient(
+    18rem circle at calc(var(--glow-x, -100%) + 1.75rem) calc(var(--glow-y, -100%) + 1.75rem),
+    color-mix(in oklab, var(--iryx-primary) 38%, transparent),
+    transparent 62%
+  );
+  filter: blur(1.25rem);
+  opacity: var(--glow-opacity, 0);
+  transition: opacity 220ms ease;
+  pointer-events: none;
+}
+
+/*
+ * The travelling border light.
+ *
+ * A gradient fills the whole card, then a two-layer mask subtracts the
+ * content box — leaving only the 1px frame lit.
+ *
+ * All three variables come from a pointermove handler on the grid: the
+ * bright spot follows the cursor, and `--glow-opacity` fades with distance
+ * so cards light up as it approaches rather than only once it is over one.
+ * Unset, the light parks off-card at zero opacity.
+ */
+.home-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: radial-gradient(
+    14rem circle at var(--glow-x, -100%) var(--glow-y, -100%),
+    color-mix(in oklab, var(--iryx-primary) 70%, transparent),
+    transparent 55%
+  );
+  /* `exclude` is what turns a filled rectangle into a ring. */
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  opacity: var(--glow-opacity, 0);
+  transition: opacity 220ms ease;
+  pointer-events: none;
+}
+
+/*
+ * Inner scroll containers hide their bar — code blocks, the margin index, demo
+ * stages, wide tables. The document keeps its own, so the page never loses the
+ * one bar that says where you are in it.
+ */
+@layer components {
+  :not(html, body)::-webkit-scrollbar {
+    display: none;
+  }
+
+  :not(html, body) {
+    scrollbar-width: none;
   }
 }
