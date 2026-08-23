@@ -1624,6 +1624,11 @@ function simulateLoad() {
             label="Push notifications"
             description="Send alerts to this device when something needs your attention."
           />
+          <div class="flex items-start gap-6">
+            <ISwitch v-model="checked" size="sm" label="Small" />
+            <ISwitch v-model="checked" size="md" label="Medium" />
+            <ISwitch v-model="checked" size="lg" label="Large" />
+          </div>
         </div>
       </section>
 
@@ -1675,7 +1680,7 @@ function simulateLoad() {
         </h2>
         <div class="grid gap-4 sm:grid-cols-2">
           <ICard padding="none" class="overflow-hidden">
-            <ITable :columns="invoiceColumns.slice(0, 3)" :rows="[]" loading :loading-rows="3" label="Loading" />
+            <ITable :columns="invoiceColumns.slice(0, 3)" :rows="[]" loading :skeleton-rows="3" label="Loading" />
           </ICard>
           <ICard padding="none" class="overflow-hidden">
             <ITable :columns="invoiceColumns.slice(0, 3)" :rows="[]" empty-text="No invoices yet." label="Empty" />

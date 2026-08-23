@@ -3,15 +3,28 @@
   "configurations": [
     {
       "name": "playground",
-      "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["--filter", "playground", "dev"],
+      "runtimeExecutable": "corepack",
+      "runtimeArgs": [
+        "pnpm",
+        "--filter",
+        "playground",
+        "dev"
+      ],
       "port": 5173,
       "autoPort": true
     },
     {
       "name": "docs",
-      "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["--filter", "docs", "dev"],
+      "runtimeExecutable": "corepack",
+      "runtimeArgs": [
+        "pnpm",
+        "--filter",
+        "docs",
+        "dev",
+        "--port",
+        "5174",
+        "--strictPort"
+      ],
       "port": 5174,
       "autoPort": true
     }
