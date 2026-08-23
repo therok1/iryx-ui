@@ -43,11 +43,38 @@ describe('iTable rendering', () => {
 
   it('renders skeletons while loading with nothing to show, not the empty message', () => {
     const wrapper = mount(Table, {
-      props: { rows: [], columns, loading: true, loadingRows: 4, emptyText: 'Nothing here' },
+      props: { rows: [], columns, loading: true, skeletonRows: 4, emptyText: 'Nothing here' },
     })
     expect(wrapper.findAll('tbody tr')).toHaveLength(4)
     expect(wrapper.text()).not.toContain('Nothing here')
     expect(wrapper.find('table').attributes('aria-busy')).toBe('true')
+    // First load: skeletons stand in for the rows, so no refresh bar as well.
+    expect(wrapper.find('thead').classes()).not.toContain('iryx-table-loading')
+  })
+
+  /*
+   * The two loading states are alternatives. A refresh keeps the rows the
+   * reader is looking at and marks the header rule instead — swapping in
+   * skeletons would throw that content away on every page change.
+   */
+  it('marks the header rule instead of showing skeletons when refreshing with rows', () => {
+    const wrapper = mount(Table, {
+      props: { rows, columns, loading: true, skeletonRows: 4 },
+    })
+    expect(wrapper.findAll('tbody tr')).toHaveLength(rows.length)
+    expect(wrapper.find('thead').classes()).toContain('iryx-table-loading')
+    expect(wrapper.find('table').attributes('aria-busy')).toBe('true')
+  })
+
+  it('drops the refresh bar once loading ends', async () => {
+    const wrapper = mount(Table, {
+      props: { rows, columns, loading: true },
+    })
+    expect(wrapper.find('thead').classes()).toContain('iryx-table-loading')
+
+    await wrapper.setProps({ loading: false })
+    expect(wrapper.find('thead').classes()).not.toContain('iryx-table-loading')
+    expect(wrapper.find('table').attributes('aria-busy')).toBeUndefined()
   })
 
   /*
@@ -263,5 +290,44 @@ describe('iTable slots and events', () => {
     const wrapper = mount(Table, { props: { rows, columns, label: 'Invoices', caption: 'Q3' } })
     expect(wrapper.find('table').attributes('aria-label')).toBe('Invoices')
     expect(wrapper.find('caption').text()).toBe('Q3')
+  })
+
+  it('renders a trailing actions column only when the slot is filled', () => {
+    const plain = mount(Table, { props: { rows, columns } })
+    expect(plain.findAll('thead th')).toHaveLength(columns.length)
+
+    const wrapper = mount(Table, {
+      props: { rows, columns },
+      slots: { 'row-actions': '<button>Edit</button>' },
+    })
+
+    expect(wrapper.findAll('thead th')).toHaveLength(columns.length + 1)
+    expect(wrapper.findAll('tbody tr:first-child td')).toHaveLength(columns.length + 1)
+    expect(wrapper.findAll('tbody button')).toHaveLength(rows.length)
+  })
+
+  it('names the actions column for screen readers', () => {
+    const wrapper = mount(Table, {
+      props: { rows, columns, actionsLabel: 'Aktionen' },
+      slots: { 'row-actions': '<button>Edit</button>' },
+    })
+    expect(wrapper.find('thead th:last-child').text()).toBe('Aktionen')
+  })
+
+  it('does not emit rowClick from a row action', async () => {
+    const wrapper = mount(Table, {
+      props: { rows, columns, clickableRows: true },
+      slots: { 'row-actions': '<button>Edit</button>' },
+    })
+    await wrapper.find('tbody button').trigger('click')
+    expect(wrapper.emitted('rowClick')).toBeUndefined()
+  })
+
+  it('spans the actions column in the empty and expanded rows', () => {
+    const empty = mount(Table, {
+      props: { rows: [], columns },
+      slots: { 'row-actions': '<button>Edit</button>' },
+    })
+    expect(empty.find('tbody td').attributes('colspan')).toBe(String(columns.length + 1))
   })
 })

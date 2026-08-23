@@ -19,7 +19,12 @@ export const tableTheme = tv({
      * Header sort control. A real button so it is tabbable and announced as
      * one; the `<th>` carries `aria-sort` for the state.
      */
-    sortButton: 'inline-flex cursor-pointer items-center gap-1.5 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-primary/50 [&_svg]:size-3.5 [&_svg]:shrink-0',
+    /*
+     * `uppercase` is repeated from `th`: a button does not inherit
+     * `text-transform`, so a sortable header rendered in sentence case beside
+     * its uppercase neighbours.
+     */
+    sortButton: 'inline-flex cursor-pointer items-center gap-1.5 rounded-md tracking-wide uppercase outline-none focus-visible:ring-2 focus-visible:ring-primary/50 [&_svg]:size-3.5 [&_svg]:shrink-0',
     sortIcon: 'text-muted-foreground/70 transition-colors',
     td: 'px-3 py-3 align-middle text-foreground',
     /*
@@ -29,10 +34,12 @@ export const tableTheme = tv({
      */
     gutter: 'w-px px-3 py-3 align-middle',
     headGutter: 'w-px border-b border-border px-3 py-3 align-middle',
+    /* The trailing actions column: as narrow as its content, pinned right. */
+    actions: 'w-px px-3 py-3 text-end align-middle whitespace-nowrap',
+    headActions: 'w-px border-b border-border px-3 py-3 align-middle',
     expandButton: 'inline-flex size-6 cursor-pointer items-center justify-center rounded-md text-muted-foreground transition-[transform,color,background-color] outline-none hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-primary/50 [&_svg]:size-4',
     expandedRow: 'bg-muted/30',
     expandedCell: 'p-0',
-    /** Message row for "no results", spanning every column. */
     empty: 'px-3 py-10 text-center text-sm text-muted-foreground',
     caption: 'mt-3 text-sm text-muted-foreground',
   },
@@ -52,10 +59,21 @@ export const tableTheme = tv({
     selected: {
       true: { tr: 'bg-primary/5' },
     },
+    /**
+     * Refreshing: an indeterminate bar riding the rule between the header and
+     * the first row, which is where a table conventionally shows progress.
+     *
+     * Plain class rather than utilities, like the drawer's drag plumbing — it
+     * is a keyframed `background-position` on a pseudo-element, and there is
+     * no class name for Tailwind to generate. Defined in `theme.css`.
+     */
+    loading: {
+      true: { thead: 'iryx-table-loading' },
+    },
     size: {
-      sm: { th: 'py-2', td: 'py-2', gutter: 'py-2' },
+      sm: { th: 'py-2', td: 'py-2', gutter: 'py-2', actions: 'py-2' },
       md: {},
-      lg: { th: 'py-4', td: 'py-4', gutter: 'py-4' },
+      lg: { th: 'py-4', td: 'py-4', gutter: 'py-4', actions: 'py-4' },
     },
     align: {
       start: { th: 'text-start', td: 'text-start' },

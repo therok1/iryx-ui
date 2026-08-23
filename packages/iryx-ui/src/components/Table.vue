@@ -1,7 +1,7 @@
 <script setup lang="ts" generic="T = any">
 import type { TableColumn, TableSort } from '../composables/data-table'
 import { ArrowDown01Icon, ArrowRight01Icon, ArrowUp01Icon, UnfoldMoreIcon } from '@hugeicons/core-free-icons'
-import { computed } from 'vue'
+import { computed, useSlots } from 'vue'
 import { useDataTable } from '../composables/data-table'
 import { useIryxUiConfig } from '../config'
 import { tableTheme } from '../theme/table'
@@ -23,7 +23,7 @@ export interface TableProps<Row = any> {
   rowKey?: string
   loading?: boolean
   /** Rows of skeletons while `loading` and there is nothing to show yet. */
-  loadingRows?: number
+  skeletonRows?: number
   selectable?: boolean
   /** Veto selection per row — the checkbox is hidden and the header skips it. */
   isRowSelectable?: (row: Row) => boolean
@@ -38,6 +38,8 @@ export interface TableProps<Row = any> {
   size?: 'sm' | 'md' | 'lg'
   /** Text when there are no rows. Overridden by the `empty` slot. */
   emptyText?: string
+  /** Accessible name for the actions column, whose header is blank. */
+  actionsLabel?: string
   /** Accessible name for the table, since a visible caption is optional. */
   label?: string
   caption?: string
@@ -62,7 +64,8 @@ const props = withDefaults(defineProps<TableProps<T>>(), {
   rows: () => [],
   columns: () => [],
   rowKey: 'id',
-  loadingRows: 5,
+  skeletonRows: 5,
+  actionsLabel: 'Actions',
   emptyText: 'No results.',
   // Absent booleans must stay undefined so app-level config can win.
   unstyled: undefined,
@@ -99,6 +102,7 @@ const table = useDataTable<T>({
   expanded,
 })
 
+const slots = useSlots()
 const config = useIryxUiConfig()
 const isUnstyled = computed(() => props.unstyled ?? config.unstyled)
 
@@ -108,6 +112,14 @@ const theme = computed(() => tableTheme({
   hoverable: props.hoverable ?? true,
   stickyHeader: props.stickyHeader,
   clickable: props.clickableRows,
+  /*
+   * The two loading states are alternatives, never both at once. Skeletons
+   * stand in for rows that do not exist yet, so they belong to the first load;
+   * every load after that already has rows on screen, and replacing them would
+   * throw away what the reader is looking at. The bar under the header says
+   * "refreshing" without taking the content away.
+   */
+  loading: Boolean(props.loading) && table.pageRows.value.length > 0,
 }))
 
 function cls(slot: keyof NonNullable<TableProps['ui']>, extra?: string) {
@@ -117,7 +129,7 @@ function cls(slot: keyof NonNullable<TableProps['ui']>, extra?: string) {
     : (theme.value[slot] as (o?: any) => string)({ class: [override, extra] })
 }
 
-function slotCls(slot: 'sortButton' | 'sortIcon' | 'gutter' | 'headGutter' | 'expandButton' | 'expandedRow' | 'expandedCell') {
+function slotCls(slot: 'sortButton' | 'sortIcon' | 'gutter' | 'headGutter' | 'expandButton' | 'expandedRow' | 'expandedCell' | 'actions' | 'headActions') {
   return isUnstyled.value ? undefined : theme.value[slot]()
 }
 
@@ -158,7 +170,8 @@ function isCellHidden(row: T, column: TableColumn<T>) {
 const columnCount = computed(() =>
   table.visibleColumns.value.length
   + (props.selectable ? 1 : 0)
-  + (props.expandable ? 1 : 0),
+  + (props.expandable ? 1 : 0)
+  + (slots['row-actions'] ? 1 : 0),
 )
 
 const showSkeletons = computed(() => props.loading && table.pageRows.value.length === 0)
@@ -230,12 +243,16 @@ defineExpose({ table })
               </template>
             </slot>
           </th>
+
+          <th v-if="$slots['row-actions']" :class="slotCls('headActions')">
+            <span class="sr-only">{{ props.actionsLabel }}</span>
+          </th>
         </tr>
       </thead>
 
       <tbody :class="cls('tbody')">
         <template v-if="showSkeletons">
-          <tr v-for="row in props.loadingRows" :key="`skeleton-${row}`" :class="cls('tr')">
+          <tr v-for="row in props.skeletonRows" :key="`skeleton-${row}`" :class="cls('tr')">
             <td v-if="props.expandable" :class="slotCls('gutter')">
               <Skeleton class="size-4" />
             </td>
@@ -244,6 +261,9 @@ defineExpose({ table })
             </td>
             <td v-for="column in table.visibleColumns.value" :key="column.key" :class="cls('td')">
               <Skeleton class="h-4 w-24" />
+            </td>
+            <td v-if="$slots['row-actions']" :class="slotCls('actions')">
+              <Skeleton class="size-4" />
             </td>
           </tr>
         </template>
@@ -302,6 +322,11 @@ defineExpose({ table })
                   {{ table.getRowValue(row, column.key) }}
                 </slot>
               </template>
+            </td>
+
+            <!-- Stops a click on the menu from also selecting or expanding the row. -->
+            <td v-if="$slots['row-actions']" :class="slotCls('actions')" @click.stop>
+              <slot name="row-actions" :row="row" />
             </td>
           </tr>
 
