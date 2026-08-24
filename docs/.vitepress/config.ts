@@ -163,35 +163,60 @@ function pagePath(relativePath: string): string {
 }
 
 /*
- * A page's own summary, taken from its first paragraph. Every component page
- * opens with one sentence saying what the thing is, which is exactly what a
- * search result and a link preview want — and far better than the one site-wide
- * description all 80-odd pages shared before.
+ * A page's own summary, taken from the first paragraph of its source.
+ *
+ * Read from the markdown rather than the rendered HTML so it can be set in
+ * `transformPageData`, which is the only hook whose result reaches the client.
+ * A description produced in `transformHead` is server-side only: VitePress
+ * rebuilds the head on hydration from the page data it shipped, so the meta
+ * reverted to the site-wide description the moment the page became
+ * interactive — invisible to a link scraper, which reads the raw HTML, but
+ * not to a crawler that renders first.
  */
-function summarise(content: string): string | undefined {
-  /*
-   * Start at the <h1>. Every page renders its `eyebrow` frontmatter as a
-   * paragraph above the heading, so the first <p> on the page is the section
-   * name — "Forms", "Guide" — and every page in a section would otherwise
-   * share a one-word description.
-   */
-  const body = content.slice(content.indexOf('</h1>') + 1)
-  const paragraph = body.match(/<p\b[^>]*>([\s\S]*?)<\/p>/)?.[1]
-  if (!paragraph)
+function summarise(filePath: string): string | undefined {
+  if (!filePath)
     return undefined
 
+  let source: string
+  try {
+    source = readFileSync(filePath, 'utf8')
+  }
+  catch {
+    return undefined
+  }
+
+  const body = source
+    .replace(/^---[\s\S]*?\n---/, '')
+    .replace(/<script[\s\S]*?<\/script>/g, '')
+
+  /*
+   * The first line that is prose: not a heading, not a fence, not a table or
+   * a container, and not a component. `<InstallCommand />` opens the
+   * installation page, and a demo opens several others.
+   */
+  const lines = body.split(/\r?\n/)
+  const startIndex = lines.findIndex(line => /^[A-Z0-9`[]/i.test(line.trim()) && !/^[#>|]/.test(line.trim()))
+  if (startIndex === -1)
+    return undefined
+
+  const paragraph: string[] = []
+  for (const line of lines.slice(startIndex)) {
+    if (!line.trim())
+      break
+    paragraph.push(line.trim())
+  }
+
   const text = paragraph
-    .replace(/<[^>]+>/g, '')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, '\'')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&amp;/g, '&')
+    .join(' ')
+    .replace(/!?\[([^\]]*)\]\([^)]*\)/g, '$1')
+    .replace(/[`*_]/g, '')
     .replace(/\s+/g, ' ')
     .trim()
 
+  if (!text)
+    return undefined
   if (text.length <= 160)
-    return text || undefined
+    return text
 
   // Cut at a word, not mid-syllable.
   const clipped = text.slice(0, 160)
@@ -216,6 +241,11 @@ export default defineConfig({
    * well as its own domain, and without this both get indexed as duplicates.
    */
   transformPageData(pageData) {
+    // Assigned here, not in `transformHead`, so it survives hydration.
+    pageData.description = pageData.frontmatter.description
+      ?? summarise(pageData.filePath)
+      ?? description
+
     pageData.frontmatter.head ??= []
     pageData.frontmatter.head.push([
       'link',
@@ -233,10 +263,10 @@ export default defineConfig({
    * The `description` meta is the same story: VitePress skips writing its own
    * once this one overrides it.
    */
-  transformHead({ pageData, siteData, content }) {
+  transformHead({ pageData, siteData }) {
     const url = `${origin}/${pagePath(pageData.relativePath)}`
     const title = pageData.frontmatter.title || pageData.title || siteData.title
-    const summary = pageData.frontmatter.description ?? summarise(content) ?? description
+    const summary = pageData.description
 
     return [
       ['meta', { name: 'description', content: summary }],
