@@ -1,5 +1,6 @@
 ---
 eyebrow: Guide
+description: Install Iryx UI in a Vue 3 or Nuxt app, wire up Tailwind CSS v4, and register the components globally or one at a time.
 ---
 
 # Installation

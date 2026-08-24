@@ -152,6 +152,49 @@ const sidebar = [
 const origin = (process.env.DOCS_ORIGIN ?? 'https://iryx-ui.com').replace(/\/$/, '')
 const description = 'A Vue 3 component library built on Reka UI and Tailwind CSS v4.'
 
+/** A page's public path, with `index.md` and the `.md` suffix taken off. */
+function pagePath(relativePath: string): string {
+  return relativePath
+    .replace(/(^|\/)index\.md$/, '$1')
+    .replace(/\.md$/, '')
+}
+
+/*
+ * A page's own summary, taken from its first paragraph. Every component page
+ * opens with one sentence saying what the thing is, which is exactly what a
+ * search result and a link preview want — and far better than the one site-wide
+ * description all 80-odd pages shared before.
+ */
+function summarise(content: string): string | undefined {
+  /*
+   * Start at the <h1>. Every page renders its `eyebrow` frontmatter as a
+   * paragraph above the heading, so the first <p> on the page is the section
+   * name — "Forms", "Guide" — and every page in a section would otherwise
+   * share a one-word description.
+   */
+  const body = content.slice(content.indexOf('</h1>') + 1)
+  const paragraph = body.match(/<p\b[^>]*>([\s\S]*?)<\/p>/)?.[1]
+  if (!paragraph)
+    return undefined
+
+  const text = paragraph
+    .replace(/<[^>]+>/g, '')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, '\'')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&')
+    .replace(/\s+/g, ' ')
+    .trim()
+
+  if (text.length <= 160)
+    return text || undefined
+
+  // Cut at a word, not mid-syllable.
+  const clipped = text.slice(0, 160)
+  return `${clipped.slice(0, clipped.lastIndexOf(' '))}…`
+}
+
 export default defineConfig({
   title: 'Iryx UI',
   description,
@@ -170,15 +213,38 @@ export default defineConfig({
    * well as its own domain, and without this both get indexed as duplicates.
    */
   transformPageData(pageData) {
-    const path = pageData.relativePath
-      .replace(/(^|\/)index\.md$/, '$1')
-      .replace(/\.md$/, '')
-
     pageData.frontmatter.head ??= []
     pageData.frontmatter.head.push([
       'link',
-      { rel: 'canonical', href: `${origin}/${path}` },
+      { rel: 'canonical', href: `${origin}/${pagePath(pageData.relativePath)}` },
     ])
+  },
+  /*
+   * The share tags that differ per page. They used to sit in `head` as
+   * constants, so every page in the site carried the home page's title, the
+   * one site-wide description and an `og:url` of `/` — a link to any component
+   * page previewed as the home page, and told crawlers as much.
+   *
+   * `mergeHead` keys a tag on its first attribute, so what is returned here
+   * replaces the matching `property`/`name` in `head` rather than doubling it.
+   * The `description` meta is the same story: VitePress skips writing its own
+   * once this one overrides it.
+   */
+  transformHead({ pageData, siteData, content }) {
+    const url = `${origin}/${pagePath(pageData.relativePath)}`
+    const title = pageData.frontmatter.title || pageData.title || siteData.title
+    const summary = pageData.frontmatter.description ?? summarise(content) ?? description
+
+    return [
+      ['meta', { name: 'description', content: summary }],
+      ['meta', { property: 'og:title', content: title }],
+      ['meta', { property: 'og:description', content: summary }],
+      ['meta', { property: 'og:url', content: url }],
+      ['meta', { name: 'twitter:title', content: title }],
+      ['meta', { name: 'twitter:description', content: summary }],
+      // Kept in step with `<html lang>` rather than written out twice.
+      ['meta', { property: 'og:locale', content: (siteData.lang || 'en-US').replace('-', '_') }],
+    ]
   },
   cleanUrls: true,
   sitemap: { hostname: `${origin}/` },
@@ -194,20 +260,27 @@ export default defineConfig({
     ['link', { rel: 'manifest', href: '/site.webmanifest' }],
     ['meta', { name: 'theme-color', content: '#9060fb' }],
 
+    /*
+     * Only the tags that are the same on every page live here. Title,
+     * description and URL are per-page, in `transformHead` above.
+     */
     ['meta', { property: 'og:type', content: 'website' }],
     ['meta', { property: 'og:site_name', content: 'Iryx UI' }],
-    ['meta', { property: 'og:title', content: 'Iryx UI' }],
-    ['meta', { property: 'og:description', content: description }],
-    ['meta', { property: 'og:url', content: `${origin}/` }],
     ['meta', { property: 'og:image', content: `${origin}/og.png` }],
+    ['meta', { property: 'og:image:type', content: 'image/png' }],
+    /*
+     * `og.png` is the 256px square mark, so the card stays `summary` — the
+     * small square one. Scrapers trust these dimensions over the file, so a
+     * `summary_large_image` here would crop the mark into a smear. When a
+     * 1200×630 image lands, all four of these change together: width, height,
+     * alt, and the card type.
+     */
     ['meta', { property: 'og:image:width', content: '256' }],
     ['meta', { property: 'og:image:height', content: '256' }],
     ['meta', { property: 'og:image:alt', content: 'The Iryx UI mark' }],
-    // `summary`, not `summary_large_image`: the card image is square.
     ['meta', { name: 'twitter:card', content: 'summary' }],
-    ['meta', { name: 'twitter:title', content: 'Iryx UI' }],
-    ['meta', { name: 'twitter:description', content: description }],
     ['meta', { name: 'twitter:image', content: `${origin}/og.png` }],
+    ['meta', { name: 'twitter:image:alt', content: 'The Iryx UI mark' }],
     /*
      * Switzer, from Fontshare — the same face and the same source the
      * playground uses. `style.css` names it in `--iryx-font-sans`, but naming a
