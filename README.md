@@ -61,6 +61,22 @@ Full setup, including the Nuxt module and the theme tokens, is in the
 - **Unstyled escape hatch** — `unstyled` on any component (or app-wide on `IApp`) strips built-in classes and leaves the behaviour.
 - **SSR-safe**, shipped as ESM with full type definitions.
 
+## Examples
+
+[**Dashboard**](examples/dashboard) — an admin dashboard built only from this
+library: a shell whose navigation becomes a drawer on a phone, a table with
+sorting, selection, row actions and pagination, charts, a create form in a
+drawer, and a settings page with validation.
+
+```bash
+pnpm --filter @iryx-ui/example-dashboard dev
+```
+
+It is a workspace package rather than a separate repository, so it is built in
+CI and a breaking change breaks it in the same commit. Assembling it also found
+seven bugs the component pages had never hit. Read more on the
+[examples page](https://iryx-ui.com/examples/).
+
 ## Repository
 
 | Path | What |

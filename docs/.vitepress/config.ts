@@ -143,6 +143,12 @@ const sidebar = [
       { text: 'Date helpers', link: '/composables/dates' },
     ],
   },
+  {
+    title: 'Examples',
+    items: [
+      { text: 'Dashboard', link: '/examples/' },
+    ],
+  },
 ]
 
 /*
@@ -356,6 +362,7 @@ export default defineConfig({
       { text: 'Guide', link: '/guide/' },
       { text: 'Components', link: '/components/' },
       { text: 'Composables', link: '/composables/' },
+      { text: 'Examples', link: '/examples/' },
     ],
     repo: 'https://github.com/therok1/iryx-ui',
     version,
