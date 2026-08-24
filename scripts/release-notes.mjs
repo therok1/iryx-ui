@@ -22,9 +22,12 @@ const changelog = readFileSync(changelogPath, 'utf8')
 
 // Everything between this version's heading and the next one.
 const escaped = version.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-const section = changelog.match(new RegExp(`^## ${escaped}\\s*$([\\s\\S]*?)(?=^## |\\z)`, 'm'))
+// Split rather than match: `\z` is not a JavaScript escape, so the lookahead
+// that used to end this match read as a literal `z` and truncated the notes at
+// the first one in the text.
+const after = changelog.split(new RegExp(`^## ${escaped}\\s*$`, 'm'))[1]
 
-const notes = section?.[1]?.trim()
+const notes = after?.split(/^## /m)[0]?.trim()
 if (!notes) {
   // Better a bare version than a release body quoting an unrelated commit.
   console.error(`no changelog section for ${version}; falling back to the version alone`)
