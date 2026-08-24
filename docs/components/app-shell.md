@@ -187,6 +187,43 @@ Without a sidebar the shell is a header, a content column and the footer.
 
 In `main` mode the footer is pinned below the scrolling column, so it stays visible however long the page is. In `page` mode it sits at the end of the document, where a footer normally lives.
 
+## Navigation on a phone
+
+Below `md` the sidebar column is hidden and the same `#sidebar` slot is rendered inside a drawer instead, with a trigger the shell puts in the header itself. Nothing needs wiring up: a shell with a sidebar has usable navigation on a phone by default.
+
+A sidebar narrow enough for a phone is not a sidebar, and one that merely squeezes takes the content column down with it.
+
+```vue
+<IAppShell>
+  <template #header><!-- your bar --></template>
+  <template #sidebar>
+    <ISidebar :items="items" class="w-60" />
+  </template>
+</IAppShell>
+```
+
+The breakpoint is CSS, not a media query read in script, so server-rendered markup and the first client frame agree on what to draw.
+
+The slot is rendered twice — once as the column, once in the drawer — and is told which is which, so a brand or a footer can appear in only one of them:
+
+```vue
+<IAppShell>
+  <template #sidebar="{ inDrawer }">
+    <ISidebar :items="items" class="w-60">
+      <template v-if="inDrawer" #header>
+        <MyWordmark />
+      </template>
+    </ISidebar>
+  </template>
+</IAppShell>
+```
+
+Set `mobileNav` to `false` to turn the whole thing off. To place the trigger yourself rather than take the shell's, the `#header` slot receives `navOpen` and `toggleNav`.
+
+::: warning The header slot sits in a row
+To make room for that trigger, the shell wraps `#header` in a flex row. A bar that draws its own bottom rule should move it to `ui.header` — from inside the content column, the rule stops short of the trigger.
+:::
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -194,17 +231,19 @@ In `main` mode the footer is pinned below the scrolling column, so it stays visi
 | `as` | `string` | `'div'` | Element or component to render as |
 | `scroll` | `'main' \| 'page'` | `'main'` | Scroll the content column, or the document |
 | `sidebarPosition` | `'left' \| 'right'` | `'left'` | Which side the sidebar rail sits on |
+| `mobileNav` | `boolean` | `true` | Move the sidebar into a drawer below `md` |
+| `navLabel` | `string` | `'Open navigation'` | Accessible name for the drawer trigger |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged with the built-in classes |
-| `ui` | `{ root?, header?, body?, sidebar?, main?, footer? }` | — | Per-slot class overrides |
+| `ui` | `{ root?, header?, headerRow?, headerContent?, navTrigger?, navDrawer?, navDrawerBody?, body?, sidebar?, main?, footer? }` | — | Per-slot class overrides |
 
 ## Slots
 
 | Slot | When to use it |
 | --- | --- |
 | default | The page itself, inside `<main>` |
-| `header` | App bar. Measured in `page` mode to position the sticky sidebar |
-| `sidebar` | The navigation rail — usually [`ISidebar`](/components/sidebar) |
+| `header` | App bar. Receives `navOpen` and `toggleNav`. Measured in `page` mode to position the sticky sidebar |
+| `sidebar` | The navigation rail — usually [`ISidebar`](/components/sidebar). Receives `inDrawer`, and is rendered again inside the mobile drawer |
 | `footer` | Pinned below the content in `main` mode, at the end of the document in `page` mode |
 
 Pair it with [`IContainer`](/components/container) for the content width and [`IPageHeader`](/components/page-header) for the title row.

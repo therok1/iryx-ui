@@ -46,6 +46,8 @@ The sign of `delta` decides the direction, and zero is neutral.
 
 Override it with `trend` when a rising number is bad news — days to payment, error rate, churn.
 
+`trend` colours the delta and nothing else. The arrow keeps following the sign of the number, because an arrow that disagrees with the figure printed beside it — "↑ -14%" — reads as a bug rather than as nuance. Down and green means the number fell and that was the good outcome.
+
 <Demo stack>
 <template #demo>
 <div class="grid w-full gap-8 sm:grid-cols-2">
@@ -113,7 +115,7 @@ Override it with `trend` when a rising number is bad news — days to payment, e
 | `label` | `string` | — | What the number measures |
 | `value` | `string \| number` | — | The headline figure |
 | `delta` | `number` | — | Change since the comparison period |
-| `trend` | `'up' \| 'down' \| 'neutral'` | from `delta` | Overrides which direction reads as good |
+| `trend` | `'up' \| 'down' \| 'neutral'` | from `delta` | Colours the delta; the arrow still follows the sign |
 | `hint` | `string` | — | Names the comparison, e.g. "vs. last quarter" |
 | `size` | `'sm' \| 'md' \| 'lg'` | `'md'` | Overall scale |
 | `formatDelta` | `(delta: number) => string` | percentage | Formats the delta text |

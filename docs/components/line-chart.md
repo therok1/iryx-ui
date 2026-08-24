@@ -191,6 +191,42 @@ Turn `zero` on when the question is about magnitude rather than movement: the fi
 
 For something smaller still — a trend inside a table cell or a stat tile, with no axis, tooltip or crosshair at all — use [`ISparkline`](/components/sparkline).
 
+## Curves
+
+`tension` bends the line between readings, from `0` for straight segments to `1` for fully rounded.
+
+<Demo stack>
+<template #demo>
+<ILineChart :data="monthly" variant="area" :tension="0" :format="currency" class="w-full" label="Revenue, straight" />
+<ILineChart :data="monthly" variant="area" :tension="0.6" :format="currency" class="w-full" label="Revenue, curved" />
+</template>
+
+```vue
+<ILineChart :data="monthly" variant="area" :tension="0" />
+<ILineChart :data="monthly" variant="area" :tension="0.6" />
+```
+</Demo>
+
+It stays `0` by default, and that is a claim about the data rather than a taste. A curve says the readings run continuously into one another — true of a temperature trace, false of six monthly totals, where nothing happened *between* the points at all.
+
+The control points are clamped to the pair of readings they sit between. An unclamped spline overshoots: between a low reading and a high one it swings past both, dipping under the smallest number in the data and over the largest. A chart that draws values nobody measured is worse than a chart with corners.
+
+## Filling the width
+
+Readings sit a quarter of a category clear of each edge, so the first and last markers have somewhere to sit. `flush` carries the line and its fill flat out to the edges anyway, without moving the readings, the markers, the labels or the tooltip.
+
+<Demo stack>
+<template #demo>
+<ILineChart :data="monthly" variant="area" :tension="0.6" flush :format="currency" class="w-full" label="Revenue, filling the width" />
+</template>
+
+```vue
+<ILineChart :data="monthly" variant="area" :tension="0.6" flush />
+```
+</Demo>
+
+The extension is flat, so it never implies a value the series does not have — it holds the first and last readings level out to the edge. A series broken by a gap only extends the runs that actually reach an end of the data.
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -198,6 +234,8 @@ For something smaller still — a trend inside a table cell or a stat tile, with
 | `data` | `LineChartDatum[]` | `[]` | One entry per category, in order |
 | `series` | `ChartSeries[]` | — | Two or more measures per category |
 | `variant` | `'line' \| 'area'` | `'line'` | `area` adds a wash; ignored for multiple series |
+| `tension` | `number` | `0` | Curve between readings, `0` straight to `1` rounded |
+| `flush` | `boolean` | — | Carry the line and fill flat to the plot edges |
 | `height` | `number` | `240` | Rendered height in px; width fills the container |
 | `ticks` | `number` | `5` | Target tick count; the axis lands on round numbers |
 | `axis` | `boolean` | `true` | Draw the value axis and its gridlines |
