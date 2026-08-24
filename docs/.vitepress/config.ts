@@ -164,6 +164,21 @@ export default defineConfig({
       `User-agent: *\nAllow: /\n\nSitemap: ${origin}/sitemap.xml\n`,
     )
   },
+  /*
+   * A canonical URL per page. The site is reachable at `iryx-ui.pages.dev` as
+   * well as its own domain, and without this both get indexed as duplicates.
+   */
+  transformPageData(pageData) {
+    const path = pageData.relativePath
+      .replace(/(^|\/)index\.md$/, '$1')
+      .replace(/\.md$/, '')
+
+    pageData.frontmatter.head ??= []
+    pageData.frontmatter.head.push([
+      'link',
+      { rel: 'canonical', href: `${origin}/${path}` },
+    ])
+  },
   cleanUrls: true,
   sitemap: { hostname: `${origin}/` },
   // The default theme is never imported, so its appearance handling is not

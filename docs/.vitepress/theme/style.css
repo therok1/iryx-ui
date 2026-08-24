@@ -414,13 +414,18 @@ body {
    * Offset by the inset: the coordinates are measured against the card's own
    * box, and this element starts 1.75rem outside it.
    */
+  /*
+   * The tint is carried by `opacity`, not by `color-mix`. A build emits a
+   * full-strength fallback for browsers without `color-mix(in lab, …)`, and
+   * where that path is taken the bloom lands at 100% and washes the card.
+   */
   background: radial-gradient(
     18rem circle at calc(var(--glow-x, -100%) + 1.75rem) calc(var(--glow-y, -100%) + 1.75rem),
-    color-mix(in oklab, var(--iryx-primary) 38%, transparent),
+    var(--iryx-primary),
     transparent 62%
   );
   filter: blur(1.25rem);
-  opacity: var(--glow-opacity, 0);
+  opacity: calc(var(--glow-opacity, 0) * 0.38);
   transition: opacity 220ms ease;
   pointer-events: none;
 }
@@ -444,7 +449,7 @@ body {
   padding: 1px;
   background: radial-gradient(
     14rem circle at var(--glow-x, -100%) var(--glow-y, -100%),
-    color-mix(in oklab, var(--iryx-primary) 70%, transparent),
+    var(--iryx-primary),
     transparent 55%
   );
   /* `exclude` is what turns a filled rectangle into a ring. */
@@ -456,7 +461,7 @@ body {
     linear-gradient(#000 0 0) content-box,
     linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
-  opacity: var(--glow-opacity, 0);
+  opacity: calc(var(--glow-opacity, 0) * 0.7);
   transition: opacity 220ms ease;
   pointer-events: none;
 }
@@ -563,75 +568,6 @@ body {
  * cursor — the card reacts to where the pointer actually is, rather than
  * flipping a single hover state on and off.
  */
-/* `z-index` here is what gives the bloom below something to sit behind. */
-.home-card {
-  position: relative;
-  z-index: 0;
-}
-
-/*
- * The bloom around the lit edge.
- *
- * Deliberately *behind* the card: the card's own background is opaque, so
- * only the part spilling past the edge shows — which is what makes it read
- * as light escaping rather than a wash over the content.
- */
-.home-card::before {
-  content: '';
-  position: absolute;
-  inset: -1.75rem;
-  z-index: -1;
-  border-radius: inherit;
-  /*
-   * Offset by the inset: the coordinates are measured against the card's own
-   * box, and this element starts 1.75rem outside it.
-   */
-  background: radial-gradient(
-    18rem circle at calc(var(--glow-x, -100%) + 1.75rem) calc(var(--glow-y, -100%) + 1.75rem),
-    color-mix(in oklab, var(--iryx-primary) 38%, transparent),
-    transparent 62%
-  );
-  filter: blur(1.25rem);
-  opacity: var(--glow-opacity, 0);
-  transition: opacity 220ms ease;
-  pointer-events: none;
-}
-
-/*
- * The travelling border light.
- *
- * A gradient fills the whole card, then a two-layer mask subtracts the
- * content box — leaving only the 1px frame lit.
- *
- * All three variables come from a pointermove handler on the grid: the
- * bright spot follows the cursor, and `--glow-opacity` fades with distance
- * so cards light up as it approaches rather than only once it is over one.
- * Unset, the light parks off-card at zero opacity.
- */
-.home-card::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 1px;
-  background: radial-gradient(
-    14rem circle at var(--glow-x, -100%) var(--glow-y, -100%),
-    color-mix(in oklab, var(--iryx-primary) 70%, transparent),
-    transparent 55%
-  );
-  /* `exclude` is what turns a filled rectangle into a ring. */
-  mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  mask-composite: exclude;
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  opacity: var(--glow-opacity, 0);
-  transition: opacity 220ms ease;
-  pointer-events: none;
-}
 
 /*
  * Inner scroll containers hide their bar — code blocks, the margin index, demo
