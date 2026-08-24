@@ -56,6 +56,13 @@ const escapeHatches = [
 const GLOW_REACH = 160
 
 /*
+ * How bright the border light gets at its peak. Applied here rather than in
+ * the stylesheet: `opacity: calc(var(--glow-opacity) * 0.7)` resolves to zero
+ * on a pseudo-element in Chromium.
+ */
+const GLOW_PEAK = 0.7
+
+/*
  * Listened for on the whole section: `pointermove` only fires on what the
  * cursor is over, so per-card listeners went quiet in the gutters between
  * them. Written straight to style rather than through reactive state, since
@@ -75,7 +82,7 @@ function trackGlow(event: PointerEvent) {
 
     card.style.setProperty('--glow-x', `${event.clientX - bounds.left}px`)
     card.style.setProperty('--glow-y', `${event.clientY - bounds.top}px`)
-    card.style.setProperty('--glow-opacity', `${Math.max(0, 1 - distance / GLOW_REACH)}`)
+    card.style.setProperty('--glow-opacity', `${Math.max(0, 1 - distance / GLOW_REACH) * GLOW_PEAK}`)
   }
 }
 

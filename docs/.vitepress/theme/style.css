@@ -391,43 +391,8 @@ body {
  * cursor — the card reacts to where the pointer actually is, rather than
  * flipping a single hover state on and off.
  */
-/* `z-index` here is what gives the bloom below something to sit behind. */
 .home-card {
   position: relative;
-  z-index: 0;
-}
-
-/*
- * The bloom around the lit edge.
- *
- * Deliberately *behind* the card: the card's own background is opaque, so
- * only the part spilling past the edge shows — which is what makes it read
- * as light escaping rather than a wash over the content.
- */
-.home-card::before {
-  content: '';
-  position: absolute;
-  inset: -1.75rem;
-  z-index: -1;
-  border-radius: inherit;
-  /*
-   * Offset by the inset: the coordinates are measured against the card's own
-   * box, and this element starts 1.75rem outside it.
-   */
-  /*
-   * The tint is carried by `opacity`, not by `color-mix`. A build emits a
-   * full-strength fallback for browsers without `color-mix(in lab, …)`, and
-   * where that path is taken the bloom lands at 100% and washes the card.
-   */
-  background: radial-gradient(
-    18rem circle at calc(var(--glow-x, -100%) + 1.75rem) calc(var(--glow-y, -100%) + 1.75rem),
-    var(--iryx-primary),
-    transparent 62%
-  );
-  filter: blur(1.25rem);
-  opacity: calc(var(--glow-opacity, 0) * 0.38);
-  transition: opacity 220ms ease;
-  pointer-events: none;
 }
 
 /*
@@ -461,9 +426,19 @@ body {
     linear-gradient(#000 0 0) content-box,
     linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
-  opacity: calc(var(--glow-opacity, 0) * 0.7);
+  opacity: var(--glow-opacity, 0);
   transition: opacity 220ms ease;
   pointer-events: none;
+}
+
+/*
+ * There is no cursor to follow on a touch screen, so the light would either
+ * never appear or park itself wherever the last tap landed.
+ */
+@media (hover: none) {
+  .home-card::after {
+    display: none;
+  }
 }
 
 
