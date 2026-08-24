@@ -51,10 +51,10 @@ const timeline = computed<TimelineItem[]>(() => activity.map(entry => ({
     </IPageHeader>
 
     <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-      <ICard variant="soft" class="shadow-xs">
+      <ICard class="bg-muted/50 shadow-xs">
         <IStat label="Outstanding" :value="formatMoney(outstanding)" :delta="8.2" hint="Sent and overdue" />
       </ICard>
-      <ICard variant="soft" class="shadow-xs">
+      <ICard class="bg-muted/50 shadow-xs">
         <!--
           Down is the good direction here, so `trend` overrides the colour the
           sign would otherwise pick: a falling overdue total is not a loss.
@@ -67,10 +67,10 @@ const timeline = computed<TimelineItem[]>(() => activity.map(entry => ({
           :hint="`${overdue.length} invoices`"
         />
       </ICard>
-      <ICard variant="soft" class="shadow-xs">
+      <ICard class="bg-muted/50 shadow-xs">
         <IStat label="Collected" :value="formatMoney(collected)" :delta="12.1" hint="This month" />
       </ICard>
-      <ICard variant="soft" class="shadow-xs">
+      <ICard class="bg-muted/50 shadow-xs">
         <IStat label="Average days to pay" value="27" :delta="-4" trend="up" hint="Target 30" />
       </ICard>
     </div>
