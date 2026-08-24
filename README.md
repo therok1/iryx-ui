@@ -68,6 +68,7 @@ Full setup, including the Nuxt module and the theme tokens, is in the
 | `packages/iryx-ui` | The published library: components, themes, Vue plugin, Nuxt module |
 | `docs` | The documentation site (VitePress, custom theme) |
 | `playground` | Vite + Vue dev app, hot-reloads against the library source |
+| `examples/dashboard` | An admin dashboard built from the library, to read and copy |
 
 ## Contributing
 

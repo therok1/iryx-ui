@@ -52,6 +52,34 @@ importers:
         specifier: 2.0.0-alpha.19
         version: 2.0.0-alpha.19(@types/node@25.9.2)(change-case@5.4.4)(jiti@2.7.0)(postcss@8.5.26)(typescript@6.0.3)(yaml@2.9.0)
 
+  examples/dashboard:
+    dependencies:
+      '@hugeicons/core-free-icons':
+        specifier: ^4.2.3
+        version: 4.2.3
+      '@hugeicons/vue':
+        specifier: ^1.0.7
+        version: 1.0.7(vue@3.5.41(typescript@6.0.3))
+      iryx-ui:
+        specifier: workspace:*
+        version: link:../../packages/iryx-ui
+      vue:
+        specifier: ^3.5.35
+        version: 3.5.41(typescript@6.0.3)
+    devDependencies:
+      '@tailwindcss/vite':
+        specifier: ^4.3.0
+        version: 4.3.0(vite@8.2.1(@types/node@25.9.2)(jiti@2.7.0)(yaml@2.9.0))
+      '@vitejs/plugin-vue':
+        specifier: ^6.0.7
+        version: 6.0.8(vite@8.2.1(@types/node@25.9.2)(jiti@2.7.0)(yaml@2.9.0))(vue@3.5.41(typescript@6.0.3))
+      tailwindcss:
+        specifier: ^4.3.0
+        version: 4.3.0
+      vite:
+        specifier: ^8.0.16
+        version: 8.2.1(@types/node@25.9.2)(jiti@2.7.0)(yaml@2.9.0)
+
   packages/iryx-ui:
     dependencies:
       '@hugeicons/core-free-icons':
@@ -218,10 +246,6 @@ packages:
 
   '@babel/runtime@7.29.7':
     resolution: {integrity: sha512-Nq8OhGWiZIZGV6hLHoyAKLLcJihP/xFeBMGJoUrxTX2psI8dCifzLhZISFb+VWS3wFMRDmCGw5R+dOySCqPLhw==}
-    engines: {node: '>=6.9.0'}
-
-  '@babel/types@7.29.7':
-    resolution: {integrity: sha512-4zBIxpPzowiZpusoFkyGVwakdRJUyuH5PxQ/PrqghfdFWWasvnCdPfQXHrenDai+gyLARulZjZowCOj6fjT4pA==}
     engines: {node: '>=6.9.0'}
 
   '@babel/types@7.29.8':
@@ -2422,11 +2446,6 @@ packages:
   muggle-string@0.4.1:
     resolution: {integrity: sha512-VNTrAak/KhO2i8dqqnqnAHOa3cYBwXEZe9h+D5h/1ZqFSTEFHdM65lR7RoIqq3tBBYavsOXV84NoHXZ0AkPyqQ==}
 
-  nanoid@3.3.12:
-    resolution: {integrity: sha512-ZB9RH/39qpq5Vu6Y+NmUaFhQR6pp+M2Xt76XBnEwDaGcVAqhlvxrl3B2bKS5D3NH3QR76v3aSrKaF/Kiy7lEtQ==}
-    engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
-    hasBin: true
-
   nanoid@3.3.18:
     resolution: {integrity: sha512-DTg4MJbGMWkfi6VZFdNt2/caMbQy4Ou+Op/hJQvGEWcnVfoA1QA+xzRKAzw9jD6+GVOOeYr/mIcuDSdug6F6+w==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
@@ -3254,18 +3273,13 @@ snapshots:
 
   '@babel/parser@7.29.7':
     dependencies:
-      '@babel/types': 7.29.7
+      '@babel/types': 7.29.8
 
   '@babel/parser@7.29.8':
     dependencies:
       '@babel/types': 7.29.8
 
   '@babel/runtime@7.29.7': {}
-
-  '@babel/types@7.29.7':
-    dependencies:
-      '@babel/helper-string-parser': 7.29.7
-      '@babel/helper-validator-identifier': 7.29.7
 
   '@babel/types@7.29.8':
     dependencies:
@@ -3568,6 +3582,10 @@ snapshots:
     dependencies:
       vue: 3.5.35(typescript@6.0.3)
 
+  '@hugeicons/vue@1.0.7(vue@3.5.41(typescript@6.0.3))':
+    dependencies:
+      vue: 3.5.41(typescript@6.0.3)
+
   '@humanfs/core@0.19.2':
     dependencies:
       '@humanfs/types': 0.15.0
@@ -3856,7 +3874,7 @@ snapshots:
       eslint-visitor-keys: 4.2.1
       espree: 10.4.0
       estraverse: 5.3.0
-      picomatch: 4.0.4
+      picomatch: 4.0.5
 
   '@swc/helpers@0.5.23':
     dependencies:
@@ -4206,7 +4224,7 @@ snapshots:
 
   '@vue/compiler-core@3.5.35':
     dependencies:
-      '@babel/parser': 7.29.7
+      '@babel/parser': 7.29.8
       '@vue/shared': 3.5.35
       entities: 7.0.1
       estree-walker: 2.0.2
@@ -4280,12 +4298,12 @@ snapshots:
   '@vue/language-core@3.3.4':
     dependencies:
       '@volar/language-core': 2.4.28
-      '@vue/compiler-dom': 3.5.35
-      '@vue/shared': 3.5.35
+      '@vue/compiler-dom': 3.5.41
+      '@vue/shared': 3.5.41
       alien-signals: 3.2.1
       muggle-string: 0.4.1
       path-browserify: 1.0.1
-      picomatch: 4.0.4
+      picomatch: 4.0.5
 
   '@vue/reactivity@3.5.35':
     dependencies:
@@ -4972,9 +4990,9 @@ snapshots:
     dependencies:
       format: 0.2.2
 
-  fdir@6.5.0(picomatch@4.0.4):
+  fdir@6.5.0(picomatch@4.0.5):
     optionalDependencies:
-      picomatch: 4.0.4
+      picomatch: 4.0.5
 
   file-entry-cache@8.0.0:
     dependencies:
@@ -5727,8 +5745,6 @@ snapshots:
 
   muggle-string@0.4.1: {}
 
-  nanoid@3.3.12: {}
-
   nanoid@3.3.18: {}
 
   natural-compare@1.4.0: {}
@@ -5862,7 +5878,7 @@ snapshots:
 
   postcss@8.5.15:
     dependencies:
-      nanoid: 3.3.12
+      nanoid: 3.3.18
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
@@ -6116,8 +6132,8 @@ snapshots:
 
   tinyglobby@0.2.17:
     dependencies:
-      fdir: 6.5.0(picomatch@4.0.4)
-      picomatch: 4.0.4
+      fdir: 6.5.0(picomatch@4.0.5)
+      picomatch: 4.0.5
 
   tinyrainbow@3.1.0: {}
 
@@ -6206,7 +6222,7 @@ snapshots:
     dependencies:
       '@jridgewell/remapping': 2.3.5
       acorn: 8.16.0
-      picomatch: 4.0.4
+      picomatch: 4.0.5
       webpack-virtual-modules: 0.6.2
 
   untyped@2.0.0:

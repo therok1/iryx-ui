@@ -1,0 +1,13 @@
+@import "tailwindcss";
+@import "../../../packages/iryx-ui/theme.css";
+
+/*
+ * This example develops against the library *source* (see the vite alias), so
+ * scan that for utility classes on top of theme.css's own scan of dist.
+ * Copying the example out of the repo means dropping this line too.
+ */
+@source "../../../packages/iryx-ui/src";
+
+:root {
+  --iryx-font-sans: "Switzer", ui-sans-serif, system-ui, sans-serif;
+}

@@ -6,3 +6,4 @@ packages:
   - packages/*
   - playground
   - docs
+  - examples/*

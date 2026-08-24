@@ -27,6 +27,21 @@
       ],
       "port": 5174,
       "autoPort": true
+    },
+    {
+      "name": "dashboard",
+      "runtimeExecutable": "corepack",
+      "runtimeArgs": [
+        "pnpm",
+        "--filter",
+        "@iryx-ui/example-dashboard",
+        "dev",
+        "--port",
+        "5175",
+        "--strictPort"
+      ],
+      "port": 5175,
+      "autoPort": true
     }
   ]
 }
