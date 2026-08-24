@@ -35,9 +35,22 @@ const customers = computed(() => {
     <IPageHeader title="Customers" :description="`${customers.length} accounts billed this quarter.`" />
 
     <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-      <ICard v-for="customer in customers" :key="customer.name" class="shadow-xs">
-        <div class="flex items-start gap-3">
-          <IAvatar :name="customer.name" size="md" />
+      <!--
+        `padding="none"` so the two halves can carry their own. The identity
+        band is a raised surface with a bottom border, which puts the rule edge
+        to edge for free — an `ISeparator` between padded blocks stops short of
+        the card on both sides, and a divider that does not reach the edges
+        reads as a mistake rather than as a division.
+      -->
+      <ICard
+        v-for="customer in customers"
+        :key="customer.name"
+        padding="none"
+        class="overflow-hidden shadow-xs"
+      >
+        <div class="flex items-start gap-3 border-b border-border bg-muted p-4">
+          <!-- The avatar's own surface is `bg-muted`, which is now the band it sits on. -->
+          <IAvatar :name="customer.name" size="md" class="bg-background" />
 
           <div class="min-w-0 flex-1">
             <p class="truncate font-medium">
@@ -53,9 +66,7 @@ const customers = computed(() => {
           </IBadge>
         </div>
 
-        <ISeparator class="my-4" />
-
-        <div class="flex items-end justify-between gap-3">
+        <div class="flex items-end justify-between gap-3 p-4 pb-0">
           <div>
             <p class="text-sm text-muted-foreground">
               Billed
@@ -77,7 +88,7 @@ const customers = computed(() => {
           </IButton>
         </div>
 
-        <p class="mt-2 text-xs text-muted-foreground">
+        <p class="px-4 pt-2 pb-4 text-xs text-muted-foreground">
           {{ customer.count }} {{ customer.count === 1 ? 'invoice' : 'invoices' }}
         </p>
       </ICard>

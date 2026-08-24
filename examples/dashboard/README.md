@@ -14,7 +14,7 @@ corepack pnpm --filter @iryx-ui/example-dashboard dev
 | --- | --- |
 | Overview | `IStat`, `ILineChart`, `IBarChart`, `ITable`, `ITimeline`, `ICard` |
 | Invoices | `ITable` with sorting, selection, row actions and pagination, `IInput`, `ISelect`, `IBadge`, `useConfirm`, `useToast` |
-| Customers | `IAvatar`, `ICard`, `IBadge`, `ISeparator` |
+| Customers | `IAvatar`, `ICard`, `IBadge`, `IButton` |
 | Settings | `IForm`, `IFormField`, `INumberInput`, `ISwitch`, `IRadioGroup`, `useAppearance` |
 
 The shell itself — `IApp`, `IAppShell`, `ISidebar`, `IDropdownMenu`,
