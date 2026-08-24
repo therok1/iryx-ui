@@ -1,5 +1,21 @@
 # iryx-ui
 
+## 0.14.0
+
+### Minor Changes
+
+- 13d157c: `ICombobox` gains `clearable`. Once a value is set, the dropdown arrow becomes a clear button — clearing empties the query, returns focus to the input, and sets the model to `null`, or to `[]` when `multiple`. `clearLabel` renames it for non-English apps, and `ui.clear` styles it.
+
+  Multiple selection is now documented and covered by tests. It always worked, since `multiple` forwards to `ComboboxRoot` and the field already joined the chosen labels — but nothing said so, which made it invisible.
+
+- 13d157c: A `multiple` `ICombobox` now draws each chosen value as a removable chip inside the field instead of joining the labels into one comma-separated string. The input stays a query box and shares the chips’ line whenever there is room for it, chips are removed with their cross or with Backspace while the query is empty, and the field wraps and grows rather than clipping — matching `ITagsInput`, whose chip styling it shares.
+
+  A `tag` slot replaces a chip's contents, `removeLabel` names the remove button for non-English apps, and `ui.tag` / `ui.tagText` / `ui.tagDelete` style the parts.
+
+- 1e3cc45: Export `IIcon` and the `IconLike` type. It is the icon renderer every other component already used internally — it takes both shapes an icon comes in, a Hugeicons data array or any component that renders an SVG, so your own controls can accept an `icon` prop on the same terms the library does.
+
+  Icons stay decorative by default (`aria-hidden`). A new `label` prop swaps that for `role="img"` and an `aria-label`, for the case where the icon is the only thing naming a control.
+
 ## 0.13.0
 
 ### Minor Changes
