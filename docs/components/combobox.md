@@ -14,6 +14,8 @@ const grouped = ref('')
 const invalidClient = ref('')
 const newClient = ref('')
 const sku = ref('')
+const clearable = ref('acme')
+const tags = ref(['acme', 'bolt'])
 
 const clients = [
   { label: 'Acme Industries', value: 'acme' },
@@ -210,6 +212,50 @@ Use `virtual` for lists in the thousands.
 
 Inside an [`IFormField`](/components/form-field) the field passes its own validity down, so `invalid` rarely needs setting by hand.
 
+## Clearing
+
+`clearable` turns the dropdown arrow into a clear button as soon as something is selected — the arrow is only useful while the field is empty, and two targets in the same corner of a 36px field is a mis-click waiting to happen.
+
+<Demo stack>
+<template #demo>
+<ICombobox v-model="clearable" :items="clients" placeholder="Search clients" clearable class="w-64" />
+</template>
+
+```vue
+<ICombobox v-model="client" :items="clients" placeholder="Search clients" clearable />
+```
+</Demo>
+
+Clearing empties the query, returns focus to the input and sets the model to `null` — or to `[]` when `multiple`. The button is not a tab stop: it sits one keystroke away from a field whose own <IKbd keys="escape" size="xs" /> and typing already clear it, so making it a stop would slow every pass through a form to save nobody a step.
+
+Rename it for a non-English app with `clearLabel`, which is its accessible name.
+
+## Multiple
+
+`multiple` lets the field hold several values. The model becomes an array and chosen rows keep their tick.
+
+<Demo stack>
+<template #demo>
+<ICombobox v-model="tags" :items="clients" placeholder="Search clients" multiple clearable class="w-72" />
+</template>
+
+```vue
+<script setup lang="ts">
+const selected = ref(['acme', 'bolt'])
+</script>
+
+<template>
+  <ICombobox v-model="selected" :items="clients" multiple clearable />
+</template>
+```
+</Demo>
+
+Each value is drawn as a removable chip inside the field, and the input stays a query box — so the labels are readable at a glance and there is still somewhere to type. Remove one with its cross, or with <IKbd keys="backspace" size="xs" /> while the query is empty. The field wraps and grows rather than clipping, the same trade [`ITagsInput`](/components/tags-input) makes.
+
+The popup stays open as you tick rows, so a run of choices is one visit rather than one visit each.
+
+Reach for [`ITagsInput`](/components/tags-input) instead when the values are free text rather than a fixed list, and for [`ICheckbox`](/components/checkbox) when there are only a handful of options and hiding them behind a popup buys nothing.
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -220,6 +266,10 @@ Inside an [`IFormField`](/components/form-field) the field passes its own validi
 | `invalid` | `boolean` | — | Red border and ring; inherited from `IFormField` when unset |
 | `id` | `string` | — | Id for the input; `IFormField` supplies one |
 | `emptyText` | `string` | `'No results found.'` | Line shown when nothing matches |
+| `clearable` | `boolean` | — | Swap the arrow for a clear button once a value is set |
+| `clearLabel` | `string` | `'Clear'` | Accessible name for that button |
+| `multiple` | `boolean` | — | Hold several values as chips; the model becomes an array |
+| `removeLabel` | `(label: string) => string` | `Remove …` | Accessible name for a chip's remove button |
 | `create` | `boolean` | — | Offer a "create" row for an unmatched query |
 | `createLabel` | `(query: string) => string` | `Create "…"` | Label for that row |
 | `virtual` | `boolean` | — | Render only the rows in view; flattens groups |
@@ -227,9 +277,9 @@ Inside an [`IFormField`](/components/form-field) the field passes its own validi
 | `overscan` | `number` | `12` | Rows rendered beyond the viewport on each side |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged with the built-in classes |
-| `ui` | `{ anchor?, input?, trigger?, content?, viewport?, item?, empty?, group?, groupLabel? }` | — | Per-slot class overrides |
+| `ui` | `{ anchor?, input?, trigger?, clear?, tag?, tagText?, tagDelete?, content?, viewport?, item?, empty?, group?, groupLabel? }` | — | Per-slot class overrides |
 
-`disabled`, `multiple`, `dir` and the rest of Reka UI's `ComboboxRoot` props are forwarded.
+`disabled`, `dir` and the rest of Reka UI's `ComboboxRoot` props are forwarded.
 
 ## Events
 
@@ -245,6 +295,7 @@ Reka UI's own `ComboboxRoot` events are re-emitted unchanged.
 | --- | --- | --- |
 | `empty` | `{ query }` | Replace the no-results line with your own markup |
 | `create` | `{ query }` | Replace the create row's label with your own markup |
+| `tag` | `{ option, remove }` | Replace a chip's contents; call `remove()` to drop that value |
 
 ## Item shapes
 

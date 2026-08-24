@@ -76,6 +76,150 @@ describe('combobox', () => {
     expect(wrapper.get('input').element.value).toBe('Acme Industries')
   })
 
+  it('shows the arrow, and no clear button, while nothing is selected', async () => {
+    const wrapper = mount(Combobox, {
+      props: { items: clients, clearable: true },
+      attachTo: document.body,
+    })
+    await nextTick()
+    expect(wrapper.find('[aria-label="Clear"]').exists()).toBe(false)
+    wrapper.unmount()
+  })
+
+  it('swaps the arrow for a clear button once a value is selected', async () => {
+    const wrapper = mount(Combobox, {
+      props: { items: clients, clearable: true, modelValue: 'acme' },
+      attachTo: document.body,
+    })
+    await nextTick()
+    expect(wrapper.find('[aria-label="Clear"]').exists()).toBe(true)
+    wrapper.unmount()
+  })
+
+  it('leaves the arrow alone when clearable is off', async () => {
+    const wrapper = mount(Combobox, {
+      props: { items: clients, modelValue: 'acme' },
+      attachTo: document.body,
+    })
+    await nextTick()
+    expect(wrapper.find('[aria-label="Clear"]').exists()).toBe(false)
+    wrapper.unmount()
+  })
+
+  it('clears the model and the input text', async () => {
+    const wrapper = mount(Combobox, {
+      props: { items: clients, clearable: true, modelValue: 'acme' },
+      attachTo: document.body,
+    })
+    await nextTick()
+    await wrapper.get('[aria-label="Clear"]').trigger('click')
+    await nextTick()
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([null])
+    expect(wrapper.get('input').element.value).toBe('')
+    wrapper.unmount()
+  })
+
+  it('draws a chip per value when multiple, leaving the input free to type in', async () => {
+    const wrapper = mount(Combobox, {
+      props: { items: clients, multiple: true, modelValue: ['acme', 'bolt'], defaultOpen: true },
+      attachTo: document.body,
+    })
+    await nextTick()
+    expect(wrapper.findAll('[aria-label^="Remove"]').map(b => b.attributes('aria-label')))
+      .toEqual(['Remove Acme Industries', 'Remove Bolt Logistics'])
+    expect(wrapper.get('input').element.value).toBe('')
+    const chosen = [...document.querySelectorAll('[role="option"][aria-selected="true"]')]
+    expect(chosen.map(o => o.textContent?.trim())).toEqual(['Acme Industries', 'Bolt Logistics'])
+    wrapper.unmount()
+  })
+
+  it('keeps the joined labels for a single-value field', async () => {
+    const wrapper = mount(Combobox, {
+      props: { items: clients, modelValue: 'acme' },
+      attachTo: document.body,
+    })
+    await nextTick()
+    expect(wrapper.find('[aria-label^="Remove"]').exists()).toBe(false)
+    expect(wrapper.get('input').element.value).toBe('Acme Industries')
+    wrapper.unmount()
+  })
+
+  it('shows the placeholder while a multiple field is empty', async () => {
+    const wrapper = mount(Combobox, {
+      props: { items: clients, multiple: true, modelValue: [], placeholder: 'Search clients' },
+      attachTo: document.body,
+    })
+    await nextTick()
+    expect(wrapper.find('[aria-label^="Remove"]').exists()).toBe(false)
+    expect(wrapper.get('input').attributes('placeholder')).toBe('Search clients')
+    wrapper.unmount()
+  })
+
+  /*
+   * A flex line breaks on an item's base size, so `grow` (basis auto) let the
+   * placeholder's own width push the input onto its own row while there was
+   * still space beside the chips. happy-dom does no layout, so this asserts
+   * the class that fixes it rather than the geometry.
+   */
+  it('gives the input a zero basis so it shares the line with the chips', async () => {
+    const wrapper = mount(Combobox, {
+      props: { items: clients, multiple: true, modelValue: ['acme'] },
+      attachTo: document.body,
+    })
+    await nextTick()
+    const classes = wrapper.get('input').classes()
+    expect(classes).toContain('flex-1')
+    expect(classes).not.toContain('grow')
+    wrapper.unmount()
+  })
+
+  it('drops just that value when a chip is removed', async () => {
+    const wrapper = mount(Combobox, {
+      props: { items: clients, multiple: true, modelValue: ['acme', 'bolt'] },
+      attachTo: document.body,
+    })
+    await nextTick()
+    await wrapper.get('[aria-label="Remove Acme Industries"]').trigger('click')
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([['bolt']])
+    wrapper.unmount()
+  })
+
+  it('takes the last chip on Backspace in an empty input', async () => {
+    const wrapper = mount(Combobox, {
+      props: { items: clients, multiple: true, modelValue: ['acme', 'bolt'] },
+      attachTo: document.body,
+    })
+    await nextTick()
+    await wrapper.get('input').trigger('keydown', { key: 'Backspace' })
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([['acme']])
+    wrapper.unmount()
+  })
+
+  it('leaves a mid-query Backspace alone', async () => {
+    const wrapper = mount(Combobox, {
+      props: { items: clients, multiple: true, modelValue: ['acme', 'bolt'] },
+      attachTo: document.body,
+    })
+    await nextTick()
+    const input = wrapper.get('input')
+    input.element.value = 'cir'
+    await input.trigger('keydown', { key: 'Backspace' })
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+    wrapper.unmount()
+  })
+
+  it('clears a multiple combobox back to an empty array', async () => {
+    const wrapper = mount(Combobox, {
+      props: { items: clients, multiple: true, clearable: true, modelValue: ['acme', 'bolt'] },
+      attachTo: document.body,
+    })
+    await nextTick()
+    await wrapper.get('[aria-label="Clear"]').trigger('click')
+    await nextTick()
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([[]])
+    wrapper.unmount()
+  })
+
   it('renders options when open, expanding string items', async () => {
     mount(Combobox, {
       props: { items: ['One', 'Two'], defaultOpen: true },

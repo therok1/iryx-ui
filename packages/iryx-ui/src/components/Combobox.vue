@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import type { AcceptableValue, ComboboxRootEmits, ComboboxRootProps } from 'reka-ui'
-import { ArrowDown01Icon, Tick02Icon } from '@hugeicons/core-free-icons'
+import { ArrowDown01Icon, Cancel01Icon, Tick02Icon } from '@hugeicons/core-free-icons'
 import {
   ComboboxAnchor,
+  ComboboxCancel,
   ComboboxContent,
   ComboboxEmpty,
   ComboboxGroup,
@@ -18,7 +19,7 @@ import {
   useFilter,
   useForwardPropsEmits,
 } from 'reka-ui'
-import { computed, ref, watchEffect } from 'vue'
+import { computed, ref, watch, watchEffect } from 'vue'
 import { useFormField } from '../composables/form'
 import { useIryxUiConfig } from '../config'
 import { comboboxTheme } from '../theme/combobox'
@@ -49,8 +50,22 @@ export interface ComboboxProps extends ComboboxRootProps {
   /** Mark the field as invalid — styles the border and ring red. */
   invalid?: boolean
   id?: string
+  /**
+   * Hold several values. The model becomes an array and each choice is drawn
+   * as a removable chip inside the field.
+   */
+  multiple?: boolean
   /** Shown when the query matches nothing. Override for non-English apps. */
   emptyText?: string
+  /**
+   * Swap the dropdown arrow for a clear button once something is selected.
+   * Clearing empties the query too and returns focus to the input.
+   */
+  clearable?: boolean
+  /** Accessible name for that button — override for non-English apps. */
+  clearLabel?: string
+  /** Accessible name for a chip's remove button. Receives the chip's label. */
+  removeLabel?: (label: string) => string
   /**
    * Offer a "create" row when the query matches no option's label, for
    * adding a client or item without leaving the field. Selecting it emits
@@ -77,6 +92,10 @@ export interface ComboboxProps extends ComboboxRootProps {
     anchor?: string
     input?: string
     trigger?: string
+    clear?: string
+    tag?: string
+    tagText?: string
+    tagDelete?: string
     content?: string
     viewport?: string
     item?: string
@@ -96,6 +115,8 @@ defineOptions({ inheritAttrs: false })
 
 const props = withDefaults(defineProps<ComboboxProps>(), {
   emptyText: 'No results found.',
+  clearLabel: 'Clear',
+  removeLabel: (label: string) => `Remove ${label}`,
   createLabel: (query: string) => `Create "${query}"`,
   estimateSize: 32,
   overscan: 12,
@@ -107,6 +128,8 @@ const props = withDefaults(defineProps<ComboboxProps>(), {
   invalid: undefined,
   disabled: undefined,
   create: undefined,
+  clearable: undefined,
+  multiple: undefined,
   unstyled: undefined,
 })
 
@@ -129,6 +152,32 @@ const emits = defineEmits<ComboboxRootEmits & {
  * and `open-on-focus` would reopen on that. It would also pop every combobox
  * open as you tabbed through a form.
  */
+/**
+ * The selection is mirrored here and handed straight back to `ComboboxRoot`,
+ * so the component is internally controlled whether or not the caller
+ * controls it. Removing a chip means *writing* the model, and an
+ * uncontrolled root owns a ref we cannot reach — the same reason
+ * `ComboboxCancel` needs `reset-model-value-on-clear` to do its half.
+ * `defaultValue` seeds the mirror and is then withheld from the root, since
+ * handing over both would have Reka count itself controlled *and* defaulted.
+ */
+const selected = ref<AcceptableValue | AcceptableValue[] | undefined>(props.modelValue ?? props.defaultValue)
+watch(() => props.modelValue, (value) => {
+  if (value !== undefined)
+    selected.value = value
+})
+
+function setSelected(value: AcceptableValue | AcceptableValue[] | undefined): void {
+  selected.value = value
+  emits('update:modelValue', value as never)
+}
+
+const showClear = computed(() => {
+  if (!props.clearable || props.disabled)
+    return false
+  const value = selected.value
+  return Array.isArray(value) ? value.length > 0 : value != null && value !== ''
+})
 const rootProps = computed(() => {
   const {
     items: _items,
@@ -137,6 +186,9 @@ const rootProps = computed(() => {
     invalid: _invalid,
     id: _id,
     emptyText: _emptyText,
+    clearable: _clearable,
+    clearLabel: _clearLabel,
+    removeLabel: _removeLabel,
     create: _create,
     createLabel: _createLabel,
     virtual: _virtual,
@@ -145,9 +197,11 @@ const rootProps = computed(() => {
     unstyled: _unstyled,
     class: _class,
     ui: _ui,
+    defaultValue: _defaultValue,
+    modelValue: _modelValue,
     ...rest
   } = props
-  return rest
+  return { ...rest, modelValue: selected.value }
 })
 const forwarded = useForwardPropsEmits(rootProps, emits)
 
@@ -212,11 +266,49 @@ const virtualOptions = computed(() => {
   return options.value.filter(option => contains(option.label, trimmed))
 })
 
+/** The chosen values as options, in the order they were picked. */
+const chosen = computed<ComboboxItemOption[]>(() => {
+  const value = selected.value
+  if (!Array.isArray(value))
+    return []
+  return value.map(v => options.value.find(option => option.value === v) ?? { label: String(v), value: String(v) })
+})
+
+/**
+ * Chips replace the joined-label string only when there is something to draw.
+ * An empty multiple field keeps its placeholder, which a wrapping row of
+ * nothing would otherwise sit on top of.
+ */
+const showChips = computed(() => Boolean(props.multiple) && chosen.value.length > 0)
+
+function remove(value: AcceptableValue): void {
+  const current = selected.value
+  if (!Array.isArray(current))
+    return
+  setSelected(current.filter(v => v !== value))
+}
+
+/**
+ * Backspace in an empty input takes the last chip, the way every tag field
+ * behaves — including ITagsInput. Guarded on an empty input so it never eats
+ * a character mid-query.
+ */
+function onInputKeydown(event: KeyboardEvent): void {
+  if (event.key !== 'Backspace' || !showChips.value)
+    return
+  if ((event.target as HTMLInputElement).value !== '')
+    return
+  event.preventDefault()
+  remove(chosen.value[chosen.value.length - 1]!.value)
+}
+
 /** What the closed field shows: the selected option's label, not its value. */
 function displayValue(value: AcceptableValue | AcceptableValue[]): string {
   const labelOf = (v: AcceptableValue) => options.value.find(option => option.value === v)?.label ?? String(v ?? '')
+  // With chips the labels are already on screen; repeating them in the input
+  // would leave nowhere to type.
   if (Array.isArray(value))
-    return value.map(labelOf).join(', ')
+    return showChips.value ? '' : value.map(labelOf).join(', ')
   return value == null || value === '' ? '' : labelOf(value)
 }
 
@@ -270,12 +362,13 @@ const isUnstyled = computed(() => props.unstyled ?? config.unstyled)
 const theme = computed(() =>
   comboboxTheme({
     size: props.size,
+    chips: showChips.value,
     invalid: isInvalid.value,
     disabled: props.disabled,
   }),
 )
 
-type Slot = 'anchor' | 'input' | 'trigger' | 'content' | 'viewport' | 'item' | 'empty' | 'group' | 'groupLabel'
+type Slot = 'anchor' | 'input' | 'trigger' | 'clear' | 'tag' | 'tagText' | 'tagDelete' | 'content' | 'viewport' | 'item' | 'empty' | 'group' | 'groupLabel'
 
 function slotClass(slot: Slot, extra?: string) {
   const override = props.ui?.[slot]
@@ -294,8 +387,38 @@ const itemIndicatorClass = computed(() => (isUnstyled.value ? undefined : theme.
     the popup open with the field unfocused. Generating no box removes the
     strip; the anchor becomes the layout box and the popper still measures it.
   -->
-  <ComboboxRoot v-bind="forwarded" open-on-click class="contents">
+  <ComboboxRoot
+    v-bind="forwarded"
+    open-on-click
+    :reset-model-value-on-clear="props.clearable || props.resetModelValueOnClear"
+    class="contents"
+    @update:model-value="selected = $event"
+  >
     <ComboboxAnchor :class="slotClass('anchor', props.class)">
+      <!--
+        Chips sit before the input rather than in a row of their own, so the
+        query box keeps whatever width the last line has left and only wraps
+        when there is genuinely no room.
+      -->
+      <span
+        v-for="option in chosen"
+        :key="String(option.value)"
+        :class="slotClass('tag')"
+      >
+        <slot name="tag" :option="option" :remove="() => remove(option.value)">
+          <span :class="slotClass('tagText')">{{ option.label }}</span>
+          <button
+            type="button"
+            tabindex="-1"
+            :aria-label="props.removeLabel(option.label)"
+            :class="slotClass('tagDelete')"
+            @click.stop="remove(option.value)"
+          >
+            <Icon :icon="Cancel01Icon" />
+          </button>
+        </slot>
+      </span>
+
       <ComboboxInput
         :id="inputId"
         v-model="query"
@@ -307,8 +430,22 @@ const itemIndicatorClass = computed(() => (isUnstyled.value ? undefined : theme.
         :class="slotClass('input')"
         @focus="onInputFocus"
         @input="onInput"
+        @keydown="onInputKeydown"
       />
-      <ComboboxTrigger :class="slotClass('trigger')">
+      <!--
+        The clear button takes the arrow's place rather than sitting beside it:
+        a field that is already filled has nothing useful behind the arrow that
+        clicking the input does not also do, and two 16px targets in the same
+        corner are a mis-click waiting to happen.
+      -->
+      <ComboboxCancel
+        v-if="showClear"
+        :aria-label="props.clearLabel"
+        :class="slotClass('clear')"
+      >
+        <Icon :icon="Cancel01Icon" />
+      </ComboboxCancel>
+      <ComboboxTrigger v-else :class="slotClass('trigger')">
         <Icon :icon="ArrowDown01Icon" />
       </ComboboxTrigger>
     </ComboboxAnchor>
