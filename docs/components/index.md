@@ -12,7 +12,7 @@ const { theme } = useData()
 
 {{ theme.componentCount }} components, all prefixed `I`. Every one supports `unstyled` and a `class` override; multi-part components take a `ui` prop for per-slot classes.
 
-Anywhere a component takes an `icon`, it accepts either shape: a [Hugeicons](https://hugeicons.com) export, or any component that renders an SVG.
+Anywhere a component takes an `icon`, it accepts either shape: a [Hugeicons](https://hugeicons.com) export, or any component that renders an SVG — [`IIcon`](/components/icon) is what resolves the difference, and you can use it directly.
 
 ## Layout & structure
 
@@ -111,6 +111,7 @@ Anywhere a component takes an `icon`, it accepts either shape: a [Hugeicons](htt
 | [`ITable`](/components/table) | Sorting, selection, expansion and per-cell slots, client- or server-driven |
 | [`IStat`](/components/stat) | KPI tile — label, value, signed delta with trend colour, and a hint |
 | [`IKbd`](/components/kbd) | Keyboard shortcut as chips — `mod` renders ⌘ or Ctrl per platform |
+| [`IIcon`](/components/icon) | The shared icon renderer — takes a Hugeicons array or any SVG component |
 | [`ITimeline`](/components/timeline) | Ordered run of events — icons, status variants, machine-readable times |
 | [`ITree`](/components/tree) | Expandable nested list — selection and expansion as arrays of values |
 | [`IAvatar`](/components/avatar) | Person or organisation — initials fallback, five sizes, presence dot |

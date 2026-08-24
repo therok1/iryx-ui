@@ -36,6 +36,7 @@ export const componentNames = [
   'FileUpload',
   'Form',
   'FormField',
+  'Icon',
   'Input',
   'Kbd',
   'Label',
