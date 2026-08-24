@@ -152,6 +152,9 @@ const sidebar = [
 const origin = (process.env.DOCS_ORIGIN ?? 'https://iryx-ui.com').replace(/\/$/, '')
 const description = 'A Vue 3 component library built on Reka UI and Tailwind CSS v4.'
 
+/* The card image carries no words, so its alt describes the mark itself. */
+const imageAlt = 'The Iryx UI mark, white on violet'
+
 /** A page's public path, with `index.md` and the `.md` suffix taken off. */
 function pagePath(relativePath: string): string {
   return relativePath
@@ -269,18 +272,17 @@ export default defineConfig({
     ['meta', { property: 'og:image', content: `${origin}/og.png` }],
     ['meta', { property: 'og:image:type', content: 'image/png' }],
     /*
-     * `og.png` is the 256px square mark, so the card stays `summary` — the
-     * small square one. Scrapers trust these dimensions over the file, so a
-     * `summary_large_image` here would crop the mark into a smear. When a
-     * 1200×630 image lands, all four of these change together: width, height,
-     * alt, and the card type.
+     * These four move together. Scrapers trust the declared dimensions over
+     * the file, so a card type that disagrees with them crops the image rather
+     * than fixing it: `og.png` was the 256px square mark and `summary`, and is
+     * now 1200×630 and `summary_large_image`.
      */
-    ['meta', { property: 'og:image:width', content: '256' }],
-    ['meta', { property: 'og:image:height', content: '256' }],
-    ['meta', { property: 'og:image:alt', content: 'The Iryx UI mark' }],
-    ['meta', { name: 'twitter:card', content: 'summary' }],
+    ['meta', { property: 'og:image:width', content: '1200' }],
+    ['meta', { property: 'og:image:height', content: '630' }],
+    ['meta', { property: 'og:image:alt', content: imageAlt }],
+    ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
     ['meta', { name: 'twitter:image', content: `${origin}/og.png` }],
-    ['meta', { name: 'twitter:image:alt', content: 'The Iryx UI mark' }],
+    ['meta', { name: 'twitter:image:alt', content: imageAlt }],
     /*
      * Switzer, from Fontshare — the same face and the same source the
      * playground uses. `style.css` names it in `--iryx-font-sans`, but naming a
