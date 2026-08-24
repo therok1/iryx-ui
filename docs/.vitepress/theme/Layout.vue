@@ -93,13 +93,14 @@ watch(() => route.path, () => {
 
         <a
           :href="withBase('/')"
-          class="flex items-center gap-2.5 text-[1.0625rem] font-semibold tracking-[-0.03em] transition-opacity hover:opacity-70"
+          class="flex shrink-0 items-center gap-2.5 text-[1.0625rem] font-semibold tracking-[-0.03em] whitespace-nowrap transition-opacity hover:opacity-70"
         >
           <img :src="withBase('/logo.svg')" alt="" class="h-4 w-auto">
           {{ site.title }}
         </a>
 
-        <nav class="hidden items-center gap-5 sm:flex" aria-label="Main">
+        <!-- The wordmark never wraps, so the links are what stand down when the bar runs out of room. -->
+        <nav class="hidden items-center gap-5 lg:flex" aria-label="Main">
           <a
             v-for="item in theme.nav"
             :key="item.link"
