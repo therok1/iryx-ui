@@ -10,6 +10,14 @@
  * decimal helpers work on these strings; `Intl.NumberFormat` renders them.
  */
 
+/** The signed-in user. Read by the account menu and the profile card alike,
+ * so the two cannot drift apart. */
+export const user = {
+  name: 'Rae Lindqvist',
+  email: 'rae@northwind.example',
+  role: 'owner',
+}
+
 export interface Invoice {
   id: string
   number: string

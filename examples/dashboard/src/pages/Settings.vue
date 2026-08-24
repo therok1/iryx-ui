@@ -2,6 +2,7 @@
 import type { Appearance, FormError } from 'iryx-ui'
 import { useAppearance, useToast } from 'iryx-ui'
 import { reactive, ref } from 'vue'
+import { user } from '../data'
 
 const { success } = useToast()
 const { appearance, setAppearance } = useAppearance()
@@ -12,6 +13,8 @@ const { appearance, setAppearance } = useAppearance()
  * library, so `validate` does the same job in plain functions.
  */
 const state = reactive({
+  name: user.name,
+  role: user.role,
   company: 'Northwind Ops',
   email: 'billing@northwind.example',
   terms: '30',
@@ -22,6 +25,9 @@ const state = reactive({
 
 function validate(values: typeof state): FormError[] {
   const errors: FormError[] = []
+
+  if (!values.name.trim())
+    errors.push({ name: 'name', message: 'Your name is on the emails you send.' })
 
   if (!values.company.trim())
     errors.push({ name: 'company', message: 'A company name appears on every invoice.' })
@@ -36,6 +42,13 @@ function validate(values: typeof state): FormError[] {
 
   return errors
 }
+
+const roles = [
+  { label: 'Owner', value: 'owner' },
+  { label: 'Administrator', value: 'admin' },
+  { label: 'Accountant', value: 'accountant' },
+  { label: 'Viewer', value: 'viewer' },
+]
 
 const currencies = [
   { label: 'Euro (EUR)', value: 'EUR' },
@@ -65,6 +78,45 @@ async function onSubmit(): Promise<void> {
     <IPageHeader title="Settings" description="How invoices are issued and chased." />
 
     <IForm :state="state" :validate="validate" @submit="onSubmit">
+      <!--
+        Same banded shape as the customer card: a raised identity strip whose
+        bottom border reaches both edges, then the fields below it. The avatar
+        takes `bg-background` because its own surface is `bg-muted`, which is
+        the colour of the band it now sits on.
+      -->
+      <ICard padding="none" class="mb-4 overflow-hidden shadow-xs">
+        <div class="flex items-center gap-4 border-b border-border bg-muted p-4">
+          <IAvatar :name="state.name" size="lg" class="bg-background" />
+
+          <div class="min-w-0 flex-1">
+            <p class="truncate font-medium">
+              {{ state.name || 'Unnamed' }}
+            </p>
+            <p class="truncate text-sm text-muted-foreground">
+              {{ user.email }}
+            </p>
+          </div>
+
+          <IButton variant="outline" size="sm" type="button">
+            Change photo
+          </IButton>
+        </div>
+
+        <div class="grid gap-4 p-4 sm:grid-cols-2">
+          <IFormField name="name" label="Full name" required>
+            <IInput v-model="state.name" />
+          </IFormField>
+
+          <IFormField
+            name="role"
+            label="Role"
+            help="Decides what this account can see and change."
+          >
+            <ISelect v-model="state.role" :items="roles" />
+          </IFormField>
+        </div>
+      </ICard>
+
       <ICard title="Billing details" class="shadow-xs">
         <div class="flex flex-col gap-4">
           <IFormField name="company" label="Company name" required>

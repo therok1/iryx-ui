@@ -2,7 +2,13 @@ import { tv } from 'tailwind-variants'
 
 export const lineChartTheme = tv({
   slots: {
-    root: 'w-full text-primary',
+    /*
+     * `relative` so the accessible data table, which is positioned out of
+     * sight, resolves against this root. Left static, its containing block
+     * was the document, and its height counted towards the page scroll area
+     * from outside every scroll container in between.
+     */
+    root: 'relative w-full text-primary',
     /**
      * The tooltip's coordinates come from the SVG, so the SVG has to be its
      * positioning context. Anchoring to the root instead shifts it up by the
@@ -14,7 +20,7 @@ export const lineChartTheme = tv({
     tick: 'fill-muted-foreground text-xs [font-variant-numeric:tabular-nums]',
     category: 'fill-muted-foreground text-xs',
     line: 'fill-none stroke-current stroke-2 [stroke-linecap:round] [stroke-linejoin:round]',
-    area: 'fill-current stroke-none opacity-10',
+    area: 'stroke-none',
     crosshair: 'stroke-border',
     marker: 'fill-current',
     /** Keeps the marker legible where it sits on top of the line. */

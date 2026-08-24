@@ -75,13 +75,25 @@ const account: DropdownMenuEntry[] = [
 </script>
 
 <template>
-  <IApp class="min-h-dvh">
+  <!--
+    No height class here. `IAppShell scroll="main"` already sets `h-svh` and
+    `overflow-hidden` on this same element, and a `min-h-dvh` on top of it made
+    the box taller than the viewport — `dvh` exceeds `svh` wherever a browser
+    has retracting chrome — which gave the document its own scrollbar behind
+    the main column's.
+  -->
+  <IApp>
     <!--
       `scroll="main"` pins the shell to the viewport and scrolls the content
       column alone, so the sidebar and header stay put — what a dashboard
       usually wants. `scroll="page"` scrolls the whole document instead.
     -->
-    <IAppShell scroll="main">
+    <!--
+      The content column gets its own recessed surface and a max width. Cards
+      are bg-background, so a muted canvas behind them is what makes them read
+      as raised rather than as outlined rectangles.
+    -->
+    <IAppShell scroll="main" :ui="{ main: 'bg-muted/60' }">
       <template #header>
         <div class="flex h-14 items-center gap-3 border-b border-border px-4">
           <span class="font-semibold tracking-tight">Northwind Ops</span>
@@ -131,7 +143,9 @@ const account: DropdownMenuEntry[] = [
         across a nav, and a table's sort or a form's draft would survive a move
         to another page and back.
       -->
-      <component :is="pages[page]" :key="page" class="p-6" />
+      <IContainer class="py-6">
+        <component :is="pages[page]" :key="page" />
+      </IContainer>
     </IAppShell>
 
     <IToaster />

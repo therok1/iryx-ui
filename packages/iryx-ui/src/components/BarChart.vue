@@ -542,29 +542,40 @@ function barClass(bar: Bar) {
       </div>
     </div>
 
-    <!-- The marks are decorative to assistive tech; this carries the data. -->
-    <table :class="slotClass('table')">
-      <caption>{{ props.label }}</caption>
-      <thead>
-        <tr>
-          <th scope="col">
-            Category
-          </th>
-          <th v-for="entry in series" :key="entry.key" scope="col">
-            {{ entry.name ?? 'Value' }}
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(datum, index) in props.data" :key="`row-${datum.label}-${index}`">
-          <th scope="row">
-            {{ datum.label }}
-          </th>
-          <td v-for="entry in series" :key="entry.key">
-            {{ readValue(datum, entry.key) == null ? '—' : formatValue(readValue(datum, entry.key)!) }}
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <!--
+      The marks are decorative to assistive tech; this carries the data.
+
+      `sr-only` goes on a wrapper rather than on the table itself. A table
+      treats a specified width as a *minimum* and refuses to shrink below
+      its content, so `sr-only` left it at full content size — absolutely
+      positioned, still measured, and adding its height to the document's
+      scroll area. A page with two charts grew a second scrollbar behind
+      the app. A div honours the 1px box and clips the table inside it.
+    -->
+    <div :class="slotClass('table')">
+      <table>
+        <caption>{{ props.label }}</caption>
+        <thead>
+          <tr>
+            <th scope="col">
+              Category
+            </th>
+            <th v-for="entry in series" :key="entry.key" scope="col">
+              {{ entry.name ?? 'Value' }}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(datum, index) in props.data" :key="`row-${datum.label}-${index}`">
+            <th scope="row">
+              {{ datum.label }}
+            </th>
+            <td v-for="entry in series" :key="entry.key">
+              {{ readValue(datum, entry.key) == null ? '—' : formatValue(readValue(datum, entry.key)!) }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>

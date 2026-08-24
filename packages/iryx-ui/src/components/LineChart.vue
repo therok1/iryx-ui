@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ChartSeries } from '../composables/cartesian'
 import type { SparseValue } from '../composables/scale'
-import { computed, ref } from 'vue'
+import { computed, ref, useId } from 'vue'
 import { AXIS_GAP, cartesianLayout, clampTooltip, seriesColor, slotOf, warnOnSlotOverflow } from '../composables/cartesian'
 import { useElementSize } from '../composables/element-size'
 import { useIryxUiConfig } from '../config'
@@ -167,6 +167,14 @@ function toArea(points: Point[]): string {
   return `${toLine(points)} L${last.x} ${base} L${first.x} ${base} Z`
 }
 
+/*
+ * A gradient needs an id, and two charts on the same page must not share
+ * one — the second would reference the first's stops and inherit its
+ * colour. `useId` is unique per component instance and stable across SSR
+ * and hydration, which a counter or a random string is not.
+ */
+const areaGradientId = `iryx-area-${useId()}`
+
 const hovered = ref<number>()
 
 /** One marker per series that actually has a reading at the hovered category. */
@@ -279,13 +287,26 @@ function slotClass(slot: keyof NonNullable<LineChartProps['ui']>, extra?: string
         -->
         <slot name="underlay" v-bind="layout" />
 
+        <!--
+          The wash fades out downwards rather than sitting as one flat tint,
+          so the line stays the strongest thing in the plot and the area
+          reads as depth under it rather than as a filled shape.
+        -->
+        <defs v-if="showArea">
+          <linearGradient :id="areaGradientId" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="currentColor" stop-opacity="0.35" />
+            <stop offset="100%" stop-color="currentColor" stop-opacity="0" />
+          </linearGradient>
+        </defs>
+
         <!-- Behind the line, so the wash never dulls the reading itself. -->
         <template v-if="showArea">
           <path
             v-for="(points, index) in lines[0]!.runs"
             :key="`area-${index}`"
             :d="toArea(points)"
-            :style="{ fill: lines[0]!.color }"
+            :fill="`url(#${areaGradientId})`"
+            :style="{ color: lines[0]!.color }"
             :class="slotClass('area')"
           />
         </template>
@@ -366,29 +387,40 @@ function slotClass(slot: keyof NonNullable<LineChartProps['ui']>, extra?: string
       </div>
     </div>
 
-    <!-- The marks are decorative to assistive tech; this carries the data. -->
-    <table :class="slotClass('table')">
-      <caption>{{ props.label }}</caption>
-      <thead>
-        <tr>
-          <th scope="col">
-            Category
-          </th>
-          <th v-for="entry in series" :key="entry.key" scope="col">
-            {{ entry.name ?? 'Value' }}
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(datum, index) in props.data" :key="`row-${datum.label}-${index}`">
-          <th scope="row">
-            {{ datum.label }}
-          </th>
-          <td v-for="entry in series" :key="entry.key">
-            {{ readValue(datum, entry.key) == null ? '—' : formatValue(readValue(datum, entry.key)!) }}
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <!--
+      The marks are decorative to assistive tech; this carries the data.
+
+      `sr-only` goes on a wrapper rather than on the table itself. A table
+      treats a specified width as a *minimum* and refuses to shrink below
+      its content, so `sr-only` left it at full content size — absolutely
+      positioned, still measured, and adding its height to the document's
+      scroll area. A page with two charts grew a second scrollbar behind
+      the app. A div honours the 1px box and clips the table inside it.
+    -->
+    <div :class="slotClass('table')">
+      <table>
+        <caption>{{ props.label }}</caption>
+        <thead>
+          <tr>
+            <th scope="col">
+              Category
+            </th>
+            <th v-for="entry in series" :key="entry.key" scope="col">
+              {{ entry.name ?? 'Value' }}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(datum, index) in props.data" :key="`row-${datum.label}-${index}`">
+            <th scope="row">
+              {{ datum.label }}
+            </th>
+            <td v-for="entry in series" :key="entry.key">
+              {{ readValue(datum, entry.key) == null ? '—' : formatValue(readValue(datum, entry.key)!) }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>

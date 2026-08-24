@@ -260,7 +260,9 @@ describe('stacked bars', () => {
     const wrapper = await mountChart({ data: stackData, series: stackSeries, stacked: true })
     await wrapper.findAll('rect')[0]!.trigger('pointerenter')
 
-    const tooltip = wrapper.findAll('div').at(-1)!
+    // The tooltip is the only div positioned by an inline style. Taking the
+    // last div instead broke as soon as the chart gained another one.
+    const tooltip = wrapper.findAll('div').find(d => d.attributes('style')?.includes('left'))!
     expect(tooltip.text()).toContain('Total')
     expect(tooltip.text()).toContain('600')
   })
