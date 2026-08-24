@@ -28,6 +28,20 @@ export interface LineChartProps {
    * overlapping washes muddy into a colour that belongs to neither.
    */
   variant?: 'line' | 'area'
+  /**
+   * How much to curve the line, from `0` (straight segments between
+   * readings) to `1` (fully rounded). Straight by default: a curve claims the
+   * readings run continuously into each other, which is true of a temperature
+   * trace and false of six monthly totals.
+   */
+  tension?: number
+  /**
+   * Carry the line and its fill flat out to the left and right edges of the
+   * plot. The readings themselves do not move — markers, labels and the
+   * tooltip stay where they are — so the chart fills its box without
+   * pretending to know a value it was never given.
+   */
+  flush?: boolean
   /** Rendered height in px. Width always fills the container. */
   height?: number
   /** Target tick count. The axis lands on round numbers, so this is a hint. */
@@ -61,6 +75,8 @@ export interface LineChartProps {
 }
 
 const props = withDefaults(defineProps<LineChartProps>(), {
+  tension: 0,
+  flush: undefined,
   data: () => [],
   variant: 'line',
   height: 240,
@@ -135,7 +151,7 @@ const lines = computed(() => {
         return
       }
       current.push({
-        x: round(layout.value.bandCentre(index)),
+        x: round(layout.value.pointAt(index)),
         y: round(layout.value.y(value)),
         index,
       })
@@ -155,8 +171,73 @@ const lines = computed(() => {
  */
 const showArea = computed(() => props.variant === 'area' && !isMulti.value && lines.value.length > 0)
 
+/** Where the data starts and ends, and the plot edges it can be carried to. */
+const edgeX = computed(() => {
+  const count = props.data?.length ?? 0
+  return {
+    first: count ? round(layout.value.pointAt(0)) : 0,
+    last: count ? round(layout.value.pointAt(count - 1)) : 0,
+    left: round(layout.value.plot.left),
+    right: round(layout.value.plot.left + layout.value.plot.width),
+  }
+})
+
+function tail(last: Point): string {
+  return props.flush && last.x === edgeX.value.last
+    ? `L${edgeX.value.right} ${last.y}`
+    : ''
+}
+
+/** `tension` is a 0–1 dial; a Catmull-Rom spline wants a sixth of it. */
+const curve = computed(() => Math.min(Math.max(props.tension, 0), 1) / 6)
+
+/*
+ * Catmull-Rom through the readings, converted to the cubic segments SVG
+ * draws, with each control point clamped to the pair it sits between.
+ *
+ * The clamp is the whole point. An unclamped spline overshoots: between a low
+ * reading and a high one it swings past both, so the curve dips under the
+ * smallest number in the data and over the largest. On a decorative shape
+ * that is a flourish; on a chart it draws values that were never measured.
+ */
 function toLine(points: Point[]): string {
-  return points.map((point, index) => `${index === 0 ? 'M' : 'L'}${point.x} ${point.y}`).join(' ')
+  const first = points[0]!
+  const last = points[points.length - 1]!
+
+  /*
+   * Only the run that actually reaches an end of the data gets extended. A
+   * series broken by a gap renders as several runs, and carrying an inner
+   * one out to the edge would draw straight through the gap it was split for.
+   */
+  const lead = props.flush && first.x === edgeX.value.first
+    ? `M${edgeX.value.left} ${first.y} L${first.x} ${first.y}`
+    : `M${first.x} ${first.y}`
+
+  const start = lead
+  if (curve.value === 0 || points.length < 2) {
+    const line = points.slice(1).map(point => `L${point.x} ${point.y}`)
+    return [start, ...line, tail(last)].filter(Boolean).join(' ')
+  }
+
+  const clamp = (value: number, a: number, b: number) =>
+    Math.min(Math.max(value, Math.min(a, b)), Math.max(a, b))
+
+  const segments = points.slice(1).map((point, index) => {
+    const p1 = points[index]!
+    // The ends have no neighbour beyond them, so they double back on themselves.
+    const p0 = points[index - 1] ?? p1
+    const p2 = point
+    const p3 = points[index + 2] ?? p2
+
+    const c1x = p1.x + (p2.x - p0.x) * curve.value
+    const c1y = clamp(p1.y + (p2.y - p0.y) * curve.value, p1.y, p2.y)
+    const c2x = p2.x - (p3.x - p1.x) * curve.value
+    const c2y = clamp(p2.y - (p3.y - p1.y) * curve.value, p1.y, p2.y)
+
+    return `C${round(c1x)} ${round(c1y)}, ${round(c2x)} ${round(c2y)}, ${p2.x} ${p2.y}`
+  })
+
+  return [start, ...segments, tail(last)].filter(Boolean).join(' ')
 }
 
 /** Closed to the bottom of the plot, not to zero — the axis may not show it. */
@@ -164,7 +245,10 @@ function toArea(points: Point[]): string {
   const base = layout.value.plot.top + layout.value.plot.height
   const first = points[0]!
   const last = points[points.length - 1]!
-  return `${toLine(points)} L${last.x} ${base} L${first.x} ${base} Z`
+  // Closed under whatever the line actually spans, extensions included.
+  const leftX = props.flush && first.x === edgeX.value.first ? edgeX.value.left : first.x
+  const rightX = props.flush && last.x === edgeX.value.last ? edgeX.value.right : last.x
+  return `${toLine(points)} L${rightX} ${base} L${leftX} ${base} Z`
 }
 
 /*
@@ -192,7 +276,7 @@ const markers = computed(() => {
 })
 
 const crosshairX = computed(() =>
-  hovered.value == null ? undefined : round(layout.value.bandCentre(hovered.value)),
+  hovered.value == null ? undefined : round(layout.value.pointAt(hovered.value)),
 )
 
 const tooltip = computed(() => {
@@ -224,7 +308,7 @@ const tooltip = computed(() => {
     label: datum.label,
     rows,
     multi: isMulti.value,
-    x: clampTooltip(layout.value.bandCentre(hovered.value), 'x'.repeat(widest), width.value),
+    x: clampTooltip(layout.value.pointAt(hovered.value), 'x'.repeat(widest), width.value),
     y: Math.min(...markers.value.map(marker => marker.y), layout.value.plot.top + layout.value.plot.height),
   }
 })
@@ -346,7 +430,7 @@ function slotClass(slot: keyof NonNullable<LineChartProps['ui']>, extra?: string
         <template v-for="(datum, index) in props.data" :key="`label-${datum.label}-${index}`">
           <text
             v-if="index % layout.labelStep === 0"
-            :x="layout.bandCentre(index)"
+            :x="layout.pointAt(index)"
             :y="layout.plot.top + layout.plot.height + 14"
             text-anchor="middle"
             :class="slotClass('category')"

@@ -93,10 +93,24 @@ const account: DropdownMenuEntry[] = [
       are bg-background, so a muted canvas behind them is what makes them read
       as raised rather than as outlined rectangles.
     -->
-    <IAppShell scroll="main" :ui="{ main: 'bg-muted/60' }">
+    <IAppShell
+      scroll="main"
+      :ui="{
+        main: 'bg-muted/20',
+        // On the shell's header, not on the bar inside it: that bar sits in the
+        // content column, so its own rule stops short of the nav trigger.
+        header: 'border-b border-border',
+        // The sidebar brings its own header into the drawer, so it does not need
+        // the padding that otherwise clears the close button.
+        navDrawerBody: 'pt-0',
+      }"
+    >
       <template #header>
-        <div class="flex h-14 items-center gap-3 border-b border-border px-4">
-          <span class="font-semibold tracking-tight">Northwind Ops</span>
+        <div class="flex h-14 items-center gap-3 px-4">
+          <span class="flex items-center gap-2.5 font-semibold tracking-tight">
+            <img src="/logo.svg" alt="" class="h-4 w-auto">
+            Iryx UI
+          </span>
 
           <IInput
             placeholder="Search invoices, customers…"
@@ -134,8 +148,29 @@ const account: DropdownMenuEntry[] = [
         </div>
       </template>
 
-      <template #sidebar>
-        <ISidebar :items="items" class="w-60" />
+      <!--
+        The shell renders this slot twice — once as the column, once inside the
+        mobile drawer — and hands over which is which. The brand only belongs in
+        the drawer: the header bar already carries it in the wide layout.
+      -->
+      <template #sidebar="{ inDrawer }">
+        <!--
+          In the drawer the brand row is sized and placed to match the panel's
+          close button — 24px tall, starting at the same 16px — so the two read
+          as one row rather than as two stacked ones.
+        -->
+        <ISidebar
+          :items="items"
+          class="w-60"
+          :ui="inDrawer ? { header: '-mt-1 h-6 px-3 py-0' } : undefined"
+        >
+          <template v-if="inDrawer" #header>
+            <span class="flex items-center gap-2.5 font-semibold tracking-tight">
+              <img src="/logo.svg" alt="" class="h-4 w-auto">
+              Iryx UI
+            </span>
+          </template>
+        </ISidebar>
       </template>
 
       <!--

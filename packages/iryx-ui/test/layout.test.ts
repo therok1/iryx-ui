@@ -278,7 +278,9 @@ describe('appShell', () => {
     const wrapper = mount(AppShell, { props: { scroll: 'page' }, slots })
     expect(wrapper.attributes('class')).toContain('min-h-svh')
     expect(wrapper.attributes('class')).not.toContain('overflow-hidden')
-    expect(wrapper.get('#hdr').element.parentElement!.className).toContain('sticky')
+    // The shell wraps the header slot in a row of its own, for the mobile nav
+    // trigger, so the sticky bar is an ancestor rather than the direct parent.
+    expect(wrapper.get('#hdr').element.closest('.sticky')).not.toBeNull()
   })
 
   /*

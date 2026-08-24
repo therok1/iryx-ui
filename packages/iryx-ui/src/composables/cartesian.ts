@@ -63,6 +63,13 @@ export interface CartesianLayout {
   labelStep: number
   /** Centre of a category slot, in px along the category axis. */
   bandCentre: (index: number) => number
+  /**
+   * Where a *point* sits, as against the middle of a band. The first lands
+   * on the left edge of the plot and the last on the right, so a line spans
+   * the full width instead of floating half a band clear of both sides.
+   * Bars want `bandCentre`; lines and areas want this.
+   */
+  pointAt: (index: number) => number
 }
 
 export function cartesianLayout(input: CartesianInput): CartesianLayout {
@@ -139,6 +146,20 @@ export function cartesianLayout(input: CartesianInput): CartesianLayout {
     bandWidth,
     labelStep,
     bandCentre: (index: number) => bandStart + bandWidth * (index + 0.5),
+    // A single reading has no span to stretch across, so it sits in the middle.
+    pointAt: (index: number) => {
+      if (input.categories <= 1)
+        return bandStart + bandSpan / 2
+      /*
+       * Not quite the full width: a quarter of a band at each end, against the
+       * half a band that centring in a band would have given. A line that ends
+       * exactly on the plot edge reads as clipped rather than as finished, and
+       * its end marker has nowhere to sit.
+       */
+      const inset = bandWidth * 0.25
+      const usable = bandSpan - inset * 2
+      return bandStart + inset + (usable * index) / (input.categories - 1)
+    },
   }
 }
 

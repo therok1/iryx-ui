@@ -35,7 +35,7 @@ describe('stat', () => {
   })
 
   it('colours a rise as good and a fall as bad by default', () => {
-    expect(mount(Stat, { props: { delta: 5 } }).get('span.text-success').exists()).toBe(true)
+    expect(mount(Stat, { props: { delta: 5 } }).find('span.text-success').exists()).toBe(true)
     expect(mount(Stat, { props: { delta: -5 } }).find('span.text-success').exists()).toBe(false)
   })
 
@@ -48,7 +48,7 @@ describe('stat', () => {
     const wrapper = mount(Stat, { props: { label: 'Overdue', delta: -14, trend: 'up' } })
     expect(wrapper.text()).toContain('-14%')
     expect(wrapper.get('svg').html()).toBe(arrowDown)
-    expect(wrapper.get('span.text-success').exists()).toBe(true)
+    expect(wrapper.find('span.text-success').exists()).toBe(true)
   })
 
   it('takes a formatter for deltas that are not percentages', () => {

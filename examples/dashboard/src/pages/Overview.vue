@@ -80,6 +80,8 @@ const timeline = computed<TimelineItem[]>(() => activity.map(entry => ({
         <ILineChart
           :data="revenue"
           variant="area"
+          :tension="0.6"
+          flush
           :height="260"
           locale="en-IE"
           :format="{ style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }"

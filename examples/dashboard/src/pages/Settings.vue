@@ -85,7 +85,7 @@ async function onSubmit(): Promise<void> {
         the colour of the band it now sits on.
       -->
       <ICard padding="none" class="mb-4 overflow-hidden shadow-xs">
-        <div class="flex items-center gap-4 border-b border-border bg-muted p-4">
+        <div class="flex items-center gap-4 border-b border-border bg-muted/50 p-4">
           <IAvatar :name="state.name" size="lg" class="bg-background" />
 
           <div class="min-w-0 flex-1">

@@ -48,7 +48,7 @@ const customers = computed(() => {
         padding="none"
         class="overflow-hidden shadow-xs"
       >
-        <div class="flex items-start gap-3 border-b border-border bg-muted p-4">
+        <div class="flex items-start gap-3 border-b border-border bg-muted/50 p-4">
           <!-- The avatar's own surface is `bg-muted`, which is now the band it sits on. -->
           <IAvatar :name="customer.name" size="md" class="bg-background" />
 
