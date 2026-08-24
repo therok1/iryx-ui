@@ -417,14 +417,22 @@ body {
     var(--iryx-primary),
     transparent 55%
   );
-  /* `exclude` is what turns a filled rectangle into a ring. */
-  mask:
-    linear-gradient(#000 0 0) content-box,
+  /*
+   * `exclude` subtracts the content box, leaving only the 1px frame lit.
+   *
+   * Written as longhands, never the `mask` shorthand: a minifier is free to
+   * move the shorthand after `mask-composite`, and the shorthand resets it to
+   * `add` — which fills the whole card instead of ringing it.
+   */
+  mask-image:
+    linear-gradient(#000 0 0),
     linear-gradient(#000 0 0);
+  mask-clip: content-box, border-box;
   mask-composite: exclude;
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
+  -webkit-mask-image:
+    linear-gradient(#000 0 0),
     linear-gradient(#000 0 0);
+  -webkit-mask-clip: content-box, border-box;
   -webkit-mask-composite: xor;
   opacity: var(--glow-opacity, 0);
   transition: opacity 220ms ease;
