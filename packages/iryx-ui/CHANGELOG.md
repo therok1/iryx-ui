@@ -1,5 +1,34 @@
 # iryx-ui
 
+## 0.15.0
+
+### Minor Changes
+
+- 29c9ad7: `IAppShell` turns its sidebar into a drawer on small screens. Below `md` the sidebar column is hidden and the same `#sidebar` slot renders inside a left drawer, with a trigger the shell puts in the header itself — so an app gets usable navigation on a phone without wiring anything up. `mobileNav` turns it off, `navLabel` names the trigger, and the `#sidebar` slot receives `inDrawer` so a brand or footer can differ between the two. The `#header` slot now also receives `navOpen` and `toggleNav` for apps that would rather place the trigger themselves.
+
+  The breakpoint is CSS, not a media query read in script, so server-rendered markup and the first client frame agree.
+
+  **Note for custom themes:** the header slot is now wrapped in a row (`ui.headerRow`, `ui.headerContent`) to make room for that trigger, so the bar is one level deeper in the DOM than before.
+
+- 29c9ad7: `ILineChart` takes a `tension` from `0` to `1`, curving the line between readings. It stays `0` by default: a curve claims the readings run continuously into each other, which is true of a temperature trace and false of six monthly totals.
+
+  Control points are clamped to the pair of readings they sit between. An unclamped spline overshoots — between a low reading and a high one it swings past both, drawing values below the smallest number in the data and above the largest.
+
+  `flush` carries the line and its fill flat out to the left and right edges of the plot, while the readings, markers and labels stay put — so the chart fills its box without pretending to know a value it was never given.
+
+  Line charts also now span the plot rather than sitting half a category clear of each edge, keeping a quarter-category inset so the end markers have somewhere to sit.
+
+### Patch Changes
+
+- 43a842e: `IButton` no longer picks up an underline from the prose around it. A button rendered `as="a"` lands in whatever link styles its page defines, and inside documentation or article markup that usually means an underline on hover — which made a solid button read as a link. The `link` variant still underlines on hover, as it always did.
+- bfff36e: `ILineChart` and `IBarChart` no longer add their own height to the page's scroll area. The accessible data table carried `sr-only` directly, but a table treats a specified width as a _minimum_ and refuses to shrink below its content — so the table stayed at full size, absolutely positioned and still measured. A page with two charts grew a second scrollbar behind the app. The class moves to a wrapping `div`, which honours the 1px box and clips the table inside it.
+- 9a1c603: `IFormField` spaces its parts with a flex gap instead of `space-y`. Margin-based spacing puts the margin on the control element itself, and `ICombobox` renders its root as `display: contents` — a box margins do not apply to — so a combobox sat tight against its label while every other control cleared it by 8px.
+- bfff36e: `ILineChart`'s `area` variant fills with a downward gradient rather than one flat tint, so the line stays the strongest thing in the plot and the wash reads as depth under it. The gradient id comes from `useId`, so two charts on a page cannot share one.
+- 7cb6ea2: `ISidebar`'s nav had `px-2 py-1`, so a link sat 8px from the side edges but only 4px from the top — the first link read as crowded against the header. It is now an even `p-2`.
+- 7cb6ea2: `IStat`'s `trend` no longer turns the arrow around. It is documented as a colour override — for the case where down is the good direction, like a falling overdue total — but it also flipped the arrow, so `:delta="-14" trend="up"` rendered "↑ -14%", an arrow contradicting the signed number printed beside it.
+
+  The arrow now follows the sign of `delta` and `trend` colours it, which is what the prop always said it did.
+
 ## 0.14.0
 
 ### Minor Changes
