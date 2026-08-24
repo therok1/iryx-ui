@@ -10,6 +10,18 @@
 /sitemap.xml
   Cache-Control: public, max-age=0, must-revalidate
 
+# HSTS: after one HTTPS visit the browser refuses plain HTTP for this domain
+# and every subdomain until max-age lapses, upgrading the request itself rather
+# than trusting a redirect that an attacker on the network could intercept.
+#
+# Deliberately no `preload`. That ships the domain inside browser binaries, and
+# getting back off the list takes months of release cycles — it is the one part
+# of this that cannot be undone by editing a header.
+#
+# 30 days to start. Raise to 31536000 once a deploy has gone out and both the
+# apex and www still load: a long max-age is only worth setting on a header
+# already watched working.
 /*
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
+  Strict-Transport-Security: max-age=2592000; includeSubDomains
