@@ -1,5 +1,149 @@
 # iryx-ui
 
+## 0.13.0
+
+### Minor Changes
+
+- d709dd2: New component: `IAccordion` — a disclosure list on Reka's Accordion, driven by the same `items` rule as the rest of the library. `type="multiple"` lets several panels stand open and turns the model into an array; `collapsible` lets the open panel close again in `single` mode; `variant` is `plain` (rules between rows) or `outline` (a panel each).
+
+  This finally exposes the collapsible behaviour that has been buried inside `ISidebar` since the navigation work, with the two lessons that came out of it baked in: the animated element carries no padding, because margin is not part of an animated height and survives the close as a gap under a shut panel; and the chevron reads `data-state` from the trigger through a group, because `data-state` sits on the trigger and a bare `data-[state=open]:` on the icon inside it matches nothing at all.
+
+- d709dd2: Add `IAvatar`, `IAvatarGroup`, `ITimeline` and `IAspectRatio`.
+
+  `IAvatar` treats initials as the normal state rather than a failure state — most people in most applications have never uploaded a photo. Initials come from the first and last words of a name, so "Ana María Ruiz Vega" gives AV rather than four unreadable letters, and the presence dot carries a name because a colour says nothing on its own. `IAvatarGroup` overlaps them into a stack with a `max` and a "+n" chip, ringing each avatar in the page background so the overlap reads as depth.
+
+  `ITimeline` is an ordered run of events — an audit trail, a delivery's progress. It is deliberately not `IStepper`: a stepper is a process you move through with steps still to come, a timeline is a record of what already happened. The connecting spine is drawn per item so the last one can omit it, rather than one line behind the column that would trail off past the final marker.
+
+  `IAspectRatio` holds a box at a fixed ratio so content that sizes itself cannot shift the page when it loads.
+
+  `IPopover` gains a `title` prop, and no longer reserves room for its close button by padding the whole panel — that indented every row, so a form inside could never reach the full width. Only the title makes way for the button now, because the top line is the only one it can collide with.
+
+- d709dd2: Add `ICollapsible` and `IColorPicker`, and give `ITree` counts.
+
+  `ICollapsible` is the bare disclosure behind `IAccordion` — one region that opens and closes, for when there are no siblings to coordinate with. It shares the accordion's height animation, so the two can never open at different speeds.
+
+  `IColorPicker` gives a saturation plane, a hue ramp, an optional opacity ramp, a hex field and optional presets. The model is a hex **string**, because a string is what goes into a stylesheet, a database column and a design token. The opacity ramp sits on a chequerboard, since transparent at one end is otherwise indistinguishable from white, and the thumbs are white rings rather than filled dots so the colour underneath stays visible.
+
+  `ITree` items take a `count`, shown against the row's trailing edge so the numbers line up in a column instead of stepping inward with every level. Rows also keep a small base inset, so a top-level chevron no longer sits flush against the tree's leading edge.
+
+- d709dd2: New component: `ICommandPalette` — every command in the app behind one shortcut, grouped, filtered as you type, and driven entirely by keyboard.
+
+  It opens on `mod+k` by default, where `mod` is Command on Apple platforms and Control everywhere else. The listener sits on the window rather than on the palette, because the palette is not in the DOM until it opens — a listener on it could never be what opens it.
+
+  Commands carry `keywords`, which are search terms that never appear on screen: synonyms, the old name of a renamed page, the word a reader would guess before learning yours. A `shortcut` is display only — the palette never binds it, because a shortcut belongs to the command and has to work whether or not the palette is open. An `href` renders the row as an `<a>`, so middle-click and open-in-new-tab behave.
+
+  Built on Reka's `Listbox` primitives inside a dialog, so arrow keys, typeahead, focus return and `Escape` come from the same place every other overlay gets them.
+
+- d709dd2: Add `IKbd` — a keyboard shortcut drawn as one chip per key.
+
+  `mod` renders as ⌘ on Apple platforms and Ctrl everywhere else, using the same vocabulary `matchesHotkey` reads, so the shortcut you bind and the shortcut you show cannot drift apart. The platform is resolved after mount rather than during render: there is no `navigator` on the server, so deciding earlier would print "Ctrl" into server markup and "⌘" on the client and mismatch hydration on every page carrying a shortcut.
+
+  The glyphs are hidden from assistive technology and the group carries the spoken form instead — `mod+shift+k` announces as "Command Shift K" — because ⌘ on its own announces as nothing useful.
+
+  `ICommandPalette` now renders its items' shortcuts with this component instead of its own inline markup, and `matchesHotkey` shares the platform check, so there is one answer to "which key is `mod`" in the library.
+
+- 8f6eb28: Add `INavigationMenu`, the app-level navigation bar built on Reka's `NavigationMenu`.
+
+  Entries are data, following the same rule `IDropdownMenu` uses: an entry with its own `items` becomes a panel trigger, everything else is a plain link. Every panel shares one viewport, so moving between triggers resizes and slides a single surface rather than swapping popups. `columns` widens a panel's grid, per menu or per entry; `orientation="vertical"` stacks the entries and opens panels to the side; an entry without `href` renders a `<button>` and calls `onSelect`, which is what a router link wants.
+
+- d709dd2: **Breaking (small):** `INumberInput`'s `class` now lands on the root rather than on the `<input>`.
+
+  The stepper is positioned against the root and the input fills it, so a width written through `class` narrowed the field while leaving the arrows pinned to the root's far edge — floating in space beside the control. Sizing the box that defines the field is the only placement where the two cannot come apart, and it matches `IInput`, whose `class` already goes to the element carrying the field chrome.
+
+  Reach the input itself with `ui.input`. Attributes are unaffected: they still go to the `<input>`, so `aria-label` continues to name the control. If you were working around the old behaviour with `:ui="{ root: 'max-w-xs' }"`, that still works — `class` now does the same thing.
+
+- d709dd2: Add `IPopover`, `IContextMenu`, `IMenubar` and `IToolbar`.
+
+  `IPopover` anchors a panel to its trigger, for content too big for a tooltip and too small for a dialog — with `modal` to trap focus when it holds a form, an optional close button the panel reserves room for, and a `close` function handed to the default slot. A width is part of the default on purpose: an unconstrained popover lets a paragraph stretch across the viewport.
+
+  `IContextMenu` and `IMenubar` share `IDropdownMenu`'s entry shape, renderer and theme rather than duplicating them — Reka's context, menubar and dropdown parts are all thin wrappers over the same `Menu` primitives, so there is one menu in this library wearing three ways of being opened. `IContextMenu` reports opening through `update:open` rather than taking a `v-model:open`: a context menu appears where the pointer is, so opening one from code would have nowhere to put it.
+
+  `IToolbar` gives a row of controls a single Tab stop with arrow keys moving between them. Its buttons are `IButton`s in ghost form, so a toolbar button and a button elsewhere cannot drift apart, and anything beyond buttons, links and separators goes in the default slot — `IToggleGroup` nests inside without fighting it for the same keys.
+
+- 39de323: Add the page layout set: `IAppShell`, `ISidebar`, `IPageHeader` and `IContainer`.
+
+  `IAppShell` is a frame and nothing more — every region is a slot, so the top bar, sidebar and footer stay yours. Its `scroll` prop picks between two genuinely different layouts: `"main"` pins the shell to the viewport and scrolls only the content column, while `"page"` scrolls the document with a sticky header and sidebar, which is the one anchor links and scroll restoration work with. In `page` mode the shell measures its own header and publishes the height as `--iryx-shell-header-height`, because a sticky sidebar would otherwise park behind a sticky header and CSS has no way to say "below the header" on its own.
+
+  `ISidebar` takes links, optionally grouped into sections, with collapsible groups, badges and a `v-model:collapsed` icons-only mode. Section headings live under a `section` key rather than `label`: a collapsible group carries `items` too, so one shared key would mean guessing which of the two an entry is, and an icon-less group would quietly render as a heading.
+
+  `IPageHeader` puts the title and action row on one line from `sm` up and stacks them below it, and `IContainer` is the shared reading measure.
+
+- d709dd2: Add `IPinInput` and `ITagsInput`, completing the form set.
+
+  `IPinInput` gives one cell per character for a short code, with `group-size` to break a long one into readable chunks, `mask` for a PIN, and `otp` so a phone can offer the code straight from the SMS that carried it. Its model is a plain **string** rather than Reka's array of single characters — a code is a string in the request body, the validator and the email it arrived in.
+
+  `ITagsInput` collects a list as removable tags, with a configurable delimiter, `max`, duplicate control, and paste splitting. The field grows as tags wrap rather than scrolling them out of sight, the name lands on the `<input>` rather than the box around it, and each delete control is named after the tag it removes instead of being one of a row of identical crosses. Inside an `IFormField` it inherits the id, invalid state and error's `aria-describedby`.
+
+- d709dd2: `IProgress` now takes `segments` — runs that share one track, for storage by file type, a budget by category, a release by status. Each carries its own value and variant; `modelValue` is ignored and the accessible value becomes their sum.
+
+  A run with a `label` gets a legend row beneath the track. That legend is text rather than a tooltip on purpose: the runs are hidden from assistive technology through the track, so it is the only place the breakdown can be read. A run with no `variant` takes the new `neutral` fill, which reads the same as the unclaimed remainder.
+
+  Segments can sum past `max` — a disk that grew, a budget overspent — so runs are clamped cumulatively rather than scaled. The bar fills and stops instead of painting outside the track, the last run to reach the end keeps the rounded corner, and the legend still reports what each run asked for.
+
+- d709dd2: Every animation and transition now honours `prefers-reduced-motion`. The guard ships in `theme.css`, so importing it is all it takes.
+
+  Durations drop to `0.01ms` rather than the animation being removed: Reka unmounts a dialog, drawer, popover or toast when its exit animation raises `animationend`, and `animation: none` means that event never fires and the overlay stays mounted forever. The two looping indicators are handled separately, because running them once would leave them wherever their last keyframe lands — the indeterminate `IProgress` bar parks at the start of its track instead of sliding past the end of it, and `ITable`'s loading bar becomes a steady rule.
+
+  Also fixes the appearance-switch guard, which suppressed transitions during a light/dark switch and removed itself on the next animation frame. A background tab has no next frame — and a system appearance change fires there regardless — so the guard could outlive the switch and leave every transition and animation on the page dead until reload. It now clears on a timer as well, and shortens durations rather than setting `animation: none`.
+
+- d709dd2: Add `IScrollArea` and `ISplitter`.
+
+  `IScrollArea` replaces the platform's scrollbar with a thin themed one — but only the _bar_. The viewport still scrolls natively, so wheel, trackpad, keyboard and touch behave exactly as the platform intends and none of the usual costs of hijacking scrolling apply. It is a different job from `IScrollFade`, which leaves the native bar alone and fades the content edges instead.
+
+  `ISplitter` divides resizable panes with a draggable handle, horizontally or vertically, with per-panel minimum and maximum sizes, collapsing, and an `auto-save-id` that remembers a reader's arrangement across reloads. The handle keeps a padded hit area larger than its visible rule, because a 1px target is unusable with a mouse and impossible on a trackpad.
+
+- d709dd2: New component: `IScrollFade` — a scroll container whose edges fade while there is more to scroll, on either axis. It answers the question a cropped list always raises without waiting for a scrollbar to appear and say so.
+
+  The fade is a **mask**, not an overlaid gradient. An overlay has to be painted in the container's own background colour, which is a guess: on a card, a muted panel or an image the guess is visibly wrong. A mask removes pixels instead, so whatever is behind shows through and it is correct on every surface. The trade-off is that a mask applies to everything the element paints: a border on the component, its scrollbar and any `position: sticky` child fade with the content. Put the frame on a wrapper and keep sticky headers outside.
+
+  Edges are measured rather than assumed: `scroll` for position, a `ResizeObserver` on both the container and its children for extent, and a `MutationObserver` for rows added or removed, which changes the scroll extent without resizing anything already observed. There is a pixel of slack at both ends, because fractional layout leaves `scrollTop` a hair short of its maximum and an exact comparison paints a trailing fade on a list already scrolled to the bottom.
+
+  `fadeStart` / `fadeEnd` switch an edge off, `size` sets the length, and the default slot receives `{ atStart, atEnd, overflowing }` — also exposed on the root as `data-at-start`, `data-at-end` and `data-overflowing` so a "more below" hint can be pure CSS.
+
+- d709dd2: Add `ISignaturePad` — a signature drawn with a pointer, or typed by anyone who cannot.
+
+  The first component here that is not a Reka wrapper: canvas and pointer events all the way down. The pen thins as the hand speeds up, because a constant width reads as a traced outline rather than handwriting; the canvas is backed at the device's pixel ratio, so a signature is not soft on a modern screen; and the surface sets `touch-action: none`, without which a finger signature scrolls the page instead of drawing.
+
+  The typed field is on by default and is not a nicety — a canvas cannot be drawn on with a keyboard, so without it the control is unusable for anyone who does not point. The typed name is rendered onto the same canvas in a script face, so the model is a PNG data URL either way and nothing downstream has to know which route was taken. `null` when unsigned, so `required` works in an `IForm` without a special case, and a one-point stroke does not count as a signature.
+
+- d709dd2: **Breaking:** `ITable`'s `loadingRows` prop is now `skeletonRows`. It only ever controlled the skeleton placeholders, and now that `loading` also drives a refresh bar the old name read as though it governed both. Rename the prop at call sites; nothing else about it changed.
+- d709dd2: Add `ISlider` — a value or a range on one track, with an optional label, live value and min/max scale.
+
+  The model keeps whatever shape you give it: a plain number stays a number, an array stays an array, so a slider drops into an existing form without reshaping the model around it. `formatValue` drives the readout, the scale captions and each thumb's accessible label together, and `valueCommit` fires once when the drag ends for the value worth saving.
+
+- d709dd2: `ISwitch` now takes a `size` prop (`sm` / `md` / `lg`), matching `ICheckbox`. The track, thumb and travel scale together, so the thumb rests the same 2px inside the track edge at every size, and the small track is nudged to centre against a label first line.
+- d709dd2: `ITable` now shows an indeterminate bar on the rule between the header and the first row while a refresh is in flight. `loading` previously only did something when the table had no rows to show, so a page change or re-sort in server mode gave no sign that anything was happening. Skeletons still cover the first load; the two indicators are alternatives and never appear together.
+- d709dd2: Add a `row-actions` slot to `ITable`. Filling it adds a trailing column, sized to its content and pinned to the end, for a per-row menu; `actionsLabel` names the blank header for screen readers. A click inside the column does not reach the row, so it can be combined with `clickableRows`.
+- d709dd2: Add `IToggle` and `IToggleGroup` — a button that stays pressed, and a row of them sharing one Tab stop.
+
+  `IToggle` borrows `IButton`'s geometry exactly: the same five heights, so the two line up in a toolbar, and the same `data-icon="inline-start"` / `"inline-end"` markers, so the padding tightens on the side an icon sits on. There is one look on purpose — a toggle has to read as a button whether or not it is pressed.
+
+  `IToggleGroup` is items-driven like `ITabs` and works in `single` or `multiple` mode. Its `joined` and `plain` variants decide only how the items are spaced, since an item is exactly the button `IToggle` renders. With `icon-only`, each item's hidden label becomes its accessible name rather than being thrown away.
+
+- d709dd2: Add `ITree` and `ITimeField`.
+
+  `ITree` is an expandable nested list — a file browser, a category hierarchy. Both models are arrays of **values**: `v-model` for what is selected, `v-model:expanded` for what is open. Reka tracks the selection as item objects; that stays inside the component, because a list of strings is what survives a round trip through a URL, a store or a request body. Depth is padding on the row rather than a nested container, so a row's hover and selection background still spans the full width of the tree.
+
+  `ITimeField` enters a time one segment at a time, each its own arrow-key control. The model is a zero-padded `HH:mm` (or `HH:mm:ss`) **string** on a 24-hour clock, never a `Date` — a `Date` carries a date and a time zone nobody asked for, and padding means the value sorts and compares as a plain string. `hourCycle` is a display choice only; the model stays 24-hour either way. `toTime()` and `toIsoTime()` are exported alongside the existing date helpers.
+
+### Patch Changes
+
+- d709dd2: Give `ICard`'s title a real line box. It was set in `leading-none`, which clamps the line to the cap height and left the description crowding it; the header now uses `leading-snug` with a slightly wider gap.
+- d709dd2: `IDatePicker` and `IDateRangePicker` now render calendar day numbers with `tabular-nums`. A proportional `1` is narrower than a `0`, so days sat off-centre in their pill and the week columns visibly wobbled down the month.
+- 11eddbf: Stop importing `node:process` in the charting code. `cartesian.ts` used it for a dev-only `NODE_ENV` check, which put a Node builtin into a browser bundle — every browser bundler externalises it, so `process` was undefined at runtime and any chart with more than eight series threw instead of warning. It now reads `process.env.NODE_ENV` as a bare global, which bundlers replace statically and can drop entirely from a production build.
+- d709dd2: `IRadioGroup`'s `orientation` now changes the layout as well as the keyboard direction. It was forwarded to Reka, so the arrow keys already followed it, but the root stayed a single-column grid — `horizontal` now wraps the options into a row.
+- 3c3de7b: Rework `ISidebar`'s submenu collapse, and fix two defects in it.
+
+  The group chevron never rotated: `data-state` lives on the trigger, not on the icon inside it, so the `data-[state=open]:` selector on the chevron matched nothing. It now reads the trigger's group. The transition also has to name `rotate` rather than `transform`, since Tailwind v4's `rotate-*` sets the independent `rotate` property.
+
+  The panel also had no height animation at all — it faded while popping to full height, so every row below it jumped. It now animates height against the measurement Reka publishes as `--reka-collapsible-content-height`, with the rows lifting and fading in on their own curve. The animated element had to be stripped of its margin and padding for that to work, since margin is not part of an animated height and would survive the close as a gap under a shut panel; the spacing moved to an inner wrapper, reachable as `ui.groupInner`.
+
+  Nested rows are now aligned by arithmetic instead of a chosen padding: the rule sits on the centre of the parent's icon, and a child's label lands in the parent's label column. The previous value put child labels three pixels off their parent's, which read as a mistake rather than as either alignment.
+
+- d709dd2: `ISkeleton` now merges `class` onto its root. With `lines` above 1 the class landed on every line instead of the wrapper, so a width cap sized each line rather than the stack and the block could not be centred by its container.
+- d709dd2: `IStepper` layout fixes. Vertical steps laid the separator out beside the trigger instead of below it, because the item stayed a flex row — the rule now runs down between the steps, aligned to the centre of the indicator. In horizontal steppers the last item no longer claims an equal share of the row: it has no separator to fill, so the track used to end in a step-wide gap that read as the whole stepper being shifted left.
+- d709dd2: Fix the case of sortable column headers in `ITable`. The header cell is uppercase, but its sort button did not inherit `text-transform`, so sortable columns rendered in sentence case beside their uppercase neighbours.
+
 ## 0.12.0
 
 ### Minor Changes
