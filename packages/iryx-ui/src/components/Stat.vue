@@ -45,18 +45,27 @@ const props = withDefaults(defineProps<StatProps>(), {
   unstyled: undefined,
 })
 
-/** Zero counts as neutral, so a flat result reads as neither good nor bad. */
-const trend = computed(() => {
-  if (props.trend)
-    return props.trend
+/**
+ * Which way the number actually moved. Zero counts as neutral, so a flat
+ * result reads as neither good nor bad.
+ */
+const direction = computed(() => {
   if (props.delta == null || props.delta === 0)
     return 'neutral'
   return props.delta > 0 ? 'up' : 'down'
 })
 
+/**
+ * The colour only. `trend` says whether the move was *good*, which the sign
+ * cannot tell on its own — falling costs are a win. It deliberately does not
+ * touch the arrow: an arrow that disagrees with the signed number printed
+ * beside it ("↑ -14%") reads as a bug rather than as nuance.
+ */
+const trend = computed(() => props.trend ?? direction.value)
+
 /** Decorative: the colour and the formatted value already carry the meaning. */
 const trendArrow = computed(() =>
-  ({ up: ArrowUp01Icon, down: ArrowDown01Icon, neutral: ArrowRight01Icon }[trend.value]),
+  ({ up: ArrowUp01Icon, down: ArrowDown01Icon, neutral: ArrowRight01Icon }[direction.value]),
 )
 
 const formattedDelta = computed(() => {

@@ -14,7 +14,7 @@ export const sidebarTheme = tv({
     root: 'flex h-full flex-col gap-2 border-border bg-background text-foreground transition-[width] duration-200 ease-out',
     header: 'flex shrink-0 items-center gap-2 px-3 py-3',
     /** The only scrolling region; header and footer stay pinned. */
-    nav: 'flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-2 py-1',
+    nav: 'flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-2',
     footer: 'flex shrink-0 items-center gap-2 border-t border-border px-3 py-3',
     section: 'flex flex-col gap-1',
     sectionLabel: 'px-2 pt-1 pb-0.5 text-xs font-medium tracking-wide text-muted-foreground uppercase',
