@@ -8,7 +8,7 @@ import { tv } from 'tailwind-variants'
  */
 export const calendarTheme = tv({
   slots: {
-    root: 'text-foreground',
+    root: 'w-fit text-foreground',
     header: 'flex items-center justify-between gap-2 pb-3',
     heading: 'text-sm font-medium',
     nav: 'flex size-7 items-center justify-center rounded-lg text-muted-foreground transition-colors outline-none hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-primary/50 disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-4',

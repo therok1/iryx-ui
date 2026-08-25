@@ -108,7 +108,7 @@ The two states are drawn differently on purpose. A day outside `min`/`max` is fa
 
 <Demo stack>
 <template #demo>
-<div class="grid w-full gap-8 sm:grid-cols-2">
+<div class="grid w-full justify-items-center gap-8 sm:grid-cols-2">
 <ICalendar v-model="day" locale="en-GB" weekday-format="short" label="Short weekday names" />
 <ICalendar v-model="day" :week-starts-on="0" label="Weeks starting Sunday" />
 </div>
