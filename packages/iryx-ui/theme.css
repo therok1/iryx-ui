@@ -222,6 +222,14 @@
   --animate-collapsible-down: collapsible-down 240ms var(--iryx-collapsible-ease);
   --animate-collapsible-up: collapsible-up 180ms var(--iryx-collapsible-ease);
   /*
+   * An accordion closes at the speed it opens, unlike a lone collapsible.
+   * Its panels move in pairs — one shutting while its sibling unrolls — and a
+   * quicker close finishes first, so the page is briefly shorter than either
+   * end state and everything below rides up a few pixels and drops back.
+   * Matched durations sum to a smooth interpolation between the two states.
+   */
+  --animate-accordion-up: collapsible-up 240ms var(--iryx-collapsible-ease);
+  /*
    * The rows lift and fade as two animations, not one keyframe set, because
    * they want different curves. On the shared emphasized ease the opacity is
    * already at ~1 within a couple of frames — the fade is technically there and

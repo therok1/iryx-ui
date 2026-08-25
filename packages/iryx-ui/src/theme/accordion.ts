@@ -7,7 +7,7 @@ export const accordionTheme = tv({
     header: 'flex',
     trigger: 'group/trigger flex flex-1 items-center justify-between gap-4 py-4 text-left text-sm font-medium transition-colors outline-none hover:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/50 disabled:pointer-events-none disabled:opacity-50',
     icon: 'size-4 shrink-0 text-muted-foreground transition-[rotate] duration-200 ease-out group-data-[state=open]/trigger:rotate-180',
-    content: 'overflow-hidden text-sm text-muted-foreground data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down',
+    content: 'overflow-hidden text-sm text-muted-foreground data-[state=closed]:animate-accordion-up data-[state=open]:animate-collapsible-down',
     contentInner: 'pb-4',
   },
   variants: {
