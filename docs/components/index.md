@@ -43,6 +43,7 @@ Anywhere a component takes an `icon`, it accepts either shape: a [Hugeicons](htt
 | [`IPasswordInput`](/components/password-input) | Masked field with a show/hide toggle and an optional strength meter |
 | [`IPinInput`](/components/pin-input) | One cell per character for a short code — the model is a plain string |
 | [`ITagsInput`](/components/tags-input) | Collects a list as removable tags — delimiter, `max`, paste splitting |
+| [`IEditable`](/components/editable) | Text that becomes a field in place — controls, submit modes, custom preview |
 | [`IFileUpload`](/components/file-upload) | Drag-and-drop file field with `accept` / `maxSize` / `maxFiles` and thumbnails |
 | [`ISignaturePad`](/components/signature-pad) | Drawn signature with undo and clear — the model is a PNG data URL |
 | [`ICalendar`](/components/calendar) | Month grid that stays on the page — bounds, availability, several months |

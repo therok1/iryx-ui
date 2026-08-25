@@ -35,6 +35,7 @@ export const componentNames = [
   'DonutChart',
   'Drawer',
   'DropdownMenu',
+  'Editable',
   'EmptyState',
   'FileUpload',
   'Form',

@@ -86,6 +86,7 @@ const sidebar = [
       { text: 'Donut chart', link: '/components/donut-chart' },
       { text: 'Drawer', link: '/components/drawer' },
       { text: 'Dropdown menu', link: '/components/dropdown-menu' },
+      { text: 'Editable', link: '/components/editable' },
       { text: 'Empty state', link: '/components/empty-state' },
       { text: 'File upload', link: '/components/file-upload' },
       { text: 'Form', link: '/components/form' },
