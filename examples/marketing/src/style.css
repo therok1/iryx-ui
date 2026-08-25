@@ -1,0 +1,197 @@
+@import "tailwindcss";
+@import "../../../packages/iryx-ui/theme.css";
+
+/*
+ * This example develops against the library *source* (see the vite alias), so
+ * scan that for utility classes on top of theme.css's own scan of dist.
+ * Copying the example out of the repo means dropping this line too.
+ */
+@source "../../../packages/iryx-ui/src";
+
+:root {
+  --iryx-font-sans: "Switzer", ui-sans-serif, system-ui, sans-serif;
+}
+
+/*
+ * The hero's ground: a faint ruled grid for structure, and two slow blooms in
+ * the brand hue behind it. Both belong to the hero rather than the page — they
+ * sit inside that section and scroll away with it.
+ */
+.hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+/* `--iryx-border` is the token the component borders use, so it follows light
+ * and dark without a second rule. */
+.hero-grid {
+  position: absolute;
+  inset: -4rem 0 -3rem;
+  z-index: -10;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, var(--iryx-border) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--iryx-border) 1px, transparent 1px);
+  background-size: 72px 72px;
+  opacity: 0.5;
+  /* Fades in every direction from the middle, so it ends rather than stops. */
+  mask-image: radial-gradient(80% 90% at 50% 25%, black 0%, black 30%, transparent 76%);
+}
+
+.hero-bloom {
+  position: absolute;
+  inset: -8rem 0 auto;
+  height: 40rem;
+  z-index: -20;
+  pointer-events: none;
+  /* Faded out at the foot, or the hero's own clip cuts the glow off flat. */
+  mask-image: linear-gradient(to bottom, black 45%, transparent 92%);
+}
+
+/*
+ * Blur plus opacity, never a `filter` on something masked: `filter` applies
+ * before `mask`, so a blurred masked shape comes back with a hard edge.
+ */
+.hero-bloom::before,
+.hero-bloom::after {
+  content: "";
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(90px);
+  will-change: transform;
+}
+
+.hero-bloom::before {
+  left: 8%;
+  top: -6rem;
+  width: 34rem;
+  height: 34rem;
+  background: var(--iryx-primary);
+  opacity: 0.22;
+  animation: hero-drift-a 24s ease-in-out infinite alternate;
+}
+
+.hero-bloom::after {
+  right: 6%;
+  top: 2rem;
+  width: 26rem;
+  height: 26rem;
+  background: var(--iryx-primary-to);
+  opacity: 0.18;
+  animation: hero-drift-b 19s ease-in-out infinite alternate;
+}
+
+/* Transform only — a blur this size repainted per frame would cost real time. */
+@keyframes hero-drift-a {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to { transform: translate3d(6rem, 2rem, 0) scale(1.15); }
+}
+
+@keyframes hero-drift-b {
+  from { transform: translate3d(0, 0, 0) scale(1.1); }
+  to { transform: translate3d(-5rem, 3rem, 0) scale(0.95); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-bloom::before,
+  .hero-bloom::after {
+    animation: none;
+  }
+}
+
+/*
+ * The alternative ground: two counter-rotating conic sweeps, blurred into an
+ * aurora. Swap `hero-aurora` for `hero-bloom` in the template to go back to
+ * the static pair of blobs.
+ *
+ * Conic rather than radial because a radial glow has no direction — it sits
+ * there. A sweep turns, so the colour arrives and leaves, which is what makes
+ * it read as motion at a speed nobody has to watch.
+ */
+.hero-aurora {
+  position: absolute;
+  inset: -18rem 0 auto;
+  height: 52rem;
+  z-index: -20;
+  pointer-events: none;
+  /* Elliptical fade, so the light has no edge of its own anywhere. */
+  mask-image: radial-gradient(60% 55% at 50% 45%, black 0%, black 35%, transparent 78%);
+}
+
+.hero-aurora::before,
+.hero-aurora::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  border-radius: 9999px;
+  filter: blur(70px);
+  will-change: transform;
+}
+
+.hero-aurora::before {
+  width: 62rem;
+  height: 62rem;
+  opacity: 0.3;
+  background: conic-gradient(
+    from 90deg,
+    var(--iryx-primary) 0deg,
+    transparent 70deg,
+    var(--iryx-primary-to) 160deg,
+    transparent 250deg,
+    var(--iryx-primary) 360deg
+  );
+  animation: hero-sweep 44s linear infinite;
+}
+
+.hero-aurora::after {
+  width: 42rem;
+  height: 42rem;
+  opacity: 0.22;
+  background: conic-gradient(
+    from 210deg,
+    transparent 0deg,
+    var(--iryx-primary-to) 120deg,
+    transparent 220deg,
+    var(--iryx-primary) 330deg,
+    transparent 360deg
+  );
+  animation: hero-sweep 63s linear infinite reverse;
+}
+
+@keyframes hero-sweep {
+  to { transform: rotate(1turn); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-aurora::before,
+  .hero-aurora::after {
+    animation: none;
+  }
+}
+
+/*
+ * The wash is barely there in light. It reads as light in a room, and a room
+ * that is already white has nothing left to light — at the dark appearance's
+ * strength the same gradient is a stain on the paper rather than a glow.
+ */
+:root:not(.dark) .hero-aurora::before {
+  opacity: 0.1;
+}
+
+:root:not(.dark) .hero-aurora::after {
+  opacity: 0.07;
+}
+
+/*
+ * Stand-in for the product shot: the hero's own ruling over a soft wash, so an
+ * empty frame still reads as part of the page rather than as a missing asset.
+ */
+.shot {
+  background-color: var(--iryx-muted);
+  background-image:
+    linear-gradient(to right, var(--iryx-border) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--iryx-border) 1px, transparent 1px);
+  background-size: 48px 48px;
+}

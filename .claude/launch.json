@@ -42,6 +42,21 @@
       ],
       "port": 5175,
       "autoPort": true
+    },
+    {
+      "name": "marketing",
+      "runtimeExecutable": "corepack",
+      "runtimeArgs": [
+        "pnpm",
+        "--filter",
+        "@iryx-ui/example-marketing",
+        "dev",
+        "--port",
+        "5176",
+        "--strictPort"
+      ],
+      "port": 5176,
+      "autoPort": true
     }
   ]
 }
