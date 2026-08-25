@@ -16,7 +16,7 @@
  */
 export const user = {
   name: 'Rae Lindqvist',
-  email: 'rae@northwind.example',
+  email: 'rae@iryx.example',
   role: 'owner',
 }
 

@@ -11,7 +11,7 @@ const state = reactive({
   name: user.name,
   role: user.role,
   company: 'Northwind Ops',
-  email: 'billing@northwind.example',
+  email: 'billing@iryx.example',
   terms: '30',
   currency: 'EUR',
   reminders: true,
