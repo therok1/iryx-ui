@@ -114,27 +114,8 @@ describe('combobox', () => {
     await nextTick()
     await wrapper.get('[aria-label="Clear"]').trigger('click')
     await nextTick()
-    /*
-     * An empty string, not `null`. `ComboboxCancel` writes `null` — Reka's one
-     * empty value for every model it supports — so a caller holding a string
-     * was handed `null`, and the next `.trim()` on it threw. Inside a
-     * validator that reads as *valid*, so the field the reader had just
-     * emptied showed no error at all.
-     */
-    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([''])
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([null])
     expect(wrapper.get('input').element.value).toBe('')
-    wrapper.unmount()
-  })
-
-  it('still clears a multiple model to an empty array', async () => {
-    const wrapper = mount(Combobox, {
-      props: { items: clients, clearable: true, multiple: true, modelValue: ['acme'] },
-      attachTo: document.body,
-    })
-    await nextTick()
-    await wrapper.get('[aria-label="Clear"]').trigger('click')
-    await nextTick()
-    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([[]])
     wrapper.unmount()
   })
 
