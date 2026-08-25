@@ -76,6 +76,7 @@ Anywhere a component takes an `icon`, it accepts either shape: a [Hugeicons](htt
 | [`IConfirmDialog`](/components/confirm-dialog) | Host for `useConfirm()` — renders the promise-based confirmation |
 | [`ITooltip`](/components/tooltip) | Hover/focus tooltip with side, align, delay and optional arrow |
 | [`IPopover`](/components/popover) | Panel anchored to its trigger — sides, arrow, optional `modal` focus trap |
+| [`IHoverCard`](/components/hover-card) | Hover-summoned preview of what a link points at — delays, sides, arrow |
 | [`IContextMenu`](/components/context-menu) | Right-click menu sharing `IDropdownMenu`'s entries and theme |
 
 ## Feedback

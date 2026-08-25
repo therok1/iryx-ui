@@ -2,7 +2,7 @@ import type { DropdownMenuEntry } from '../src'
 import { enableAutoUnmount, mount } from '@vue/test-utils'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { h, nextTick } from 'vue'
-import { ContextMenu, Menubar, Popover, Toolbar } from '../src'
+import { ContextMenu, HoverCard, Menubar, Popover, Toolbar } from '../src'
 
 /** These portal their content into the body, so mounted trees must be torn down. */
 enableAutoUnmount(afterEach)
@@ -308,5 +308,63 @@ describe('toolbar', () => {
 
   it('drops every built-in class when unstyled', () => {
     expect(mount(Toolbar, { props: { items, unstyled: true } }).classes()).toHaveLength(0)
+  })
+})
+
+describe('hoverCard', () => {
+  it('stays closed until asked', () => {
+    mount(HoverCard, { props: { open: false }, slots: { trigger, default: 'Preview' } })
+    expect(body().textContent).not.toContain('Preview')
+  })
+
+  it('renders its content when open', async () => {
+    mount(HoverCard, { props: { open: true }, slots: { trigger, default: 'Preview' } })
+    await nextTick()
+    expect(body().textContent).toContain('Preview')
+  })
+
+  /** The same chrome as the popover: to a reader they are the same object. */
+  it('carries the panel chrome', async () => {
+    mount(HoverCard, { props: { open: true }, slots: { trigger, default: 'Preview' } })
+    await nextTick()
+    const content = body().querySelector('[data-state="open"][data-side]')
+    expect(content?.className).toContain('bg-background')
+    expect(content?.className).toContain('w-72')
+    expect(content?.className).toContain('p-4')
+  })
+
+  it('takes a width and a padding', async () => {
+    mount(HoverCard, {
+      props: { open: true, width: 'none', padding: 'none' },
+      slots: { trigger, default: 'Preview' },
+    })
+    await nextTick()
+    const content = body().querySelector('[data-state="open"][data-side]')
+    expect(content?.className).not.toContain('w-72')
+    expect(content?.className).toContain('p-0')
+  })
+
+  /** Focus opens it too, or a keyboard user could never reach the preview. */
+  it('opens on the trigger taking focus', async () => {
+    const wrapper = mount(HoverCard, {
+      props: { openDelay: 0 },
+      slots: { trigger, default: 'Preview' },
+      attachTo: document.body,
+    })
+    await wrapper.get('button').trigger('focus')
+    // The open is scheduled on a timer even at zero delay.
+    await new Promise(resolve => setTimeout(resolve, 20))
+    await nextTick()
+    expect(body().textContent).toContain('Preview')
+  })
+
+  it('drops every built-in class when unstyled', async () => {
+    mount(HoverCard, {
+      props: { open: true, unstyled: true },
+      slots: { trigger, default: 'Preview' },
+    })
+    await nextTick()
+    const content = body().querySelector('[data-state="open"][data-side]')
+    expect(content?.className).toBe('')
   })
 })

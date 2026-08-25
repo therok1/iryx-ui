@@ -88,6 +88,7 @@ const sidebar = [
       { text: 'File upload', link: '/components/file-upload' },
       { text: 'Form', link: '/components/form' },
       { text: 'Form field', link: '/components/form-field' },
+      { text: 'Hover card', link: '/components/hover-card' },
       { text: 'Icon', link: '/components/icon' },
       { text: 'Input', link: '/components/input' },
       { text: 'Kbd', link: '/components/kbd' },
