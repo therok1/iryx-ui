@@ -93,32 +93,6 @@ defineSlots<{
   preview?: (props: { value: string, isEmpty: boolean }) => unknown
 }>()
 
-/**
- * Reka commits on blur through its dismissable-layer stack, and that stack
- * treats *any* later `[data-dismissable-layer]` in the document as a layer
- * above this one — so clicking a second editable further down the page leaves
- * the first one still editing. Fine for a popover inside a dialog, wrong for
- * two siblings in a table.
- *
- * So Reka is left the key handling and we take blur ourselves.
- */
-const rekaSubmitMode = computed(() => {
-  if (props.submitMode === 'both')
-    return 'enter'
-  return props.submitMode === 'blur' ? 'none' : props.submitMode
-})
-
-function handleBlur(event: FocusEvent, submit: () => void): void {
-  if (props.submitMode !== 'blur' && props.submitMode !== 'both')
-    return
-  // Focus moving to this editable's own controls is not leaving it.
-  const next = event.relatedTarget as Node | null
-  const root = (event.currentTarget as HTMLElement).closest('[data-dismissable-layer]')
-  if (next && root?.contains(next))
-    return
-  submit()
-}
-
 const field = useFormField()
 const fieldId = computed(() => props.id ?? field?.id.value)
 const isInvalid = computed(() => props.invalid ?? field?.invalid.value ?? false)
@@ -141,7 +115,7 @@ function slotClass(slot: keyof NonNullable<EditableProps['ui']>, extra?: string)
     :model-value="props.modelValue"
     :placeholder="props.placeholder"
     :activation-mode="props.activationMode"
-    :submit-mode="rekaSubmitMode"
+    :submit-mode="props.submitMode"
     :select-on-focus="props.selectOnFocus"
     :start-with-edit-mode="props.startWithEditMode"
     :max-length="props.maxLength"
@@ -160,7 +134,7 @@ function slotClass(slot: keyof NonNullable<EditableProps['ui']>, extra?: string)
       <EditablePreview :class="slotClass('preview', isEmpty ? theme.placeholder() : undefined)">
         <slot name="preview" :value="value ?? ''" :is-empty="isEmpty" />
       </EditablePreview>
-      <EditableInput :class="slotClass('input')" @blur="(event: FocusEvent) => handleBlur(event, submit)" />
+      <EditableInput :class="slotClass('input')" />
     </EditableArea>
 
     <!--
