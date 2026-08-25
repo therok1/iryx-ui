@@ -116,7 +116,8 @@ const timeline = computed<TimelineItem[]>(() => activity.map(entry => ({
       <ICard title="Where the book stands" description="Every invoice by status" class="shadow-xs">
         <IDonutChart
           :data="byStatus"
-          :size="220"
+          :size="260"
+          :thickness="26"
           locale="en-IE"
           :format="{ style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }"
           label="Invoiced total by status"
