@@ -156,6 +156,23 @@ describe('combobox', () => {
   })
 
   /*
+   * A chip is shorter than a line of text, so the chips variant's `h-auto`
+   * left a multiple field sitting below every other field in its row. The
+   * size's height stays as a floor.
+   */
+  it('keeps a multiple field as tall as a single one', async () => {
+    const wrapper = mount(Combobox, {
+      props: { items: clients, multiple: true, modelValue: ['acme'] },
+      attachTo: document.body,
+    })
+    await nextTick()
+    const anchor = wrapper.get('input').element.closest('[class*="rounded-xl"]')!
+    expect(anchor.className).toContain('min-h-9')
+    expect(anchor.className).toContain('h-auto')
+    wrapper.unmount()
+  })
+
+  /*
    * A flex line breaks on an item's base size, so `grow` (basis auto) let the
    * placeholder's own width push the input onto its own row while there was
    * still space beside the chips. happy-dom does no layout, so this asserts
@@ -184,13 +201,25 @@ describe('combobox', () => {
     wrapper.unmount()
   })
 
-  it('takes the last chip on Backspace in an empty input', async () => {
+  /*
+   * Two presses for the first chip, one for each after it — Reka's own
+   * `TagsInput` behaviour, which `ITagsInput` also has. Two fields that look
+   * identical must not answer the same key differently.
+   */
+  it('marks the last chip on the first Backspace and removes it on the next', async () => {
     const wrapper = mount(Combobox, {
       props: { items: clients, multiple: true, modelValue: ['acme', 'bolt'] },
       attachTo: document.body,
     })
     await nextTick()
-    await wrapper.get('input').trigger('keydown', { key: 'Backspace' })
+    const input = wrapper.get('input')
+
+    await input.trigger('keydown', { key: 'Backspace' })
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+    // The item and its delete control both carry the state, so count the chips.
+    expect(wrapper.findAll('[aria-label^="Remove"][data-state="active"]')).toHaveLength(1)
+
+    await input.trigger('keydown', { key: 'Backspace' })
     expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([['acme']])
     wrapper.unmount()
   })

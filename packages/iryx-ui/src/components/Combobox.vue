@@ -16,6 +16,11 @@ import {
   ComboboxTrigger,
   ComboboxViewport,
   ComboboxVirtualizer,
+  TagsInputInput,
+  TagsInputItem,
+  TagsInputItemDelete,
+  TagsInputItemText,
+  TagsInputRoot,
   useFilter,
   useForwardPropsEmits,
 } from 'reka-ui'
@@ -289,18 +294,14 @@ function remove(value: AcceptableValue): void {
 }
 
 /**
- * Backspace in an empty input takes the last chip, the way every tag field
- * behaves — including ITagsInput. Guarded on an empty input so it never eats
- * a character mid-query.
+ * The chips as options rather than as values, which is what `TagsInputRoot`
+ * models. It writes whole options back, and those map straight to the values
+ * the caller holds.
  */
-function onInputKeydown(event: KeyboardEvent): void {
-  if (event.key !== 'Backspace' || !showChips.value)
-    return
-  if ((event.target as HTMLInputElement).value !== '')
-    return
-  event.preventDefault()
-  remove(chosen.value[chosen.value.length - 1]!.value)
-}
+const taggedOptions = computed({
+  get: () => chosen.value,
+  set: (options: ComboboxItemOption[]) => setSelected(options.map(option => option.value)),
+})
 
 /** What the closed field shows: the selected option's label, not its value. */
 function displayValue(value: AcceptableValue | AcceptableValue[]): string {
@@ -396,30 +397,78 @@ const itemIndicatorClass = computed(() => (isUnstyled.value ? undefined : theme.
   >
     <ComboboxAnchor :class="slotClass('anchor', props.class)">
       <!--
+        The chips are Reka's own `TagsInput`, composed inside the anchor the
+        way its docs do. Everything a tag field owes the keyboard — arrow keys
+        between tags, the two-step Backspace, a mark on the one about to go —
+        comes with it, and `ITagsInput` is the same primitive, so the two
+        cannot answer the same key differently.
+
+        Its model is the *options*, not their values: a `TagsInputItem` is
+        identified by its value, and a combobox whose labels differ from its
+        values has nothing else to identify a chip by. `TagsInputItemText`
+        supplies what is read. Comparison is structural — Reka uses `ohash` —
+        so a recomputed option still matches the one already in the list.
+
+        Rendered whenever `multiple`, not only once there are chips: swapping
+        the input element out from under Reka on the first pick closes the
+        popup.
+
         Chips sit before the input rather than in a row of their own, so the
         query box keeps whatever width the last line has left and only wraps
         when there is genuinely no room.
       -->
-      <span
-        v-for="option in chosen"
-        :key="String(option.value)"
-        :class="slotClass('tag')"
+      <TagsInputRoot
+        v-if="props.multiple"
+        v-model="taggedOptions"
+        delimiter=""
+        :disabled="props.disabled"
+        class="contents"
       >
-        <slot name="tag" :option="option" :remove="() => remove(option.value)">
-          <span :class="slotClass('tagText')">{{ option.label }}</span>
-          <button
-            type="button"
-            tabindex="-1"
-            :aria-label="props.removeLabel(option.label)"
-            :class="slotClass('tagDelete')"
-            @click.stop="remove(option.value)"
-          >
-            <Icon :icon="Cancel01Icon" />
-          </button>
-        </slot>
-      </span>
+        <TagsInputItem
+          v-for="option in chosen"
+          :key="String(option.value)"
+          :value="option"
+          :class="slotClass('tag')"
+        >
+          <slot name="tag" :option="option" :remove="() => remove(option.value)">
+            <TagsInputItemText :class="slotClass('tagText')">
+              {{ option.label }}
+            </TagsInputItemText>
+            <TagsInputItemDelete
+              :aria-label="props.removeLabel(option.label)"
+              :class="slotClass('tagDelete')"
+            >
+              <Icon :icon="Cancel01Icon" />
+            </TagsInputItemDelete>
+          </slot>
+        </TagsInputItem>
+
+        <ComboboxInput
+          :id="inputId"
+          v-model="query"
+          as-child
+          :display-value="displayValue"
+        >
+          <!--
+            Enter belongs to the combobox — it takes the highlighted option, or
+            the create row. Left alone, `TagsInputInput` would also commit the
+            raw query as a tag.
+          -->
+          <TagsInputInput
+            v-bind="$attrs"
+            :placeholder="props.placeholder"
+            :aria-invalid="isInvalid || undefined"
+            :aria-describedby="field?.describedBy.value"
+            :class="slotClass('input')"
+            @keydown.enter.prevent
+            @focus="onInputFocus"
+            @input="onInput"
+          />
+        </ComboboxInput>
+      </TagsInputRoot>
 
       <ComboboxInput
+        v-else
         :id="inputId"
         v-model="query"
         v-bind="$attrs"
@@ -430,7 +479,6 @@ const itemIndicatorClass = computed(() => (isUnstyled.value ? undefined : theme.
         :class="slotClass('input')"
         @focus="onInputFocus"
         @input="onInput"
-        @keydown="onInputKeydown"
       />
       <!--
         The clear button takes the arrow's place rather than sitting beside it:

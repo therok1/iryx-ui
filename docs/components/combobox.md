@@ -250,7 +250,7 @@ const selected = ref(['acme', 'bolt'])
 ```
 </Demo>
 
-Each value is drawn as a removable chip inside the field, and the input stays a query box — so the labels are readable at a glance and there is still somewhere to type. Remove one with its cross, or with <IKbd keys="backspace" size="xs" /> while the query is empty. The field wraps and grows rather than clipping, the same trade [`ITagsInput`](/components/tags-input) makes.
+Each value is drawn as a removable chip inside the field, and the input stays a query box — so the labels are readable at a glance and there is still somewhere to type. Remove one with its cross, or with <IKbd keys="backspace" size="xs" /> while the query is empty — the first press marks the last chip and the next removes it, as in [`ITagsInput`](/components/tags-input). The field wraps and grows rather than clipping, the same trade [`ITagsInput`](/components/tags-input) makes.
 
 The popup stays open as you tick rows, so a run of choices is one visit rather than one visit each.
 
