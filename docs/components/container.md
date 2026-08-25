@@ -56,7 +56,9 @@ A container caps a whole page. For a readable line length, constrain the text it
 
 ## Gutter
 
-The gutter is the horizontal padding that keeps content off the window edge on small screens. `none` is for when the child draws its own — a full-bleed image, or a table that should touch the edges on a phone.
+The gutter is the horizontal padding that keeps content off the window edge. Each one is a **ramp rather than a number** — `md` is `px-4` on a phone, `px-6` from `sm`, `px-8` from `lg` — because a single value has to pick a side: enough room on a wide window leaves a phone with no width left for the content itself.
+
+`none` is for when the child draws its own gutter — a full-bleed image, or a table that should touch the edges on a phone. Take `none` and set your own class when you want one fixed value at every width.
 
 <Demo stack>
 <template #demo>
