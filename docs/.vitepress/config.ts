@@ -68,6 +68,7 @@ const sidebar = [
       { text: 'Breadcrumb', link: '/components/breadcrumb' },
       { text: 'Button', link: '/components/button' },
       { text: 'Button group', link: '/components/button-group' },
+      { text: 'Calendar', link: '/components/calendar' },
       { text: 'Card', link: '/components/card' },
       { text: 'Chart legend', link: '/components/chart-legend' },
       { text: 'Checkbox', link: '/components/checkbox' },

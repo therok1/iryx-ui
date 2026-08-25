@@ -23,6 +23,7 @@ import { computed, ref, shallowRef, watch } from 'vue'
 import { formatIsoDate, toCalendarDate, toIsoDate } from '../composables/date'
 import { useFormField } from '../composables/form'
 import { useIryxUiConfig } from '../config'
+import { calendarTheme } from '../theme/calendar'
 import { datePickerTheme } from '../theme/date-picker'
 import Icon from './Icon.vue'
 
@@ -161,7 +162,15 @@ function clear(): void {
   open.value = false
 }
 
-const theme = computed(() => datePickerTheme({ size: props.size, invalid: isInvalid.value, range: true }))
+/*
+ * Two themes: the field and its panel, and the month grid shared with
+ * `ICalendar` and `IDatePicker`. The range styling is a variant of the grid's,
+ * since a band across several days is a property of the grid, not of the field.
+ */
+const theme = computed(() => ({
+  ...datePickerTheme({ size: props.size, invalid: isInvalid.value }),
+  ...calendarTheme({ range: true }),
+}))
 
 function slotClass(slot: keyof NonNullable<DateRangePickerProps['ui']>, extra?: string) {
   const override = props.ui?.[slot]

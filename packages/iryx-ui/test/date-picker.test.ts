@@ -1,7 +1,7 @@
 import { enableAutoUnmount, flushPromises, mount } from '@vue/test-utils'
 import { afterEach, describe, expect, it } from 'vitest'
 import { nextTick } from 'vue'
-import { DatePicker, DateRangePicker, formatIsoDate, isoToday, toCalendarDate, toIsoDate } from '../src'
+import { Calendar, DatePicker, DateRangePicker, formatIsoDate, isoToday, toCalendarDate, toIsoDate } from '../src'
 
 // The calendars portal into document.body, so a left-over popover from an
 // earlier test would be counted by the next one's queries.
@@ -195,5 +195,78 @@ describe('dateRangePicker', () => {
     })
     expect(wrapper.text()).toContain('1 Aug')
     expect(wrapper.text()).not.toContain('to')
+  })
+})
+
+describe('calendar', () => {
+  function mountCalendar(props: Record<string, unknown> = {}) {
+    return mount(Calendar, {
+      props: { modelValue: '2026-08-15', ...props },
+      attachTo: document.body,
+    })
+  }
+
+  it('renders the month of the selected date, inline', () => {
+    const wrapper = mountCalendar()
+    expect(wrapper.text()).toContain('August 2026')
+    // Inline: no trigger, no portal — the grid is the component.
+    expect(wrapper.find('table').exists()).toBe(true)
+  })
+
+  it('marks the selected day', () => {
+    const wrapper = mountCalendar()
+    expect(wrapper.get('[data-selected]').text()).toBe('15')
+  })
+
+  it('emits an ISO string when a day is picked', async () => {
+    const wrapper = mountCalendar()
+    const days = wrapper.findAll('[data-reka-calendar-cell-trigger]')
+    await days.find(day => day.text() === '20')!.trigger('click')
+    expect(wrapper.emitted('update:modelValue')?.[0]).toEqual(['2026-08-20'])
+  })
+
+  /** The caller works in ISO strings; Reka's predicate takes a DateValue. */
+  it('takes an unavailability predicate in ISO strings', () => {
+    const seen: string[] = []
+    const wrapper = mountCalendar({
+      isUnavailable: (date: string) => {
+        seen.push(date)
+        return date === '2026-08-20'
+      },
+    })
+    expect(seen).toContain('2026-08-20')
+    expect(wrapper.find('[data-unavailable]').text()).toBe('20')
+  })
+
+  it('shows several months side by side', () => {
+    const wrapper = mountCalendar({ months: 2 })
+    expect(wrapper.findAll('table')).toHaveLength(2)
+  })
+
+  /**
+   * Without it the calendar changes height as you page through, which moves
+   * everything below it. On by default for that reason.
+   */
+  it('keeps every month six rows tall by default', () => {
+    const wrapper = mountCalendar({ modelValue: '2026-02-10' })
+    expect(wrapper.findAll('tbody tr')).toHaveLength(6)
+  })
+
+  /**
+   * Otherwise a calendar for next month's appointments opens on this month
+   * with every day disabled, and the reader has to work out that the fix is
+   * to page forward.
+   */
+  it('opens inside the bounds when nothing is selected', () => {
+    const wrapper = mount(Calendar, {
+      props: { modelValue: null, min: '2027-03-01', max: '2027-04-30' },
+      attachTo: document.body,
+    })
+    expect(wrapper.text()).toContain('March 2027')
+  })
+
+  it('drops every built-in class when unstyled', () => {
+    const wrapper = mountCalendar({ unstyled: true })
+    expect(wrapper.get('table').classes()).toHaveLength(0)
   })
 })

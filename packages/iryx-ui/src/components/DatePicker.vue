@@ -1,28 +1,17 @@
 <script setup lang="ts">
-import { ArrowLeft01Icon, ArrowRight01Icon, Calendar03Icon } from '@hugeicons/core-free-icons'
+import { Calendar03Icon } from '@hugeicons/core-free-icons'
 import {
-  CalendarCell,
-  CalendarCellTrigger,
-  CalendarGrid,
-  CalendarGridBody,
-  CalendarGridHead,
-  CalendarGridRow,
-  CalendarHeadCell,
-  CalendarHeader,
-  CalendarHeading,
-  CalendarNext,
-  CalendarPrev,
-  CalendarRoot,
   PopoverContent,
   PopoverPortal,
   PopoverRoot,
   PopoverTrigger,
 } from 'reka-ui'
 import { computed, ref } from 'vue'
-import { formatIsoDate, isoToday, toCalendarDate, toIsoDate } from '../composables/date'
+import { formatIsoDate, isoToday } from '../composables/date'
 import { useFormField } from '../composables/form'
 import { useIryxUiConfig } from '../config'
 import { datePickerTheme } from '../theme/date-picker'
+import Calendar from './Calendar.vue'
 import Icon from './Icon.vue'
 
 export interface DatePickerProps {
@@ -42,6 +31,11 @@ export interface DatePickerProps {
   format?: Intl.DateTimeFormatOptions
   /** 0 is Sunday. Defaults to the locale's own convention. */
   weekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6
+  /**
+   * Refuse a date — a taken slot, a closed day. Given an ISO `YYYY-MM-DD`
+   * string. Unavailable days are struck through rather than hidden.
+   */
+  isUnavailable?: (date: string) => boolean
   /** Offer a "clear" action in the footer. */
   clearable?: boolean
   /** Footer and navigation labels — override for non-English apps. */
@@ -83,16 +77,6 @@ const isInvalid = computed(() => props.invalid ?? field?.invalid.value ?? false)
 const config = useIryxUiConfig()
 const isUnstyled = computed(() => props.unstyled ?? config.unstyled)
 
-const calendarValue = computed({
-  get: () => toCalendarDate(model.value),
-  set: (value) => {
-    model.value = toIsoDate(value)
-  },
-})
-
-const minValue = computed(() => toCalendarDate(props.min))
-const maxValue = computed(() => toCalendarDate(props.max))
-
 const display = computed(() => formatIsoDate(model.value, props.locale, props.format))
 
 function pickToday(): void {
@@ -107,10 +91,19 @@ function clear(): void {
 
 const theme = computed(() => datePickerTheme({ size: props.size, invalid: isInvalid.value }))
 
-function slotClass(slot: keyof NonNullable<DatePickerProps['ui']>, extra?: string) {
+/** The field and panel slots this component still owns. */
+type FieldSlot = 'trigger' | 'placeholder' | 'content' | 'footer' | 'action'
+
+function slotClass(slot: FieldSlot, extra?: string) {
   const override = props.ui?.[slot]
   return isUnstyled.value ? [override, extra] : theme.value[slot]({ class: [override, extra] })
 }
+
+/** The rest belong to the grid, and are forwarded to it untouched. */
+const calendarUi = computed(() => {
+  const { trigger, placeholder, content, footer, action, ...rest } = props.ui ?? {}
+  return rest
+})
 </script>
 
 <template>
@@ -136,66 +129,20 @@ function slotClass(slot: keyof NonNullable<DatePickerProps['ui']>, extra?: strin
 
     <PopoverPortal>
       <PopoverContent :class="slotClass('content')" :side-offset="4" align="start">
-        <CalendarRoot
-          v-slot="{ grid, weekDays }"
-          v-model="calendarValue"
-          :min-value="minValue"
-          :max-value="maxValue"
+        <Calendar
+          v-model="model"
+          :min="props.min"
+          :max="props.max"
           :locale="props.locale"
           :week-starts-on="props.weekStartsOn"
-          fixed-weeks
+          :is-unavailable="props.isUnavailable"
+          :previous-label="props.previousLabel"
+          :next-label="props.nextLabel"
           initial-focus
+          :unstyled="props.unstyled"
+          :ui="calendarUi"
           @update:model-value="open = false"
-        >
-          <CalendarHeader :class="slotClass('header')">
-            <CalendarPrev :aria-label="props.previousLabel" :class="slotClass('nav')">
-              <Icon :icon="ArrowLeft01Icon" />
-            </CalendarPrev>
-            <CalendarHeading :class="slotClass('heading')" />
-            <CalendarNext :aria-label="props.nextLabel" :class="slotClass('nav')">
-              <Icon :icon="ArrowRight01Icon" />
-            </CalendarNext>
-          </CalendarHeader>
-
-          <div :class="slotClass('months')">
-            <CalendarGrid
-              v-for="month in grid"
-              :key="month.value.toString()"
-              :class="slotClass('grid')"
-            >
-              <CalendarGridHead>
-                <CalendarGridRow>
-                  <CalendarHeadCell
-                    v-for="day in weekDays"
-                    :key="day"
-                    :class="slotClass('headCell')"
-                  >
-                    {{ day }}
-                  </CalendarHeadCell>
-                </CalendarGridRow>
-              </CalendarGridHead>
-              <CalendarGridBody>
-                <CalendarGridRow
-                  v-for="(week, index) in month.rows"
-                  :key="`week-${index}`"
-                >
-                  <CalendarCell
-                    v-for="date in week"
-                    :key="date.toString()"
-                    :date="date"
-                    :class="slotClass('cell')"
-                  >
-                    <CalendarCellTrigger
-                      :day="date"
-                      :month="month.value"
-                      :class="slotClass('cellTrigger')"
-                    />
-                  </CalendarCell>
-                </CalendarGridRow>
-              </CalendarGridBody>
-            </CalendarGrid>
-          </div>
-        </CalendarRoot>
+        />
 
         <div :class="slotClass('footer')">
           <button type="button" :class="slotClass('action')" @click="pickToday">

@@ -17,6 +17,7 @@ export const componentNames = [
   'Breadcrumb',
   'Button',
   'ButtonGroup',
+  'Calendar',
   'Card',
   'ChartLegend',
   'Checkbox',

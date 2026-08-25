@@ -45,6 +45,7 @@ Anywhere a component takes an `icon`, it accepts either shape: a [Hugeicons](htt
 | [`ITagsInput`](/components/tags-input) | Collects a list as removable tags — delimiter, `max`, paste splitting |
 | [`IFileUpload`](/components/file-upload) | Drag-and-drop file field with `accept` / `maxSize` / `maxFiles` and thumbnails |
 | [`ISignaturePad`](/components/signature-pad) | Drawn signature with undo and clear — the model is a PNG data URL |
+| [`ICalendar`](/components/calendar) | Month grid that stays on the page — bounds, availability, several months |
 | [`IDatePicker`](/components/date-picker) | Calendar in a popover; the model is an ISO `YYYY-MM-DD` string |
 | [`IDateRangePicker`](/components/date-range-picker) | Two-month range calendar; the model is `{ start, end }` ISO strings |
 | [`ITimeField`](/components/time-field) | Segmented time entry — the model is a `HH:mm` string |
