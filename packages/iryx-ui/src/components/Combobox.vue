@@ -203,7 +203,30 @@ const rootProps = computed(() => {
   } = props
   return { ...rest, modelValue: selected.value }
 })
-const forwarded = useForwardPropsEmits(rootProps, emits)
+/**
+ * Every root emit is forwarded untouched except one: clearing empties the
+ * model without changing its type.
+ *
+ * `ComboboxCancel` writes `null`, Reka's single empty value for every model it
+ * supports. A caller holding a string is then holding `null`, and the next
+ * thing to touch it — a `.trim()` in a validator, a `.toLowerCase()` in a
+ * filter — throws. Worse, a throw inside validation reads as *valid*: the
+ * field the reader just emptied shows no error at all.
+ *
+ * A cleared string therefore clears to `''`, which is what Reka documents as
+ * the empty value anyway. Arrays still clear to `[]` and everything else to
+ * `null`, as before. `selected` is read before the root's own listener runs,
+ * so it still holds the value being cleared.
+ */
+const forwardEmit = ((event: string, ...args: unknown[]) => {
+  if (event === 'update:modelValue' && args[0] === null && typeof selected.value === 'string') {
+    emits('update:modelValue', '' as never)
+    return
+  }
+  ;(emits as (event: string, ...args: unknown[]) => void)(event, ...args)
+}) as typeof emits
+
+const forwarded = useForwardPropsEmits(rootProps, forwardEmit)
 
 function toOption(item: ComboboxItemOption | string): ComboboxItemOption {
   return typeof item === 'string' ? { label: item, value: item } : item

@@ -226,7 +226,7 @@ Inside an [`IFormField`](/components/form-field) the field passes its own validi
 ```
 </Demo>
 
-Clearing empties the query, returns focus to the input and sets the model to `null` — or to `[]` when `multiple`. The button is not a tab stop: it sits one keystroke away from a field whose own <IKbd keys="escape" size="xs" /> and typing already clear it, so making it a stop would slow every pass through a form to save nobody a step.
+Clearing empties the query, returns focus to the input, and empties the model **without changing its type**: a string model clears to `''`, an array to `[]`, anything else to `null`. That matters more than it sounds — a model that turns into `null` breaks the next `.trim()` or `.toLowerCase()` that touches it, and when that call is inside a validator the throw reads as *valid*, so the field the reader just emptied shows no error at all. The button is not a tab stop: it sits one keystroke away from a field whose own <IKbd keys="escape" size="xs" /> and typing already clear it, so making it a stop would slow every pass through a form to save nobody a step.
 
 Rename it for a non-English app with `clearLabel`, which is its accessible name.
 
