@@ -130,6 +130,16 @@ const timeline = computed<TimelineItem[]>(() => activity.map(entry => ({
       </ICard>
     </div>
 
+    <ICard title="By channel" description="Month to date" class="shadow-xs">
+      <IBarChart
+        :data="byChannel"
+        orientation="horizontal"
+        :height="220"
+        locale="en-IE"
+        :format="{ style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }"
+      />
+    </ICard>
+
     <div class="grid gap-4 lg:grid-cols-3">
       <ICard
         title="Recent invoices"
@@ -163,14 +173,5 @@ const timeline = computed<TimelineItem[]>(() => activity.map(entry => ({
         <ITimeline :items="timeline" size="sm" />
       </ICard>
     </div>
-    <ICard title="By channel" description="Month to date" class="shadow-xs">
-      <IBarChart
-        :data="byChannel"
-        orientation="horizontal"
-        :height="220"
-        locale="en-IE"
-        :format="{ style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }"
-      />
-    </ICard>
   </div>
 </template>
