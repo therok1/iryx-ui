@@ -16,6 +16,7 @@ export interface DropdownMenuProps {
   items?: DropdownMenuEntry[]
   /** Which edge of the trigger to align to. */
   align?: 'start' | 'center' | 'end'
+  alignOffset?: number
   side?: 'top' | 'right' | 'bottom' | 'left'
   sideOffset?: number
   /** Skip built-in classes; you take over styling entirely. */
@@ -80,6 +81,7 @@ const contentClass = computed(() => {
     <DropdownMenuPortal>
       <DropdownMenuContent
         :align="props.align"
+        :align-offset="props.alignOffset"
         :side="props.side"
         :side-offset="props.sideOffset"
         :class="contentClass"

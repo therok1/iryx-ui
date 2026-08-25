@@ -49,7 +49,7 @@ A menu opened from a button. Entries are data, and their shape decides what they
 <IButton variant="outline">Actions</IButton>
 </template>
 </IDropdownMenu>
-<p class="text-xs text-muted-foreground">{{ picked ? `You chose: ${picked}` : 'Nothing chosen yet.' }}</p>
+<p class="text-sm text-muted-foreground">{{ picked ? `You chose: ${picked}` : 'Nothing chosen yet.' }}</p>
 </template>
 
 ```vue
@@ -87,10 +87,6 @@ Four shapes, one array, decided in this order:
 | Has its own `items` | A submenu |
 | Has an `onSelect` | A menu item |
 | Has neither | A **group label** |
-
-<IAlert variant="warning" title="An entry with no onSelect and no items is a heading" class="not-prose my-6">
-Not a disabled item, and not a broken one: it renders with no hover, no focus and no click. That is deliberate — it is how you write a group label — but it also means forgetting <code>onSelect</code> silently turns an action into a heading. If an item does nothing when you click it, this is why.
-</IAlert>
 
 Group labels are the intended use:
 
@@ -222,6 +218,7 @@ An entry with no `onSelect` renders as a group label, which is the right thing f
 | --- | --- | --- | --- |
 | `items` | `DropdownMenuEntry[]` | `[]` | The menu contents |
 | `align` | `'start' \| 'center' \| 'end'` | `'start'` | Alignment against the trigger |
+| `alignOffset` | `number` | — | Offset from the `start` or `end` alignment options, in px. |
 | `side` | `'top' \| 'right' \| 'bottom' \| 'left'` | `'bottom'` | Preferred side; flips when it will not fit |
 | `sideOffset` | `number` | `4` | Distance from the trigger, in px |
 | `unstyled` | `boolean` | — | Drop built-in classes |
