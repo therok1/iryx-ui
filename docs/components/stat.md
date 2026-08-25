@@ -22,8 +22,6 @@ A single headline number with its movement, built for a row of tiles across the 
 ```
 </Demo>
 
-The delta sits on its own line, so a row of tiles keeps its lines aligned however long each value is.
-
 ## Trend
 
 The sign of `delta` decides the direction, and zero is neutral.
