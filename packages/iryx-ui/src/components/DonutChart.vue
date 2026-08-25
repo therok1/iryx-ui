@@ -246,14 +246,10 @@ const arcs = computed<Arc[]>(() => {
     return []
 
   /*
-   * Every slice is on screen from the first frame, all of them stacked at
-   * twelve o'clock, and they unfurl together: each one's start angle travels
-   * out to where it belongs while its arc grows to full length. Not a hand
-   * sweeping round the clock, which reveals them in turn, and not each
-   * opening in place, which never moves them.
-   *
-   * Applied to the geometry rather than to a transform, because `d` is not an
-   * animatable property — there is nothing for CSS to interpolate here.
+   * Every slice is on screen from the first frame, stacked at twelve o'clock,
+   * and they unfurl together — start angles travelling out to where they
+   * belong as their arcs grow. Applied to the geometry because `d` is not an
+   * animatable property.
    */
   const reveal = progress.value
 
@@ -263,7 +259,6 @@ const arcs = computed<Arc[]>(() => {
     const settled = angle
     angle += sweep
 
-    // Out from twelve towards its final start, and open to its final width.
     const from = START + (settled - START) * reveal
     const drawn = sweep * reveal
     if (drawn <= 0)
@@ -271,8 +266,7 @@ const arcs = computed<Arc[]>(() => {
 
     return [{
       ...slice,
-      // The tooltip anchors to where the slice will end up, not to how much
-      // of it has been drawn so far.
+      // Anchors the tooltip where the slice ends up, not where it is yet.
       mid: settled + sweep / 2,
       path: arcPath(from, from + drawn),
     }]
@@ -348,9 +342,7 @@ function arcPath(from: number, to: number): string {
  * ring, which is what a full-circle annulus amounts to.
  */
 const whole = computed(() => {
-  // Only once the sweep has come all the way round; mid-reveal a lone slice
-  // is still an arc with two ends, and drawing it as a circle would skip the
-  // animation entirely.
+  // Mid-reveal a lone slice is still an arc with two ends.
   if (arcs.value.length !== 1 || !outer.value || progress.value < 1)
     return undefined
   const slice = arcs.value[0]!

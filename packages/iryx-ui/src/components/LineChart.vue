@@ -329,18 +329,12 @@ const ready = computed(() => Boolean(width.value && lines.value.length))
 const { revealed } = useChartReveal(ready, animation)
 
 /**
- * The plot is uncovered left to right by a clip rectangle that widens across
- * it — the line and its wash together, under one transform.
+ * One clip rectangle widening across the plot, uncovering the line and its
+ * wash together.
  *
- * The line alone could be drawn on with a dash offset against
- * `pathLength="1"`, which is prettier in isolation. It was tried and dropped:
- * a dash advances along the *path*, the wash can only be uncovered along *x*,
- * and the two mappings disagree wherever the line is steep. Sharing one
- * rectangle is the only way they stay in step, whatever the curve.
- *
- * The transform goes on the rectangle rather than on the marks: scaling the
- * marks would squash their shape instead of revealing it, and an opacity fade
- * would fight the wash's own translucency.
+ * Drawing the line on with a dash offset was tried and dropped: a dash
+ * advances along the *path* and a fill can only be uncovered along *x*, so
+ * the two drift apart wherever the line is steep.
  */
 const plotReveal = computed(() => ({
   transform: `scaleX(${revealed.value ? 1 : 0})`,

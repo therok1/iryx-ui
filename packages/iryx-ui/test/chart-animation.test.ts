@@ -58,13 +58,15 @@ describe('useChartAnimation', () => {
   })
 
   /**
-   * The textbook ease-in leaves the curve vertical at the finish, so most of
-   * the reveal lands in the last few frames. This is the check that it does
-   * not: nine tenths of the way through, most of the distance is behind it.
+   * The two are mirrors of each other, which is the property that makes the
+   * pair read as one family rather than as two unrelated curves.
    */
-  it('keeps ease-in from snapping shut at the end', () => {
-    const { ease } = useChartAnimation(ref({ easing: 'ease-in' as const })).value
-    expect(ease(0.9)).toBeGreaterThan(0.75)
+  it('mirrors ease-in and ease-out about the diagonal', () => {
+    const out = useChartAnimation(ref({ easing: 'ease-out' as const })).value.ease
+    const inward = useChartAnimation(ref({ easing: 'ease-in' as const })).value.ease
+
+    for (const t of [0.25, 0.5, 0.75])
+      expect(inward(t)).toBeCloseTo(1 - out(1 - t), 1)
   })
 
   it('is reactive to the prop it was handed', () => {

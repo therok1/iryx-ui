@@ -2,44 +2,26 @@ import type { Ref } from 'vue'
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 
 /**
- * The reveal every chart plays on its first paint.
+ * The reveal every chart plays on its first paint, once per instance — a
+ * dashboard that re-animated on every poll would read as a fault.
  *
- * Two mechanisms, because the marks are not all the same kind of thing. A bar
- * or a line can be revealed by a CSS transition on a transform or a dash
- * offset — the browser animates it off the main thread and Vue never renders
- * a second time. A donut cannot: `d` is not an animatable property, so
- * sweeping one open means recomputing the path, which needs a value per frame.
- *
- * Both play **once**, on the first paint with something to draw. A live
- * dashboard whose data updates every few seconds would otherwise re-animate
- * on every poll, which reads as a fault rather than as polish.
+ * A CSS transition where the marks can be transformed, a per-frame value
+ * where they cannot: `d` is not an animatable property, so a donut has to
+ * recompute its geometry.
  */
 
-/** Long enough to be seen finishing, short enough not to delay reading. */
 export const REVEAL_DURATION = 700
 
 /**
- * The curves on offer.
- *
- * A closed set rather than any CSS timing function, because the same curve
- * has to be evaluated two ways: handed to a CSS transition as a string, and
- * solved in JavaScript for the charts that animate their geometry. One set of
- * control points feeds both, so the two mechanisms stay in step.
+ * A closed set rather than any CSS timing function: the same curve is handed
+ * to CSS as a string and solved in JavaScript for the donut, so both come
+ * from one set of control points.
  */
 export type ChartEasing = 'ease-out' | 'ease-in' | 'ease-in-out' | 'linear'
 
 const CURVES: Record<ChartEasing, readonly [number, number, number, number]> = {
-  // Most of the distance early, settling at the end. The default: it reads as
-  // the chart arriving rather than as the chart being drawn.
-  'ease-out': [0.22, 1, 0.36, 1],
-  /*
-   * A gentle one. The textbook ease-in puts its second control point at
-   * x = 1, which leaves the curve vertical at the finish: the reveal crawls
-   * for most of its duration and then snaps the last third in a couple of
-   * frames. Pulling that point inside the box bounds the closing speed, and a
-   * little lift on the first point stops the opening being a dead stop.
-   */
-  'ease-in': [0.4, 0.05, 0.7, 0.65],
+  'ease-out': [0.16, 1, 0.3, 1],
+  'ease-in': [0.7, 0, 0.84, 0],
   'ease-in-out': [0.65, 0, 0.35, 1],
   'linear': [0, 0, 1, 1],
 }
@@ -66,9 +48,8 @@ export interface ResolvedAnimation {
  * Solve a cubic Bézier for `y` at a given `x`, with the endpoints pinned at
  * (0,0) and (1,1) as CSS does.
  *
- * By bisection rather than Newton-Raphson: twenty halvings land inside a
- * thousandth of a pixel's worth of progress, it cannot diverge on the curves
- * with near-vertical starts, and it is a third of the code.
+ * Bisection rather than Newton-Raphson: it cannot diverge on the curves with
+ * near-vertical starts, and twenty halvings is well past sub-pixel.
  */
 function bezier([x1, y1, x2, y2]: readonly [number, number, number, number]) {
   const axis = (a: number, b: number, t: number) => {
@@ -97,7 +78,6 @@ function bezier([x1, y1, x2, y2]: readonly [number, number, number, number]) {
   }
 }
 
-/** The one place a chart's `animate` prop is turned into numbers. */
 export function useChartAnimation(animate: Ref<ChartAnimate | undefined>) {
   return computed<ResolvedAnimation>(() => {
     const value = animate.value ?? true
@@ -107,7 +87,6 @@ export function useChartAnimation(animate: Ref<ChartAnimate | undefined>) {
 
     return {
       enabled: value !== false,
-      // A zero or negative duration is "no animation" rather than an error.
       duration: Math.max(options.duration ?? REVEAL_DURATION, 0),
       css: `cubic-bezier(${points.join(', ')})`,
       ease: bezier(points),
@@ -115,19 +94,12 @@ export function useChartAnimation(animate: Ref<ChartAnimate | undefined>) {
   })
 }
 
-/**
- * Motion is a preference, and a chart is information first. Read at the
- * moment of the reveal rather than watched: this decides whether to animate
- * once, and a chart already on screen should not restart because the setting
- * changed underneath it.
- */
 function prefersReducedMotion(): boolean {
   return typeof window !== 'undefined'
     && typeof window.matchMedia === 'function'
     && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 }
 
-/** No `requestAnimationFrame` on the server, and nothing there to animate. */
 function canAnimate(animation: ResolvedAnimation): boolean {
   return animation.enabled
     && animation.duration > 0
@@ -136,12 +108,10 @@ function canAnimate(animation: ResolvedAnimation): boolean {
 }
 
 /**
- * A flag for CSS-driven charts: `false` for the first painted frame, `true`
- * from the next one, which is what makes a transition run.
- *
- * `ready` is the chart's own "there is something to draw" — a measured width
- * and at least one mark. Flipping on mount instead would animate an empty box
- * and be over by the time the `ResizeObserver` reports.
+ * `false` for the first painted frame, `true` from the next — which is what
+ * makes a transition run. Gated on `ready` rather than on mount: a chart with
+ * no measured width yet would animate an empty box and be finished before the
+ * `ResizeObserver` reported.
  */
 export function useChartReveal(ready: Ref<boolean>, animation: Ref<ResolvedAnimation>) {
   const revealed = ref(false)
@@ -170,10 +140,7 @@ export function useChartReveal(ready: Ref<boolean>, animation: Ref<ResolvedAnima
   return { revealed }
 }
 
-/**
- * A value from 0 to 1 for charts whose marks have to be recomputed to be
- * revealed. Eased, so it can be applied to geometry directly.
- */
+/** Eased 0 to 1, for marks that have to be recomputed to be revealed. */
 export function useChartProgress(ready: Ref<boolean>, animation: Ref<ResolvedAnimation>) {
   const progress = ref(0)
   let played = false
@@ -189,12 +156,8 @@ export function useChartProgress(ready: Ref<boolean>, animation: Ref<ResolvedAni
       return
     }
 
-    // Read once, at the start: retuning the curve halfway through a reveal
-    // would make it jump.
     const { duration, ease } = animation.value
 
-    // The first frame's timestamp is the start, so the clock begins when the
-    // browser is actually ready to paint rather than when this was scheduled.
     let start: number | undefined
     function step(now: number): void {
       start ??= now

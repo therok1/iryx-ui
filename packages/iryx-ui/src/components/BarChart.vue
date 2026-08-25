@@ -424,13 +424,9 @@ const animation = useChartAnimation(computed(() => props.animate))
 const { revealed } = useChartReveal(ready, animation)
 
 /**
- * Bars grow out of the baseline, which is the axis they are read against —
- * not out of their own box, which would have a negative bar rising into the
- * plot from below and reading as a positive one on the way.
- *
- * A CSS transform rather than an animated `height`: the browser can run it
- * off the main thread, and Vue renders once instead of once a frame. The
- * origin has to be set per bar because it is a coordinate, not a corner.
+ * Bars grow out of the baseline, not out of their own box — a negative bar
+ * scaled from its box would rise into the plot from below and read as a
+ * positive one on the way.
  */
 function barStyle(bar: Bar) {
   const baseline = layout.value.value(0)
@@ -441,14 +437,11 @@ function barStyle(bar: Bar) {
     transformOrigin: horizontal.value
       ? `${baseline}px ${along}px`
       : `${along}px ${baseline}px`,
-    // Both ends are written out. Transitioning to `none` instead of an
-    // explicit identity gives the browser nothing to interpolate towards on
-    // an SVG element, and the bar snaps to full size instead of growing.
+    // Both ends written out: transitioning to `none` gives an SVG element
+    // nothing to interpolate towards, and the bar snaps to full size.
     transform: `${axis}(${revealed.value ? 1 : 0})`,
     transition: `transform ${animation.value.duration}ms ${animation.value.css}`,
-    // A short stagger across the categories, so the row reads left to right
-    // rather than arriving as one block. Capped, or a long series would still
-    // be animating well after the reader has started looking at it.
+    // Capped, or a long series is still arriving after the reader has started.
     transitionDelay: `${Math.min(bar.categoryIndex * 30, 200)}ms`,
   }
 }

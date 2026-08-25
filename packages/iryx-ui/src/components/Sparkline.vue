@@ -144,15 +144,8 @@ const ready = computed(() => runs.value.length > 0)
 const { revealed } = useChartReveal(ready, animation)
 
 /**
- * The line and its wash are uncovered together by one clip rectangle widening
- * across the box.
- *
- * One rectangle, not a dash for the line and something else for the fill: a
- * dash advances along the *path* and a fill can only be uncovered along *x*,
- * so the two drift apart wherever the line is steep. Sharing the rectangle is
- * what keeps them in step. It is also not an opacity fade — the wash is a
- * gradient that is already part-transparent, and an inline opacity would
- * replace that rather than scale it.
+ * One clip rectangle over the line and its wash both — see `ILineChart` for
+ * why a dash offset cannot keep the two in step.
  */
 const wipeReveal = computed(() => ({
   transform: `scaleX(${revealed.value ? 1 : 0})`,
