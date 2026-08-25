@@ -85,8 +85,6 @@ The locale decides both the order of the segments and the separator — there is
 ```
 </Demo>
 
-Left unset it follows [`IApp`](/components/app)'s `locale`, and falls back to `en` — **not** to the reader's own browser setting. If your app knows its reader's locale, set it on `IApp` once rather than on every field.
-
 ## Bounds and availability
 
 `minValue` and `maxValue` fence the field, and `isUnavailable` refuses individual days — both in ISO strings, as everywhere else.
