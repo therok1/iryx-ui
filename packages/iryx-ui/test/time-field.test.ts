@@ -102,3 +102,18 @@ describe('timeField', () => {
     expect(mount(TimeField, { props: { unstyled: true } }).classes()).toHaveLength(0)
   })
 })
+
+describe('timeField bounds', () => {
+  it('marks an out-of-range time invalid', () => {
+    const early = mount(TimeField, { props: { modelValue: '07:00', minValue: '09:00', maxValue: '17:00' } })
+    expect(early.attributes('aria-invalid')).toBe('true')
+
+    const late = mount(TimeField, { props: { modelValue: '19:00', minValue: '09:00', maxValue: '17:00' } })
+    expect(late.attributes('aria-invalid')).toBe('true')
+  })
+
+  it('leaves a time inside the range alone', () => {
+    const wrapper = mount(TimeField, { props: { modelValue: '10:30', minValue: '09:00', maxValue: '17:00' } })
+    expect(wrapper.attributes('aria-invalid')).toBeUndefined()
+  })
+})

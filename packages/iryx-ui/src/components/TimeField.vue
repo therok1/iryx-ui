@@ -60,7 +60,26 @@ const emits = defineEmits<{ 'update:modelValue': [value: string | null] }>()
 
 const field = useFormField()
 const fieldId = computed(() => props.id ?? field?.id.value)
-const isInvalid = computed(() => props.invalid ?? field?.invalid.value ?? false)
+
+/**
+ * Outside `minValue`/`maxValue`. Reka works this out too and exposes it as
+ * `data-invalid`, but nothing sets `aria-invalid`, so an out-of-range time
+ * was accepted in silence. Padded `HH:mm` compares as a string.
+ */
+const outOfRange = computed(() => {
+  const value = props.modelValue
+  if (!value || !toTime(value))
+    return false
+  return Boolean(
+    (props.minValue && value < props.minValue)
+    || (props.maxValue && value > props.maxValue),
+  )
+})
+
+/* A caller's `invalid: false` cannot suppress a fact about the value. */
+const isInvalid = computed(() =>
+  (props.invalid ?? field?.invalid.value ?? false) || outOfRange.value,
+)
 
 const config = useIryxUiConfig()
 const isUnstyled = computed(() => props.unstyled ?? config.unstyled)

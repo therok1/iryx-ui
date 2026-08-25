@@ -13,18 +13,22 @@ import {
   Banner,
   Breadcrumb,
   Button,
+  Calendar,
   Card,
   Checkbox,
   Collapsible,
   ColorPicker,
   Combobox,
   Container,
+  DateField,
   DatePicker,
   DateRangePicker,
   Dialog,
+  DonutChart,
   Drawer,
   EmptyState,
   FileUpload,
+  HoverCard,
   Input,
   Kbd,
   Label,
@@ -141,6 +145,9 @@ const cases: [string, Component, Record<string, unknown>][] = [
   ['Toggle', Toggle, { 'aria-label': 'Bold' }],
   ['ToggleGroup', ToggleGroup, { 'items': ['List', 'Board'], 'aria-label': 'View' }],
   ['TimeField', TimeField, { 'modelValue': '09:30', 'aria-label': 'Start time' }],
+  ['DateField', DateField, { 'modelValue': '2026-08-15', 'aria-label': 'Invoice date' }],
+  ['Calendar', Calendar, { modelValue: '2026-08-15', label: 'Invoice date' }],
+  ['DonutChart', DonutChart, { data: [{ label: 'A', value: 3 }, { label: 'B', value: 1 }], label: 'Split' }],
   ['Tree', Tree, { items: [{ label: 'src', children: [{ label: 'a' }] }], ariaLabel: 'Files' }],
   ['Timeline', Timeline, { items: [{ title: 'Created', time: '09:12' }, { title: 'Paid', time: '14:03' }] }],
   ['Toolbar', Toolbar, { items: [{ label: 'Undo' }, '-', { label: 'Redo' }], ariaLabel: 'History' }],
@@ -152,6 +159,7 @@ const overlays: [string, Component, Record<string, unknown>][] = [
   ['Dialog', Dialog, { open: true, title: 'Edit invoice', description: 'Change the details.' }],
   ['Drawer', Drawer, { open: true, title: 'Filters', description: 'Narrow the list.' }],
   ['Popover', Popover, { open: true, ariaLabel: 'Filters', showClose: true }],
+  ['HoverCard', HoverCard, { open: true }],
 ]
 
 async function violationsOf(target: Element) {
@@ -173,7 +181,9 @@ describe('accessibility', () => {
   it.each(overlays)('%s has no axe violations', async (_name, component, props) => {
     mount(component, { props, attachTo: document.body })
     await nextTick()
-    const panel = document.body.querySelector('[role="dialog"]')!
+    // A hover card is not a dialog — it is anchored content with no focus
+    // trap — so the panel is found by either.
+    const panel = document.body.querySelector('[role="dialog"], [data-side]')!
     expect(await violationsOf(panel)).toEqual([])
   })
 

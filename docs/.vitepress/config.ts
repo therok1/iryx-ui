@@ -79,6 +79,7 @@ const sidebar = [
       { text: 'Confirm dialog', link: '/components/confirm-dialog' },
       { text: 'Container', link: '/components/container' },
       { text: 'Context menu', link: '/components/context-menu' },
+      { text: 'Date field', link: '/components/date-field' },
       { text: 'Date picker', link: '/components/date-picker' },
       { text: 'Date range picker', link: '/components/date-range-picker' },
       { text: 'Dialog', link: '/components/dialog' },

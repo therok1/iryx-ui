@@ -150,18 +150,4 @@ Every month is six rows tall by default. `fixedWeeks` turns that off, at the cos
 | `nextLabel` | `string` | `'Next month'` | Label for the forward control |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Classes for the root |
-| `ui` | `object` | — | Per-slot classes |
-
-## `ui` slots
-
-| Slot | Description |
-| --- | --- |
-| `root` | Outermost element |
-| `header` | Row holding the heading and the two nav controls |
-| `heading` | The month and year |
-| `nav` | Back and forward controls |
-| `months` | Row of month grids |
-| `grid` | One month's table |
-| `headCell` | A weekday heading |
-| `cell` | A day's table cell — where a range band is painted |
-| `cellTrigger` | The day itself |
+| `ui` | `{ root?, header?, heading?, nav?, months?, grid?, headCell?, cell?, cellTrigger? }` | — | Per-slot class overrides |

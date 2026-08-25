@@ -186,7 +186,7 @@ const open = ref(false)
 | `width` | `'none' \| 'sm' \| 'md' \| 'lg'` | `'md'` | Card width; `none` sizes to content |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Classes for the card |
-| `ui` | `object` | — | Per-slot classes |
+| `ui` | `{ content?, arrow? }` | — | Per-slot class overrides |
 
 ## Slots
 
@@ -194,10 +194,3 @@ const open = ref(false)
 | --- | --- |
 | `trigger` | What the card hangs off. Rendered as-is — pass a link or a button |
 | default | The card's content |
-
-## `ui` slots
-
-| Slot | Description |
-| --- | --- |
-| `content` | The card panel |
-| `arrow` | The pointer, when `arrow` is set |

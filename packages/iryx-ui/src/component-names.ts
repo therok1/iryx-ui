@@ -28,6 +28,7 @@ export const componentNames = [
   'Container',
   'ConfirmDialog',
   'ContextMenu',
+  'DateField',
   'DatePicker',
   'DateRangePicker',
   'Dialog',

@@ -252,24 +252,10 @@ It plays **once**, on the first paint with something to draw — not again when 
 | `label` | `string` | — | Accessible name for the figure and its data table |
 | `unstyled` | `boolean` | — | Skip built-in classes |
 | `class` | `string` | — | Classes for the root |
-| `ui` | `object` | — | Per-slot classes |
+| `ui` | `{ root?, svg?, slice?, center?, tooltip?, tooltipLabel?, tooltipValue?, tooltipShare?, table? }` | — | Per-slot class overrides |
 
 ## Slots
 
 | Slot | Props | Description |
 | --- | --- | --- |
 | `center` | `{ total, formatted }` | Content for the hole; ignored when `pie` |
-
-## `ui` slots
-
-| Slot | Description |
-| --- | --- |
-| `root` | Outermost element |
-| `svg` | The drawing surface |
-| `slice` | Every sector, and the circle a lone slice becomes |
-| `center` | The hole's content box |
-| `tooltip` | Hover tooltip |
-| `tooltipLabel` | The slice's name inside the tooltip |
-| `tooltipValue` | The value inside the tooltip |
-| `tooltipShare` | The percentage inside the tooltip |
-| `table` | The visually hidden data table |
