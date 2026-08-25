@@ -42,7 +42,7 @@ describe('component overview', () => {
 
   it('groups the charts under their own heading', () => {
     const charts = section('Charts')
-    for (const name of ['ISparkline', 'IBarChart', 'ILineChart', 'IChartLegend'])
+    for (const name of ['ISparkline', 'IBarChart', 'ILineChart', 'IDonutChart', 'IChartLegend'])
       expect(charts).toContain(`\`${name}\``)
 
     expect(section('Forms')).not.toContain('Chart')

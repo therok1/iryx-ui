@@ -81,6 +81,7 @@ const sidebar = [
       { text: 'Date picker', link: '/components/date-picker' },
       { text: 'Date range picker', link: '/components/date-range-picker' },
       { text: 'Dialog', link: '/components/dialog' },
+      { text: 'Donut chart', link: '/components/donut-chart' },
       { text: 'Drawer', link: '/components/drawer' },
       { text: 'Dropdown menu', link: '/components/dropdown-menu' },
       { text: 'Empty state', link: '/components/empty-state' },

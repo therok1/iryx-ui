@@ -126,4 +126,5 @@ Plain SVG, no charting dependency. They inherit the theme like everything else, 
 | [`ISparkline`](/components/sparkline) | Tiny inline trend line, sized to whatever box you put it in |
 | [`IBarChart`](/components/bar-chart) | Vertical or horizontal, grouped or stacked, round-number axis, hover tooltip |
 | [`ILineChart`](/components/line-chart) | Line or area, single or multi-series, with a crosshair and hover marker |
+| [`IDonutChart`](/components/donut-chart) | Parts of one whole as a ring or a pie, with the total in the hole |
 | [`IChartLegend`](/components/chart-legend) | Standalone legend; shown automatically from two series up |

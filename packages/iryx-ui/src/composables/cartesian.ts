@@ -197,8 +197,14 @@ export function seriesColor(index: number): string {
   return `var(--iryx-chart-${Math.min(Math.max(index, 0), SERIES_SLOTS - 1) + 1})`
 }
 
-/** A series' palette slot: pinned if it has one, otherwise its position. */
-export function slotOf(entry: ChartSeries, index: number): number {
+/**
+ * A series' palette slot: pinned if it has one, otherwise its position.
+ *
+ * Typed on the pin alone rather than on `ChartSeries`, so the charts with no
+ * second axis — a donut's rows are their own identity — can share the rule
+ * without inventing a `key` they have no use for.
+ */
+export function slotOf(entry: { slot?: number }, index: number): number {
   return entry.slot ?? index
 }
 
