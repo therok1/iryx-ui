@@ -1,5 +1,55 @@
 # iryx-ui
 
+## 0.17.0
+
+### Minor Changes
+
+- 3604415: Add `ICalendar`, the month grid on its own
+
+  The grid `IDatePicker` puts behind a field, available inline for the cases a popover is the wrong shape — a booking page, an availability view. ISO `YYYY-MM-DD` model like the pickers, plus `min` / `max`, an `isUnavailable` predicate taking ISO strings, `months`, `pagedNavigation`, `weekdayFormat`, `preventDeselect` and `readonly`.
+
+  With nothing selected it opens inside `min` / `max` rather than on today, so a calendar for a future window no longer opens on a month where every day is disabled.
+
+  Both pickers now render the same theme rather than a second copy of it: the grid's classes moved to `calendarTheme`, and `IDatePicker` renders `ICalendar` internally. `IDatePicker` also gained `isUnavailable` as a result.
+
+- 53d320f: Add `IDateField`, segmented date entry
+
+  Day, month and year as three arrow-key controls, ordered by the locale, with the same chrome and sizes as `ITimeField`. ISO `YYYY-MM-DD` model, `minValue` / `maxValue`, and an `isUnavailable` predicate taking ISO strings. The one to reach for when the reader already knows the date — a birthday, an invoice date — where hunting through a month grid is slower than typing.
+
+- 0b8c007: `IDropdownMenu` takes a `header` slot
+
+  A block above the items — an account's name and address, a workspace, a plan. It renders outside the item list, so it takes no stop in the arrow-key order and typeahead ignores it. An entry with no `onSelect` was the only way to do this before, and a group label is the wrong thing for an identity: it is neither a heading for the items below nor something to act on.
+
+- ffb21f4: Add `IEditable`, text that becomes a field in place
+
+  For changing one value where it sits — a title, a table cell, a note — without a form or a dialog for a single line. Both states are plain text: no border, no box, just a caret, with a hover tint as the only chrome. `controls` adds edit, save and cancel buttons; `submitMode` decides what commits (`both` by default, so `Enter` works); `preview` re-renders the value however you like.
+
+- 9d4cef0: Add `IHoverCard`, a preview summoned by hovering a link
+
+  The popover's chrome with the tooltip's trigger: `openDelay` and `closeDelay`, `side` / `align` / `sideOffset`, an optional `arrow`, and the same `width` and `padding` scales as `IPopover`. `enableTouch` is off by default — a tap has no hover before it, so nothing inside a hover card may be the only route to an action.
+
+### Patch Changes
+
+- b111957: `ICombobox`'s chips are Reka's `TagsInput`
+
+  The chips were hand-built markup, so the keyboard had only what was written for it: Backspace removed the last chip outright and nothing else worked. They are `TagsInput` items now, composed inside the anchor as Reka's own docs do — arrow keys move between chips, the first Backspace marks the last one and the next removes it, matching `ITagsInput`.
+
+  A multiple field also keeps its size's height as a floor. One chip is shorter than a line of text, so it used to sit 2px below every other field in its row.
+
+- 34d59c0: `IContainer`'s gutters now respond to the viewport
+
+  Each gutter was a single value at every width — `md` was `px-6` on a 360px phone and on a 2560px monitor alike. A fixed gutter has to pick a side, and the middle is wrong at both ends: too much of a narrow screen spent on margins, too little breathing room on a wide one.
+
+  `sm` is now `px-3 sm:px-4`, `md` is `px-4 sm:px-6 lg:px-8`, and `lg` is `px-6 sm:px-8 lg:px-12`. `gutter="none"` is unchanged, and remains the way to set one fixed value of your own.
+
+- 53d320f: `ITimeField` now honours `minValue` and `maxValue`
+
+  They were decorative. Reka computes the out-of-range state and exposes it as `data-invalid`, but nothing styled that attribute and nothing set `aria-invalid`, so a time outside the range was accepted in silence. It now marks the field invalid the same way the `invalid` prop and `IFormField` do — and a caller's `invalid: false` cannot suppress it, since being out of range is a fact about the value.
+
+- 197bfa2: `IStat`'s delta sits beside the value
+
+  It had a line of its own, which left every tile taller than its content. The two are one reading — a figure and how it moved — so they now share a baseline, wrapping only when a long value leaves no room.
+
 ## 0.16.0
 
 ### Minor Changes
