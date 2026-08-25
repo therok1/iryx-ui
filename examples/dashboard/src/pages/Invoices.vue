@@ -68,7 +68,12 @@ function today(): string {
 }
 
 const draft = reactive({
-  customer: '',
+  /*
+   * `string | null`, because clearing the combobox writes `null` — that is
+   * what the component means by empty, whatever type the field started as.
+   * Declaring it here is what makes the validator below have to say so too.
+   */
+  customer: '' as string | null,
   issued: today(),
   terms: '30',
   total: '',
@@ -99,7 +104,7 @@ function onCreateCustomer(name: string): void {
 function validateDraft(values: typeof draft): FormError[] {
   const errors: FormError[] = []
 
-  if (!values.customer.trim())
+  if (!values.customer?.trim())
     errors.push({ name: 'customer', message: 'An invoice needs someone to bill.' })
 
   if (!values.issued)
@@ -139,13 +144,16 @@ function openCreate(): void {
 }
 
 function createInvoice(): void {
+  // Validation has already refused an empty one, so this only narrows the type.
+  const customer = draft.customer ?? ''
+
   const invoice: Invoice = {
     id: `new-${Date.now()}`,
     number: nextNumber(),
     customer: {
-      name: draft.customer,
-      email: rows.value.find(row => row.customer.name === draft.customer)?.customer.email
-        ?? `ap@${draft.customer.toLowerCase().replace(/[^a-z0-9]+/g, '')}.example`,
+      name: customer,
+      email: rows.value.find(row => row.customer.name === customer)?.customer.email
+        ?? `ap@${customer.toLowerCase().replace(/[^a-z0-9]+/g, '')}.example`,
     },
     issued: draft.issued,
     due: addDays(draft.issued, Number(draft.terms) || 30),
