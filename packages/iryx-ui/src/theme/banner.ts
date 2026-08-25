@@ -22,10 +22,8 @@ export const bannerTheme = tv({
     position: {
       static: {},
       top: { root: 'sticky top-0 z-30' },
-      /** Pinned to the bottom of the viewport; the rule moves to the top edge. */
       bottom: { root: 'fixed inset-x-0 bottom-0 z-30 border-t border-b-0' },
     },
-    /** Constrains the text while the fill still spans the viewport. */
     contained: {
       true: { container: 'max-w-5xl' },
       false: {},

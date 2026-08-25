@@ -2,24 +2,9 @@ import { tv } from 'tailwind-variants'
 
 export const avatarTheme = tv({
   slots: {
-    /*
-     * Deliberately *not* `overflow-hidden`. The clip is what a circular
-     * avatar needs for its image, but it also cropped the status dot, which
-     * sits on the edge by design. The image and fallback inherit the radius
-     * and clip themselves instead, leaving the dot free to overhang.
-     */
     root: 'relative inline-flex shrink-0 items-center justify-center bg-muted align-middle select-none',
     image: 'size-full rounded-[inherit] object-cover',
     fallback: 'flex size-full items-center justify-center overflow-hidden rounded-[inherit] font-medium text-muted-foreground uppercase',
-    /*
-     * A presence dot pinned to the bounding box's lower corner, which on a
-     * circle puts it just outside the curve rather than overlapping it. That
-     * is deliberate: it keeps the dot clear of the face or logo underneath.
-     * The ring is the page background, not a colour, so it reads as sitting
-     * on top of whatever is behind it.
-     *
-     * This is also why the root must not clip — see the note there.
-     */
     status: 'absolute right-0 bottom-0 rounded-full ring-2 ring-background',
   },
   variants: {
@@ -53,7 +38,6 @@ export const avatarGroupTheme = tv({
   slots: {
     root: 'flex flex-row-reverse items-center justify-end',
     item: 'ring-2 ring-background',
-    /** The "+3" chip closing the stack. */
     overflow: 'flex shrink-0 items-center justify-center rounded-full bg-muted font-medium text-muted-foreground ring-2 ring-background',
   },
   variants: {

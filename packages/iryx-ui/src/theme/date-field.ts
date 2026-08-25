@@ -1,20 +1,10 @@
 import { tv } from 'tailwind-variants'
 import { fieldBase } from './input'
 
-/*
- * The time field's chrome, because they are the same control with different
- * segments — a reader typing a date and a reader typing a time should not be
- * looking at two different fields.
- */
 export const dateFieldTheme = tv({
   slots: {
     root: `inline-flex items-center gap-0.5 ${fieldBase} w-auto focus-within:ring-2 focus-within:ring-primary/50`,
-    /*
-     * `tabular-nums`: without it the field changes width as the digits change
-     * and the segments jitter while someone is typing into them.
-     */
     segment: 'rounded px-0.5 text-foreground tabular-nums outline-none focus:bg-primary focus:text-primary-foreground data-[disabled]:cursor-not-allowed',
-    /** The separators between segments — punctuation, not somewhere to focus. */
     literal: 'text-muted-foreground',
   },
   variants: {

@@ -1,14 +1,9 @@
 import { tv } from 'tailwind-variants'
 import { fieldBase } from './input'
 
-/*
- * The field and the panel around the grid. The grid itself is `calendarTheme`,
- * which `ICalendar` and both pickers share.
- */
 export const datePickerTheme = tv({
   slots: {
     trigger: `flex items-center justify-between gap-2 ${fieldBase} cursor-pointer [&_svg]:size-4 [&_svg]:shrink-0 [&_svg]:opacity-60`,
-    /** Shown in place of the value, so it reads as absent rather than chosen. */
     placeholder: 'text-muted-foreground',
     content: 'z-50 rounded-xl border border-border bg-background p-3 text-foreground shadow-md',
     footer: 'flex items-center justify-between gap-2 pt-3',

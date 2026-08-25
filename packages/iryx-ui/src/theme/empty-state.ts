@@ -6,7 +6,6 @@ export const emptyStateTheme = tv({
     icon: 'text-muted-foreground',
     title: 'font-medium text-foreground',
     description: 'max-w-sm text-sm text-muted-foreground',
-    /** Only rendered when the actions slot is used. */
     actions: 'flex flex-wrap items-center justify-center gap-2',
   },
   variants: {

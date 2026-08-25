@@ -1,10 +1,5 @@
 import { tv } from 'tailwind-variants'
 
-/*
- * Children are pulled together by a pixel so adjacent borders collapse into
- * one. `relative` plus a raised z-index on hover and focus keeps a focus ring
- * from being overlapped by the next child.
- */
 export const buttonGroupTheme = tv({
   base: 'isolate inline-flex [&>*]:relative [&>*:focus-visible]:z-10 [&>*:hover]:z-10',
   variants: {

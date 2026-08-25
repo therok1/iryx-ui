@@ -17,7 +17,6 @@ export const numberInputTheme = tv({
     invalid: {
       true: { input: 'border-red-500 focus-visible:ring-red-500/40' },
     },
-    /** Leaves room for the stepper so long values can't slide under it. */
     withStepper: {
       true: {},
     },

@@ -3,12 +3,10 @@ import { tv } from 'tailwind-variants'
 export const cardTheme = tv({
   slots: {
     root: 'rounded-2xl text-foreground',
-    /** Only rendered when a title, description or header slot is provided. */
     header: 'flex flex-col gap-1.5',
     title: 'text-base leading-snug font-semibold',
     description: 'text-sm text-muted-foreground',
     body: '',
-    /** Only rendered when a footer slot is provided. */
     footer: 'flex items-center gap-2',
   },
   variants: {

@@ -17,7 +17,6 @@ export const badgeTheme = tv({
       true: { root: 'border-border bg-background text-foreground' },
       false: {},
     },
-    // Padding tightens on the side a `data-icon` marks, as on Button.
     size: {
       sm: {
         root: 'h-5 gap-1 px-1.5 text-xs has-[[data-icon=inline-end]]:pr-1 has-[[data-icon=inline-start]]:pl-1 [&_svg]:size-3',

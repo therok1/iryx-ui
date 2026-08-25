@@ -1,13 +1,5 @@
 import { tv } from 'tailwind-variants'
 
-/*
- * The bar itself is quiet — a menubar is chrome, not a control panel, and a
- * heavy container competes with the document under it. The triggers only take
- * a surface once they are hovered or their menu is open.
- *
- * Panels reuse `dropdownMenuTheme().content`, so a menubar menu and a dropdown
- * are the same object; only the way they are opened differs.
- */
 export const menubarTheme = tv({
   slots: {
     root: 'flex items-center gap-0.5 rounded-xl border border-border bg-background p-1',

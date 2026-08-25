@@ -1,20 +1,9 @@
 import { tv } from 'tailwind-variants'
 
-/*
- * Chips are drawn from `currentColor` rather than the page's own tokens, so
- * they suit whatever surface they land on. A shortcut goes inside a tooltip,
- * a solid button and a menu row, and each of those inverts the text colour —
- * a chip fixed to `border-border` and `text-muted-foreground` looked right on
- * the page and washed out everywhere else.
- *
- * `min-w` with centred text keeps a row of one-character keys from looking
- * ragged — "⌘" and "K" are very different widths in most faces.
- */
 export const kbdTheme = tv({
   slots: {
     root: 'inline-flex shrink-0 items-center',
     key: 'inline-flex items-center justify-center rounded border border-current/25 bg-current/10 text-center font-medium text-current/75',
-    /** The `+` between chips. Punctuation, so it is hidden from readers. */
     separator: 'text-current/60',
   },
   variants: {

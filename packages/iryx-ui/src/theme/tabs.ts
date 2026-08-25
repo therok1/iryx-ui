@@ -1,11 +1,5 @@
 import { tv } from 'tailwind-variants'
 
-/*
- * The active marker is a single `TabsIndicator` that slides between triggers,
- * rather than a background on each one — that is what lets it animate. Reka
- * exposes its geometry as --reka-tabs-indicator-position / -size, and only
- * `translate` and the size transition, so nothing else eases.
- */
 export const tabsTheme = tv({
   slots: {
     root: 'flex flex-col gap-4',
@@ -21,10 +15,6 @@ export const tabsTheme = tv({
         indicator: 'top-1 h-[calc(100%---spacing(2))] rounded-lg bg-background shadow-sm',
         trigger: 'rounded-lg px-3 py-1.5 text-muted-foreground data-[state=active]:text-foreground',
       },
-      /**
-       * Underline for page-level navigation. The trigger is square: a rounded
-       * corner would bend the bar that sits under it.
-       */
       line: {
         list: 'gap-4 border-b border-border',
         indicator: 'bottom-0 h-0.5 rounded-none bg-primary',

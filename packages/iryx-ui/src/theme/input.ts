@@ -4,12 +4,6 @@ import { tv } from 'tailwind-variants'
 export const fieldBase
   = 'w-full rounded-xl border border-border bg-input text-foreground transition-colors outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/50 disabled:cursor-not-allowed disabled:opacity-50'
 
-/**
- * The chrome lives on `root`, not on the `<input>`, so leading and trailing
- * content can take real space in a flex row. Reserving room with padding
- * instead would mean guessing the width of arbitrary slot content, and long
- * values would slide underneath it.
- */
 export const inputTheme = tv({
   slots: {
     root: `flex items-center ${fieldBase} focus-within:ring-2 focus-within:ring-primary/50 has-[input:disabled]:cursor-not-allowed has-[input:disabled]:opacity-50`,
@@ -44,10 +38,6 @@ export const textareaTheme = tv({
     invalid: {
       true: 'border-red-500 focus-visible:ring-red-500/40',
     },
-    /**
-     * The measured height is the whole point, so drop the size variant's
-     * `min-h` floor and the drag handle that would fight it.
-     */
     autosize: {
       true: 'min-h-0 resize-none',
     },

@@ -4,7 +4,6 @@ export const separatorTheme = tv({
   slots: {
     root: 'flex shrink-0 items-center',
     line: 'bg-border',
-    /** Only rendered when a label is provided. */
     label: 'shrink-0 text-xs text-muted-foreground',
   },
   variants: {

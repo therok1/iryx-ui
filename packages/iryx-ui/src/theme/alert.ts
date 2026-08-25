@@ -17,7 +17,6 @@ export const alertTheme = tv({
       warning: { icon: 'text-warning' },
       danger: { icon: 'text-danger' },
     },
-    /** Tightens the title/description gap when both are present. */
     withTitle: {
       true: { description: 'mt-1' },
     },
