@@ -4,11 +4,6 @@ import { Download01Icon } from '@hugeicons/core-free-icons'
 import { computed } from 'vue'
 import { activity, byChannel, formatDay, formatMoment, formatMoney, invoices, revenue, statusVariant } from '../data'
 
-/*
- * Totals are summed as integer cents, not floats. `0.1 + 0.2` is
- * 0.30000000000000004, and a column of invoices adds that error up until the
- * figure on screen disagrees with the one in the ledger.
- */
 function sumCents(rows: typeof invoices): string {
   const cents = rows.reduce((total, row) => total + Math.round(Number(row.total) * 100), 0)
   return (cents / 100).toFixed(2)
@@ -20,17 +15,6 @@ const collected = computed(() => sumCents(invoices.filter(row => row.status === 
 
 const recent = computed(() => [...invoices].sort((a, b) => b.issued.localeCompare(a.issued)).slice(0, 5))
 
-/**
- * What the book is made of. The stat row states one outstanding figure; this
- * is the same money split by where each invoice has got to, which is the
- * question the number itself cannot answer.
- *
- * Slots are pinned so a status keeps its colour when the book empties of one:
- * without them, clearing every draft would repaint the three that remain.
- * They are palette slots, not the badges' semantic colours — a chart palette
- * is chosen for separation between neighbours, and a red among them would
- * read as a warning about whichever slice happened to hold it.
- */
 const byStatus = computed(() => ([
   { label: 'Paid', value: Number(sumCents(invoices.filter(row => row.status === 'paid'))), slot: 4 },
   { label: 'Sent', value: Number(sumCents(invoices.filter(row => row.status === 'sent'))), slot: 0 },
@@ -42,8 +26,6 @@ const columns: TableColumn[] = [
   { key: 'number', label: 'Invoice', width: '8rem' },
   { key: 'customer.name', label: 'Customer' },
   { key: 'issued', label: 'Issued', width: '9rem' },
-  // `numeric` gives the column tabular figures, so digits line up down the
-  // column rather than wandering with the width of each glyph.
   { key: 'total', label: 'Total', numeric: true, width: '8rem' },
   { key: 'status', label: 'Status', align: 'center', width: '7rem' },
 ]
@@ -68,27 +50,24 @@ const timeline = computed<TimelineItem[]>(() => activity.map(entry => ({
       </template>
     </IPageHeader>
 
-    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div class="grid gap-4 sm:grid-cols-2 2xl:grid-cols-4">
       <ICard padding="sm" class="relative overflow-hidden bg-muted/50 shadow-xs">
         <IStat
           label="Outstanding"
           :value="formatMoney(outstanding)"
           :delta="8.2"
           hint="Sent and overdue"
-          size="lg"
+          size="sm"
         />
       </ICard>
       <ICard padding="sm" class="bg-muted/50 shadow-xs">
-        <!--
-          Down is the good direction here, so `trend` overrides the colour the
-          sign would otherwise pick: a falling overdue total is not a loss.
-        -->
         <IStat
           label="Overdue"
           :value="formatMoney(sumCents(overdue))"
           :delta="-14"
           trend="up"
           :hint="`${overdue.length} invoices`"
+          size="sm"
         />
       </ICard>
       <ICard padding="sm" class="bg-muted/50 shadow-xs">
@@ -161,7 +140,7 @@ const timeline = computed<TimelineItem[]>(() => activity.map(entry => ({
             {{ formatMoney(row.total) }}
           </template>
           <template #cell-status="{ row }">
-            <IBadge :variant="statusVariant[row.status]" size="sm" class="capitalize">
+            <IBadge :variant="statusVariant[row.status as keyof typeof statusVariant]" size="sm" class="capitalize">
               {{ row.status }}
             </IBadge>
           </template>

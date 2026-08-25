@@ -3,11 +3,6 @@ import { Mail01Icon } from '@hugeicons/core-free-icons'
 import { computed } from 'vue'
 import { formatMoney, invoices } from '../data'
 
-/*
- * Derived from the invoices rather than kept as a second list. Two lists of
- * the same thing drift, and the totals below are the sort a reader will check
- * against the invoices page.
- */
 const customers = computed(() => {
   const byName = new Map<string, { name: string, email: string, cents: number, count: number, overdue: number }>()
 
@@ -35,13 +30,6 @@ const customers = computed(() => {
     <IPageHeader title="Customers" :description="`${customers.length} accounts billed this quarter.`" />
 
     <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-      <!--
-        `padding="none"` so the two halves can carry their own. The identity
-        band is a raised surface with a bottom border, which puts the rule edge
-        to edge for free — an `ISeparator` between padded blocks stops short of
-        the card on both sides, and a divider that does not reach the edges
-        reads as a mistake rather than as a division.
-      -->
       <ICard
         v-for="customer in customers"
         :key="customer.name"
@@ -49,7 +37,6 @@ const customers = computed(() => {
         class="overflow-hidden shadow-xs"
       >
         <div class="flex items-start gap-3 border-b border-border bg-muted/50 p-4">
-          <!-- The avatar's own surface is `bg-muted`, which is now the band it sits on. -->
           <IAvatar :name="customer.name" size="md" class="bg-background" />
 
           <div class="min-w-0 flex-1">
@@ -71,7 +58,6 @@ const customers = computed(() => {
             <p class="text-sm text-muted-foreground">
               Billed
             </p>
-            <!-- Tabular figures so the totals line up card to card. -->
             <p class="text-lg font-semibold tabular-nums">
               {{ formatMoney((customer.cents / 100).toFixed(2)) }}
             </p>

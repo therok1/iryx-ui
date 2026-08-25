@@ -9,11 +9,6 @@ import { formatDay, formatMoney, invoices, statusVariant } from '../data'
 const { toast, success } = useToast()
 const { confirm } = useConfirm()
 
-/*
- * A copy, not the imported array. The module export is the seed; the page
- * owns the list from mount on, so creating an invoice shows up immediately
- * and nothing writes back into shared module state.
- */
 const rows = ref<Invoice[]>([...invoices])
 
 const query = ref('')
@@ -22,11 +17,6 @@ const selection = ref<string[]>([])
 const page = ref(1)
 const perPage = 8
 
-/*
- * 'all', not ''. Reka reserves the empty string to mean *nothing selected*
- * and refuses it as an item value outright, so a real "no filter" option
- * needs a value of its own.
- */
 const statuses = [
   { label: 'All statuses', value: 'all' },
   { label: 'Paid', value: 'paid' },
@@ -35,12 +25,6 @@ const statuses = [
   { label: 'Draft', value: 'draft' },
 ]
 
-/*
- * Filtering and paging happen here because the whole list is already in
- * memory. Past a few hundred rows this moves to the server: `ITable` takes a
- * `total` for exactly that case, so it reports the full count while holding
- * only the current page.
- */
 const filtered = computed(() => {
   const term = query.value.trim().toLowerCase()
   return rows.value.filter((row) => {
@@ -54,25 +38,17 @@ const filtered = computed(() => {
 
 const paged = computed(() => filtered.value.slice((page.value - 1) * perPage, page.value * perPage))
 
-// A filter that shortens the list can strand the reader on a page that no
-// longer exists, showing an empty table with rows behind it.
 function resetPage(): void {
   page.value = 1
 }
 
 const creating = ref(false)
 
-/** Today, as the ISO date the pickers and the data both use. */
 function today(): string {
   return new Date().toISOString().slice(0, 10)
 }
 
 const draft = reactive({
-  /*
-   * `string | null`, because clearing the combobox writes `null` — that is
-   * what the component means by empty, whatever type the field started as.
-   * Declaring it here is what makes the validator below have to say so too.
-   */
   customer: '' as string | null,
   issued: today(),
   terms: '30',
@@ -80,13 +56,11 @@ const draft = reactive({
   notes: '',
 })
 
-/** Every customer already billed, for the combobox to offer. */
 const customerOptions = computed(() => {
   const names = [...new Set(rows.value.map(row => row.customer.name))].sort()
   return names.map(name => ({ label: name, value: name }))
 })
 
-/** Added by the combobox's create row, so a new name can be picked at once. */
 const addedCustomers = ref<string[]>([])
 
 const customerItems = computed(() => [
@@ -95,8 +69,6 @@ const customerItems = computed(() => [
 ])
 
 function onCreateCustomer(name: string): void {
-  // The combobox deliberately does not set a value for a row that did not
-  // exist. Adding it to the list and then selecting it is the caller's half.
   addedCustomers.value = [name, ...addedCustomers.value]
   draft.customer = name
 }
@@ -110,15 +82,12 @@ function validateDraft(values: typeof draft): FormError[] {
   if (!values.issued)
     errors.push({ name: 'issued', message: 'Pick the date it goes out.' })
 
-  // Money as a string, checked as one: parsing to a float to validate would
-  // round the very value the check is meant to protect.
   if (!/^\d+(?:\.\d{1,2})?$/.test(values.total) || Number(values.total) <= 0)
     errors.push({ name: 'total', message: 'Enter an amount, to at most two decimal places.' })
 
   return errors
 }
 
-/** Next in the run, so the number follows the ones already on the page. */
 function nextNumber(): string {
   const highest = rows.value.reduce((top, row) => {
     const n = Number(row.number.replace(/\D/g, ''))
@@ -127,7 +96,6 @@ function nextNumber(): string {
   return `INV-${highest + 1}`
 }
 
-/** Due date is issue date plus the terms, in whole days. */
 function addDays(iso: string, days: number): string {
   const date = new Date(`${iso}T00:00`)
   date.setDate(date.getDate() + days)
@@ -144,7 +112,6 @@ function openCreate(): void {
 }
 
 function createInvoice(): void {
-  // Validation has already refused an empty one, so this only narrows the type.
   const customer = draft.customer ?? ''
 
   const invoice: Invoice = {
@@ -157,7 +124,6 @@ function createInvoice(): void {
     },
     issued: draft.issued,
     due: addDays(draft.issued, Number(draft.terms) || 30),
-    // A new invoice is a draft: nothing has been sent yet.
     status: 'draft',
     total: Number(draft.total).toFixed(2),
   }
@@ -230,15 +196,6 @@ async function voidInvoice(row: Invoice): Promise<void> {
       </IBadge>
     </div>
 
-    <!--
-      `padding="none"`, not `ui.body`: the padding lives on the card *root*, so
-      zeroing the body leaves the root's own inset behind and the row rules stop
-      short of the border. `overflow-hidden` clips the table to the radius.
-    -->
-    <!--
-      A drawer rather than a dialog: an invoice form is a side task off the
-      list, and the list stays visible behind it.
-    -->
     <IDrawer
       v-model:open="creating"
       side="right"
@@ -322,15 +279,11 @@ async function voidInvoice(row: Invoice): Promise<void> {
           {{ formatMoney(row.total) }}
         </template>
         <template #cell-status="{ row }">
-          <IBadge :variant="statusVariant[row.status]" size="sm" class="capitalize">
+          <IBadge :variant="statusVariant[row.status as keyof typeof statusVariant]" size="sm" class="capitalize">
             {{ row.status }}
           </IBadge>
         </template>
 
-        <!--
-          A trailing column sized to its content. Clicks inside it never reach
-          the row, so an action never doubles as a row selection.
-        -->
         <template #row-actions="{ row }">
           <IDropdownMenu :items="rowActions(row)" align="end">
             <template #trigger>

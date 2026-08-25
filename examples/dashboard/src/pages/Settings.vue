@@ -7,11 +7,6 @@ import { user } from '../data'
 const { success } = useToast()
 const { appearance, setAppearance } = useAppearance()
 
-/*
- * `IForm` validates a reactive state object. It takes any Standard Schema
- * validator — Zod, Valibot, ArkType — but this example ships no schema
- * library, so `validate` does the same job in plain functions.
- */
 const state = reactive({
   name: user.name,
   role: user.role,
@@ -35,8 +30,6 @@ function validate(values: typeof state): FormError[] {
   if (!values.email.includes('@'))
     errors.push({ name: 'email', message: 'Enter an address replies can reach.' })
 
-  // The terms field is a count of days, so it is validated as an integer
-  // rather than trusted to be one because the input says `type="number"`.
   if (!/^\d+$/.test(values.terms) || Number(values.terms) < 1)
     errors.push({ name: 'terms', message: 'Payment terms are a whole number of days.' })
 
@@ -66,7 +59,6 @@ const saving = ref(false)
 
 async function onSubmit(): Promise<void> {
   saving.value = true
-  // Stands in for the request. `IForm` has already validated by this point.
   await new Promise(resolve => setTimeout(resolve, 600))
   saving.value = false
   success('Billing settings saved')
@@ -78,12 +70,6 @@ async function onSubmit(): Promise<void> {
     <IPageHeader title="Settings" description="How invoices are issued and chased." />
 
     <IForm :state="state" :validate="validate" @submit="onSubmit">
-      <!--
-        Same banded shape as the customer card: a raised identity strip whose
-        bottom border reaches both edges, then the fields below it. The avatar
-        takes `bg-background` because its own surface is `bg-muted`, which is
-        the colour of the band it now sits on.
-      -->
       <ICard padding="none" class="mb-4 overflow-hidden shadow-xs">
         <div class="flex items-center gap-4 border-b border-border bg-muted/50 p-4">
           <IAvatar :name="state.name" size="lg" class="bg-background" />
@@ -160,15 +146,11 @@ async function onSubmit(): Promise<void> {
       </ICard>
 
       <ICard title="Appearance" class="mt-4 shadow-xs">
-        <!--
-          Bound to `useAppearance` rather than to the form: it takes effect on
-          change and is a preference of this browser, not a value to submit.
-        -->
         <IRadioGroup
           :model-value="appearance"
           :items="appearances"
           orientation="horizontal"
-          @update:model-value="value => setAppearance(value as Appearance)"
+          @update:model-value="(value: Appearance) => setAppearance(value)"
         />
       </ICard>
 
