@@ -20,6 +20,24 @@ const collected = computed(() => sumCents(invoices.filter(row => row.status === 
 
 const recent = computed(() => [...invoices].sort((a, b) => b.issued.localeCompare(a.issued)).slice(0, 5))
 
+/**
+ * What the book is made of. The stat row states one outstanding figure; this
+ * is the same money split by where each invoice has got to, which is the
+ * question the number itself cannot answer.
+ *
+ * Slots are pinned so a status keeps its colour when the book empties of one:
+ * without them, clearing every draft would repaint the three that remain.
+ * They are palette slots, not the badges' semantic colours — a chart palette
+ * is chosen for separation between neighbours, and a red among them would
+ * read as a warning about whichever slice happened to hold it.
+ */
+const byStatus = computed(() => ([
+  { label: 'Paid', value: Number(sumCents(invoices.filter(row => row.status === 'paid'))), slot: 4 },
+  { label: 'Sent', value: Number(sumCents(invoices.filter(row => row.status === 'sent'))), slot: 0 },
+  { label: 'Overdue', value: Number(sumCents(overdue.value)), slot: 2 },
+  { label: 'Draft', value: Number(sumCents(invoices.filter(row => row.status === 'draft'))), slot: 6 },
+]))
+
 const columns: TableColumn[] = [
   { key: 'number', label: 'Invoice', width: '8rem' },
   { key: 'customer.name', label: 'Customer' },
@@ -50,9 +68,16 @@ const timeline = computed<TimelineItem[]>(() => activity.map(entry => ({
       </template>
     </IPageHeader>
 
-    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-      <ICard class="bg-muted/50 shadow-xs">
-        <IStat label="Outstanding" :value="formatMoney(outstanding)" :delta="8.2" hint="Sent and overdue" />
+    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+      <ICard class="bg-muted/50 shadow-xs sm:col-span-2">
+        <IStat
+          label="Outstanding"
+          :value="formatMoney(outstanding)"
+          :delta="8.2"
+          hint="Sent and overdue"
+          size="lg"
+        />
+        <ISparkline :data="revenue.map(month => month.value)" :height="44" class="mt-4" label="Revenue over the last six months" />
       </ICard>
       <ICard class="bg-muted/50 shadow-xs">
         <!--
@@ -82,20 +107,25 @@ const timeline = computed<TimelineItem[]>(() => activity.map(entry => ({
           variant="area"
           :tension="0.6"
           flush
-          :height="260"
+          :height="300"
           locale="en-IE"
           :format="{ style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }"
         />
       </ICard>
 
-      <ICard title="By channel" description="Month to date" class="shadow-xs">
-        <IBarChart
-          :data="byChannel"
-          orientation="horizontal"
-          :height="260"
+      <ICard title="Where the book stands" description="Every invoice by status" class="shadow-xs">
+        <IDonutChart
+          :data="byStatus"
+          :size="220"
           locale="en-IE"
           :format="{ style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }"
-        />
+          label="Invoiced total by status"
+        >
+          <template #center="{ formatted }">
+            <span class="text-xl font-semibold tabular-nums">{{ formatted }}</span>
+            <span class="text-xs text-muted-foreground">invoiced</span>
+          </template>
+        </IDonutChart>
       </ICard>
     </div>
 
@@ -132,5 +162,14 @@ const timeline = computed<TimelineItem[]>(() => activity.map(entry => ({
         <ITimeline :items="timeline" size="sm" />
       </ICard>
     </div>
+    <ICard title="By channel" description="Month to date" class="shadow-xs">
+      <IBarChart
+        :data="byChannel"
+        orientation="horizontal"
+        :height="220"
+        locale="en-IE"
+        :format="{ style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }"
+      />
+    </ICard>
   </div>
 </template>
