@@ -12,6 +12,8 @@ import {
 } from '@hugeicons/core-free-icons'
 import { useAppearance } from 'iryx-ui'
 import { computed, ref } from 'vue'
+import { user } from './data'
+
 import Customers from './pages/Customers.vue'
 import Invoices from './pages/Invoices.vue'
 import Overview from './pages/Overview.vue'
@@ -67,8 +69,6 @@ function toggleAppearance(): void {
 }
 
 const account: DropdownMenuEntry[] = [
-  { label: 'Signed in as rae@northwind.example' },
-  '-',
   { label: 'Account settings', icon: Settings01Icon, onSelect: () => (page.value = 'settings') },
   { label: 'Sign out', icon: Logout01Icon, danger: true, onSelect: () => {} },
 ]
@@ -133,15 +133,29 @@ const account: DropdownMenuEntry[] = [
               <IIcon :icon="isDark ? Sun03Icon : Moon02Icon" data-icon />
             </IButton>
 
-            <IDropdownMenu :items="account" align="end">
+            <IDropdownMenu :items="account" align="end" class="min-w-56">
               <template #trigger>
                 <button
                   type="button"
                   aria-label="Account menu"
                   class="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
                 >
-                  <IAvatar name="Rae Lindqvist" size="sm" status="online" />
+                  <IAvatar :name="user.name" size="sm" status="online" />
                 </button>
+              </template>
+
+              <template #header>
+                <div class="flex items-center gap-2.5">
+                  <IAvatar :name="user.name" size="sm" />
+                  <div class="min-w-0">
+                    <p class="truncate text-sm font-medium">
+                      {{ user.name }}
+                    </p>
+                    <p class="truncate text-xs text-muted-foreground">
+                      {{ user.email }}
+                    </p>
+                  </div>
+                </div>
               </template>
             </IDropdownMenu>
           </div>

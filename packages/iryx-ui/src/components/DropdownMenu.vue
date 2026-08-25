@@ -24,6 +24,7 @@ export interface DropdownMenuProps {
   /** Override classes per slot, e.g. `{ item: 'py-2' }`. */
   ui?: {
     content?: string
+    header?: string
     item?: string
     label?: string
     separator?: string
@@ -38,12 +39,30 @@ const props = withDefaults(defineProps<DropdownMenuProps>(), {
   unstyled: undefined,
 })
 
+defineSlots<{
+  /** What opens the menu. */
+  trigger?: () => unknown
+  /**
+   * A block above the items — an account's name and address, a workspace, a
+   * plan. Not a menu row: it is not focusable and nothing selects it.
+   */
+  header?: () => unknown
+  /** Replaces the items entirely. */
+  default?: () => unknown
+}>()
+
 const open = defineModel<boolean>('open', { default: false })
 
 const config = useIryxUiConfig()
 const isUnstyled = computed(() => props.unstyled ?? config.unstyled)
 
 const entries = computed(() => props.items ?? [])
+
+const headerClass = computed(() => {
+  if (isUnstyled.value)
+    return props.ui?.header
+  return dropdownMenuTheme().header({ class: props.ui?.header })
+})
 
 const contentClass = computed(() => {
   if (isUnstyled.value)
@@ -65,6 +84,15 @@ const contentClass = computed(() => {
         :side-offset="props.sideOffset"
         :class="contentClass"
       >
+        <!--
+          Outside the item list on purpose: a header is read, not chosen, so
+          it must not take a stop in the arrow-key order or answer to
+          typeahead.
+        -->
+        <div v-if="$slots.header" :class="headerClass">
+          <slot name="header" />
+        </div>
+
         <slot>
           <DropdownMenuItems :entries="entries" :unstyled="isUnstyled" :ui="props.ui" />
         </slot>

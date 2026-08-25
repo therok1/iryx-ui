@@ -2,7 +2,7 @@ import type { DropdownMenuEntry } from '../src'
 import { enableAutoUnmount, mount } from '@vue/test-utils'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { h, nextTick } from 'vue'
-import { ContextMenu, HoverCard, Menubar, Popover, Toolbar } from '../src'
+import { ContextMenu, DropdownMenu, HoverCard, Menubar, Popover, Toolbar } from '../src'
 
 /** These portal their content into the body, so mounted trees must be torn down. */
 enableAutoUnmount(afterEach)
@@ -129,6 +129,41 @@ async function rightClick(wrapper: ReturnType<typeof mount>) {
   await wrapper.get('button').trigger('contextmenu')
   await nextTick()
 }
+
+describe('dropdownMenu', () => {
+  // An entry with no `onSelect` renders as a group label, not a menu item.
+  const items: DropdownMenuEntry[] = [
+    { label: 'Account settings', onSelect: () => {} },
+    { label: 'Sign out', onSelect: () => {} },
+  ]
+
+  it('renders a header above the items', async () => {
+    mount(DropdownMenu, {
+      props: { open: true, items },
+      slots: { trigger, header: '<p>rae@northwind.example</p>' },
+    })
+    await nextTick()
+    expect(body().textContent).toContain('rae@northwind.example')
+  })
+
+  /** A header is read, not chosen: it must not take a stop in the menu order. */
+  it('keeps the header out of the item list', async () => {
+    mount(DropdownMenu, {
+      props: { open: true, items },
+      slots: { trigger, header: '<p>rae@northwind.example</p>' },
+    })
+    await nextTick()
+    const rows = body().querySelectorAll('[role="menuitem"]')
+    expect(rows).toHaveLength(2)
+    expect([...rows].map(row => row.textContent?.trim())).not.toContain('rae@northwind.example')
+  })
+
+  it('renders nothing for it when the slot is absent', async () => {
+    mount(DropdownMenu, { props: { open: true, items }, slots: { trigger } })
+    await nextTick()
+    expect(body().querySelector('.border-b')).toBeNull()
+  })
+})
 
 describe('contextMenu', () => {
   it('stays closed until the region is right-clicked', () => {

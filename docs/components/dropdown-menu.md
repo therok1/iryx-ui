@@ -20,6 +20,11 @@ const items = [
   { label: 'Delete', danger: true, onSelect: noop('Delete') },
 ]
 
+const account = [
+  { label: 'Account settings', onSelect: noop('Account settings') },
+  { label: 'Sign out', danger: true, onSelect: noop('Sign out') },
+]
+
 const labelled = [
   { label: 'This entry has no onSelect, so it is a heading' },
   { label: 'Edit', onSelect: noop('Edit') },
@@ -168,6 +173,49 @@ const items = [
 ]
 ```
 
+## A header
+
+The `header` slot puts a block above the items — an account's name and address, the current workspace, a plan. It is read, not chosen: it takes no stop in the arrow-key order and typeahead ignores it, which a menu entry used as a label cannot say.
+
+<Demo stack>
+<template #demo>
+<IDropdownMenu :items="account" align="start" class="min-w-56">
+<template #trigger>
+<IButton variant="outline" size="sm">Account</IButton>
+</template>
+<template #header>
+<div class="flex items-center gap-2.5">
+<IAvatar name="Rae Lindqvist" size="sm" />
+<div class="min-w-0">
+<p class="truncate text-sm font-medium">Rae Lindqvist</p>
+<p class="truncate text-xs text-muted-foreground">rae@northwind.example</p>
+</div>
+</div>
+</template>
+</IDropdownMenu>
+</template>
+
+```vue
+<IDropdownMenu :items="account" class="min-w-56">
+  <template #trigger>
+    <IButton variant="outline">Account</IButton>
+  </template>
+
+  <template #header>
+    <div class="flex items-center gap-2.5">
+      <IAvatar :name="user.name" size="sm" />
+      <div class="min-w-0">
+        <p class="truncate text-sm font-medium">{{ user.name }}</p>
+        <p class="truncate text-xs text-muted-foreground">{{ user.email }}</p>
+      </div>
+    </div>
+  </template>
+</IDropdownMenu>
+```
+</Demo>
+
+An entry with no `onSelect` renders as a group label, which is the right thing for "Recent files" above a list of them — but wrong for an identity block, which is neither a heading for the items below nor something to act on.
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -178,7 +226,7 @@ const items = [
 | `sideOffset` | `number` | `4` | Distance from the trigger, in px |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged with the built-in classes |
-| `ui` | `{ content?, item?, label?, separator?, subTrigger?, subContent? }` | — | Per-slot class overrides |
+| `ui` | `{ content?, header?, item?, label?, separator?, subTrigger?, subContent? }` | — | Per-slot class overrides |
 
 ```ts
 interface DropdownMenuItemOption {
@@ -199,5 +247,7 @@ type DropdownMenuEntry = DropdownMenuItemOption | '-'
 | Slot | When to use it |
 | --- | --- |
 | `trigger` | The button that opens the menu. **Required** |
+| `header` | A block above the items — an identity, a workspace, a plan |
+| default | Replaces the items entirely |
 
 A dropdown menu is for *actions*. For choosing a value, use [`ISelect`](/components/select) — it has a model, the right ARIA roles, and typeahead.
