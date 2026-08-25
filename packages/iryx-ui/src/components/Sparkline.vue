@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import type { ChartAnimate } from '../composables/chart-reveal'
 import type { SparseValue } from '../composables/scale'
-import { computed } from 'vue'
+import { computed, useId } from 'vue'
+import { useChartAnimation, useChartReveal } from '../composables/chart-reveal'
 import { extent, linearScale } from '../composables/scale'
 import { useIryxUiConfig } from '../config'
 import { sparklineTheme } from '../theme/sparkline'
@@ -27,6 +29,13 @@ export interface SparklineProps {
   label?: string
   /** Rendered height in px. Width always fills the container. */
   height?: number
+  /**
+   * Draw the line on across the box on the first paint. Off by default here,
+   * unlike the full-size charts: a sparkline usually sits inside a stat tile
+   * or a table row, and a page of them animating at once is a distraction
+   * rather than an arrival.
+   */
+  animate?: ChartAnimate
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   class?: string
@@ -39,6 +48,7 @@ const props = withDefaults(defineProps<SparklineProps>(), {
   variant: 'line',
   baseline: 'min',
   height: 32,
+  animate: false,
   unstyled: undefined,
 })
 
@@ -129,6 +139,42 @@ function toArea(points: Point[]): string {
   return `${toLine(points)} L${last.x} ${baseY.value} L${first.x} ${baseY.value} Z`
 }
 
+const animation = useChartAnimation(computed(() => props.animate))
+const ready = computed(() => runs.value.length > 0)
+const { revealed } = useChartReveal(ready, animation)
+
+/**
+ * The line and its wash are uncovered together by one clip rectangle widening
+ * across the box.
+ *
+ * One rectangle, not a dash for the line and something else for the fill: a
+ * dash advances along the *path* and a fill can only be uncovered along *x*,
+ * so the two drift apart wherever the line is steep. Sharing the rectangle is
+ * what keeps them in step. It is also not an opacity fade — the wash is a
+ * gradient that is already part-transparent, and an inline opacity would
+ * replace that rather than scale it.
+ */
+const wipeReveal = computed(() => ({
+  transform: `scaleX(${revealed.value ? 1 : 0})`,
+  transformOrigin: '0px 0px',
+  transition: `transform ${animation.value.duration}ms ${animation.value.css}`,
+}))
+
+/** The end dot has nothing to wipe across, so it arrives with the line's end. */
+const dotReveal = computed(() => ({
+  opacity: revealed.value ? 1 : 0,
+  transition: `opacity ${Math.round(animation.value.duration * 0.3)}ms ${animation.value.css}`,
+  transitionDelay: `${Math.round(animation.value.duration * 0.8)}ms`,
+}))
+
+/*
+ * Ids have to be unique per instance: two sparklines on a page must not share
+ * a gradient or a clip, or the second would reference the first's. `useId` is
+ * stable across SSR and hydration, which a counter or a random string is not.
+ */
+const clipId = `iryx-spark-clip-${useId()}`
+const gradientId = `iryx-spark-area-${useId()}`
+
 /** The most recent reading, wherever the series happens to end. */
 const endPoint = computed<Point | undefined>(() => {
   const last = runs.value[runs.value.length - 1]
@@ -158,22 +204,46 @@ function slotClass(slot: 'root' | 'plot' | 'line' | 'area' | 'dot' | 'ring', ext
       :aria-hidden="props.label ? undefined : true"
       :class="slotClass('plot')"
     >
-      <template v-if="props.variant === 'area'">
+      <defs>
+        <!--
+          The wash fades out downwards rather than sitting as one flat tint,
+          the same way `ILineChart` draws its area: the line stays the
+          strongest thing in the box and the fill reads as depth under it.
+
+          `gradientUnits="userSpaceOnUse"` down the full box, because the
+          default bounding-box units would rescale the gradient to whatever
+          height the data happens to span — a flat series would take the
+          whole ramp across two pixels.
+        -->
+        <linearGradient :id="gradientId" gradientUnits="userSpaceOnUse" :x1="0" :y1="0" :x2="0" :y2="BOX">
+          <stop offset="0%" stop-color="currentColor" stop-opacity="0.35" />
+          <stop offset="100%" stop-color="currentColor" stop-opacity="0" />
+        </linearGradient>
+
+        <!-- The reveal's wipe — see `wipeReveal`. -->
+        <clipPath :id="clipId">
+          <rect x="0" y="0" :width="BOX" :height="BOX" :style="wipeReveal" />
+        </clipPath>
+      </defs>
+
+      <!-- One clip over both, so the fill and the line uncover together. -->
+      <g :clip-path="`url(#${clipId})`">
         <path
-          v-for="(points, index) in runs"
+          v-for="(points, index) in props.variant === 'area' ? runs : []"
           :key="`area-${index}`"
           :d="toArea(points)"
+          :fill="`url(#${gradientId})`"
           :class="slotClass('area')"
         />
-      </template>
 
-      <path
-        v-for="(points, index) in runs"
-        :key="`line-${index}`"
-        :d="toLine(points)"
-        vector-effect="non-scaling-stroke"
-        :class="slotClass('line')"
-      />
+        <path
+          v-for="(points, index) in runs"
+          :key="`line-${index}`"
+          :d="toLine(points)"
+          vector-effect="non-scaling-stroke"
+          :class="slotClass('line')"
+        />
+      </g>
 
       <!--
         A zero-length path with a round cap renders as a circle of the stroke's
@@ -186,12 +256,14 @@ function slotClass(slot: 'root' | 'plot' | 'line' | 'area' | 'dot' | 'ring', ext
           :d="`M${endPoint.x} ${endPoint.y} L${endPoint.x} ${endPoint.y}`"
           stroke-width="12"
           vector-effect="non-scaling-stroke"
+          :style="dotReveal"
           :class="slotClass('ring')"
         />
         <path
           :d="`M${endPoint.x} ${endPoint.y} L${endPoint.x} ${endPoint.y}`"
           stroke-width="8"
           vector-effect="non-scaling-stroke"
+          :style="dotReveal"
           :class="slotClass('dot')"
         />
       </template>

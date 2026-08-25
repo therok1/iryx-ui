@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import type { ChartSeries } from '../composables/cartesian'
+import type { ChartAnimate } from '../composables/chart-reveal'
 import type { SparseValue } from '../composables/scale'
 import { computed, ref, useId } from 'vue'
 import { AXIS_GAP, cartesianLayout, clampTooltip, seriesColor, slotOf, warnOnSlotOverflow } from '../composables/cartesian'
+import { useChartAnimation, useChartReveal } from '../composables/chart-reveal'
 import { useElementSize } from '../composables/element-size'
 import { useIryxUiConfig } from '../config'
 import { lineChartTheme } from '../theme/line-chart'
@@ -48,6 +50,12 @@ export interface LineChartProps {
   ticks?: number
   /** Drop the value axis and its gridlines. */
   axis?: boolean
+  /**
+   * Draw the line on across the plot on the first paint. Skipped for a reader
+   * who has asked for reduced motion, and played once — not again when the
+   * data changes underneath it.
+   */
+  animate?: ChartAnimate
   /** Drop the legend. Only honoured for a single series. */
   legend?: boolean
   /**
@@ -82,6 +90,7 @@ const props = withDefaults(defineProps<LineChartProps>(), {
   height: 240,
   ticks: 5,
   axis: true,
+  animate: true,
   legend: true,
   zero: false,
   unstyled: undefined,
@@ -258,6 +267,8 @@ function toArea(points: Point[]): string {
  * and hydration, which a counter or a random string is not.
  */
 const areaGradientId = `iryx-area-${useId()}`
+/** Same reasoning for the reveal's clip path. */
+const plotClipId = `iryx-plot-clip-${useId()}`
 
 const hovered = ref<number>()
 
@@ -312,6 +323,30 @@ const tooltip = computed(() => {
     y: Math.min(...markers.value.map(marker => marker.y), layout.value.plot.top + layout.value.plot.height),
   }
 })
+
+const animation = useChartAnimation(computed(() => props.animate))
+const ready = computed(() => Boolean(width.value && lines.value.length))
+const { revealed } = useChartReveal(ready, animation)
+
+/**
+ * The plot is uncovered left to right by a clip rectangle that widens across
+ * it — the line and its wash together, under one transform.
+ *
+ * The line alone could be drawn on with a dash offset against
+ * `pathLength="1"`, which is prettier in isolation. It was tried and dropped:
+ * a dash advances along the *path*, the wash can only be uncovered along *x*,
+ * and the two mappings disagree wherever the line is steep. Sharing one
+ * rectangle is the only way they stay in step, whatever the curve.
+ *
+ * The transform goes on the rectangle rather than on the marks: scaling the
+ * marks would squash their shape instead of revealing it, and an opacity fade
+ * would fight the wash's own translucency.
+ */
+const plotReveal = computed(() => ({
+  transform: `scaleX(${revealed.value ? 1 : 0})`,
+  transformOrigin: `${layout.value.plot.left}px 0px`,
+  transition: `transform ${animation.value.duration}ms ${animation.value.css}`,
+}))
 
 const theme = computed(() => lineChartTheme())
 
@@ -381,19 +416,22 @@ function slotClass(slot: keyof NonNullable<LineChartProps['ui']>, extra?: string
             <stop offset="0%" stop-color="currentColor" stop-opacity="0.35" />
             <stop offset="100%" stop-color="currentColor" stop-opacity="0" />
           </linearGradient>
-        </defs>
 
-        <!-- Behind the line, so the wash never dulls the reading itself. -->
-        <template v-if="showArea">
-          <path
-            v-for="(points, index) in lines[0]!.runs"
-            :key="`area-${index}`"
-            :d="toArea(points)"
-            :fill="`url(#${areaGradientId})`"
-            :style="{ color: lines[0]!.color }"
-            :class="slotClass('area')"
-          />
-        </template>
+          <!--
+            The reveal's wipe. It widens with the line rather than fading,
+            and lives here so the area keeps its own translucency — an
+            opacity applied to the shape would override the wash's.
+          -->
+          <clipPath :id="plotClipId">
+            <rect
+              :x="layout.plot.left"
+              :y="layout.plot.top"
+              :width="layout.plot.width"
+              :height="layout.plot.height"
+              :style="plotReveal"
+            />
+          </clipPath>
+        </defs>
 
         <!-- Under the lines: a crosshair drawn on top would cut through them. -->
         <line
@@ -406,17 +444,33 @@ function slotClass(slot: keyof NonNullable<LineChartProps['ui']>, extra?: string
           :class="slotClass('crosshair')"
         />
 
-        <!-- Colour is set inline, not by class: Tailwind cannot generate a class
-           name assembled at runtime, so `stroke-chart-3` would never exist. -->
-        <template v-for="line in lines" :key="`series-${line.seriesIndex}`">
+        <!--
+          The line and its wash share one clip, so the reveal uncovers them
+          together. Colour is set inline, not by class: Tailwind cannot
+          generate a class name assembled at runtime, so `stroke-chart-3`
+          would never exist.
+        -->
+        <g :clip-path="`url(#${plotClipId})`">
+          <!-- Behind the line, so the wash never dulls the reading itself. -->
           <path
-            v-for="(points, index) in line.runs"
-            :key="`line-${line.seriesIndex}-${index}`"
-            :d="toLine(points)"
-            :style="{ stroke: line.color }"
-            :class="slotClass('line')"
+            v-for="(points, index) in showArea ? lines[0]!.runs : []"
+            :key="`area-${index}`"
+            :d="toArea(points)"
+            :fill="`url(#${areaGradientId})`"
+            :style="{ color: lines[0]!.color }"
+            :class="slotClass('area')"
           />
-        </template>
+
+          <template v-for="line in lines" :key="`series-${line.seriesIndex}`">
+            <path
+              v-for="(points, index) in line.runs"
+              :key="`line-${line.seriesIndex}-${index}`"
+              :d="toLine(points)"
+              :style="{ stroke: line.color }"
+              :class="slotClass('line')"
+            />
+          </template>
+        </g>
 
         <!--
         One marker per series at the hovered category. A dot on every point is

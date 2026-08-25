@@ -52,7 +52,9 @@ function distance(a: Point, b: Point): number {
 /** The measurement lands in a post-flush watcher, so let it settle. */
 async function mountChart(props: Record<string, unknown> = {}) {
   withWidth(600)
-  const wrapper = mount(DonutChart, { props: { data, ...props }, attachTo: document.body })
+  // Geometry, not motion: the reveal recomputes the arcs, so these mount
+  // with it off and assert the settled ring.
+  const wrapper = mount(DonutChart, { props: { data, animate: false, ...props }, attachTo: document.body })
   await nextTick()
   return wrapper
 }
@@ -139,7 +141,7 @@ describe('donutChart', () => {
 
   it('hands the centre slot the total', async () => {
     const wrapper = mount(DonutChart, {
-      props: { data },
+      props: { data, animate: false },
       slots: { center: '<span>{{ params.formatted }}</span>' },
       attachTo: document.body,
     })

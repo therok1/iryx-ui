@@ -184,6 +184,29 @@ Drop the axis and gridlines for a chart that sits inside a tile, where the shape
 
 `null` is a missing reading, not a zero — no bar is drawn at all, which is not the same as a bar of no height.
 
+## Animation
+
+The bars grow out of the baseline on the first paint, staggered a little across the categories so the row reads left to right. They grow from the *baseline*, not from their own box, so a negative bar drops rather than rising into the plot on its way down.
+
+<Demo stack>
+<template #demo>
+<ChartReplay v-slot="{ key, animate }">
+<IBarChart :key="key" :data="monthly" :animate="animate" label="Revenue by month" class="w-full" />
+</ChartReplay>
+</template>
+
+```vue
+<IBarChart :data="monthly" :animate="{ easing: 'ease-out', duration: 700 }" />
+
+<!-- Off entirely -->
+<IBarChart :data="monthly" :animate="false" />
+```
+</Demo>
+
+`animate` takes `false` to switch the reveal off, or an object to tune it: `duration` in milliseconds and `easing`, one of `ease-out` (the default), `ease-in`, `ease-in-out` or `linear`.
+
+It plays **once**, on the first paint with something to draw — not again when the data changes underneath it, which on a polling dashboard would read as a fault rather than as polish. A reader who has asked for reduced motion gets the finished chart with no animation at all.
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -195,6 +218,7 @@ Drop the axis and gridlines for a chart that sits inside a tile, where the shape
 | `height` | `number` | `240` | Rendered height in px; width fills the container |
 | `ticks` | `number` | `5` | Target tick count; the axis lands on round numbers |
 | `axis` | `boolean` | `true` | Draw the value axis and its gridlines |
+| `animate` | `boolean` or `{ duration, easing }` | `true` | Reveal on the first paint; `false` turns it off |
 | `legend` | `boolean` | `true` | Only honoured for a single series |
 | `totalLabel` | `string` | `'Total'` | Word for the stacked tooltip's sum |
 | `locale` | `string` | — | Locale for every number in the chart |

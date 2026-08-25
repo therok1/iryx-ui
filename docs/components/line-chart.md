@@ -227,6 +227,31 @@ Readings sit a quarter of a category clear of each edge, so the first and last m
 
 The extension is flat, so it never implies a value the series does not have — it holds the first and last readings level out to the edge. A series broken by a gap only extends the runs that actually reach an end of the data.
 
+## Animation
+
+The plot is uncovered left to right: the line and its wash share one clip, so they arrive together.
+
+<Demo stack>
+<template #demo>
+<ChartReplay v-slot="{ key, animate }">
+<ILineChart :key="key" :data="monthly" area :animate="animate" label="Revenue by month" class="w-full" />
+</ChartReplay>
+</template>
+
+```vue
+<ILineChart :data="monthly" area :animate="{ easing: 'ease-out', duration: 700 }" />
+
+<!-- Off entirely -->
+<ILineChart :data="monthly" :animate="false" />
+```
+</Demo>
+
+`animate` takes `false` to switch the reveal off, or an object to tune it: `duration` in milliseconds and `easing`, one of `ease-out` (the default), `ease-in`, `ease-in-out` or `linear`.
+
+Drawing the line on with a dash offset was tried and dropped. A dash advances along the *path* while a fill can only be uncovered along *x*, so the line and its wash drifted apart wherever the line was steep — one clip rectangle is what keeps them in step, whatever the curve.
+
+It plays **once**, on the first paint with something to draw — not again when the data changes underneath it. A reader who has asked for reduced motion gets the finished chart with no animation at all.
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -239,6 +264,7 @@ The extension is flat, so it never implies a value the series does not have — 
 | `height` | `number` | `240` | Rendered height in px; width fills the container |
 | `ticks` | `number` | `5` | Target tick count; the axis lands on round numbers |
 | `axis` | `boolean` | `true` | Draw the value axis and its gridlines |
+| `animate` | `boolean` or `{ duration, easing }` | `true` | Reveal on the first paint; `false` turns it off |
 | `legend` | `boolean` | `true` | Only honoured for a single series |
 | `zero` | `boolean` | `false` | Force zero onto the axis |
 | `locale` | `string` | — | Locale for every number in the chart |

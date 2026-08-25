@@ -46,7 +46,9 @@ Full setup, including the Nuxt module and the theme tokens, is in the
       </IFormField>
 
       <template #footer>
-        <IButton @click="save">Save</IButton>
+        <IButton @click="save">
+          Save
+        </IButton>
       </template>
     </ICard>
   </IApp>

@@ -62,7 +62,9 @@ Components are auto-imported with the `I` prefix.
       </IFormField>
 
       <template #footer>
-        <IButton @click="save">Save</IButton>
+        <IButton @click="save">
+          Save
+        </IButton>
       </template>
     </ICard>
   </IApp>

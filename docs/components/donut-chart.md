@@ -207,6 +207,35 @@ The palette defines eight categorical slots. Past the eighth the last one repeat
 
 The slices are `aria-hidden`, and the data is exposed instead as a table with a column for the value and a column for the share. `label` names it — pass one, or the figure reaches assistive tech unnamed.
 
+## Animation
+
+Every slice is on screen from the first frame, all of them stacked at twelve o'clock, and they unfurl together into place. Not a hand sweeping round the clock, which would reveal them in turn.
+
+<Demo stack>
+<template #demo>
+<ChartReplay v-slot="{ key, animate }">
+<IDonutChart :key="key" :data="sources" :animate="animate" label="Traffic by source" class="w-full">
+  <template #center="{ formatted }">
+    <span class="text-2xl font-semibold tabular-nums">{{ formatted }}</span>
+  </template>
+</IDonutChart>
+</ChartReplay>
+</template>
+
+```vue
+<IDonutChart :data="sources" :animate="{ easing: 'ease-out', duration: 700 }" />
+
+<!-- Off entirely -->
+<IDonutChart :data="sources" :animate="false" />
+```
+</Demo>
+
+`animate` takes `false` to switch the reveal off, or an object to tune it: `duration` in milliseconds and `easing`, one of `ease-out` (the default), `ease-in`, `ease-in-out` or `linear`.
+
+This is the one chart whose reveal is not a CSS transition. A path's `d` is not an animatable property, so the geometry is recomputed each frame against an eased progress value — which is why the easing is a named curve rather than any CSS timing function: the same control points have to be solvable in JavaScript.
+
+It plays **once**, on the first paint with something to draw — not again when the data changes underneath it. A reader who has asked for reduced motion gets the finished chart with no animation at all.
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -216,6 +245,7 @@ The slices are `aria-hidden`, and the data is exposed instead as a table with a 
 | `thickness` | `number` | — | Ring width in px; defaults to two fifths of the radius |
 | `pie` | `boolean` | `false` | Fill the middle in |
 | `gap` | `number` | `2` | Space between neighbouring slices in px; `0` closes it |
+| `animate` | `boolean` or `{ duration, easing }` | `true` | Reveal on the first paint; `false` turns it off |
 | `legend` | `boolean` | `true` | Show the legend |
 | `locale` | `string` | — | Passed to `Intl.NumberFormat` |
 | `format` | `Intl.NumberFormatOptions` | — | Passed to `Intl.NumberFormat` |

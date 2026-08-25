@@ -98,7 +98,11 @@ describe('sparkline', () => {
     expect(paths).toHaveLength(2)
     // Closed back down to the baseline.
     expect(paths[0]!.attributes('d')).toContain('Z')
-    expect(paths[0]!.classes().join(' ')).toContain('opacity-10')
+    // The wash is a gradient, the same one ILineChart uses, so it is set as
+    // a fill attribute rather than by a class — a class cannot name a
+    // <linearGradient>.
+    expect(paths[0]!.attributes('fill')).toContain('url(#')
+    expect(wrapper.find('linearGradient').exists()).toBe(true)
   })
 
   it('closes an area to zero when asked and zero is in range', () => {

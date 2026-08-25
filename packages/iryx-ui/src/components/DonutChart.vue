@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import type { ChartSeries } from '../composables/cartesian'
+import type { ChartAnimate } from '../composables/chart-reveal'
 import type { SparseValue } from '../composables/scale'
 import { computed, ref } from 'vue'
 import { clampTooltip, seriesColor, slotOf, warnOnSlotOverflow } from '../composables/cartesian'
+import { useChartAnimation, useChartProgress } from '../composables/chart-reveal'
 import { useElementSize } from '../composables/element-size'
 import { useIryxUiConfig } from '../config'
 import { donutChartTheme } from '../theme/donut-chart'
@@ -56,6 +58,12 @@ export interface DonutChartProps {
    * meet before they reach it.
    */
   gap?: number
+  /**
+   * Sweep the ring open on the first paint. Skipped for a reader who has
+   * asked for reduced motion, and played once — not again when the data
+   * changes underneath it.
+   */
+  animate?: ChartAnimate
   /** Drop the legend. */
   legend?: boolean
   /** Locale and options for every number shown — the total and the tooltip. */
@@ -80,6 +88,7 @@ const props = withDefaults(defineProps<DonutChartProps>(), {
   data: () => [],
   size: 240,
   gap: 2,
+  animate: true,
   legend: true,
   unstyled: undefined,
 })
@@ -229,21 +238,44 @@ interface Arc extends Slice {
   path: string
 }
 
+const ready = computed(() => Boolean(width.value && outer.value && slices.value.length))
+const { progress } = useChartProgress(ready, useChartAnimation(computed(() => props.animate)))
+
 const arcs = computed<Arc[]>(() => {
-  if (!width.value || !outer.value || !slices.value.length)
+  if (!ready.value)
     return []
 
+  /*
+   * Every slice is on screen from the first frame, all of them stacked at
+   * twelve o'clock, and they unfurl together: each one's start angle travels
+   * out to where it belongs while its arc grows to full length. Not a hand
+   * sweeping round the clock, which reveals them in turn, and not each
+   * opening in place, which never moves them.
+   *
+   * Applied to the geometry rather than to a transform, because `d` is not an
+   * animatable property — there is nothing for CSS to interpolate here.
+   */
+  const reveal = progress.value
+
   let angle = START
-  return slices.value.map((slice) => {
+  return slices.value.flatMap((slice) => {
     const sweep = slice.share * Math.PI * 2
-    const from = angle
+    const settled = angle
     angle += sweep
 
-    return {
+    // Out from twelve towards its final start, and open to its final width.
+    const from = START + (settled - START) * reveal
+    const drawn = sweep * reveal
+    if (drawn <= 0)
+      return []
+
+    return [{
       ...slice,
-      mid: from + sweep / 2,
-      path: arcPath(from, from + sweep),
-    }
+      // The tooltip anchors to where the slice will end up, not to how much
+      // of it has been drawn so far.
+      mid: settled + sweep / 2,
+      path: arcPath(from, from + drawn),
+    }]
   })
 })
 
@@ -316,7 +348,10 @@ function arcPath(from: number, to: number): string {
  * ring, which is what a full-circle annulus amounts to.
  */
 const whole = computed(() => {
-  if (arcs.value.length !== 1 || !outer.value)
+  // Only once the sweep has come all the way round; mid-reveal a lone slice
+  // is still an arc with two ends, and drawing it as a circle would skip the
+  // animation entirely.
+  if (arcs.value.length !== 1 || !outer.value || progress.value < 1)
     return undefined
   const slice = arcs.value[0]!
   return {

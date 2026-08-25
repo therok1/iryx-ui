@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import type { ChartSeries } from '../composables/cartesian'
+import type { ChartAnimate } from '../composables/chart-reveal'
 import type { SparseValue } from '../composables/scale'
 import { computed, ref } from 'vue'
 import { AXIS_GAP, cartesianLayout, clampTooltip, seriesColor, slotOf, tooltipHalfWidth, warnOnSlotOverflow } from '../composables/cartesian'
+import { useChartAnimation, useChartReveal } from '../composables/chart-reveal'
 import { useElementSize } from '../composables/element-size'
 import { useIryxUiConfig } from '../config'
 import { barChartTheme } from '../theme/bar-chart'
@@ -46,6 +48,12 @@ export interface BarChartProps {
   ticks?: number
   /** Drop the value axis and its gridlines. */
   axis?: boolean
+  /**
+   * Grow the bars out of the baseline on the first paint. Skipped for a
+   * reader who has asked for reduced motion, and played once — not again when
+   * the data changes underneath it.
+   */
+  animate?: ChartAnimate
   /** Drop the legend. Only honoured for a single series — see below. */
   legend?: boolean
   /** Word for the stacked tooltip's sum — override for non-English apps. */
@@ -74,6 +82,7 @@ const props = withDefaults(defineProps<BarChartProps>(), {
   height: 240,
   ticks: 5,
   axis: true,
+  animate: true,
   legend: true,
   totalLabel: 'Total',
   unstyled: undefined,
@@ -410,6 +419,40 @@ function slotClass(slot: keyof NonNullable<BarChartProps['ui']>, extra?: string)
   return isUnstyled.value ? [override, extra] : theme.value[slot]({ class: [override, extra] })
 }
 
+const ready = computed(() => Boolean(width.value && bars.value.length))
+const animation = useChartAnimation(computed(() => props.animate))
+const { revealed } = useChartReveal(ready, animation)
+
+/**
+ * Bars grow out of the baseline, which is the axis they are read against —
+ * not out of their own box, which would have a negative bar rising into the
+ * plot from below and reading as a positive one on the way.
+ *
+ * A CSS transform rather than an animated `height`: the browser can run it
+ * off the main thread, and Vue renders once instead of once a frame. The
+ * origin has to be set per bar because it is a coordinate, not a corner.
+ */
+function barStyle(bar: Bar) {
+  const baseline = layout.value.value(0)
+  const along = horizontal.value ? bar.y + bar.height / 2 : bar.x + bar.width / 2
+  const axis = horizontal.value ? 'scaleX' : 'scaleY'
+
+  return {
+    transformOrigin: horizontal.value
+      ? `${baseline}px ${along}px`
+      : `${along}px ${baseline}px`,
+    // Both ends are written out. Transitioning to `none` instead of an
+    // explicit identity gives the browser nothing to interpolate towards on
+    // an SVG element, and the bar snaps to full size instead of growing.
+    transform: `${axis}(${revealed.value ? 1 : 0})`,
+    transition: `transform ${animation.value.duration}ms ${animation.value.css}`,
+    // A short stagger across the categories, so the row reads left to right
+    // rather than arriving as one block. Capped, or a long series would still
+    // be animating well after the reader has started looking at it.
+    transitionDelay: `${Math.min(bar.categoryIndex * 30, 200)}ms`,
+  }
+}
+
 function barClass(bar: Bar) {
   const faded = hovered.value != null && hovered.value !== bar.categoryIndex
   return isUnstyled.value
@@ -475,7 +518,7 @@ function barClass(bar: Bar) {
           v-for="(bar, index) in bars"
           :key="`bar-${bar.categoryIndex}-${bar.seriesIndex}-${index}`"
           :d="barPath(bar)"
-          :style="{ fill: seriesColor(slotOf(series[bar.seriesIndex]!, bar.seriesIndex)) }"
+          :style="{ fill: seriesColor(slotOf(series[bar.seriesIndex]!, bar.seriesIndex)), ...barStyle(bar) }"
           :class="barClass(bar)"
         />
 

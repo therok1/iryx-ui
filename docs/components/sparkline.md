@@ -32,7 +32,7 @@ The width always fills the container; `height` (32px by default) is the only dim
 
 ## Area and the end dot
 
-`area` adds a wash beneath the line, which holds up better on a busy surface. `endDot` marks the most recent point.
+`area` adds a wash beneath the line, which holds up better on a busy surface — the same downward-fading gradient [`ILineChart`](/components/line-chart) uses, so the two read as one family. `endDot` marks the most recent point.
 
 <Demo stack>
 <template #demo>
@@ -140,6 +140,29 @@ Without a `label` the sparkline is decorative and hidden from assistive technolo
 <ISparkline :data="revenue" label="Revenue over the last twelve months, rising from 18 to 48" />
 ```
 
+## Animation
+
+A sparkline can reveal itself like [`ILineChart`](/components/line-chart) does — the line and its wash uncovered together, left to right — but it is **off by default** here. A sparkline usually sits in a stat tile or a table row, and twenty of them animating at once is a distraction rather than an arrival.
+
+<Demo stack>
+<template #demo>
+<ChartReplay v-slot="{ key, animate }">
+<ISparkline :key="key" :data="revenue" variant="area" end-dot :height="64" :animate="animate" class="w-full" label="Revenue, last 12 months" />
+</ChartReplay>
+</template>
+
+```vue
+<ISparkline :data="revenue" variant="area" end-dot :animate="{ easing: 'ease-out', duration: 700 }" />
+
+<!-- The default -->
+<ISparkline :data="revenue" />
+```
+</Demo>
+
+`animate` takes `true` for the default reveal, or an object to tune it: `duration` in milliseconds and `easing`, one of `ease-out` (the default), `ease-in`, `ease-in-out` or `linear`.
+
+It plays **once** per instance, and a reader who has asked for reduced motion gets the finished sparkline with no animation at all.
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -153,6 +176,7 @@ Without a `label` the sparkline is decorative and hidden from assistive technolo
 | `muted` | `boolean` | — | Draw in de-emphasised ink |
 | `label` | `string` | — | Accessible description; without one it is decorative |
 | `height` | `number` | `32` | Rendered height in px; width fills the container |
+| `animate` | `boolean` or `{ duration, easing }` | `false` | Draw the line on; off by default here |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged with the built-in classes |
 | `ui` | `{ root?, plot?, line?, area?, dot?, ring? }` | — | Per-slot class overrides |
