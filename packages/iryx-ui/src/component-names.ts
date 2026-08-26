@@ -9,6 +9,7 @@ export const componentNames = [
   'App',
   'AppShell',
   'AspectRatio',
+  'AuthProviders',
   'Avatar',
   'AvatarGroup',
   'Badge',

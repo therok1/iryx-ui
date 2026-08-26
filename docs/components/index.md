@@ -41,6 +41,7 @@ Anywhere a component takes an `icon`, it accepts either shape: a [Hugeicons](htt
 | [`ITextarea`](/components/textarea) | Multi-line field with matching sizes, `invalid` state and optional `autosize` |
 | [`INumberInput`](/components/number-input) | Decimal-safe numeric field — the model is a **string** |
 | [`IPasswordInput`](/components/password-input) | Masked field with a show/hide toggle and an optional strength meter |
+| [`IAuthProviders`](/components/auth-providers) | Third-party sign-in row — marks aligned, labels centred, brand assets stay yours |
 | [`IPinInput`](/components/pin-input) | One cell per character for a short code — the model is a plain string |
 | [`ITagsInput`](/components/tags-input) | Collects a list as removable tags — delimiter, `max`, paste splitting |
 | [`IEditable`](/components/editable) | Text that becomes a field in place — controls, submit modes, custom preview |

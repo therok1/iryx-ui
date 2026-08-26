@@ -1,6 +1,7 @@
 export * from './accordion'
 export * from './alert'
 export * from './app-shell'
+export * from './auth-providers'
 export * from './avatar'
 export * from './badge'
 export * from './banner'

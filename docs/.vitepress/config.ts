@@ -60,6 +60,7 @@ const sidebar = [
       { text: 'App', link: '/components/app' },
       { text: 'App shell', link: '/components/app-shell' },
       { text: 'Aspect ratio', link: '/components/aspect-ratio' },
+      { text: 'Auth providers', link: '/components/auth-providers' },
       { text: 'Avatar', link: '/components/avatar' },
       { text: 'Avatar group', link: '/components/avatar-group' },
       { text: 'Badge', link: '/components/badge' },
