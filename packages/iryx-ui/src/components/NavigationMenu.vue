@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import type { NavigationMenuEntry, NavigationMenuGroupItem, NavigationMenuLinkItem } from '../composables/navigation-menu'
 import { ArrowDown01Icon } from '@hugeicons/core-free-icons'
 import {
@@ -33,7 +34,7 @@ export interface NavigationMenuProps {
   disableHoverTrigger?: boolean
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   /** Override classes per slot, e.g. `{ viewport: 'w-96' }`. */
   ui?: {
     root?: string

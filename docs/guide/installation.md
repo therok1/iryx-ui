@@ -87,6 +87,22 @@ export default defineNuxtConfig({
 ```
 </Demo>
 
+## TypeScript
+
+Components are registered globally under the `I` prefix and declared on Vue's `GlobalComponents`, so their props are type-checked in templates with no import and no extra setup.
+
+If you pass a different `prefix` to `createIryxUi()`, declare your own augmentation instead:
+
+```ts
+import type { IryxUiGlobalComponents } from 'iryx-ui'
+
+declare module 'vue' {
+  interface GlobalComponents extends IryxUiGlobalComponents {}
+}
+```
+
+Every `class` prop takes the exported `ClassValue` — a string, or an array of strings and falsy values, so `:class="[base, active && 'ring-2']"` type-checks. Object syntax is deliberately excluded: `tailwind-merge` cannot merge it, so it would lose to a built-in class rather than replace it.
+
 ## Typeface
 
 Typography follows the `--iryx-font-sans` token, which defaults to the system stack. Load any family you like and point the token at it:

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import { SplitterGroup, SplitterPanel, SplitterResizeHandle } from 'reka-ui'
 import { computed } from 'vue'
 import { useIryxUiConfig } from '../config'
@@ -30,7 +31,7 @@ export interface SplitterProps {
   keyboardResizeBy?: number
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   /** Override classes per slot, e.g. `{ rule: 'bg-primary' }`. */
   ui?: {
     root?: string

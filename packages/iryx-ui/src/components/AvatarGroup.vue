@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import type { AvatarProps } from './Avatar.vue'
 import { computed } from 'vue'
 import { useIryxUiConfig } from '../config'
@@ -19,7 +20,7 @@ export interface AvatarGroupProps {
   shape?: 'circle' | 'square'
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   /** Override classes per slot, e.g. `{ overflow: 'bg-primary' }`. */
   ui?: {
     root?: string

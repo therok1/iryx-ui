@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { SwitchRootEmits, SwitchRootProps } from 'reka-ui'
+import type { ClassValue } from '../class-value'
 import { Label, SwitchRoot, SwitchThumb, useForwardPropsEmits, useId } from 'reka-ui'
 import { computed } from 'vue'
 import { useIryxUiConfig } from '../config'
@@ -14,7 +15,7 @@ export interface SwitchProps extends SwitchRootProps {
   id?: string
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   /** Override classes per slot, e.g. `{ thumb: 'bg-black' }`. */
   ui?: {
     wrapper?: string

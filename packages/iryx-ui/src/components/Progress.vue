@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import { ProgressIndicator, ProgressRoot, useId } from 'reka-ui'
 import { computed, useSlots } from 'vue'
 import { useIryxUiConfig } from '../config'
@@ -39,7 +40,7 @@ export interface ProgressProps {
   formatValue?: (value: number, max: number) => string
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   /** Override classes per slot, e.g. `{ track: 'h-4' }`. */
   ui?: {
     root?: string

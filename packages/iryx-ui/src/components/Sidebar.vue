@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import type { SidebarItems, SidebarLink } from '../composables/sidebar'
 import { ArrowRight01Icon } from '@hugeicons/core-free-icons'
 import { CollapsibleContent, CollapsibleRoot, CollapsibleTrigger, Primitive } from 'reka-ui'
@@ -20,7 +21,7 @@ export interface SidebarProps {
   label?: string
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   /** Override classes per slot, e.g. `{ nav: 'px-4' }`. */
   ui?: {
     root?: string

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { SelectRootEmits, SelectRootProps } from 'reka-ui'
+import type { ClassValue } from '../class-value'
 import { ArrowDown01Icon, Tick02Icon } from '@hugeicons/core-free-icons'
 import {
   SelectContent,
@@ -45,7 +46,7 @@ export interface SelectProps extends SelectRootProps {
   size?: 'sm' | 'md' | 'lg'
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   ui?: {
     trigger?: string
     content?: string

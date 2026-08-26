@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import type { ChartSeries } from '../composables/cartesian'
 import type { ChartAnimate } from '../composables/chart-reveal'
 import type { SparseValue } from '../composables/scale'
@@ -76,7 +77,7 @@ export interface DonutChartProps {
   label?: string
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   ui?: Partial<Record<
     'root' | 'svg' | 'slice' | 'center' | 'tooltip' | 'tooltipLabel'
     | 'tooltipValue' | 'tooltipShare' | 'table',
@@ -389,7 +390,7 @@ const tooltip = computed(() => {
 
 const theme = computed(() => donutChartTheme())
 
-function slotClass(slot: keyof NonNullable<DonutChartProps['ui']>, extra?: string) {
+function slotClass(slot: keyof NonNullable<DonutChartProps['ui']>, extra?: ClassValue) {
   const override = props.ui?.[slot]
   return isUnstyled.value ? [override, extra] : theme.value[slot]({ class: [override, extra] })
 }

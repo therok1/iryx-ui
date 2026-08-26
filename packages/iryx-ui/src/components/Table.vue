@@ -1,4 +1,5 @@
 <script setup lang="ts" generic="T = any">
+import type { ClassValue } from '../class-value'
 import type { TableColumn, TableSort } from '../composables/data-table'
 import { ArrowDown01Icon, ArrowRight01Icon, ArrowUp01Icon, UnfoldMoreIcon } from '@hugeicons/core-free-icons'
 import { computed, useSlots } from 'vue'
@@ -45,7 +46,7 @@ export interface TableProps<Row = any> {
   caption?: string
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   /** Override classes per slot, e.g. `{ td: 'py-1' }`. */
   ui?: {
     root?: string
@@ -122,7 +123,7 @@ const theme = computed(() => tableTheme({
   loading: Boolean(props.loading) && table.pageRows.value.length > 0,
 }))
 
-function cls(slot: keyof NonNullable<TableProps['ui']>, extra?: string) {
+function cls(slot: keyof NonNullable<TableProps['ui']>, extra?: ClassValue) {
   const override = props.ui?.[slot]
   return isUnstyled.value
     ? [override, extra]

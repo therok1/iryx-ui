@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import { Cancel01Icon, Edit02Icon, Tick02Icon } from '@hugeicons/core-free-icons'
 import {
   EditableArea,
@@ -56,7 +57,7 @@ export interface EditableProps {
   cancelLabel?: string
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   ui?: {
     root?: string
     area?: string
@@ -102,7 +103,7 @@ const isUnstyled = computed(() => props.unstyled ?? config.unstyled)
 
 const theme = computed(() => editableTheme({ size: props.size, invalid: isInvalid.value }))
 
-function slotClass(slot: keyof NonNullable<EditableProps['ui']>, extra?: string) {
+function slotClass(slot: keyof NonNullable<EditableProps['ui']>, extra?: ClassValue) {
   const override = props.ui?.[slot]
   return isUnstyled.value ? [override, extra] : theme.value[slot]({ class: [override, extra] })
 }

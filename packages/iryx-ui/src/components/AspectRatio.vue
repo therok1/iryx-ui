@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import { AspectRatio } from 'reka-ui'
 import { computed } from 'vue'
 import { useIryxUiConfig } from '../config'
@@ -11,7 +12,7 @@ export interface AspectRatioProps {
   ratio?: number
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
 }
 
 /**

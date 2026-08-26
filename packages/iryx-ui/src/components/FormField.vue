@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import { useId } from 'reka-ui'
 import { computed, provide, watch } from 'vue'
 import { formFieldContextKey, getByPath, useForm } from '../composables/form'
@@ -21,7 +22,7 @@ export interface FormFieldProps {
   error?: string
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   ui?: {
     root?: string
     header?: string

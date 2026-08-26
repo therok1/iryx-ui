@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import { DateFieldInput, DateFieldRoot } from 'reka-ui'
 import { computed } from 'vue'
 import { toCalendarDate, toIsoDate } from '../composables/date'
@@ -26,7 +27,7 @@ export interface DateFieldProps {
   required?: boolean
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   /** Override classes per slot, e.g. `{ segment: 'px-1' }`. */
   ui?: {
     root?: string

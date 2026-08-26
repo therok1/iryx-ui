@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import type { ChartAnimate } from '../composables/chart-reveal'
 import type { SparseValue } from '../composables/scale'
 import { computed, useId } from 'vue'
@@ -38,7 +39,7 @@ export interface SparklineProps {
   animate?: ChartAnimate
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   /** Override classes per slot, e.g. `{ line: 'stroke-[3]' }`. */
   ui?: Partial<Record<'root' | 'plot' | 'line' | 'area' | 'dot' | 'ring', string>>
 }
@@ -176,7 +177,7 @@ const endPoint = computed<Point | undefined>(() => {
 
 const theme = computed(() => sparklineTheme({ muted: props.muted }))
 
-function slotClass(slot: 'root' | 'plot' | 'line' | 'area' | 'dot' | 'ring', extra?: string) {
+function slotClass(slot: 'root' | 'plot' | 'line' | 'area' | 'dot' | 'ring', extra?: ClassValue) {
   const override = props.ui?.[slot]
   return isUnstyled.value ? [override, extra] : theme.value[slot]({ class: [override, extra] })
 }

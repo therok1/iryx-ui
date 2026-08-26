@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import type { ChartSeries } from '../composables/cartesian'
 import { computed } from 'vue'
 import { seriesColor, slotOf } from '../composables/cartesian'
@@ -10,7 +11,7 @@ export interface ChartLegendProps {
   /** Dim the entries that are not the one being hovered. */
   active?: number
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   ui?: Partial<Record<'root' | 'item' | 'swatch' | 'name', string>>
 }
 
@@ -21,7 +22,7 @@ const isUnstyled = computed(() => props.unstyled ?? config.unstyled)
 
 const theme = computed(() => chartLegendTheme())
 
-function slotClass(slot: 'root' | 'item' | 'swatch' | 'name', extra?: string) {
+function slotClass(slot: 'root' | 'item' | 'swatch' | 'name', extra?: ClassValue) {
   const override = props.ui?.[slot]
   return isUnstyled.value ? [override, extra] : theme.value[slot]({ class: [override, extra] })
 }

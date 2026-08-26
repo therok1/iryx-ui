@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import { Cancel01Icon } from '@hugeicons/core-free-icons'
 import {
   PopoverArrow,
@@ -40,7 +41,7 @@ export interface PopoverProps {
   ariaLabel?: string
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   /** Override classes per slot, e.g. `{ content: 'w-96' }`. */
   ui?: {
     content?: string

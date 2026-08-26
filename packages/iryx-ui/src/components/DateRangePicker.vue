@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import type { DateValue } from '../composables/date'
 import { ArrowLeft01Icon, ArrowRight01Icon, Calendar03Icon } from '@hugeicons/core-free-icons'
 import {
@@ -63,7 +64,7 @@ export interface DateRangePickerProps {
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   /** Applied to the trigger, which is the element carrying the field chrome. */
-  class?: string
+  class?: ClassValue
   /** Override classes per slot, e.g. `{ content: 'p-4' }`. */
   ui?: Partial<Record<
     'trigger' | 'placeholder' | 'content' | 'header' | 'heading' | 'nav'
@@ -172,7 +173,7 @@ const theme = computed(() => ({
   ...calendarTheme({ range: true }),
 }))
 
-function slotClass(slot: keyof NonNullable<DateRangePickerProps['ui']>, extra?: string) {
+function slotClass(slot: keyof NonNullable<DateRangePickerProps['ui']>, extra?: ClassValue) {
   const override = props.ui?.[slot]
   return isUnstyled.value ? [override, extra] : theme.value[slot]({ class: [override, extra] })
 }

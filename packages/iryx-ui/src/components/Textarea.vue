@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useFormField } from '../composables/form'
 import { useIryxUiConfig } from '../config'
@@ -24,7 +25,7 @@ export interface TextareaProps {
   id?: string
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
 }
 
 const props = withDefaults(defineProps<TextareaProps>(), {

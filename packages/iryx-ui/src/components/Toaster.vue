@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import type { ToastRecord } from '../composables/toast'
 import { Alert02Icon, AlertCircleIcon, Cancel01Icon, CheckmarkCircle02Icon, InformationCircleIcon } from '@hugeicons/core-free-icons'
 import {
@@ -25,7 +26,7 @@ export interface ToasterProps {
   closeLabel?: string
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   /** Override classes per slot, e.g. `{ viewport: 'sm:max-w-md' }`. */
   ui?: {
     viewport?: string

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import type { IconLike } from '../composables/icon'
 import { ArrowDown01Icon } from '@hugeicons/core-free-icons'
 import {
@@ -37,7 +38,7 @@ export interface AccordionProps {
   disabled?: boolean
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   ui?: Partial<Record<
     'root' | 'item' | 'header' | 'trigger' | 'icon' | 'content' | 'contentInner',
     string

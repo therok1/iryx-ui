@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import type { CommandEntry, CommandItem } from '../composables/command-palette'
 import { Search01Icon } from '@hugeicons/core-free-icons'
 import {
@@ -42,7 +43,7 @@ export interface CommandPaletteProps {
   footer?: boolean
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   ui?: Partial<Record<
     'overlay' | 'content' | 'header' | 'icon' | 'input' | 'viewport' | 'group'
     | 'groupLabel' | 'item' | 'itemIcon' | 'itemLabel' | 'shortcut' | 'key' | 'empty' | 'footer' | 'list',
@@ -148,7 +149,7 @@ const theme = computed(() => commandPaletteTheme())
 type Slot = keyof NonNullable<CommandPaletteProps['ui']>
 
 /** Always a string: `IKbd` takes a plain `class`, and an array will not do. */
-function slotClass(slot: Slot, extra?: string) {
+function slotClass(slot: Slot, extra?: ClassValue) {
   const override = props.ui?.[slot]
   return isUnstyled.value
     ? [override, extra].filter(Boolean).join(' ')

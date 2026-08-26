@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { CheckboxRootEmits, CheckboxRootProps } from 'reka-ui'
+import type { ClassValue } from '../class-value'
 import { MinusSignIcon, Tick02Icon } from '@hugeicons/core-free-icons'
 import { CheckboxIndicator, CheckboxRoot, Label, useForwardPropsEmits, useId } from 'reka-ui'
 import { computed } from 'vue'
@@ -16,7 +17,7 @@ export interface CheckboxProps extends CheckboxRootProps {
   id?: string
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   /** Override classes per slot, e.g. `{ indicator: 'text-black' }`. */
   ui?: {
     wrapper?: string

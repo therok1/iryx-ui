@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import { Cancel01Icon } from '@hugeicons/core-free-icons'
 import {
   TagsInputClear,
@@ -43,7 +44,7 @@ export interface TagsInputProps {
   id?: string
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   /** Override classes per slot, e.g. `{ tag: 'bg-accent' }`. */
   ui?: {
     root?: string
@@ -91,7 +92,7 @@ const isUnstyled = computed(() => props.unstyled ?? config.unstyled)
 
 const slots = computed(() => tagsInputTheme({ size: props.size, invalid: isInvalid.value }))
 
-function slotClass(name: keyof NonNullable<TagsInputProps['ui']>, extra?: string) {
+function slotClass(name: keyof NonNullable<TagsInputProps['ui']>, extra?: ClassValue) {
   const override = [props.ui?.[name], extra]
   return isUnstyled.value ? override : slots.value[name]({ class: override })
 }

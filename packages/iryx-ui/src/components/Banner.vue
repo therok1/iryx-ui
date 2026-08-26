@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import type { IconLike } from '../composables/icon'
 import { Cancel01Icon } from '@hugeicons/core-free-icons'
 import { Primitive } from 'reka-ui'
@@ -36,7 +37,7 @@ export interface BannerProps {
   label?: string
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   /** Override classes per slot, e.g. `{ container: 'max-w-3xl' }`. */
   ui?: {
     root?: string

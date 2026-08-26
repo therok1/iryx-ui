@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import type { IconLike } from '../composables/icon'
 import { TabsContent, TabsIndicator, TabsList, TabsRoot, TabsTrigger } from 'reka-ui'
 import { computed } from 'vue'
@@ -25,7 +26,7 @@ export interface TabsProps {
   keepMounted?: boolean
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   /** Override classes per slot, e.g. `{ list: 'w-full' }`. */
   ui?: {
     root?: string

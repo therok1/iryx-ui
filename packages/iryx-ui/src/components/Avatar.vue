@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import { AvatarFallback, AvatarImage, AvatarRoot } from 'reka-ui'
 import { computed } from 'vue'
 import { useIryxUiConfig } from '../config'
@@ -32,7 +33,7 @@ export interface AvatarProps {
   delayMs?: number
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   /** Override classes per slot, e.g. `{ fallback: 'bg-primary' }`. */
   ui?: {
     root?: string

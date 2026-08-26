@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import { Primitive } from 'reka-ui'
 import { computed } from 'vue'
 import { useIryxUiConfig } from '../config'
@@ -20,7 +21,7 @@ export interface BadgeProps {
   label?: string
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   /** Override classes per slot, e.g. `{ dot: 'size-3' }`. */
   ui?: {
     root?: string

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import type { IconLike } from '../composables/icon'
 import { ArrowRight01Icon } from '@hugeicons/core-free-icons'
 import { TreeItem, TreeRoot } from 'reka-ui'
@@ -39,7 +40,7 @@ export interface TreeProps {
   ariaLabel?: string
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   /** Override classes per slot, e.g. `{ item: 'py-2' }`. */
   ui?: {
     root?: string
@@ -124,7 +125,7 @@ const isUnstyled = computed(() => props.unstyled ?? config.unstyled)
 const theme = computed(() => treeTheme({ size: props.size }))
 
 /** Joined rather than left as an array: `Icon` takes a plain `class` string. */
-function slotClass(name: keyof NonNullable<TreeProps['ui']>, extra?: string) {
+function slotClass(name: keyof NonNullable<TreeProps['ui']>, extra?: ClassValue) {
   const override = [props.ui?.[name], extra].filter(Boolean).join(' ')
   return isUnstyled.value ? override : theme.value[name]({ class: override })
 }

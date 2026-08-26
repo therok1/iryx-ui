@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { AcceptableValue, ComboboxRootEmits, ComboboxRootProps } from 'reka-ui'
+import type { ClassValue } from '../class-value'
 import { ArrowDown01Icon, Cancel01Icon, Tick02Icon } from '@hugeicons/core-free-icons'
 import {
   ComboboxAnchor,
@@ -92,7 +93,7 @@ export interface ComboboxProps extends ComboboxRootProps {
   overscan?: number
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   ui?: {
     anchor?: string
     input?: string
@@ -371,7 +372,7 @@ const theme = computed(() =>
 
 type Slot = 'anchor' | 'input' | 'trigger' | 'clear' | 'tag' | 'tagText' | 'tagDelete' | 'content' | 'viewport' | 'item' | 'empty' | 'group' | 'groupLabel'
 
-function slotClass(slot: Slot, extra?: string) {
+function slotClass(slot: Slot, extra?: ClassValue) {
   const override = props.ui?.[slot]
   return isUnstyled.value ? [override, extra] : theme.value[slot]({ class: [override, extra] })
 }

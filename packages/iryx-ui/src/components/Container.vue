@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import { Primitive } from 'reka-ui'
 import { computed } from 'vue'
 import { useIryxUiConfig } from '../config'
@@ -15,7 +16,7 @@ export interface ContainerProps {
   gutter?: 'none' | 'sm' | 'md' | 'lg'
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   /** Override classes per slot, e.g. `{ root: 'py-10' }`. */
   ui?: {
     root?: string

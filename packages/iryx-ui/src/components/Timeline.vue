@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import type { IconLike } from '../composables/icon'
 import { computed } from 'vue'
 import { useIryxUiConfig } from '../config'
@@ -29,7 +30,7 @@ export interface TimelineProps {
   variant?: TimelineVariant
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   /** Override classes per slot, e.g. `{ title: 'text-base' }`. */
   ui?: {
     root?: string

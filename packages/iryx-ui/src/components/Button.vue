@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import { Loading03Icon } from '@hugeicons/core-free-icons'
 import { Primitive } from 'reka-ui'
 import { computed } from 'vue'
@@ -30,7 +31,7 @@ export interface ButtonProps {
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   type?: 'button' | 'submit' | 'reset'
-  class?: string
+  class?: ClassValue
 }
 
 const props = withDefaults(defineProps<ButtonProps>(), {

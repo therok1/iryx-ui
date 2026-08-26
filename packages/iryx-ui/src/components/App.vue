@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { ConfigProviderProps } from 'reka-ui'
+import type { ClassValue } from '../class-value'
 import type { Appearance } from '../composables/appearance'
 import type { Theme, ThemePresetName } from '../theme/presets'
 import { ConfigProvider, Primitive } from 'reka-ui'
@@ -23,7 +24,7 @@ export interface AppProps extends /* @vue-ignore */ ConfigProviderProps {
    * pass `div` (with `class`) if you want App to own your page shell.
    */
   as?: string
-  class?: string
+  class?: ClassValue
 }
 
 const props = withDefaults(defineProps<AppProps>(), {

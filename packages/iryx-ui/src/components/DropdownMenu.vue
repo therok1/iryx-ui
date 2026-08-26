@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import type { DropdownMenuEntry } from '../composables/dropdown-menu'
 import {
   DropdownMenuContent,
@@ -21,7 +22,7 @@ export interface DropdownMenuProps {
   sideOffset?: number
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   /** Override classes per slot, e.g. `{ item: 'py-2' }`. */
   ui?: {
     content?: string

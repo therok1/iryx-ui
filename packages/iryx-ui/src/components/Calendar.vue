@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import { ArrowLeft01Icon, ArrowRight01Icon } from '@hugeicons/core-free-icons'
 import {
   CalendarCell,
@@ -62,7 +63,7 @@ export interface CalendarProps {
   nextLabel?: string
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   /** Override classes per slot, e.g. `{ cellTrigger: 'rounded-full' }`. */
   ui?: Partial<Record<
     'root' | 'header' | 'heading' | 'nav' | 'months' | 'grid'
@@ -127,7 +128,7 @@ const isDateUnavailable = computed(() => {
 
 const theme = computed(() => calendarTheme())
 
-function slotClass(slot: keyof NonNullable<CalendarProps['ui']>, extra?: string) {
+function slotClass(slot: keyof NonNullable<CalendarProps['ui']>, extra?: ClassValue) {
   const override = props.ui?.[slot]
   return isUnstyled.value ? [override, extra] : theme.value[slot]({ class: [override, extra] })
 }

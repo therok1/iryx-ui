@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { IconArray } from '@hugeicons/vue'
+import type { ClassValue } from '../class-value'
 import type { IconLike } from '../composables/icon'
 import { HugeiconsIcon } from '@hugeicons/vue'
 import { computed } from 'vue'
@@ -13,7 +14,7 @@ export interface IconProps {
    * such as inside a control with no visible text.
    */
   label?: string
-  class?: string
+  class?: ClassValue
 }
 
 const props = defineProps<IconProps>()

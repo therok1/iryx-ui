@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { SliderRootProps } from 'reka-ui'
+import type { ClassValue } from '../class-value'
 import { SliderRange, SliderRoot, SliderThumb, SliderTrack, useId } from 'reka-ui'
 import { computed } from 'vue'
 import { useIryxUiConfig } from '../config'
@@ -40,7 +41,7 @@ export interface SliderProps extends /* @vue-ignore */ Omit<SliderRootProps, 'mo
   id?: string
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   /** Override classes per slot, e.g. `{ thumb: 'size-6' }`. */
   ui?: {
     root?: string
@@ -125,7 +126,7 @@ const slots = computed(() => sliderTheme({
   disabled: props.disabled ?? false,
 }))
 
-function slotClass(name: keyof NonNullable<SliderProps['ui']>, extra?: string) {
+function slotClass(name: keyof NonNullable<SliderProps['ui']>, extra?: ClassValue) {
   const override = [props.ui?.[name], extra]
   return isUnstyled.value ? override : slots.value[name]({ class: override })
 }

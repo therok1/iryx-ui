@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import { computed, ref, toRef } from 'vue'
 import { scrollFadeMask, useScrollEdges } from '../composables/scroll-fade'
 import { useIryxUiConfig } from '../config'
@@ -15,7 +16,7 @@ export interface ScrollFadeProps {
   fadeEnd?: boolean
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
 }
 
 const props = withDefaults(defineProps<ScrollFadeProps>(), {

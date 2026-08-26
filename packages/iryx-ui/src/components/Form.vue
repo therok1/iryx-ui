@@ -1,4 +1,5 @@
 <script setup lang="ts" generic="T extends Record<string, any>">
+import type { ClassValue } from '../class-value'
 import type { FormError, FormSubmitEvent, FormValidateOn, StandardSchemaLike } from '../composables/form'
 import { computed, provide, ref } from 'vue'
 import { formContextKey, isStandardSchema, issuePath } from '../composables/form'
@@ -13,7 +14,7 @@ export interface FormProps<S extends Record<string, any>> {
   /** Which interactions re-validate a field. Submit always validates everything. */
   validateOn?: FormValidateOn[]
   disabled?: boolean
-  class?: string
+  class?: ClassValue
 }
 
 const props = withDefaults(defineProps<FormProps<T>>(), {

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import { Separator } from 'reka-ui'
 import { computed, useSlots } from 'vue'
 import { useIryxUiConfig } from '../config'
@@ -15,7 +16,7 @@ export interface SeparatorProps {
   decorative?: boolean
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   /** Override classes per slot, e.g. `{ line: 'bg-primary' }`. */
   ui?: {
     root?: string

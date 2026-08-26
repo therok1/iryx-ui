@@ -84,6 +84,24 @@ Components are auto-imported with the `I` prefix.
 <IDialog unstyled />
 ```
 
+## TypeScript
+
+The plugin registers every component under the `I` prefix, and the package declares
+them on Vue's `GlobalComponents`, so their props are checked in templates without an
+import. A project that passes a different `prefix` declares its own augmentation:
+
+```ts
+import type { IryxUiGlobalComponents } from 'iryx-ui'
+
+declare module 'vue' {
+  interface GlobalComponents extends IryxUiGlobalComponents {}
+}
+```
+
+Every `class` prop takes the exported `ClassValue` — a string, or an array of strings
+and falsy values. Object syntax is not accepted: `tailwind-merge` cannot merge it, so
+it would lose to a built-in class rather than replace it.
+
 ## Requirements
 
 - Vue 3.5 or newer

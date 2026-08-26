@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import type { IconLike } from '../composables/icon'
 import { ArrowRight01Icon } from '@hugeicons/core-free-icons'
 import { Primitive } from 'reka-ui'
@@ -25,7 +26,7 @@ export interface BreadcrumbProps {
   label?: string
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   /** Override classes per slot, e.g. `{ current: 'text-primary' }`. */
   ui?: {
     root?: string

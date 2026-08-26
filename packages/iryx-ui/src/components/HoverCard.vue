@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import {
   HoverCardArrow,
   HoverCardContent,
@@ -34,7 +35,7 @@ export interface HoverCardProps {
   width?: 'none' | 'sm' | 'md' | 'lg'
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   ui?: {
     content?: string
     arrow?: string

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import { Primitive } from 'reka-ui'
 import { computed, useSlots } from 'vue'
 import { useIryxUiConfig } from '../config'
@@ -18,7 +19,7 @@ export interface CardProps {
   description?: string
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   /** Override classes per slot, e.g. `{ footer: 'justify-end' }`. */
   ui?: {
     root?: string

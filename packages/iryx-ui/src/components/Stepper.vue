@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import { Tick02Icon } from '@hugeicons/core-free-icons'
 import {
   StepperDescription,
@@ -34,7 +35,7 @@ export interface StepperProps {
   linear?: boolean
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   /** Override classes per slot, e.g. `{ indicator: 'size-10' }`. */
   ui?: {
     root?: string

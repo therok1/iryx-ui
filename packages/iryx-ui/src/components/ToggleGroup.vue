@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import type { IconLike } from '../composables/icon'
 import type { ToggleGroupVariant } from '../theme/toggle'
 import { ToggleGroupItem, ToggleGroupRoot } from 'reka-ui'
@@ -41,7 +42,7 @@ export interface ToggleGroupProps {
   loop?: boolean
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   /** Override classes per slot, e.g. `{ item: 'px-6' }`. */
   ui?: {
     root?: string

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { RadioGroupRootEmits, RadioGroupRootProps } from 'reka-ui'
+import type { ClassValue } from '../class-value'
 import { Label, RadioGroupIndicator, RadioGroupItem, RadioGroupRoot, useForwardPropsEmits, useId } from 'reka-ui'
 import { computed } from 'vue'
 import { useIryxUiConfig } from '../config'
@@ -19,7 +20,7 @@ export interface RadioGroupProps extends RadioGroupRootProps {
   size?: 'sm' | 'md' | 'lg'
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   ui?: { root?: string, item?: string, label?: string, description?: string }
 }
 

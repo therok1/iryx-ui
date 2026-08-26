@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import type { IconLike } from '../composables/icon'
 import { Primitive } from 'reka-ui'
 import { computed } from 'vue'
@@ -16,7 +17,7 @@ export interface EmptyStateProps {
   size?: 'sm' | 'md' | 'lg'
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   /** Override classes per slot, e.g. `{ title: 'text-xl' }`. */
   ui?: {
     root?: string

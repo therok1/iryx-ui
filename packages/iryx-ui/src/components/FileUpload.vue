@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import { Delete02Icon, File01Icon, Upload05Icon } from '@hugeicons/core-free-icons'
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useFormField } from '../composables/form'
@@ -40,7 +41,7 @@ export interface FileUploadProps {
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   /** Applied to the outer wrapper, which stacks the zone above the list. */
-  class?: string
+  class?: ClassValue
   /** Override classes per slot, e.g. `{ dropzone: 'py-10' }`. */
   ui?: Partial<Record<
     'root' | 'dropzone' | 'input' | 'icon' | 'label' | 'browse' | 'hint' | 'list'
@@ -224,7 +225,7 @@ const theme = computed(() =>
   }),
 )
 
-function slotClass(slot: keyof NonNullable<FileUploadProps['ui']>, extra?: string) {
+function slotClass(slot: keyof NonNullable<FileUploadProps['ui']>, extra?: ClassValue) {
   const override = props.ui?.[slot]
   return isUnstyled.value ? [override, extra] : theme.value[slot]({ class: [override, extra] })
 }

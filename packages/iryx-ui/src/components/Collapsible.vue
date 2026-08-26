@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import { ArrowDown01Icon } from '@hugeicons/core-free-icons'
 import { CollapsibleContent, CollapsibleRoot, CollapsibleTrigger } from 'reka-ui'
 import { computed } from 'vue'
@@ -24,7 +25,7 @@ export interface CollapsibleProps {
   unmountOnHide?: boolean
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   /** Override classes per slot, e.g. `{ content: 'pt-2' }`. */
   ui?: {
     root?: string
@@ -46,7 +47,7 @@ const isUnstyled = computed(() => props.unstyled ?? config.unstyled)
 
 const theme = computed(() => collapsibleTheme({ iconPosition: props.iconPosition }))
 
-function slotClass(name: keyof NonNullable<CollapsibleProps['ui']>, extra?: string) {
+function slotClass(name: keyof NonNullable<CollapsibleProps['ui']>, extra?: ClassValue) {
   const override = [props.ui?.[name], extra].filter(Boolean).join(' ')
   return isUnstyled.value ? override : theme.value[name]({ class: override })
 }

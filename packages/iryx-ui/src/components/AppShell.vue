@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import { Menu01Icon } from '@hugeicons/core-free-icons'
 import { Primitive } from 'reka-ui'
 import { computed, ref, useSlots } from 'vue'
@@ -27,7 +28,7 @@ export interface AppShellProps {
   navLabel?: string
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   /** Override classes per slot, e.g. `{ main: 'p-8' }`. */
   ui?: {
     root?: string
@@ -164,7 +165,7 @@ function slotClass(slot: Slot) {
 
     <div :class="slotClass('body')">
       <div v-if="$slots.sidebar" :class="slotClass('sidebar')">
-        <slot name="sidebar" />
+        <slot name="sidebar" :in-drawer="false" />
       </div>
 
       <main :class="slotClass('main')">

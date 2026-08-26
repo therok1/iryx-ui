@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import { ArrowDown01Icon, ArrowUp01Icon } from '@hugeicons/core-free-icons'
 import { computed, ref, watch } from 'vue'
 import {
@@ -44,7 +45,7 @@ export interface NumberInputProps {
   decrementLabel?: string
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   /** Override classes per slot, e.g. `{ step: 'px-2' }`. */
   ui?: {
     root?: string
@@ -180,7 +181,7 @@ const theme = computed(() =>
  * Note the template keeps a single root element: a leading comment node would
  * make this a fragment, and Vue then has no root to fall attributes through to.
  */
-function slotClass(slot: 'root' | 'input' | 'stepper' | 'step', extra?: string) {
+function slotClass(slot: 'root' | 'input' | 'stepper' | 'step', extra?: ClassValue) {
   const override = props.ui?.[slot]
   return isUnstyled.value ? [override, extra] : theme.value[slot]({ class: [override, extra] })
 }

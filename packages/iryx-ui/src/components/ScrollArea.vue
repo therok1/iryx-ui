@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import {
   ScrollAreaCorner,
   ScrollAreaRoot,
@@ -24,7 +25,7 @@ export interface ScrollAreaProps {
   scrollHideDelay?: number
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   /** Override classes per slot, e.g. `{ thumb: 'bg-primary' }`. */
   ui?: {
     root?: string

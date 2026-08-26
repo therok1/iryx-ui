@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import type { SignaturePoint, SignatureStroke } from '../composables/signature'
 import { ArrowTurnBackwardIcon, Delete02Icon } from '@hugeicons/core-free-icons'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
@@ -30,7 +31,7 @@ export interface SignaturePadProps {
   id?: string
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   /** Override classes per slot, e.g. `{ canvas: 'bg-white' }`. */
   ui?: {
     root?: string
@@ -244,7 +245,7 @@ const theme = computed(() =>
   signaturePadTheme({ invalid: isInvalid.value, disabled: props.disabled }),
 )
 
-function slotClass(name: keyof NonNullable<SignaturePadProps['ui']>, extra?: string) {
+function slotClass(name: keyof NonNullable<SignaturePadProps['ui']>, extra?: ClassValue) {
   const override = [props.ui?.[name], extra].filter(Boolean).join(' ')
   return isUnstyled.value ? override : theme.value[name]({ class: override })
 }

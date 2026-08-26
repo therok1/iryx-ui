@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import { ArrowDown01Icon, ArrowRight01Icon, ArrowUp01Icon } from '@hugeicons/core-free-icons'
 import { Primitive } from 'reka-ui'
 import { computed } from 'vue'
@@ -28,7 +29,7 @@ export interface StatProps {
   formatDelta?: (delta: number) => string
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   /** Override classes per slot, e.g. `{ value: 'text-4xl' }`. */
   ui?: {
     root?: string

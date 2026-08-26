@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import { computed } from 'vue'
 import { resolveConfirm, useConfirmState } from '../composables/confirm'
 import Button from './Button.vue'
@@ -12,7 +13,7 @@ export interface ConfirmDialogProps {
   size?: 'sm' | 'md' | 'lg' | 'xl'
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
 }
 
 const props = withDefaults(defineProps<ConfirmDialogProps>(), {

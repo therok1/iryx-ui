@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import {
   TooltipArrow,
   TooltipContent,
@@ -24,7 +25,7 @@ export interface TooltipProps {
   disabled?: boolean
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   /** Override classes per slot, e.g. `{ content: 'max-w-sm' }`. */
   ui?: {
     content?: string

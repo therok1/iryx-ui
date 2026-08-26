@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import type { DropdownMenuEntry } from '../composables/dropdown-menu'
 import { ContextMenuContent, ContextMenuPortal, ContextMenuRoot, ContextMenuTrigger } from 'reka-ui'
 import { computed } from 'vue'
@@ -15,7 +16,7 @@ export interface ContextMenuProps {
   collisionPadding?: number
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   /** Override classes per slot, e.g. `{ item: 'py-2' }`. */
   ui?: {
     content?: string

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import type { DropdownMenuEntry } from '../composables/dropdown-menu'
 import {
   MenubarContent,
@@ -32,7 +33,7 @@ export interface MenubarProps {
   sideOffset?: number
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   /** Override classes per slot, e.g. `{ trigger: 'px-4' }`. */
   ui?: {
     root?: string

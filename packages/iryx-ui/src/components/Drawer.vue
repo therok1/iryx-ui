@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import { Cancel01Icon } from '@hugeicons/core-free-icons'
 import {
   DrawerContent,
@@ -52,7 +53,7 @@ export interface DrawerProps {
   closeLabel?: string
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   /** Override classes per slot, e.g. `{ content: 'sm:max-w-3xl' }`. */
   ui?: {
     overlay?: string

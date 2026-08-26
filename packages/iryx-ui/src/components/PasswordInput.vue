@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import { ViewIcon, ViewOffIcon } from '@hugeicons/core-free-icons'
 import { computed, ref } from 'vue'
 import { useIryxUiConfig } from '../config'
@@ -29,7 +30,7 @@ export interface PasswordInputProps {
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   /** Applied to the outer wrapper, which stacks the field above the meter. */
-  class?: string
+  class?: ClassValue
   /** Override classes per slot, e.g. `{ meter: 'mt-1' }`. */
   ui?: {
     root?: string
@@ -98,7 +99,7 @@ const inputClass = computed(() =>
   isUnstyled.value ? props.ui?.input : theme.value.input({ class: props.ui?.input }),
 )
 
-function slotClass(slot: 'root' | 'toggle' | 'meter' | 'track' | 'segment' | 'label', extra?: string) {
+function slotClass(slot: 'root' | 'toggle' | 'meter' | 'track' | 'segment' | 'label', extra?: ClassValue) {
   const override = props.ui?.[slot]
   return isUnstyled.value ? [override, extra] : theme.value[slot]({ class: [override, extra] })
 }

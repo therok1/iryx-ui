@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import type { ChartSeries } from '../composables/cartesian'
 import type { ChartAnimate } from '../composables/chart-reveal'
 import type { SparseValue } from '../composables/scale'
@@ -74,7 +75,7 @@ export interface LineChartProps {
   label?: string
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   ui?: Partial<Record<
     'root' | 'svg' | 'grid' | 'tick' | 'category' | 'line' | 'area' | 'crosshair'
     | 'marker' | 'markerRing' | 'tooltip' | 'tooltipLabel' | 'tooltipValue' | 'table',
@@ -344,7 +345,7 @@ const plotReveal = computed(() => ({
 
 const theme = computed(() => lineChartTheme())
 
-function slotClass(slot: keyof NonNullable<LineChartProps['ui']>, extra?: string) {
+function slotClass(slot: keyof NonNullable<LineChartProps['ui']>, extra?: ClassValue) {
   const override = props.ui?.[slot]
   return isUnstyled.value ? [override, extra] : theme.value[slot]({ class: [override, extra] })
 }

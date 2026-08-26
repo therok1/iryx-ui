@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import type { ButtonSize } from '../composables/button-group'
 import { Primitive } from 'reka-ui'
 import { computed, provide } from 'vue'
@@ -19,7 +20,7 @@ export interface ButtonGroupProps {
   block?: boolean
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
 }
 
 const props = withDefaults(defineProps<ButtonGroupProps>(), {

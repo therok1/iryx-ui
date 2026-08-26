@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import { computed } from 'vue'
 import { parseHotkey, useApplePlatform } from '../composables/kbd'
 import { useIryxUiConfig } from '../config'
@@ -24,7 +25,7 @@ export interface KbdProps {
   ariaLabel?: string
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   /** Override classes per slot, e.g. `{ key: 'bg-background' }`. */
   ui?: {
     root?: string
@@ -54,7 +55,7 @@ const isUnstyled = computed(() => props.unstyled ?? config.unstyled)
 
 const theme = computed(() => kbdTheme({ size: props.size }))
 
-function slotClass(name: keyof NonNullable<KbdProps['ui']>, extra?: string) {
+function slotClass(name: keyof NonNullable<KbdProps['ui']>, extra?: ClassValue) {
   const override = [props.ui?.[name], extra].filter(Boolean).join(' ')
   return isUnstyled.value ? override : theme.value[name]({ class: override })
 }

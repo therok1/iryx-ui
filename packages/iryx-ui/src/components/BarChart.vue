@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import type { ChartSeries } from '../composables/cartesian'
 import type { ChartAnimate } from '../composables/chart-reveal'
 import type { SparseValue } from '../composables/scale'
@@ -68,7 +69,7 @@ export interface BarChartProps {
   label?: string
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   ui?: Partial<Record<
     'root' | 'svg' | 'grid' | 'tick' | 'category' | 'bar' | 'tooltip'
     | 'tooltipLabel' | 'tooltipValue' | 'table',
@@ -414,7 +415,7 @@ const tooltip = computed(() => {
 
 const theme = computed(() => barChartTheme())
 
-function slotClass(slot: keyof NonNullable<BarChartProps['ui']>, extra?: string) {
+function slotClass(slot: keyof NonNullable<BarChartProps['ui']>, extra?: ClassValue) {
   const override = props.ui?.[slot]
   return isUnstyled.value ? [override, extra] : theme.value[slot]({ class: [override, extra] })
 }

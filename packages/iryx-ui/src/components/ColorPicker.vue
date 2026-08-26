@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Color, HSBColor } from 'reka-ui'
+import type { ClassValue } from '../class-value'
 import {
   ColorAreaArea,
   ColorAreaRoot,
@@ -41,7 +42,7 @@ export interface ColorPickerProps {
   disabled?: boolean
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   /** Override classes per slot, e.g. `{ area: 'h-56' }`. */
   ui?: {
     root?: string
@@ -132,7 +133,7 @@ const isUnstyled = computed(() => props.unstyled ?? config.unstyled)
 
 const theme = computed(() => colorPickerTheme())
 
-function slotClass(name: keyof NonNullable<ColorPickerProps['ui']>, extra?: string) {
+function slotClass(name: keyof NonNullable<ColorPickerProps['ui']>, extra?: ClassValue) {
   const override = [props.ui?.[name], extra].filter(Boolean).join(' ')
   return isUnstyled.value ? override : theme.value[name]({ class: override })
 }

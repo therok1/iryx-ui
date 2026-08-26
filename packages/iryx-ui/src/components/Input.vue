@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import { Cancel01Icon, Loading03Icon } from '@hugeicons/core-free-icons'
 import { computed, onBeforeUnmount, ref, useSlots, watch } from 'vue'
 import { useFormField } from '../composables/form'
@@ -30,7 +31,7 @@ export interface InputProps {
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   /** Applied to the outer field, which is the element carrying the chrome. */
-  class?: string
+  class?: ClassValue
   /** Override classes per slot, e.g. `{ input: 'text-right' }`. */
   ui?: {
     root?: string
@@ -129,7 +130,7 @@ const hasTrailing = computed(() => props.loading || showClear.value || !!slots.t
 
 const theme = computed(() => inputTheme({ size: props.size, invalid: isInvalid.value }))
 
-function slotClass(slot: 'root' | 'input' | 'leading' | 'trailing' | 'clear', extra?: string) {
+function slotClass(slot: 'root' | 'input' | 'leading' | 'trailing' | 'clear', extra?: ClassValue) {
   const override = props.ui?.[slot]
   return isUnstyled.value ? [override, extra] : theme.value[slot]({ class: [override, extra] })
 }

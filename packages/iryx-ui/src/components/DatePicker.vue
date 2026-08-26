@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import { Calendar03Icon } from '@hugeicons/core-free-icons'
 import {
   PopoverContent,
@@ -46,7 +47,7 @@ export interface DatePickerProps {
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   /** Applied to the trigger, which is the element carrying the field chrome. */
-  class?: string
+  class?: ClassValue
   /** Override classes per slot, e.g. `{ content: 'p-4' }`. */
   ui?: Partial<Record<
     'trigger' | 'placeholder' | 'content' | 'header' | 'heading' | 'nav'
@@ -94,7 +95,7 @@ const theme = computed(() => datePickerTheme({ size: props.size, invalid: isInva
 /** The field and panel slots this component still owns. */
 type FieldSlot = 'trigger' | 'placeholder' | 'content' | 'footer' | 'action'
 
-function slotClass(slot: FieldSlot, extra?: string) {
+function slotClass(slot: FieldSlot, extra?: ClassValue) {
   const override = props.ui?.[slot]
   return isUnstyled.value ? [override, extra] : theme.value[slot]({ class: [override, extra] })
 }

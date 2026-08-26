@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ClassValue } from '../class-value'
 import { TimeFieldInput, TimeFieldRoot } from 'reka-ui'
 import { computed } from 'vue'
 import { toIsoTime, toTime } from '../composables/date'
@@ -34,7 +35,7 @@ export interface TimeFieldProps {
   id?: string
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
-  class?: string
+  class?: ClassValue
   /** Override classes per slot, e.g. `{ segment: 'px-1' }`. */
   ui?: {
     root?: string
