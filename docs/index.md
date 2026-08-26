@@ -134,7 +134,7 @@ async function copy() {
 
 </script>
 
-<div class="mx-auto max-w-[90rem] px-5 sm:px-8">
+<IContainer>
 
 <section class="relative isolate grid gap-12 pt-16 pb-20 sm:pt-28 sm:pb-28 lg:grid-cols-[1.5fr_1fr] lg:items-center lg:gap-16">
  <div class="home-grid" aria-hidden="true"></div>
@@ -351,4 +351,4 @@ async function copy() {
  </div>
 </section>
 
-</div>
+</IContainer>

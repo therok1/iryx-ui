@@ -79,7 +79,7 @@ watch(() => route.path, () => {
       below are the largest thing on the page.
     -->
     <header class="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur">
-      <div class="mx-auto flex h-16 max-w-[90rem] items-center gap-6 px-5 sm:px-8">
+      <IContainer class="flex h-16 items-center gap-6">
         <button
           type="button"
           class="-ml-2 grid size-9 shrink-0 place-items-center rounded-lg text-muted-foreground transition-colors outline-none hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-primary/50 lg:hidden"
@@ -140,7 +140,7 @@ watch(() => route.path, () => {
             </svg>
           </a>
         </div>
-      </div>
+      </IContainer>
     </header>
 
     <!-- The mobile sidebar is the library's own drawer. If IDrawer regresses,
@@ -165,7 +165,7 @@ watch(() => route.path, () => {
       at the same optical weight as a running head, so the specimen sheet keeps
       the page.
     -->
-    <div v-else class="mx-auto flex w-full max-w-[90rem] flex-1 gap-12 px-5 sm:px-8">
+    <IContainer v-else class="flex flex-1 gap-12">
       <aside class="hidden w-52 shrink-0 lg:block">
         <!-- The library's own fade, so the index shows when it has more to scroll. -->
         <IScrollFade size="3rem" class="sticky top-16 max-h-[calc(100dvh-4rem)] py-12 pr-2">
@@ -187,15 +187,15 @@ watch(() => route.path, () => {
         </p>
         <Content />
       </main>
-    </div>
+    </IContainer>
 
     <footer class="border-t border-border">
-      <div class="mx-auto flex max-w-[90rem] flex-wrap items-center justify-between gap-3 px-5 py-8 font-mono text-xs tracking-[0.06em] text-muted-foreground sm:px-8">
+      <IContainer class="flex flex-wrap items-center justify-between gap-3 py-8 font-mono text-xs tracking-[0.06em] text-muted-foreground">
         <span>MIT · {{ theme.componentCount }} components · v{{ theme.version }}</span>
         <a :href="theme.repo" target="_blank" rel="noreferrer" class="transition-colors hover:text-foreground">
           github.com/therok1/iryx-ui
         </a>
-      </div>
+      </IContainer>
     </footer>
 
     <!--
