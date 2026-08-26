@@ -60,7 +60,7 @@ const props = withDefaults(defineProps<NavigationMenuProps>(), {
 })
 
 /** Which panel is open, by entry value. Empty string means none. */
-const model = defineModel<string>({ default: undefined })
+const model = defineModel<string | undefined>({ default: undefined })
 
 const config = useIryxUiConfig()
 const isUnstyled = computed(() => props.unstyled ?? config.unstyled)

@@ -58,7 +58,7 @@ const props = withDefaults(defineProps<HoverCardProps>(), {
   unstyled: undefined,
 })
 
-const open = defineModel<boolean>('open', { default: undefined })
+const open = defineModel<boolean | undefined>('open', { default: undefined })
 
 const config = useIryxUiConfig()
 const isUnstyled = computed(() => props.unstyled ?? config.unstyled)

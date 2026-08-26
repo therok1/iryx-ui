@@ -55,7 +55,7 @@ const props = withDefaults(defineProps<MenubarProps>(), {
 })
 
 /** Which menu is open, by value. Empty string means none. */
-const model = defineModel<string>({ default: undefined })
+const model = defineModel<string | undefined>({ default: undefined })
 
 const options = computed(() => props.menus ?? [])
 

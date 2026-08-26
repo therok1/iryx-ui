@@ -58,7 +58,7 @@ const options = computed<TabsItem[]>(() =>
  */
 const itemValue = (item: TabsItem) => item.value ?? item.label
 
-const model = defineModel<string>({ default: undefined })
+const model = defineModel<string | undefined>({ default: undefined })
 
 const config = useIryxUiConfig()
 const isUnstyled = computed(() => props.unstyled ?? config.unstyled)

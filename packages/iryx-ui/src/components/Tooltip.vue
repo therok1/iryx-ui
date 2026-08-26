@@ -40,7 +40,7 @@ const props = withDefaults(defineProps<TooltipProps>(), {
   unstyled: undefined,
 })
 
-const open = defineModel<boolean>('open', { default: undefined })
+const open = defineModel<boolean | undefined>('open', { default: undefined })
 
 const config = useIryxUiConfig()
 const isUnstyled = computed(() => props.unstyled ?? config.unstyled)
