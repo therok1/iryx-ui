@@ -243,7 +243,7 @@ To make room for that trigger, the shell wraps `#header` in a flex row. A bar th
 | --- | --- |
 | default | The page itself, inside `<main>` |
 | `header` | App bar. Receives `navOpen` and `toggleNav`. Measured in `page` mode to position the sticky sidebar |
-| `sidebar` | The navigation rail — usually [`ISidebar`](/components/sidebar). Receives `inDrawer`, and is rendered again inside the mobile drawer |
+| `sidebar` | The navigation rail — usually [`ISidebar`](/components/sidebar). Receives `inDrawer` — `false` in the rail, `true` in the mobile drawer, where the slot is rendered a second time |
 | `footer` | Pinned below the content in `main` mode, at the end of the document in `page` mode |
 
 Pair it with [`IContainer`](/components/container) for the content width and [`IPageHeader`](/components/page-header) for the title row.
