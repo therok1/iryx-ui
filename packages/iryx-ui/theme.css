@@ -593,3 +593,27 @@
     transform: none !important;
   }
 }
+
+.iryx-toast[data-swipe="move"] {
+  transform: translate3d(var(--reka-toast-swipe-move-x, 0), var(--reka-toast-swipe-move-y, 0), 0);
+  transition: none;
+}
+
+.iryx-toast[data-swipe="cancel"] {
+  transform: translate3d(0, 0, 0);
+  transition: transform 220ms var(--iryx-drawer-ease);
+}
+
+.iryx-toast[data-swipe="end"] {
+  animation: toast-swipe-out 220ms var(--iryx-drawer-ease) forwards;
+}
+
+@keyframes toast-swipe-out {
+  from {
+    transform: translate3d(var(--reka-toast-swipe-end-x, 0), var(--reka-toast-swipe-end-y, 0), 0);
+  }
+  to {
+    opacity: 0;
+    transform: translate3d(calc(var(--reka-toast-swipe-end-x, 0) + 100%), var(--reka-toast-swipe-end-y, 0), 0);
+  }
+}

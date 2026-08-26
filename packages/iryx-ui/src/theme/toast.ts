@@ -3,7 +3,7 @@ import { tv } from 'tailwind-variants'
 export const toastTheme = tv({
   slots: {
     viewport: 'fixed z-50 flex max-h-screen w-full flex-col gap-2 p-4 outline-none sm:max-w-sm',
-    root: 'flex items-start gap-3 rounded-xl border border-border bg-background p-4 text-foreground shadow-lg data-[state=closed]:animate-fade-out data-[state=open]:animate-toast-in',
+    root: 'iryx-toast flex items-start gap-3 rounded-xl border border-border bg-background p-4 text-foreground shadow-lg data-[state=closed]:animate-fade-out data-[state=open]:animate-toast-in',
     icon: 'mt-px shrink-0 [&_svg]:size-4.5',
     content: 'min-w-0 flex-1',
     title: 'text-sm font-medium text-foreground',
