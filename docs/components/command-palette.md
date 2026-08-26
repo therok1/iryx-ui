@@ -1,5 +1,6 @@
 ---
 eyebrow: Overlays
+description: Every command in the app behind one shortcut. It opens on mod+K, filters as you type, and is driven entirely by keyboard.
 ---
 
 <script setup lang="ts">

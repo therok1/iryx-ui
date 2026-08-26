@@ -1,5 +1,6 @@
 ---
 layout: home
+description: A Vue 3 component library built on Reka UI and Tailwind CSS v4. Accessible by default, yours to restyle.
 ---
 
 <script setup lang="ts">

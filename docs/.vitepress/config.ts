@@ -199,26 +199,41 @@ function summarise(filePath: string): string | undefined {
   const body = source
     .replace(/^---[\s\S]*?\n---/, '')
     .replace(/<script[\s\S]*?<\/script>/g, '')
+    // Fenced code is not prose either, and the samples are full of sentences.
+    .replace(/^```[\s\S]+?^```/gm, '')
 
   /*
    * The first line that is prose: not a heading, not a fence, not a table or
    * a container, and not a component. `<InstallCommand />` opens the
    * installation page, and a demo opens several others.
+   *
+   * A line of markup is not prose either. The landing page is one long
+   * template, and its `Accessible by default.<br>` reached the card with the
+   * tags still in it — a scraper renders the description as written. An
+   * inline tag inside a sentence is fine; it is stripped from the text below.
    */
+  const isProse = (line: string): boolean => {
+    const trimmed = line.trim()
+    // A bare `attr="value"` is a wrapped tag, not a sentence that mentions one.
+    return /^[A-Z0-9`[]/i.test(trimmed) && !/^(?:[#>|]|```)/.test(trimmed) && !/^[\w-]+="/.test(trimmed)
+  }
+
   const lines = body.split(/\r?\n/)
-  const startIndex = lines.findIndex(line => /^[A-Z0-9`[]/i.test(line.trim()) && !/^[#>|]/.test(line.trim()))
+  const startIndex = lines.findIndex(isProse)
   if (startIndex === -1)
     return undefined
 
   const paragraph: string[] = []
   for (const line of lines.slice(startIndex)) {
-    if (!line.trim())
+    if (!line.trim() || !isProse(line))
       break
     paragraph.push(line.trim())
   }
 
   const text = paragraph
     .join(' ')
+    // Inline tags go; a tag inside a code span is prose about a tag, so it stays.
+    .replace(/`[^`]*`|<[^>]*>/g, match => match.startsWith('`') ? match : '')
     .replace(/!?\[([^\]]*)\]\([^)]*\)/g, '$1')
     .replace(/[`*_]/g, '')
     .replace(/\s+/g, ' ')
