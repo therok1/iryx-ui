@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    /*
+     * The example is a consumer, so it checks against the built types rather
+     * than the source vite.config.ts aliases to — the published surface is
+     * what a reader copying this out of the repository will get. Run
+     * `pnpm build` first.
+     */
+    "paths": {
+      "iryx-ui": ["../../packages/iryx-ui/dist/index.d.ts"]
+    },
+    "types": ["vite/client"]
+  },
+  "include": ["src/**/*.ts", "src/**/*.vue"]
+}

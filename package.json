@@ -5,11 +5,12 @@
   "packageManager": "pnpm@10.30.2",
   "scripts": {
     "build": "pnpm --filter iryx-ui build",
+    "build:examples": "pnpm --filter \"./examples/*\" build",
     "dev": "pnpm --filter playground dev",
     "docs": "pnpm --filter docs dev",
     "docs:build": "pnpm --filter docs build",
     "test": "pnpm --filter iryx-ui test",
-    "typecheck": "pnpm --filter iryx-ui typecheck",
+    "typecheck": "pnpm -r typecheck",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "release": "pnpm build && changeset publish"

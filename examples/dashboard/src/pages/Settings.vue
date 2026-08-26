@@ -150,7 +150,7 @@ async function onSubmit(): Promise<void> {
           :model-value="appearance"
           :items="appearances"
           orientation="horizontal"
-          @update:model-value="(value: Appearance) => setAppearance(value)"
+          @update:model-value="(value) => setAppearance(value as Appearance)"
         />
       </ICard>
 

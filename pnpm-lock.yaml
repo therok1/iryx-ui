@@ -36,7 +36,7 @@ importers:
         specifier: workspace:*
         version: link:../packages/iryx-ui
       vue:
-        specifier: ^3.5.35
+        specifier: 3.5.35
         version: 3.5.35(typescript@6.0.3)
     devDependencies:
       '@hugeicons/core-free-icons':
@@ -59,26 +59,29 @@ importers:
         version: 4.2.3
       '@hugeicons/vue':
         specifier: ^1.0.7
-        version: 1.0.7(vue@3.5.41(typescript@6.0.3))
+        version: 1.0.7(vue@3.5.35(typescript@6.0.3))
       iryx-ui:
         specifier: workspace:*
         version: link:../../packages/iryx-ui
       vue:
-        specifier: ^3.5.35
-        version: 3.5.41(typescript@6.0.3)
+        specifier: 3.5.35
+        version: 3.5.35(typescript@6.0.3)
     devDependencies:
       '@tailwindcss/vite':
         specifier: ^4.3.0
         version: 4.3.0(vite@8.2.1(@types/node@25.9.2)(jiti@2.7.0)(yaml@2.9.0))
       '@vitejs/plugin-vue':
         specifier: ^6.0.7
-        version: 6.0.8(vite@8.2.1(@types/node@25.9.2)(jiti@2.7.0)(yaml@2.9.0))(vue@3.5.41(typescript@6.0.3))
+        version: 6.0.8(vite@8.2.1(@types/node@25.9.2)(jiti@2.7.0)(yaml@2.9.0))(vue@3.5.35(typescript@6.0.3))
       tailwindcss:
         specifier: ^4.3.0
         version: 4.3.0
       vite:
         specifier: ^8.0.16
         version: 8.2.1(@types/node@25.9.2)(jiti@2.7.0)(yaml@2.9.0)
+      vue-tsc:
+        specifier: ^3.3.4
+        version: 3.3.4(typescript@6.0.3)
 
   examples/marketing:
     dependencies:
@@ -87,26 +90,29 @@ importers:
         version: 4.2.3
       '@hugeicons/vue':
         specifier: ^1.0.7
-        version: 1.0.7(vue@3.5.41(typescript@6.0.3))
+        version: 1.0.7(vue@3.5.35(typescript@6.0.3))
       iryx-ui:
         specifier: workspace:*
         version: link:../../packages/iryx-ui
       vue:
-        specifier: ^3.5.35
-        version: 3.5.41(typescript@6.0.3)
+        specifier: 3.5.35
+        version: 3.5.35(typescript@6.0.3)
     devDependencies:
       '@tailwindcss/vite':
         specifier: ^4.3.0
         version: 4.3.0(vite@8.2.1(@types/node@25.9.2)(jiti@2.7.0)(yaml@2.9.0))
       '@vitejs/plugin-vue':
         specifier: ^6.0.7
-        version: 6.0.8(vite@8.2.1(@types/node@25.9.2)(jiti@2.7.0)(yaml@2.9.0))(vue@3.5.41(typescript@6.0.3))
+        version: 6.0.8(vite@8.2.1(@types/node@25.9.2)(jiti@2.7.0)(yaml@2.9.0))(vue@3.5.35(typescript@6.0.3))
       tailwindcss:
         specifier: ^4.3.0
         version: 4.3.0
       vite:
         specifier: ^8.0.16
         version: 8.2.1(@types/node@25.9.2)(jiti@2.7.0)(yaml@2.9.0)
+      vue-tsc:
+        specifier: ^3.3.4
+        version: 3.3.4(typescript@6.0.3)
 
   packages/iryx-ui:
     dependencies:
@@ -154,7 +160,7 @@ importers:
         specifier: ^4.1.8
         version: 4.1.8(@types/node@25.9.2)(happy-dom@20.10.2)(vite@8.0.16(@types/node@25.9.2)(jiti@2.7.0)(yaml@2.9.0))
       vue:
-        specifier: ^3.5.35
+        specifier: 3.5.35
         version: 3.5.35(typescript@6.0.3)
       vue-tsc:
         specifier: ^3.3.4
@@ -172,7 +178,7 @@ importers:
         specifier: workspace:*
         version: link:../packages/iryx-ui
       vue:
-        specifier: ^3.5.35
+        specifier: 3.5.35
         version: 3.5.35(typescript@6.0.3)
     devDependencies:
       '@tailwindcss/vite':
@@ -261,11 +267,6 @@ packages:
   '@babel/helper-validator-identifier@7.29.7':
     resolution: {integrity: sha512-qehxGkRj55h/ff8EMaJ+cYhyaKlHIxqYDn682wQD7RNp9UujOQsHog2uS0r2vzr4pW+sXf90NeeayjcNaX3fFg==}
     engines: {node: '>=6.9.0'}
-
-  '@babel/parser@7.29.7':
-    resolution: {integrity: sha512-hnORnjP/1P/zFEndoeX+n+t1RwWRJiJpM/jO7FW32Kn9r5+sJB2JWOdYo4L6k78j15eCwY3Gm/7364B1EMwtNg==}
-    engines: {node: '>=6.0.0'}
-    hasBin: true
 
   '@babel/parser@7.29.8':
     resolution: {integrity: sha512-E8lTAYNB1KW+FH+VGJuZM1ioAx2E6oVlvQFRrf5P8ZZmsiJXYAD9vTFV7yyEURNzgh1dFqMZuO6tUwcARbqFCA==}
@@ -3299,10 +3300,6 @@ snapshots:
 
   '@babel/helper-validator-identifier@7.29.7': {}
 
-  '@babel/parser@7.29.7':
-    dependencies:
-      '@babel/types': 7.29.8
-
   '@babel/parser@7.29.8':
     dependencies:
       '@babel/types': 7.29.8
@@ -3609,10 +3606,6 @@ snapshots:
   '@hugeicons/vue@1.0.7(vue@3.5.35(typescript@6.0.3))':
     dependencies:
       vue: 3.5.35(typescript@6.0.3)
-
-  '@hugeicons/vue@1.0.7(vue@3.5.41(typescript@6.0.3))':
-    dependencies:
-      vue: 3.5.41(typescript@6.0.3)
 
   '@humanfs/core@0.19.2':
     dependencies:
@@ -4170,6 +4163,12 @@ snapshots:
       vite: 8.0.16(@types/node@25.9.2)(jiti@2.7.0)(yaml@2.9.0)
       vue: 3.5.35(typescript@6.0.3)
 
+  '@vitejs/plugin-vue@6.0.8(vite@8.2.1(@types/node@25.9.2)(jiti@2.7.0)(yaml@2.9.0))(vue@3.5.35(typescript@6.0.3))':
+    dependencies:
+      '@rolldown/pluginutils': 1.0.1
+      vite: 8.2.1(@types/node@25.9.2)(jiti@2.7.0)(yaml@2.9.0)
+      vue: 3.5.35(typescript@6.0.3)
+
   '@vitejs/plugin-vue@6.0.8(vite@8.2.1(@types/node@25.9.2)(jiti@2.7.0)(yaml@2.9.0))(vue@3.5.41(typescript@6.0.3))':
     dependencies:
       '@rolldown/pluginutils': 1.0.1
@@ -4278,14 +4277,14 @@ snapshots:
 
   '@vue/compiler-sfc@3.5.35':
     dependencies:
-      '@babel/parser': 7.29.7
+      '@babel/parser': 7.29.8
       '@vue/compiler-core': 3.5.35
       '@vue/compiler-dom': 3.5.35
       '@vue/compiler-ssr': 3.5.35
       '@vue/shared': 3.5.35
       estree-walker: 2.0.2
       magic-string: 0.30.21
-      postcss: 8.5.15
+      postcss: 8.5.26
       source-map-js: 1.2.1
 
   '@vue/compiler-sfc@3.5.41':

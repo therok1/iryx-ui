@@ -28,3 +28,6 @@ jobs:
       # The docs prerender every page, so this is a second SSR pass over the
       # components the docs actually use — and it fails on a dead link.
       - run: pnpm --filter docs build
+      # The examples use combinations the docs pages never do, so building them
+      # catches props and variants that do not exist.
+      - run: pnpm build:examples
