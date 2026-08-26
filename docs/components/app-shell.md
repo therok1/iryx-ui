@@ -29,7 +29,7 @@ const paged = {
   // The body must take its content height, not flex to the frame: a body
   // shorter than the rail leaves sticky nothing to stick inside.
   body: 'flex-none',
-  sidebar: 'h-[calc(18rem-var(--iryx-shell-header-height,0px))] max-h-none',
+  sidebar: 'h-[calc(18rem-var(--iryx-shell-header-height,0px))]',
 }
 </script>
 
@@ -120,7 +120,7 @@ The shell itself is the scroll container here, and the header sticks within it.
   :ui="{
     root: 'h-72 min-h-0 overflow-y-auto',
     body: 'flex-none',
-    sidebar: 'h-[calc(18rem-var(--iryx-shell-header-height,0px))] max-h-none',
+    sidebar: 'h-[calc(18rem-var(--iryx-shell-header-height,0px))]',
   }"
 >
 ```

@@ -23,7 +23,14 @@ export const appShellTheme = tv({
       page: {
         root: 'min-h-svh',
         header: 'sticky top-0',
-        sidebar: 'sticky top-[var(--iryx-shell-header-height,0px)] max-h-[calc(100svh-var(--iryx-shell-header-height,0px))] self-start overflow-y-auto',
+        /*
+         * A full viewport height rather than a maximum. `self-start` is what
+         * makes the sticky offset work inside the stretched body row, and it
+         * also collapses the rail to the height of its own items — so a short
+         * nav left the panel, its border and its background floating in the
+         * middle of the page.
+         */
+        sidebar: 'sticky top-[var(--iryx-shell-header-height,0px)] h-[calc(100svh-var(--iryx-shell-header-height,0px))] self-start overflow-y-auto',
       },
     },
     mobileNav: {
