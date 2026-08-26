@@ -42,12 +42,15 @@ jobs:
       - run: pnpm install --frozen-lockfile
 
       - run: pnpm lint
-      - run: pnpm typecheck
-      - run: pnpm test
 
       # `pnpm release` used to do this; publishing directly means the build has
       # to happen here, or `files` in package.json points at a missing dist.
+      # It also runs before the checks because the examples type-check against
+      # the built types a consumer would get, so dist has to exist by then.
       - run: pnpm build
+
+      - run: pnpm typecheck
+      - run: pnpm test
 
       # Trusted publishing needs a CLI that can present the OIDC token. Node 22
       # ships npm 10, which cannot; `changeset publish` would route through
