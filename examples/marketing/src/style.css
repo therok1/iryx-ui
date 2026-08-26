@@ -195,3 +195,15 @@
     linear-gradient(to bottom, var(--iryx-border) 1px, transparent 1px);
   background-size: 48px 48px;
 }
+
+.panel-treatment .hero-aurora {
+  inset: auto auto -30rem -26rem;
+  width: 74rem;
+  height: 68rem;
+  mask-image: radial-gradient(72% 72% at 40% 60%, black 0%, black 38%, transparent 88%);
+}
+
+.panel-treatment .hero-grid {
+  inset: 0;
+  mask-image: radial-gradient(130% 110% at 12% 92%, black 0%, black 34%, transparent 90%);
+}

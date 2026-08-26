@@ -9,6 +9,7 @@ import {
 import { useAppearance } from 'iryx-ui'
 import { ref } from 'vue'
 import { customers, features, plans, product, questions, stats, testimonials } from './data'
+import SignIn from './pages/SignIn.vue'
 
 const { isDark, setAppearance } = useAppearance()
 
@@ -24,11 +25,15 @@ const nav = [
 ]
 
 const menuOpen = ref(false)
+
+const view = ref<'home' | 'signIn'>('home')
 </script>
 
 <template>
   <IApp>
-    <div class="min-h-svh bg-background text-foreground">
+    <SignIn v-if="view === 'signIn'" @back="view = 'home'" />
+
+    <div v-else class="min-h-svh bg-background text-foreground">
       <header class="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur">
         <IContainer class="flex h-16 items-center gap-6">
           <a href="#top" class="flex items-center gap-2.5 font-semibold tracking-tight">
@@ -58,7 +63,7 @@ const menuOpen = ref(false)
               <IIcon :icon="isDark ? Sun03Icon : Moon02Icon" data-icon />
             </IButton>
 
-            <IButton variant="ghost" size="sm" class="hidden sm:inline-flex">
+            <IButton variant="ghost" size="sm" class="hidden sm:inline-flex" @click="view = 'signIn'">
               Sign in
             </IButton>
             <IButton size="sm">
@@ -82,6 +87,16 @@ const menuOpen = ref(false)
                 >
                   {{ link.label }}
                 </a>
+
+                <ISeparator class="my-2" />
+
+                <button
+                  type="button"
+                  class="rounded-lg px-3 py-2.5 text-left text-sm transition-colors hover:bg-accent"
+                  @click="menuOpen = false; view = 'signIn'"
+                >
+                  Sign in
+                </button>
               </nav>
             </IDrawer>
           </div>
