@@ -1,5 +1,19 @@
 # iryx-ui
 
+## 0.18.0
+
+### Minor Changes
+
+- d1defc7: Add `IAuthProviders`, the third-party sign-in row: the marks pin to the left edge while the labels centre across the full width, so rows with labels of different lengths still line up. Brand marks stay the caller's — the sign-in branding of Google, Apple and the rest comes with rules the application has to meet.
+- 3a41866: Widen every `class` prop from `string` to the new exported `ClassValue`, so array syntax — `:class="[base, active && 'ring-2']"` — type-checks. Object syntax stays excluded, since `tailwind-merge` cannot merge it.
+- 3a41866: Declare every component on Vue's `GlobalComponents`, so globally registered `I`-prefixed components are type-checked in templates. `IryxUiGlobalComponents` is exported for projects that register under a different prefix.
+
+### Patch Changes
+
+- 8596f8d: `IAppShell` now passes `inDrawer: false` to the `sidebar` slot in the rail. It previously passed nothing there, which left the slot prop typed as `{}` and unusable.
+- ba509ef: `IAppShell` in `scroll="page"` mode now gives its sidebar the full height below the header instead of a maximum. `self-start` — which is what makes the sticky offset work — also collapsed the rail to the height of its own items, so a short navigation left the panel, its border and its background floating mid-page.
+- be74257: A swiped toast now follows the pointer. The gesture already dismissed it, but nothing consumed the offsets Reka writes during a swipe, so the card stayed put until it vanished.
+
 ## 0.17.1
 
 ### Patch Changes
