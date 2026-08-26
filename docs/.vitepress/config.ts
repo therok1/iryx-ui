@@ -266,44 +266,43 @@ export default defineConfig({
    * A canonical URL per page. The site is reachable at `iryx-ui.pages.dev` as
    * well as its own domain, and without this both get indexed as duplicates.
    */
-  transformPageData(pageData) {
-    // Assigned here, not in `transformHead`, so it survives hydration.
+  transformPageData(pageData, { siteConfig }) {
+    const site = siteConfig.site
+    // Assigned here, not in the head tags below, so it survives hydration.
     pageData.description = pageData.frontmatter.description
       ?? summarise(pageData.filePath)
       ?? description
 
-    pageData.frontmatter.head ??= []
-    pageData.frontmatter.head.push([
-      'link',
-      { rel: 'canonical', href: `${origin}/${pagePath(pageData.relativePath)}` },
-    ])
-  },
-  /*
-   * The share tags that differ per page. They used to sit in `head` as
-   * constants, so every page in the site carried the home page's title, the
-   * one site-wide description and an `og:url` of `/` — a link to any component
-   * page previewed as the home page, and told crawlers as much.
-   *
-   * `mergeHead` keys a tag on its first attribute, so what is returned here
-   * replaces the matching `property`/`name` in `head` rather than doubling it.
-   * The `description` meta is the same story: VitePress skips writing its own
-   * once this one overrides it.
-   */
-  transformHead({ pageData, siteData }) {
     const url = `${origin}/${pagePath(pageData.relativePath)}`
-    const title = pageData.frontmatter.title || pageData.title || siteData.title
+    const title = pageData.frontmatter.title || pageData.title || site.title
     const summary = pageData.description
 
-    return [
-      ['meta', { name: 'description', content: summary }],
+    /*
+     * The share tags that differ per page. They used to sit in `head` as
+     * constants, so every page in the site carried the home page's title, the
+     * one site-wide description and an `og:url` of `/` — a link to any
+     * component page previewed as the home page, and told crawlers as much.
+     *
+     * They live in `frontmatter.head` rather than `transformHead` because
+     * `transformHead` only runs at build time: on a client-side navigation
+     * VitePress re-applies `head` plus `frontmatter.head` and nothing else,
+     * so tags written in `transformHead` kept the first page's values until a
+     * reload. `mergeHead` keys a tag on its first attribute, so what is
+     * pushed here replaces the matching `property`/`name` in `head` rather
+     * than doubling it. The `description` meta is left out: VitePress patches
+     * that one itself from `pageData.description`.
+     */
+    pageData.frontmatter.head ??= []
+    pageData.frontmatter.head.push(
+      ['link', { rel: 'canonical', href: url }],
       ['meta', { property: 'og:title', content: title }],
       ['meta', { property: 'og:description', content: summary }],
       ['meta', { property: 'og:url', content: url }],
       ['meta', { name: 'twitter:title', content: title }],
       ['meta', { name: 'twitter:description', content: summary }],
       // Kept in step with `<html lang>` rather than written out twice.
-      ['meta', { property: 'og:locale', content: (siteData.lang || 'en-US').replace('-', '_') }],
-    ]
+      ['meta', { property: 'og:locale', content: (site.lang || 'en-US').replace('-', '_') }],
+    )
   },
   cleanUrls: true,
   sitemap: { hostname: `${origin}/` },
