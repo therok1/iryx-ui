@@ -18,7 +18,10 @@ Whole applications rather than single components. Each one lives in the reposito
 An admin dashboard for a billing product: a shell with navigation that becomes a drawer on a phone, a table with sorting, selection, row actions and pagination, charts, a create form in a drawer, and a settings page with validation.
 
 <div class="mt-6 flex flex-wrap gap-3">
-  <IButton as="a" :href="`${theme.repo}/tree/main/examples/dashboard`" target="_blank" rel="noreferrer">
+  <IButton as="a" href="https://dashboard.iryx-ui.com" target="_blank" rel="noreferrer">
+    See it live
+  </IButton>
+  <IButton variant="outline" as="a" :href="`${theme.repo}/tree/main/examples/dashboard`" target="_blank" rel="noreferrer">
     Read the source
   </IButton>
 </div>
@@ -41,7 +44,10 @@ Two lines exist only because it runs inside this repository: the `iryx-ui` alias
 A product marketing site: a sticky header with a mobile drawer, a hero over an aurora and a ruled grid, feature and stats sections, pricing cards, customer logos, testimonials, an accordion of questions, and a split-screen sign-in page with third-party providers.
 
 <div class="mt-6 flex flex-wrap gap-3">
-  <IButton as="a" :href="`${theme.repo}/tree/main/examples/marketing`" target="_blank" rel="noreferrer">
+  <IButton as="a" href="https://marketing.iryx-ui.com" target="_blank" rel="noreferrer">
+    See it live
+  </IButton>
+  <IButton variant="outline" as="a" :href="`${theme.repo}/tree/main/examples/marketing`" target="_blank" rel="noreferrer">
     Read the source
   </IButton>
 </div>
