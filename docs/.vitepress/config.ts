@@ -152,7 +152,8 @@ const sidebar = [
   {
     title: 'Examples',
     items: [
-      { text: 'Dashboard', link: '/examples/' },
+      { text: 'Dashboard', link: '/examples/#dashboard' },
+      { text: 'Marketing', link: '/examples/#marketing' },
     ],
   },
 ]
