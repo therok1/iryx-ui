@@ -44,6 +44,8 @@ export interface SelectProps extends SelectRootProps {
   items?: SelectItems
   placeholder?: string
   size?: 'sm' | 'md' | 'lg'
+  /** Lands on the trigger, so a `<label for>` names the control. */
+  id?: string
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   class?: ClassValue
@@ -76,6 +78,7 @@ const rootProps = computed(() => {
     items: _items,
     placeholder: _placeholder,
     size: _size,
+    id: _id,
     unstyled: _unstyled,
     class: _class,
     ui: _ui,
@@ -141,8 +144,8 @@ const groupLabelClass = computed(() =>
 
 <template>
   <SelectRoot v-bind="forwarded">
-    <SelectTrigger v-bind="$attrs" :class="triggerClass">
-      <SelectValue :placeholder="props.placeholder" />
+    <SelectTrigger :id="props.id" v-bind="$attrs" :class="triggerClass">
+      <SelectValue class="truncate" :placeholder="props.placeholder" />
       <SelectIcon as-child>
         <Icon :icon="ArrowDown01Icon" />
       </SelectIcon>

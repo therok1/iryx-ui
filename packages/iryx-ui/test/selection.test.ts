@@ -17,6 +17,14 @@ describe('select', () => {
     expect(wrapper.text()).toContain('Pick one')
   })
 
+  it('puts id on the trigger so a label can name it', () => {
+    const wrapper = mount(Select, {
+      props: { items: ['One'], id: 'plan' },
+      attachTo: document.body,
+    })
+    expect(wrapper.find('[role="combobox"]').attributes('id')).toBe('plan')
+  })
+
   it('shows the selected label', async () => {
     const wrapper = mount(Select, {
       props: { items: ['One', 'Two'], modelValue: 'Two' },

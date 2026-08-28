@@ -143,6 +143,7 @@ Disable the whole control, or a single option with `disabled` on the item — "N
 | `items` | `(SelectItemOption \| SelectItemGroup \| string)[]` | `[]` | Options to render |
 | `placeholder` | `string` | — | Shown while nothing is selected |
 | `size` | `'sm' \| 'md' \| 'lg'` | `'md'` | Control scale |
+| `id` | `string` | — | Lands on the trigger, so a `<label for>` names the control |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged with the built-in classes |
 | `ui` | `{ trigger?, content?, viewport?, item?, group?, groupLabel? }` | — | Per-slot class overrides |
