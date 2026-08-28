@@ -19,6 +19,8 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
+  color-scheme: light;
+
   /*
    * Typeface. The library ships no webfont — that would put font files, a
    * licence and a network request in every consumer's bundle whether they
@@ -104,6 +106,8 @@
 }
 
 .dark {
+  color-scheme: dark;
+
   /* Neutral surfaces — shadcn/ui "zinc" palette. */
   --iryx-background: oklch(0.145 0 0);
   --iryx-foreground: oklch(0.985 0 0);

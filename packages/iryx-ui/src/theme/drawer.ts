@@ -3,7 +3,7 @@ import { tv } from 'tailwind-variants'
 export const drawerTheme = tv({
   slots: {
     overlay: 'fixed inset-0 z-50 bg-black/50 data-[state=closed]:animate-fade-out data-[state=open]:animate-fade-in',
-    content: 'iryx-drawer fixed z-50 flex touch-none flex-col gap-4 border-border bg-background p-6 text-foreground shadow-lg outline-none',
+    content: 'iryx-drawer fixed z-50 flex touch-none flex-col gap-4 overscroll-contain border-border bg-background p-6 text-foreground shadow-lg outline-none',
     handle: 'shrink-0 rounded-full bg-border',
     header: 'flex flex-col gap-1',
     title: 'text-base leading-none font-semibold',

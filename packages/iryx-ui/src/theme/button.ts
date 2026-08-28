@@ -1,7 +1,7 @@
 import { tv } from 'tailwind-variants'
 
 export const buttonTheme = tv({
-  base: 'inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border border-transparent font-medium no-underline transition-[color,background-color,border-color,box-shadow,opacity,filter,translate] outline-none focus-visible:ring-2 focus-visible:ring-primary/50 active:translate-y-px disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0',
+  base: 'inline-flex shrink-0 touch-manipulation items-center justify-center gap-2 rounded-xl border border-transparent font-medium no-underline transition-[color,background-color,border-color,box-shadow,opacity,filter,translate] outline-none focus-visible:ring-2 focus-visible:ring-primary/50 active:translate-y-px disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0',
   variants: {
     variant: {
       solid: 'bg-linear-to-b from-primary-from to-primary-to text-primary-foreground hover:brightness-110 active:brightness-95',

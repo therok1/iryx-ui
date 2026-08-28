@@ -3,7 +3,7 @@ import { tv } from 'tailwind-variants'
 export const dialogTheme = tv({
   slots: {
     overlay: 'fixed inset-0 z-50 bg-black/50 data-[state=closed]:animate-fade-out data-[state=open]:animate-fade-in',
-    content: 'fixed top-1/2 left-1/2 z-50 flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] -translate-x-1/2 -translate-y-1/2 flex-col gap-4 rounded-2xl border border-border bg-background p-6 text-foreground shadow-lg outline-none data-[state=closed]:animate-dialog-out data-[state=open]:animate-dialog-in',
+    content: 'fixed top-1/2 left-1/2 z-50 flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] -translate-x-1/2 -translate-y-1/2 flex-col gap-4 overscroll-contain rounded-2xl border border-border bg-background p-6 text-foreground shadow-lg outline-none data-[state=closed]:animate-dialog-out data-[state=open]:animate-dialog-in',
     header: 'flex flex-col gap-1',
     title: 'text-base leading-none font-semibold',
     description: 'text-sm text-muted-foreground',

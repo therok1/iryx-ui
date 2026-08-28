@@ -109,7 +109,7 @@ provide(formFieldContextKey, {
 
     <slot :id="fieldId" :error="error" />
 
-    <p v-if="error" :id="`${fieldId}-error`" :class="cls('error', props.ui?.error)">
+    <p v-if="error" :id="`${fieldId}-error`" role="alert" aria-live="polite" :class="cls('error', props.ui?.error)">
       {{ error }}
     </p>
     <p v-else-if="props.help" :id="`${fieldId}-help`" :class="cls('help', props.ui?.help)">
