@@ -506,13 +506,11 @@ describe('radioGroup', () => {
     expect(horizontal.attributes('aria-orientation')).toBe('horizontal')
   })
 
-  // Same reasoning as the checkbox and switch: clicking a radio should ring it.
-  it('rings on focus, however focus arrived', () => {
+  it('rings on keyboard focus', () => {
     const classes = mount(RadioGroup, { props: { items: ['a'] } })
       .get('[role="radio"]')
       .attributes('class') ?? ''
-    expect(classes).toContain('focus:ring-2')
-    expect(classes).not.toContain('focus-visible:ring')
+    expect(classes).toContain('focus-visible:ring-2')
   })
 
   it('marks the selected item as checked', () => {

@@ -19,10 +19,10 @@ describe('switch', () => {
   })
 
   // Was an offset outline; now the same ring every other control uses.
-  it('rings on focus, however focus arrived', () => {
+  it('rings on keyboard focus', () => {
     const classes = control(mount(Switch)).attributes('class') ?? ''
-    expect(classes).toContain('focus:ring-2')
-    expect(classes).toContain('focus:ring-primary/50')
+    expect(classes).toContain('focus-visible:ring-2')
+    expect(classes).toContain('focus-visible:ring-primary/50')
     expect(classes).not.toContain('outline-primary')
   })
 

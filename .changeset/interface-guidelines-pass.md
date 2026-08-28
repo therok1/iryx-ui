@@ -13,3 +13,8 @@ Accessibility and interaction fixes from a Web Interface Guidelines pass:
   on touch devices.
 - `IFormField` marks its error message as `role="alert" aria-live="polite"`,
   so screen readers announce validation failures.
+- Checkbox, Switch, RadioGroup and the DateField/TimeField segments ring on
+  `focus-visible` rather than `focus`, so a mouse click no longer leaves a
+  focus ring behind.
+- Input drops spellcheck for `email`, `url`, `tel` and `password` types, and
+  PasswordInput and PinInput disable it outright.

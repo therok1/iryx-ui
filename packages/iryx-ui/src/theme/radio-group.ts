@@ -4,7 +4,7 @@ export const radioGroupTheme = tv({
   slots: {
     root: '',
     wrapper: 'flex items-start gap-2.5',
-    item: 'aspect-square shrink-0 cursor-pointer rounded-full border border-border bg-background transition-colors outline-none focus:ring-2 focus:ring-primary/50 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-primary',
+    item: 'aspect-square shrink-0 cursor-pointer rounded-full border border-border bg-background transition-colors outline-none focus-visible:ring-2 focus-visible:ring-primary/50 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-primary',
     indicator: 'flex size-full items-center justify-center after:block after:rounded-full after:bg-primary',
     content: 'grid gap-1',
     label: 'text-sm leading-5 text-foreground select-none',

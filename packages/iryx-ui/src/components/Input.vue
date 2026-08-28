@@ -54,6 +54,9 @@ const props = withDefaults(defineProps<InputProps>(), {
   unstyled: undefined,
 })
 
+// Autocorrect mangles addresses and identifiers, so only free text is checked.
+const spellcheck = computed(() => (['email', 'url', 'tel', 'password'].includes(props.type) ? false : undefined))
+
 const model = defineModel<string | number | null>()
 
 const slots = useSlots()
@@ -147,6 +150,7 @@ function slotClass(slot: 'root' | 'input' | 'leading' | 'trailing' | 'clear', ex
       ref="inputEl"
       :value="draft"
       :type="props.type"
+      :spellcheck="spellcheck"
       :placeholder="props.placeholder"
       :disabled="props.disabled"
       :required="props.required"

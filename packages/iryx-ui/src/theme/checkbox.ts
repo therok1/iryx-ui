@@ -3,7 +3,7 @@ import { tv } from 'tailwind-variants'
 export const checkboxTheme = tv({
   slots: {
     wrapper: 'flex items-start gap-2.5',
-    root: 'peer flex shrink-0 cursor-pointer items-center justify-center rounded border border-border bg-background text-primary-foreground transition-colors outline-none focus:ring-2 focus:ring-primary/50 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-primary data-[state=checked]:bg-primary data-[state=indeterminate]:border-primary data-[state=indeterminate]:bg-primary',
+    root: 'peer flex shrink-0 cursor-pointer items-center justify-center rounded border border-border bg-background text-primary-foreground transition-colors outline-none focus-visible:ring-2 focus-visible:ring-primary/50 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-primary data-[state=checked]:bg-primary data-[state=indeterminate]:border-primary data-[state=indeterminate]:bg-primary',
     indicator: 'flex items-center justify-center text-current',
     content: 'grid gap-1',
     label: 'text-sm leading-5 font-medium text-foreground select-none',

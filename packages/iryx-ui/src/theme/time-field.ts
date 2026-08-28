@@ -4,7 +4,7 @@ import { fieldBase } from './input'
 export const timeFieldTheme = tv({
   slots: {
     root: `inline-flex items-center gap-0.5 ${fieldBase} w-auto focus-within:ring-2 focus-within:ring-primary/50`,
-    segment: 'rounded px-0.5 text-foreground tabular-nums outline-none focus:bg-primary focus:text-primary-foreground data-[disabled]:cursor-not-allowed',
+    segment: 'rounded px-0.5 text-foreground tabular-nums outline-none focus-visible:bg-primary focus-visible:text-primary-foreground data-[disabled]:cursor-not-allowed',
     literal: 'text-muted-foreground',
   },
   variants: {

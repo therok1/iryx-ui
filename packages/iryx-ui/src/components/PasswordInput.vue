@@ -119,6 +119,7 @@ function slotClass(slot: 'root' | 'toggle' | 'meter' | 'track' | 'segment' | 'la
       :unstyled="props.unstyled"
       :ui="{ input: inputClass }"
       autocomplete="current-password"
+      spellcheck="false"
       v-bind="$attrs"
     >
       <template v-if="props.toggle" #trailing>

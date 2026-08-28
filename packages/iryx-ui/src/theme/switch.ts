@@ -3,7 +3,7 @@ import { tv } from 'tailwind-variants'
 export const switchTheme = tv({
   slots: {
     wrapper: 'flex items-start gap-2.5',
-    root: 'inline-flex shrink-0 cursor-pointer items-center rounded-full transition-colors outline-none focus:ring-2 focus:ring-primary/50 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-muted',
+    root: 'inline-flex shrink-0 cursor-pointer items-center rounded-full transition-colors outline-none focus-visible:ring-2 focus-visible:ring-primary/50 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-muted',
     thumb: 'pointer-events-none block rounded-full bg-background shadow-sm transition-transform data-[state=unchecked]:translate-x-0.5',
     content: 'grid gap-1',
     label: 'text-sm leading-5 font-medium text-foreground select-none',

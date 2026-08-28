@@ -113,6 +113,7 @@ const separatorClass = computed(() =>
     <template v-for="index in positions" :key="index">
       <PinInputInput
         :index="index"
+        spellcheck="false"
         :aria-invalid="props.invalid || undefined"
         :class="inputClass"
       />
