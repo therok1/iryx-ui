@@ -32,6 +32,23 @@ function openPalette(props: Record<string, unknown> = {}) {
 }
 
 describe('commandPalette', () => {
+  // Reka always renders `aria-describedby`, pointing at an id that only exists
+  // with a description. A palette has none, so the attribute has to be removed
+  // — the same treatment IDialog needed.
+  it('does not warn about a missing description', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    const wrapper = openPalette()
+    await nextTick()
+
+    const described = warn.mock.calls.flat().filter(
+      arg => typeof arg === 'string' && arg.includes('Missing `Description`'),
+    )
+    expect(described).toEqual([])
+    warn.mockRestore()
+    wrapper.unmount()
+  })
+
   it('renders every command, grouped', async () => {
     const wrapper = openPalette()
     await nextTick()

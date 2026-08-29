@@ -169,6 +169,7 @@ function keysOf(shortcut: string): string[] {
       <DialogContent
         :class="isUnstyled ? [props.ui?.content, props.class] : theme.content({ class: [props.ui?.content, props.class] })"
         :aria-label="props.label"
+        :aria-describedby="undefined"
       >
         <!-- Reka requires a title for the accessible name; a palette shows none. -->
         <VisuallyHidden>
