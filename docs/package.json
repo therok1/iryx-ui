@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "iryx-ui": "workspace:*",
-    "vue": "^3.5.41"
+    "vue": "^3.5.42"
   },
   "devDependencies": {
     "@hugeicons/core-free-icons": "4.2.3",
