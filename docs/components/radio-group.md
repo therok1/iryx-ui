@@ -95,6 +95,7 @@ const planItems = [
 | --- | --- | --- | --- |
 | `items` | `(RadioGroupItemOption \| string)[]` | `[]` | Options to render |
 | `size` | `'sm' \| 'md' \| 'lg'` | `'md'` | Control scale |
+| `invalid` | `boolean` | — | Mark as failing validation. Taken from the enclosing `IFormField` when omitted |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged with the built-in classes |
 | `ui` | `{ root?, item?, label?, description? }` | — | Per-slot class overrides |

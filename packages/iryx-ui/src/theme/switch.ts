@@ -27,6 +27,9 @@ export const switchTheme = tv({
     withText: {
       true: {},
     },
+    invalid: {
+      true: { root: 'ring-2 ring-red-500/40' },
+    },
   },
   compoundVariants: [
     { size: 'sm', withText: true, class: { root: 'mt-0.5' } },

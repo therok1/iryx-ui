@@ -18,6 +18,7 @@ import {
   useForwardPropsEmits,
 } from 'reka-ui'
 import { computed } from 'vue'
+import { useFormField } from '../composables/form'
 import { useIryxUiConfig } from '../config'
 import { selectTheme } from '../theme/select'
 import Icon from './Icon.vue'
@@ -46,6 +47,8 @@ export interface SelectProps extends SelectRootProps {
   size?: 'sm' | 'md' | 'lg'
   /** Lands on the trigger, so a `<label for>` names the control. */
   id?: string
+  /** Mark as failing validation. Taken from the enclosing `IFormField` when omitted. */
+  invalid?: boolean
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   class?: ClassValue
@@ -69,6 +72,7 @@ export interface SelectProps extends SelectRootProps {
 defineOptions({ inheritAttrs: false })
 
 const props = withDefaults(defineProps<SelectProps>(), {
+  invalid: undefined,
   unstyled: undefined,
 })
 const emits = defineEmits<SelectRootEmits>()
@@ -79,6 +83,7 @@ const rootProps = computed(() => {
     placeholder: _placeholder,
     size: _size,
     id: _id,
+    invalid: _invalid,
     unstyled: _unstyled,
     class: _class,
     ui: _ui,
@@ -112,10 +117,16 @@ const options = computed<SelectItemOption[]>(() => (props.items ?? []).flatMap(i
   isGroup(item) ? item.items.map(toOption) : [toOption(item)],
 ))
 
+const field = useFormField()
+const triggerId = computed(() => props.id ?? field?.id.value)
+if (field && props.id)
+  field.id.value = props.id
+const isInvalid = computed(() => props.invalid ?? field?.invalid.value ?? false)
+
 const config = useIryxUiConfig()
 const isUnstyled = computed(() => props.unstyled ?? config.unstyled)
 
-const slots = computed(() => selectTheme({ size: props.size }))
+const slots = computed(() => selectTheme({ size: props.size, invalid: isInvalid.value }))
 
 const triggerClass = computed(() =>
   isUnstyled.value
@@ -144,7 +155,13 @@ const groupLabelClass = computed(() =>
 
 <template>
   <SelectRoot v-bind="forwarded">
-    <SelectTrigger :id="props.id" v-bind="$attrs" :class="triggerClass">
+    <SelectTrigger
+      :id="triggerId"
+      :aria-invalid="isInvalid || undefined"
+      :aria-describedby="field?.describedBy.value"
+      v-bind="$attrs"
+      :class="triggerClass"
+    >
       <SelectValue class="truncate" :placeholder="props.placeholder" />
       <SelectIcon as-child>
         <Icon :icon="ArrowDown01Icon" />

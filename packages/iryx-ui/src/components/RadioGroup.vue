@@ -3,6 +3,7 @@ import type { RadioGroupRootEmits, RadioGroupRootProps } from 'reka-ui'
 import type { ClassValue } from '../class-value'
 import { Label, RadioGroupIndicator, RadioGroupItem, RadioGroupRoot, useForwardPropsEmits, useId } from 'reka-ui'
 import { computed } from 'vue'
+import { useFormField } from '../composables/form'
 import { useIryxUiConfig } from '../config'
 import { radioGroupTheme } from '../theme/radio-group'
 
@@ -18,6 +19,8 @@ export interface RadioGroupProps extends RadioGroupRootProps {
   /** Options to render. Strings are expanded to `{ label, value }`. */
   items?: (RadioGroupItemOption | string)[]
   size?: 'sm' | 'md' | 'lg'
+  /** Mark as failing validation. Taken from the enclosing `IFormField` when omitted. */
+  invalid?: boolean
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   class?: ClassValue
@@ -25,12 +28,13 @@ export interface RadioGroupProps extends RadioGroupRootProps {
 }
 
 const props = withDefaults(defineProps<RadioGroupProps>(), {
+  invalid: undefined,
   unstyled: undefined,
 })
 const emits = defineEmits<RadioGroupRootEmits>()
 
 const rootProps = computed(() => {
-  const { items: _items, size: _size, unstyled: _unstyled, class: _class, ui: _ui, ...rest } = props
+  const { items: _items, size: _size, invalid: _invalid, unstyled: _unstyled, class: _class, ui: _ui, ...rest } = props
   return rest
 })
 const forwarded = useForwardPropsEmits(rootProps, emits)
@@ -40,6 +44,10 @@ const options = computed<RadioGroupItemOption[]>(() =>
 )
 
 const groupId = useId()
+const field = useFormField()
+if (field)
+  field.id.value = undefined
+const isInvalid = computed(() => props.invalid ?? field?.invalid.value ?? false)
 
 const config = useIryxUiConfig()
 const isUnstyled = computed(() => props.unstyled ?? config.unstyled)
@@ -52,6 +60,7 @@ const isUnstyled = computed(() => props.unstyled ?? config.unstyled)
 const slots = computed(() => radioGroupTheme({
   size: props.size,
   orientation: props.orientation ?? 'vertical',
+  invalid: isInvalid.value,
 }))
 
 const rootClass = computed(() =>
@@ -71,7 +80,13 @@ const descriptionClass = computed(() =>
 </script>
 
 <template>
-  <RadioGroupRoot v-bind="forwarded" :class="rootClass">
+  <RadioGroupRoot
+    v-bind="forwarded"
+    :aria-labelledby="field?.labelId.value"
+    :aria-invalid="isInvalid || undefined"
+    :aria-describedby="field?.describedBy.value"
+    :class="rootClass"
+  >
     <slot>
       <div v-for="option in options" :key="option.value" :class="isUnstyled ? undefined : slots.wrapper()">
         <RadioGroupItem

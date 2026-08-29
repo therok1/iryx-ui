@@ -18,6 +18,9 @@ export const checkboxTheme = tv({
     withText: {
       true: { root: 'mt-0.5' },
     },
+    invalid: {
+      true: { root: 'border-red-500 focus-visible:ring-red-500/40' },
+    },
   },
   compoundVariants: [
     { size: 'lg', withText: true, class: { root: 'mt-0' } },

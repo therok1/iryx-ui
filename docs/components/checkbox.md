@@ -116,6 +116,7 @@ const all = computed({
 | `description` | `string` | — | Secondary line under the label |
 | `size` | `'sm' \| 'md' \| 'lg'` | `'md'` | Control scale |
 | `id` | `string` | generated | Useful when an external `ILabel` targets it |
+| `invalid` | `boolean` | — | Mark as failing validation. Taken from the enclosing `IFormField` when omitted |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged with the built-in classes |
 | `ui` | `{ wrapper?, root?, indicator?, content?, label?, description? }` | — | Per-slot class overrides |

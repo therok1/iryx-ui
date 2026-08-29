@@ -4,6 +4,7 @@ import type { ClassValue } from '../class-value'
 import { MinusSignIcon, Tick02Icon } from '@hugeicons/core-free-icons'
 import { CheckboxIndicator, CheckboxRoot, Label, useForwardPropsEmits, useId } from 'reka-ui'
 import { computed } from 'vue'
+import { useFormField } from '../composables/form'
 import { useIryxUiConfig } from '../config'
 import { checkboxTheme } from '../theme/checkbox'
 import Icon from './Icon.vue'
@@ -15,6 +16,8 @@ export interface CheckboxProps extends CheckboxRootProps {
   description?: string
   size?: 'sm' | 'md' | 'lg'
   id?: string
+  /** Mark as failing validation. Taken from the enclosing `IFormField` when omitted. */
+  invalid?: boolean
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   class?: ClassValue
@@ -38,6 +41,7 @@ export interface CheckboxProps extends CheckboxRootProps {
 defineOptions({ inheritAttrs: false })
 
 const props = withDefaults(defineProps<CheckboxProps>(), {
+  invalid: undefined,
   unstyled: undefined,
 })
 const emits = defineEmits<CheckboxRootEmits>()
@@ -48,6 +52,7 @@ const rootProps = computed(() => {
     description: _description,
     size: _size,
     id: _id,
+    invalid: _invalid,
     unstyled: _unstyled,
     class: _class,
     ui: _ui,
@@ -58,14 +63,18 @@ const rootProps = computed(() => {
 const forwarded = useForwardPropsEmits(rootProps, emits)
 
 const autoId = useId()
-const controlId = computed(() => props.id ?? autoId)
+const field = useFormField()
+const isInvalid = computed(() => props.invalid ?? field?.invalid.value ?? false)
+const controlId = computed(() => props.id ?? field?.id.value ?? autoId)
+if (field)
+  field.id.value = controlId.value
 /** Only wrap in a labelled layout when there is text to show. */
 const hasText = computed(() => Boolean(props.label || props.description))
 
 const config = useIryxUiConfig()
 const isUnstyled = computed(() => props.unstyled ?? config.unstyled)
 
-const slots = computed(() => checkboxTheme({ size: props.size, withText: hasText.value }))
+const slots = computed(() => checkboxTheme({ size: props.size, withText: hasText.value, invalid: isInvalid.value }))
 
 const wrapperClass = computed(() =>
   isUnstyled.value ? props.ui?.wrapper : slots.value.wrapper({ class: props.ui?.wrapper }),
@@ -94,6 +103,7 @@ const descriptionClass = computed(() =>
     <CheckboxRoot
       :id="controlId"
       v-bind="{ ...forwarded, ...$attrs }"
+      :aria-invalid="isInvalid || undefined"
       :aria-describedby="props.description ? `${controlId}-description` : undefined"
       :class="rootClass"
     >
@@ -117,7 +127,13 @@ const descriptionClass = computed(() =>
     </div>
   </div>
 
-  <CheckboxRoot v-else :id="props.id" v-bind="{ ...forwarded, ...$attrs }" :class="rootClass">
+  <CheckboxRoot
+    v-else
+    :id="controlId"
+    v-bind="{ ...forwarded, ...$attrs }"
+    :aria-invalid="isInvalid || undefined"
+    :class="rootClass"
+  >
     <CheckboxIndicator :class="indicatorClass">
       <slot>
         <Icon v-if="props.modelValue === 'indeterminate'" :icon="MinusSignIcon" />

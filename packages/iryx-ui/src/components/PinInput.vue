@@ -2,6 +2,7 @@
 import type { ClassValue } from '../class-value'
 import { PinInputInput, PinInputRoot } from 'reka-ui'
 import { computed } from 'vue'
+import { useFormField } from '../composables/form'
 import { useIryxUiConfig } from '../config'
 import { pinInputTheme } from '../theme/pin-input'
 
@@ -51,6 +52,7 @@ export interface PinInputProps {
 const props = withDefaults(defineProps<PinInputProps>(), {
   length: 6,
   separator: '–',
+  invalid: undefined,
   unstyled: undefined,
 })
 
@@ -79,10 +81,16 @@ const separatorAfter = computed(() => {
   return new Set(positions.value.filter(i => (i + 1) % size === 0 && i !== props.length - 1))
 })
 
+const field = useFormField()
+const firstCellId = computed(() => props.id ?? field?.id.value)
+if (field && props.id)
+  field.id.value = props.id
+const isInvalid = computed(() => props.invalid ?? field?.invalid.value ?? false)
+
 const config = useIryxUiConfig()
 const isUnstyled = computed(() => props.unstyled ?? config.unstyled)
 
-const slots = computed(() => pinInputTheme({ size: props.size, invalid: props.invalid }))
+const slots = computed(() => pinInputTheme({ size: props.size, invalid: isInvalid.value }))
 
 const rootClass = computed(() =>
   isUnstyled.value
@@ -99,7 +107,7 @@ const separatorClass = computed(() =>
 
 <template>
   <PinInputRoot
-    :id="props.id"
+    :aria-describedby="field?.describedBy.value"
     :model-value="cells"
     :type="props.type"
     :mask="props.mask"
@@ -112,9 +120,10 @@ const separatorClass = computed(() =>
   >
     <template v-for="index in positions" :key="index">
       <PinInputInput
+        :id="index === 0 ? firstCellId : undefined"
         :index="index"
         spellcheck="false"
-        :aria-invalid="props.invalid || undefined"
+        :aria-invalid="isInvalid || undefined"
         :class="inputClass"
       />
       <span v-if="separatorAfter.has(index)" :class="separatorClass" aria-hidden="true">

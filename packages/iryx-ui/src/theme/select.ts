@@ -17,6 +17,9 @@ export const selectTheme = tv({
       md: { trigger: 'h-9 px-3 text-sm' },
       lg: { trigger: 'h-10 px-4 text-base' },
     },
+    invalid: {
+      true: { trigger: 'border-red-500 focus-visible:ring-red-500/40' },
+    },
   },
   defaultVariants: {
     size: 'md',

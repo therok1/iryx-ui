@@ -71,7 +71,14 @@ export const formContextKey: InjectionKey<FormContext> = Symbol.for('iryx-ui:for
 
 /** Context a `FormField` exposes to the control it wraps. */
 export interface FormFieldContext {
-  id: ComputedRef<string>
+  /**
+   * The id the field's `<label for>` points at. Writable: a control with its
+   * own `id` writes that back, and one a label cannot target — a radio group,
+   * a slider — clears it so the field renders no dangling `for`.
+   */
+  id: Ref<string | undefined>
+  /** Id of the field's own `<label>`, for controls a `for` cannot target. */
+  labelId: ComputedRef<string | undefined>
   name: ComputedRef<string | undefined>
   invalid: ComputedRef<boolean>
   describedBy: ComputedRef<string | undefined>

@@ -3,6 +3,7 @@ import type { SliderRootProps } from 'reka-ui'
 import type { ClassValue } from '../class-value'
 import { SliderRange, SliderRoot, SliderThumb, SliderTrack, useId } from 'reka-ui'
 import { computed } from 'vue'
+import { useFormField } from '../composables/form'
 import { useIryxUiConfig } from '../config'
 import { sliderTheme } from '../theme/slider'
 
@@ -114,6 +115,9 @@ function thumbLabel(index: number, value: number) {
 }
 
 const autoId = useId()
+const field = useFormField()
+if (field)
+  field.id.value = undefined
 const labelId = computed(() => `${props.id ?? autoId}-label`)
 const hasHeader = computed(() => Boolean(props.label || props.showValue))
 
@@ -152,7 +156,8 @@ function slotClass(name: keyof NonNullable<SliderProps['ui']>, extra?: ClassValu
       :orientation="props.orientation"
       :inverted="props.inverted"
       :min-steps-between-thumbs="props.minStepsBetweenThumbs"
-      :aria-labelledby="props.label ? labelId : undefined"
+      :aria-labelledby="props.label ? labelId : field?.labelId.value"
+      :aria-describedby="field?.describedBy.value"
       v-bind="$attrs"
       :class="slotClass('slider')"
       @update:model-value="value => value && emits('update:modelValue', toModel(value))"

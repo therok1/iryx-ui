@@ -20,6 +20,9 @@ export const radioGroupTheme = tv({
       vertical: { root: 'grid gap-2' },
       horizontal: { root: 'flex flex-wrap items-start gap-x-6 gap-y-2' },
     },
+    invalid: {
+      true: { item: 'border-red-500 focus-visible:ring-red-500/40' },
+    },
   },
   defaultVariants: {
     size: 'md',

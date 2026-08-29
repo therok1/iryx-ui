@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ClassValue } from '../class-value'
 import { useId } from 'reka-ui'
-import { computed, provide, watch } from 'vue'
+import { computed, provide, ref, watch } from 'vue'
 import { formFieldContextKey, getByPath, useForm } from '../composables/form'
 import { useIryxUiConfig } from '../config'
 import { formFieldTheme } from '../theme/form'
@@ -40,6 +40,7 @@ const props = withDefaults(defineProps<FormFieldProps>(), {
 
 const form = useForm()
 const fieldId = useId()
+const labelFor = ref<string | undefined>(fieldId)
 
 const error = computed(() => props.error ?? form?.errorFor(props.name))
 const describedBy = computed(() => {
@@ -81,7 +82,8 @@ function cls(slot: keyof typeof slots, override?: string) {
 }
 
 provide(formFieldContextKey, {
-  id: computed(() => fieldId),
+  id: labelFor,
+  labelId: computed(() => (props.label ? `${fieldId}-label` : undefined)),
   name: computed(() => props.name),
   invalid: computed(() => Boolean(error.value)),
   describedBy,
@@ -95,7 +97,7 @@ provide(formFieldContextKey, {
     @focusout="onFocusOut"
   >
     <div v-if="props.label || props.hint || $slots.hint" :class="cls('header', props.ui?.header)">
-      <Label v-if="props.label" :for="fieldId" :required="props.required" :class="props.ui?.label">
+      <Label v-if="props.label" :id="`${fieldId}-label`" :for="labelFor" :required="props.required" :class="props.ui?.label">
         {{ props.label }}
       </Label>
       <span v-if="props.hint || $slots.hint" :class="cls('hint', props.ui?.hint)">
