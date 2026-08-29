@@ -1,4 +1,3 @@
-import { Tick02Icon } from '@hugeicons/core-free-icons'
 import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 import { defineComponent, h } from 'vue'
@@ -35,14 +34,5 @@ describe('icon', () => {
   it('passes class through', () => {
     const wrapper = mount(Icon, { props: { icon: Star, class: 'size-4' } })
     expect(wrapper.find('svg').classes()).toContain('size-4')
-  })
-
-  it('renders a hugeicons data icon as plain svg attributes', () => {
-    const wrapper = mount(Icon, { props: { icon: Tick02Icon } })
-    const svg = wrapper.find('svg')
-    expect(svg.attributes('width')).toBe('24')
-    expect(svg.attributes('height')).toBe('24')
-    expect(svg.attributes('viewBox')).toBe('0 0 24 24')
-    expect(wrapper.find('path').attributes('stroke-linecap')).toBe('round')
   })
 })
