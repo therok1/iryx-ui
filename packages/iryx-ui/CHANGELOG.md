@@ -1,5 +1,12 @@
 # iryx-ui
 
+## 0.18.4
+
+### Patch Changes
+
+- b852997: An explicit `id` on a control inside a `FormField` is now what the field's label points at. Previously only `Select`, `PinInput`, `Checkbox` and `Switch` wrote their id back to the field, so `<IInput id="login-email">` left the label pointing at the field's generated id and the control unlabelled for screen readers. `Editable` also renders its id on the input element rather than only on the root.
+- f6b74d9: `ITimeline` markers now centre on the first line of the item's title instead of sitting flush with the top of the row, where a dot or an icon read as a few pixels too high.
+
 ## 0.18.3
 
 ### Patch Changes
