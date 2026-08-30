@@ -52,6 +52,23 @@ describe('colorPicker', () => {
     expect(wrapper.emitted('update:modelValue')?.[0]?.[0]).toBe('#ff5733')
   })
 
+  /*
+   * Re-picking the chosen swatch deselects it in Reka, which reports the
+   * empty selection. Passing that on as the string `"undefined"` sent an
+   * unparseable colour back down and threw mid-render, leaving the picker
+   * mounted but rootless — every later drag then threw as well.
+   */
+  it('ignores a swatch deselection rather than emitting it', async () => {
+    const wrapper = mount(ColorPicker, { props: { modelValue: '#ff5733', swatches } })
+    await wrapper.findAll('[role="option"]')[1]?.trigger('click')
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+  })
+
+  it('falls back to a parseable colour when the model is not one', () => {
+    const wrapper = mount(ColorPicker, { props: { modelValue: 'not a colour', swatches } })
+    expect(wrapper.find('input').element.value).toBe('#ff0000')
+  })
+
   // The preview shows the current colour, so it has to track the model.
   it('paints the preview from the model', () => {
     const wrapper = mount(ColorPicker, { props: { modelValue: '#16a372' } })

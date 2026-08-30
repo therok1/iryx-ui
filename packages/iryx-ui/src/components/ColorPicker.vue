@@ -102,6 +102,23 @@ const colour = ref<HSBColor>(parse(props.modelValue))
  */
 const isAchromatic = (c: HSBColor) => c.s === 0 || c.b === 0
 
+/**
+ * What the string-taking parts of Reka are handed. They parse eagerly and
+ * throw mid-render on anything unreadable, which aborts the update and leaves
+ * a half-mounted tree: the controls keep their listeners but lose their
+ * element refs, so every later drag throws again. A hex from our own state is
+ * always parseable.
+ */
+const safeValue = computed(() => {
+  try {
+    normalizeColor(props.modelValue)
+    return props.modelValue
+  }
+  catch {
+    return toHex(colour.value)
+  }
+})
+
 watch(() => props.modelValue, (next) => {
   // Ignore the echo of our own emit; only a genuine outside change re-parses.
   if (toHex(colour.value) === next)
@@ -198,23 +215,23 @@ function slotClass(name: keyof NonNullable<ColorPickerProps['ui']>, extra?: Clas
 
     <ColorFieldRoot
       v-if="!props.hideField"
-      :model-value="props.modelValue"
+      :model-value="safeValue"
       :disabled="props.disabled"
       :class="slotClass('field')"
       @update:model-value="set"
     >
       <span :class="slotClass('preview')">
         <span :class="slotClass('checkerboard', 'rounded-none')" />
-        <span class="absolute inset-0" :style="{ background: props.modelValue }" />
+        <span class="absolute inset-0" :style="{ background: safeValue }" />
       </span>
       <ColorFieldInput :aria-label="props.fieldLabel" :class="slotClass('input')" />
     </ColorFieldRoot>
 
     <ColorSwatchPickerRoot
       v-if="props.swatches?.length"
-      :model-value="props.modelValue"
+      :model-value="safeValue"
       :class="slotClass('swatches')"
-      @update:model-value="value => set(String(value))"
+      @update:model-value="value => value && set(String(value))"
     >
       <ColorSwatchPickerItem
         v-for="colour in props.swatches"
