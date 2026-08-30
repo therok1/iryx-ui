@@ -61,6 +61,8 @@ const emits = defineEmits<{ 'update:modelValue': [value: string | null] }>()
 
 const field = useFormField()
 const fieldId = computed(() => props.id ?? field?.id.value)
+if (field && props.id)
+  field.id.value = props.id
 
 /**
  * Outside `minValue`/`maxValue`. Reka works this out too and exposes it as

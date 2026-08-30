@@ -96,6 +96,8 @@ defineSlots<{
 
 const field = useFormField()
 const fieldId = computed(() => props.id ?? field?.id.value)
+if (field && props.id)
+  field.id.value = props.id
 const isInvalid = computed(() => props.invalid ?? field?.invalid.value ?? false)
 
 const config = useIryxUiConfig()
@@ -135,7 +137,7 @@ function slotClass(slot: keyof NonNullable<EditableProps['ui']>, extra?: ClassVa
       <EditablePreview :class="slotClass('preview', isEmpty ? theme.placeholder() : undefined)">
         <slot name="preview" :value="value ?? ''" :is-empty="isEmpty" />
       </EditablePreview>
-      <EditableInput :class="slotClass('input')" />
+      <EditableInput :id="fieldId" :class="slotClass('input')" />
     </EditableArea>
 
     <!--

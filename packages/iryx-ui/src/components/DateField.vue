@@ -54,6 +54,8 @@ const emits = defineEmits<{ 'update:modelValue': [value: string | null] }>()
 
 const field = useFormField()
 const fieldId = computed(() => props.id ?? field?.id.value)
+if (field && props.id)
+  field.id.value = props.id
 
 /**
  * Out of bounds, or refused. Reka works this out too and exposes it as

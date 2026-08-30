@@ -1,7 +1,7 @@
 import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
-import { h } from 'vue'
-import { Checkbox, FormField, PinInput, RadioGroup, Select, Slider, Switch } from '../src'
+import { h, nextTick } from 'vue'
+import { Checkbox, Combobox, DateField, DatePicker, DateRangePicker, Editable, FileUpload, FormField, Input, NumberInput, PinInput, RadioGroup, Select, SignaturePad, Slider, Switch, TagsInput, Textarea, TimeField } from '../src'
 
 function field(component: unknown, props: Record<string, unknown> = {}) {
   return mount(FormField, {
@@ -68,6 +68,36 @@ describe('controls inside a form field', () => {
 
       expect(labelId).toBeTruthy()
       expect(labelledBy).toBe(labelId)
+    })
+  }
+
+  const explicitId: [string, unknown, Record<string, unknown>][] = [
+    ['Input', Input, {}],
+    ['Textarea', Textarea, {}],
+    ['NumberInput', NumberInput, {}],
+    ['Select', Select, { items: ['One'] }],
+    ['Combobox', Combobox, { items: ['One'] }],
+    ['Checkbox', Checkbox, {}],
+    ['Switch', Switch, {}],
+    ['PinInput', PinInput, {}],
+    ['DateField', DateField, {}],
+    ['DatePicker', DatePicker, {}],
+    ['DateRangePicker', DateRangePicker, {}],
+    ['TimeField', TimeField, {}],
+    ['Editable', Editable, {}],
+    ['FileUpload', FileUpload, {}],
+    ['TagsInput', TagsInput, {}],
+    ['SignaturePad', SignaturePad, {}],
+  ]
+
+  // An explicit `id` on the control has to win, or the label points at nothing.
+  for (const [name, component, props] of explicitId) {
+    it(`${name} lets an explicit id win`, async () => {
+      const wrapper = field(component, { ...props, id: 'explicit-id' })
+      await nextTick()
+
+      expect(wrapper.find('label').attributes('for')).toBe('explicit-id')
+      expect(wrapper.element.querySelector('#explicit-id')).not.toBeNull()
     })
   }
 })

@@ -90,6 +90,8 @@ const open = ref(false)
 
 const field = useFormField()
 const triggerId = computed(() => props.id ?? field?.id.value)
+if (field && props.id)
+  field.id.value = props.id
 const isInvalid = computed(() => props.invalid ?? field?.invalid.value ?? false)
 
 const config = useIryxUiConfig()

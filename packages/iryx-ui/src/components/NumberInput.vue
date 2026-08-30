@@ -84,6 +84,8 @@ const model = defineModel<string>({ default: '' })
 
 const field = useFormField()
 const inputId = computed(() => props.id ?? field?.id.value)
+if (field && props.id)
+  field.id.value = props.id
 const isInvalid = computed(() => props.invalid ?? field?.invalid.value ?? false)
 
 const config = useIryxUiConfig()

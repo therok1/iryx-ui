@@ -80,6 +80,8 @@ const currentStroke = () => strokes.value.at(-1)
 
 const field = useFormField()
 const padId = computed(() => props.id ?? field?.id.value)
+if (field && props.id)
+  field.id.value = props.id
 const isInvalid = computed(() => props.invalid ?? field?.invalid.value ?? false)
 
 const isEmpty = computed(() => !hasInk(strokes.value))
