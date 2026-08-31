@@ -58,12 +58,14 @@ jobs:
       # published with no credential at all and npm answered E404 on the PUT.
       - run: npm install -g npm@latest
 
-      # No `publish` input: this only opens or updates the version PR.
+      # No `publish-script` input: this only opens or updates the version PR.
+      # The token is an input rather than an environment variable — v2 stopped
+      # reading `GITHUB_TOKEN` from the environment.
       - name: Create release PR
         id: changesets
-        uses: changesets/action@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: changesets/action@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       # "No changesets" is not the same as "unreleased": every later push to
       # main also has none, and npm rejects publishing over a version that
@@ -81,7 +83,7 @@ jobs:
           fi
 
       - name: Publish to npm
-        if: steps.changesets.outputs.hasChangesets == 'false' && steps.state.outputs.needs_publish == 'true'
+        if: steps.changesets.outputs.has-changesets == 'false' && steps.state.outputs.needs_publish == 'true'
         working-directory: packages/iryx-ui
         run: npm publish --access public --provenance
 
@@ -89,7 +91,7 @@ jobs:
       # pointer, so GitHub shows the commit it lands on — which is always the
       # merge of the version PR, hence tags reading "Merge pull request #2".
       - name: Tag and publish release notes
-        if: steps.changesets.outputs.hasChangesets == 'false' && steps.state.outputs.needs_publish == 'true'
+        if: steps.changesets.outputs.has-changesets == 'false' && steps.state.outputs.needs_publish == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
