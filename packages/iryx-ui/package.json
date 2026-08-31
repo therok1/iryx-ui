@@ -30,6 +30,10 @@
       "types": "./dist/nuxt.d.ts",
       "default": "./dist/nuxt.js"
     },
+    "./marketing": {
+      "types": "./dist/marketing.d.ts",
+      "default": "./dist/marketing.js"
+    },
     "./theme.css": "./theme.css"
   },
   "module": "./dist/index.js",

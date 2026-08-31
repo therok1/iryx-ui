@@ -4,7 +4,6 @@ import {
   Menu01Icon,
   Moon02Icon,
   Sun03Icon,
-  Tick02Icon,
 } from '@hugeicons/core-free-icons'
 import { useAppearance } from 'iryx-ui'
 import { ref } from 'vue'
@@ -104,63 +103,42 @@ const view = ref<'home' | 'signIn'>('home')
       </header>
 
       <main id="top">
-        <section class="hero">
-          <div class="hero-aurora" aria-hidden="true" />
-          <div class="hero-grid" aria-hidden="true" />
-
-          <IContainer class="py-20 text-center sm:py-28">
-            <IBadge variant="info" dot class="mb-6">
+        <IHero
+          grid
+          :description="product.summary"
+          note="Free for five invoices a month. No card."
+        >
+          <template #badge>
+            <IBadge variant="info" dot>
               Now billing in 14 currencies
             </IBadge>
+          </template>
 
-            <h1 class="mx-auto max-w-3xl text-4xl font-semibold tracking-tight text-balance sm:text-5xl md:text-6xl">
-              {{ product.tagline }}
-            </h1>
+          <template #heading>
+            {{ product.tagline }}
+          </template>
 
-            <p class="mx-auto mt-6 max-w-2xl text-lg text-pretty text-muted-foreground">
-              {{ product.summary }}
-            </p>
+          <template #actions>
+            <IButton size="lg">
+              Start free
+              <IIcon :icon="ArrowRight02Icon" data-icon="inline-end" />
+            </IButton>
+            <IButton size="lg" variant="outline">
+              See a sample invoice
+            </IButton>
+          </template>
 
-            <div class="mt-9 flex flex-wrap items-center justify-center gap-3">
-              <IButton size="lg">
-                Start free
-                <IIcon :icon="ArrowRight02Icon" data-icon="inline-end" />
-              </IButton>
-              <IButton size="lg" variant="outline">
-                See a sample invoice
-              </IButton>
-            </div>
+          <template #media>
+            <IBrowserFrame url="app.iryx.example/invoices" :ratio="16 / 10" class="mx-auto max-w-4xl">
+              <div class="shot grid h-full w-full place-items-center">
+                <span class="text-sm text-muted-foreground">Product screenshot</span>
+              </div>
+            </IBrowserFrame>
+          </template>
+        </IHero>
 
-            <p class="mt-4 text-sm text-muted-foreground">
-              Free for five invoices a month. No card.
-            </p>
-
-            <div class="mx-auto mt-16 max-w-4xl">
-              <ICard padding="none" class="overflow-hidden text-left shadow-lg">
-                <div class="flex items-center gap-2 border-b border-border bg-muted/40 px-4 py-3">
-                  <span class="size-2.5 rounded-full bg-muted-foreground/25" />
-                  <span class="size-2.5 rounded-full bg-muted-foreground/25" />
-                  <span class="size-2.5 rounded-full bg-muted-foreground/25" />
-                  <span class="ml-3 rounded-md bg-background px-2.5 py-1 text-xs text-muted-foreground">
-                    app.iryx.example/invoices
-                  </span>
-                </div>
-
-                <IAspectRatio :ratio="16 / 10" class="rounded-t-none">
-                  <div class="shot grid h-full w-full place-items-center">
-                    <span class="text-sm text-muted-foreground">Product screenshot</span>
-                  </div>
-                </IAspectRatio>
-              </ICard>
-            </div>
-          </IContainer>
-        </section>
-
-        <IContainer class="pb-20">
-          <p class="text-center text-xs font-medium tracking-wide text-muted-foreground uppercase">
-            Billing runs on Iryx Billing at
-          </p>
-          <div class="mt-6 flex flex-wrap items-center justify-center gap-x-10 gap-y-4">
+        <ISection padding="none" class="pb-20" eyebrow="Billing runs on Iryx Billing at">
+          <div class="flex flex-wrap items-center justify-center gap-x-10 gap-y-4">
             <span
               v-for="name in customers"
               :key="name"
@@ -169,172 +147,91 @@ const view = ref<'home' | 'signIn'>('home')
               {{ name }}
             </span>
           </div>
-        </IContainer>
+        </ISection>
 
-        <IContainer class="pb-20">
+        <ISection padding="none" class="pb-20">
           <div class="grid gap-4 sm:grid-cols-3">
-            <ICard v-for="stat in stats" :key="stat.label" class="bg-muted/50 text-center shadow-xs">
-              <p class="text-3xl font-semibold tracking-tight tabular-nums">
-                {{ stat.value }}
-              </p>
-              <p class="mt-1 text-sm text-muted-foreground">
-                {{ stat.label }}
-              </p>
-            </ICard>
-          </div>
-        </IContainer>
-
-        <section id="features" class="border-t border-border bg-muted/20 py-20 sm:py-24">
-          <IContainer>
-            <div class="mx-auto max-w-2xl text-center">
-              <h2 class="text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
-                Everything the money side needs
-              </h2>
-              <p class="mt-4 text-pretty text-muted-foreground">
-                Not a general ledger. The part of the ledger that decides whether you get paid this month.
-              </p>
-            </div>
-
-            <div class="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              <ICard v-for="feature in features" :key="feature.title" class="shadow-xs">
-                <h3 class="font-medium">
-                  {{ feature.title }}
-                </h3>
-                <p class="mt-2 text-sm text-pretty text-muted-foreground">
-                  {{ feature.description }}
-                </p>
-              </ICard>
-            </div>
-          </IContainer>
-        </section>
-
-        <section id="pricing" class="py-20 sm:py-24">
-          <IContainer>
-            <div class="mx-auto max-w-2xl text-center">
-              <h2 class="text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
-                One price, whatever you invoice
-              </h2>
-              <p class="mt-4 text-pretty text-muted-foreground">
-                No percentage of what you bill. Change plan or leave from the billing page.
-              </p>
-            </div>
-
-            <div class="mt-12 grid items-start gap-4 lg:grid-cols-3">
-              <ICard
-                v-for="plan in plans"
-                :key="plan.name"
-                class="shadow-xs" :class="[
-                  plan.featured ? 'border-primary shadow-md ring-1 ring-primary/20' : undefined,
-                ]"
-              >
-                <template #header>
-                  <div class="flex items-center justify-between gap-2">
-                    <h3 class="font-medium">
-                      {{ plan.name }}
-                    </h3>
-                    <IBadge v-if="plan.featured" size="sm">
-                      Most chosen
-                    </IBadge>
-                  </div>
-                </template>
-
-                <p class="flex items-baseline gap-1.5">
-                  <span class="text-4xl font-semibold tracking-tight tabular-nums">{{ plan.price }}</span>
-                  <span class="text-sm text-muted-foreground">{{ plan.period }}</span>
-                </p>
-                <p class="mt-2 text-sm text-muted-foreground">
-                  {{ plan.description }}
-                </p>
-
-                <ul class="mt-6 flex flex-col gap-2.5">
-                  <li
-                    v-for="line in plan.features"
-                    :key="line"
-                    class="flex items-start gap-2 text-sm"
-                  >
-                    <IIcon :icon="Tick02Icon" class="mt-0.5 size-4 shrink-0 text-primary" />
-                    {{ line }}
-                  </li>
-                </ul>
-
-                <template #footer>
-                  <IButton :variant="plan.featured ? 'solid' : 'outline'" block>
-                    {{ plan.cta }}
-                  </IButton>
-                </template>
-              </ICard>
-            </div>
-          </IContainer>
-        </section>
-
-        <section id="customers" class="border-t border-border bg-muted/20 py-20 sm:py-24">
-          <IContainer>
-            <div class="mx-auto max-w-2xl text-center">
-              <h2 class="text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
-                People who stopped chasing
-              </h2>
-            </div>
-
-            <div class="mt-12 grid gap-4 lg:grid-cols-3">
-              <ICard v-for="voice in testimonials" :key="voice.name" class="shadow-xs">
-                <p class="text-pretty">
-                  “{{ voice.quote }}”
-                </p>
-                <template #footer>
-                  <div class="flex items-center gap-3">
-                    <IAvatar :name="voice.name" size="sm" />
-                    <div class="min-w-0">
-                      <p class="truncate text-sm font-medium">
-                        {{ voice.name }}
-                      </p>
-                      <p class="truncate text-xs text-muted-foreground">
-                        {{ voice.role }}
-                      </p>
-                    </div>
-                  </div>
-                </template>
-              </ICard>
-            </div>
-          </IContainer>
-        </section>
-
-        <section id="questions" class="py-20 sm:py-24">
-          <IContainer size="md">
-            <div class="text-center">
-              <h2 class="text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
-                Questions people ask first
-              </h2>
-            </div>
-
-            <IAccordion
-              class="mt-10"
-              variant="outline"
-              :items="questions.map(entry => ({ label: entry.question, content: entry.answer }))"
+            <IStat
+              v-for="stat in stats"
+              :key="stat.label"
+              :value="stat.value"
+              :label="stat.label"
+              :ui="{ root: 'flex-col-reverse', row: 'justify-center' }"
+              size="lg"
+              as="div"
+              class="rounded-xl border border-border bg-muted/50 p-6 text-center shadow-xs"
             />
-          </IContainer>
-        </section>
+          </div>
+        </ISection>
 
-        <section class="border-t border-border py-20 sm:py-24">
-          <IContainer>
-            <ICard padding="lg" class="bg-muted/50 text-center shadow-xs">
-              <h2 class="text-3xl font-semibold tracking-tight text-balance">
-                Send your next invoice from Iryx Billing
-              </h2>
-              <p class="mx-auto mt-4 max-w-xl text-pretty text-muted-foreground">
-                Five invoices a month cost nothing, and the reminders work on the free plan too.
-              </p>
-              <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
-                <IButton size="lg">
-                  Start free
-                  <IIcon :icon="ArrowRight02Icon" data-icon="inline-end" />
-                </IButton>
-                <IButton size="lg" variant="outline">
-                  Book a walkthrough
-                </IButton>
-              </div>
-            </ICard>
-          </IContainer>
-        </section>
+        <ISection
+          id="features"
+          tone="muted"
+          bordered
+          heading="Everything the money side needs"
+          description="Not a general ledger. The part of the ledger that decides whether you get paid this month."
+        >
+          <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <IFeatureCard
+              v-for="feature in features"
+              :key="feature.title"
+              :title="feature.title"
+              :description="feature.description"
+            />
+          </div>
+        </ISection>
+
+        <ISection
+          id="pricing"
+          heading="One price, whatever you invoice"
+          description="No percentage of what you bill. Change plan or leave from the billing page."
+        >
+          <IPricingTable :plans="plans" badge="Most chosen" />
+        </ISection>
+
+        <ISection
+          id="customers"
+          tone="muted"
+          bordered
+          heading="People who stopped chasing"
+        >
+          <div class="grid gap-4 lg:grid-cols-3">
+            <ITestimonialCard
+              v-for="voice in testimonials"
+              :key="voice.name"
+              :quote="voice.quote"
+              :name="voice.name"
+              :role="voice.role"
+            />
+          </div>
+        </ISection>
+
+        <ISection id="questions" size="md" heading="Questions people ask first">
+          <IAccordion
+            variant="outline"
+            :items="questions.map(entry => ({ label: entry.question, content: entry.answer }))"
+          />
+        </ISection>
+
+        <ISection bordered>
+          <ICard padding="lg" class="bg-muted/50 text-center shadow-xs">
+            <h2 class="text-3xl font-semibold tracking-tight text-balance">
+              Send your next invoice from Iryx Billing
+            </h2>
+            <p class="mx-auto mt-4 max-w-xl text-pretty text-muted-foreground">
+              Five invoices a month cost nothing, and the reminders work on the free plan too.
+            </p>
+            <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
+              <IButton size="lg">
+                Start free
+                <IIcon :icon="ArrowRight02Icon" data-icon="inline-end" />
+              </IButton>
+              <IButton size="lg" variant="outline">
+                Book a walkthrough
+              </IButton>
+            </div>
+          </ICard>
+        </ISection>
       </main>
 
       <footer class="border-t border-border py-12">

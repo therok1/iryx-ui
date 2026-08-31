@@ -23,7 +23,7 @@ vi.mock('@nuxt/kit', () => ({
 }))
 
 const module_ = (await import('../src/nuxt')).default as any
-const { componentNames } = await import('../src/component-names')
+const { componentNames, marketingComponentNames } = await import('../src/component-names')
 // Imported up here, not inside a test: pulling in the whole library takes
 // longer than the default 5s case timeout.
 const iryx = await import('../src')
@@ -45,6 +45,29 @@ describe('nuxt module', () => {
     setup()
     expect(added.map(c => c.name)).toEqual(componentNames.map(n => `I${n}`))
     expect(added.every(c => c.filePath === 'iryx-ui')).toBe(true)
+  })
+
+  it('leaves the blocks out unless they are asked for', () => {
+    setup()
+    expect(added.some(c => c.filePath === 'iryx-ui/marketing')).toBe(false)
+  })
+
+  it('registers the blocks from the subpath when enabled', () => {
+    setup({ blocks: true })
+    const blocks = added.filter(c => c.filePath === 'iryx-ui/marketing')
+    expect(blocks.map(c => c.name)).toEqual(marketingComponentNames.map(n => `I${n}`))
+    // The core set is still there, and the blocks did not displace it.
+    expect(added).toHaveLength(componentNames.length + marketingComponentNames.length)
+  })
+
+  /*
+   * The names are a hand-written list, because the module runs in Node and
+   * cannot import `.vue`. So the list has to be checked against the real
+   * exports, or a new block auto-imports nowhere.
+   */
+  it('keeps the block names in sync with the subpath exports', async () => {
+    const marketing = await import('../src/marketing/index')
+    expect(Object.keys(marketing).sort()).toEqual([...marketingComponentNames].sort())
   })
 
   it('honours a custom prefix', () => {

@@ -30,6 +30,7 @@ export default defineConfig({
       entry: {
         index: resolve(__dirname, 'src/index.ts'),
         nuxt: resolve(__dirname, 'src/nuxt.ts'),
+        marketing: resolve(__dirname, 'src/marketing.ts'),
       },
       formats: ['es'],
     },

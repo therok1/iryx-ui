@@ -1,4 +1,4 @@
-import type { Plugin } from 'vue'
+import type { Component, Plugin } from 'vue'
 import type { Appearance } from './composables/appearance'
 import type { IryxUiConfig } from './config'
 import type { Theme, ThemePresetName } from './theme/presets'
@@ -9,6 +9,11 @@ import { defaultConfig, iryxUiConfigKey } from './config'
 import { applyTheme } from './theme/presets'
 
 export interface IryxUiPluginOptions extends Partial<IryxUiConfig> {
+  /**
+   * Extra components to register globally, keyed by name. Used by the optional
+   * subpaths, e.g. `import { marketingComponents } from 'iryx-ui/marketing'`.
+   */
+  components?: Record<string, Component>
   /** Prefix for globally registered components. Defaults to `I` (IButton, ISwitch…). */
   prefix?: string
   /** Startup appearance. A preference the user already stored wins over this. */
@@ -26,12 +31,14 @@ export interface IryxUiPluginOptions extends Partial<IryxUiConfig> {
  * ```
  */
 export function createIryxUi(options: IryxUiPluginOptions = {}): Plugin {
-  const { prefix = 'I', appearance, theme, ...config } = options
+  const { prefix = 'I', appearance, theme, components: extra, ...config } = options
   return {
     install(app) {
       app.provide(iryxUiConfigKey, { ...defaultConfig, ...config })
       for (const name of componentNames)
         app.component(`${prefix}${name}`, components[name])
+      for (const [name, component] of Object.entries(extra ?? {}))
+        app.component(`${prefix}${name}`, component)
       if (theme)
         applyTheme(theme)
       if (appearance)

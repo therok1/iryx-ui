@@ -27,9 +27,9 @@ function signInWith(provider: AuthProvider): void {
 
 <template>
   <div class="grid min-h-svh bg-background text-foreground lg:grid-cols-2">
-    <aside class="hero panel-treatment relative hidden flex-col justify-between border-r border-border bg-muted p-10 lg:flex">
-      <div class="hero-aurora" aria-hidden="true" />
-      <div class="hero-grid" aria-hidden="true" />
+    <aside class="iryx-hero panel-treatment relative hidden flex-col justify-between border-r border-border bg-muted p-10 lg:flex">
+      <div class="iryx-hero-aurora" aria-hidden="true" />
+      <div class="iryx-hero-grid" aria-hidden="true" />
 
       <a href="#top" class="flex items-center gap-2.5 font-semibold tracking-tight" @click.prevent="emit('back')">
         <img src="/logo.svg" alt="" class="h-5 w-auto">

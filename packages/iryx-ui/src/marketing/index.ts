@@ -1,0 +1,7 @@
+export { default as BrowserFrame } from './BrowserFrame.vue'
+export { default as FeatureCard } from './FeatureCard.vue'
+export { default as Hero } from './Hero.vue'
+export { default as PricingCard } from './PricingCard.vue'
+export { default as PricingTable } from './PricingTable.vue'
+export { default as Section } from './Section.vue'
+export { default as TestimonialCard } from './TestimonialCard.vue'

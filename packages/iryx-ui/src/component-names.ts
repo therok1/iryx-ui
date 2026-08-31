@@ -85,3 +85,21 @@ export const componentNames = [
 ] as const
 
 export type ComponentName = (typeof componentNames)[number]
+
+/**
+ * Names of every block exported from `iryx-ui/marketing`.
+ * A list of strings rather than the modules themselves, because the Nuxt module
+ * runs at build time and must not pull `.vue` files into Node.
+ * Keep in sync with `src/marketing/index.ts`.
+ */
+export const marketingComponentNames = [
+  'BrowserFrame',
+  'FeatureCard',
+  'Hero',
+  'PricingCard',
+  'PricingTable',
+  'Section',
+  'TestimonialCard',
+] as const
+
+export type MarketingComponentName = (typeof marketingComponentNames)[number]

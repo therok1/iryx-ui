@@ -621,3 +621,175 @@
     transform: translate3d(calc(var(--reka-toast-swipe-end-x, 0) + 100%), var(--reka-toast-swipe-end-y, 0), 0);
   }
 }
+
+/*
+ * IHero's ground. Two layers that compose: a ruled grid for structure, and a
+ * moving wash of the brand hue behind it. Both sit inside the hero and scroll
+ * away with it, so neither is a page background.
+ *
+ * These are plain classes rather than utilities because the effect is built
+ * from pseudo-elements, masks and keyframes — none of which a class list on an
+ * element can express.
+ */
+.iryx-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+/*
+ * `--iryx-border` is the token component borders already use, so the ruling
+ * follows light and dark without a second rule.
+ */
+.iryx-hero-grid {
+  position: absolute;
+  inset: -4rem 0 -3rem;
+  z-index: -10;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, var(--iryx-border) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--iryx-border) 1px, transparent 1px);
+  background-size: 72px 72px;
+  opacity: 0.5;
+  /* Fades in every direction from the middle, so it ends rather than stops. */
+  mask-image: radial-gradient(80% 90% at 50% 25%, black 0%, black 30%, transparent 76%);
+}
+
+/*
+ * The `aurora` backdrop: two counter-rotating conic sweeps, blurred.
+ *
+ * Conic rather than radial because a radial glow has no direction — it sits
+ * there. A sweep turns, so the colour arrives and leaves, which is what makes
+ * it read as motion at a speed nobody has to watch.
+ */
+.iryx-hero-aurora {
+  position: absolute;
+  inset: -18rem 0 auto;
+  height: 52rem;
+  z-index: -20;
+  pointer-events: none;
+  /* Elliptical fade, so the light has no edge of its own anywhere. */
+  mask-image: radial-gradient(60% 55% at 50% 45%, black 0%, black 35%, transparent 78%);
+}
+
+/*
+ * Blur plus opacity, never a `filter` on something masked: `filter` applies
+ * before `mask`, so a blurred masked shape comes back with a hard edge.
+ */
+.iryx-hero-aurora::before,
+.iryx-hero-aurora::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  border-radius: 9999px;
+  filter: blur(70px);
+  will-change: transform;
+}
+
+.iryx-hero-aurora::before {
+  width: 62rem;
+  height: 62rem;
+  opacity: 0.3;
+  background: conic-gradient(
+    from 90deg,
+    var(--iryx-primary) 0deg,
+    transparent 70deg,
+    var(--iryx-primary-to) 160deg,
+    transparent 250deg,
+    var(--iryx-primary) 360deg
+  );
+  animation: iryx-hero-sweep 44s linear infinite;
+}
+
+.iryx-hero-aurora::after {
+  width: 42rem;
+  height: 42rem;
+  opacity: 0.22;
+  background: conic-gradient(
+    from 210deg,
+    transparent 0deg,
+    var(--iryx-primary-to) 120deg,
+    transparent 220deg,
+    var(--iryx-primary) 330deg,
+    transparent 360deg
+  );
+  animation: iryx-hero-sweep 63s linear infinite reverse;
+}
+
+@keyframes iryx-hero-sweep {
+  to { transform: rotate(1turn); }
+}
+
+/*
+ * The wash is barely there in light. It reads as light in a room, and a room
+ * that is already white has nothing left to light — at the dark appearance's
+ * strength the same gradient is a stain on the paper rather than a glow.
+ */
+:root:not(.dark) .iryx-hero-aurora::before {
+  opacity: 0.1;
+}
+
+:root:not(.dark) .iryx-hero-aurora::after {
+  opacity: 0.07;
+}
+
+/* The `bloom` backdrop: the same hue held still, as two drifting blobs. */
+.iryx-hero-bloom {
+  position: absolute;
+  inset: -8rem 0 auto;
+  height: 40rem;
+  z-index: -20;
+  pointer-events: none;
+  /* Faded out at the foot, or the hero's own clip cuts the glow off flat. */
+  mask-image: linear-gradient(to bottom, black 45%, transparent 92%);
+}
+
+.iryx-hero-bloom::before,
+.iryx-hero-bloom::after {
+  content: "";
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(90px);
+  will-change: transform;
+}
+
+.iryx-hero-bloom::before {
+  left: 8%;
+  top: -6rem;
+  width: 34rem;
+  height: 34rem;
+  background: var(--iryx-primary);
+  opacity: 0.22;
+  animation: iryx-hero-drift-a 24s ease-in-out infinite alternate;
+}
+
+.iryx-hero-bloom::after {
+  right: 6%;
+  top: 2rem;
+  width: 26rem;
+  height: 26rem;
+  background: var(--iryx-primary-to);
+  opacity: 0.18;
+  animation: iryx-hero-drift-b 19s ease-in-out infinite alternate;
+}
+
+/* Transform only — a blur this size repainted per frame would cost real time. */
+@keyframes iryx-hero-drift-a {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to { transform: translate3d(6rem, 2rem, 0) scale(1.15); }
+}
+
+@keyframes iryx-hero-drift-b {
+  from { transform: translate3d(0, 0, 0) scale(1.1); }
+  to { transform: translate3d(-5rem, 3rem, 0) scale(0.95); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .iryx-hero-aurora::before,
+  .iryx-hero-aurora::after,
+  .iryx-hero-bloom::before,
+  .iryx-hero-bloom::after {
+    animation: none;
+  }
+}

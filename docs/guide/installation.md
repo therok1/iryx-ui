@@ -67,6 +67,8 @@ export default defineNuxtConfig({
     unstyled: false,
     appearance: 'system',
     theme: 'violet',
+    // Also auto-import the blocks from `iryx-ui/marketing`. Off by default.
+    blocks: false,
   },
 })
 ```

@@ -18,6 +18,8 @@ export default defineConfig({
        * deleting this alias — `iryx-ui` then resolves to the published package,
        * which is the point.
        */
+      // Ahead of the bare specifier: an object alias matches by prefix.
+      'iryx-ui/marketing': resolve(import.meta.dirname, '../../packages/iryx-ui/src/marketing.ts'),
       'iryx-ui': resolve(import.meta.dirname, '../../packages/iryx-ui/src/index.ts'),
     },
   },

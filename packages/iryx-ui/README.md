@@ -71,6 +71,43 @@ Components are auto-imported with the `I` prefix.
 </template>
 ```
 
+## Blocks
+
+Whole page sections — a hero, a banded section, a framed screenshot — on their own
+import path, so an app that never uses them never carries them:
+
+```ts
+import { createIryxUi } from 'iryx-ui'
+import { marketingComponents } from 'iryx-ui/marketing'
+
+app.use(createIryxUi({ components: marketingComponents }))
+```
+
+In Nuxt, the module auto-imports them once `blocks` is on:
+
+```ts
+export default defineNuxtConfig({
+  modules: ['iryx-ui/nuxt'],
+  iryxUi: { blocks: true },
+})
+```
+
+```vue
+<IHero grid heading="Invoicing that chases the money for you">
+  <template #actions>
+    <IButton size="lg">Start free</IButton>
+  </template>
+</IHero>
+
+<ISection tone="muted" bordered heading="Everything the money side needs">
+  <!-- … -->
+</ISection>
+```
+
+Seven so far: `IHero`, `ISection`, `IPricingTable`, `IPricingCard`, `IFeatureCard`,
+`ITestimonialCard` and `IBrowserFrame`. Importing the subpath also declares
+them on Vue's `GlobalComponents`; a project that never imports it is untouched.
+
 ## Three ways to take the styling back
 
 ```vue

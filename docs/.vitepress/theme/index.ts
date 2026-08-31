@@ -1,5 +1,6 @@
 import type { Theme } from 'vitepress'
 import { createIryxUi } from 'iryx-ui'
+import { marketingComponents } from 'iryx-ui/marketing'
 import ChartReplay from './components/ChartReplay.vue'
 import Demo from './components/Demo.vue'
 import InstallCommand from './components/InstallCommand.vue'
@@ -17,7 +18,7 @@ export default {
     // The library's own plugin, so every `I*` component is available in
     // markdown without an import — and the docs exercise the plugin the same
     // way a consumer does.
-    app.use(createIryxUi())
+    app.use(createIryxUi({ components: marketingComponents }))
     app.component('ChartReplay', ChartReplay)
     app.component('Demo', Demo)
     app.component('InstallCommand', InstallCommand)

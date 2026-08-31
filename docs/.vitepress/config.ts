@@ -136,6 +136,19 @@ const sidebar = [
     ],
   },
   {
+    title: 'Blocks',
+    items: [
+      { text: 'Overview', link: '/blocks/' },
+      { text: 'Browser frame', link: '/blocks/browser-frame' },
+      { text: 'Feature card', link: '/blocks/feature-card' },
+      { text: 'Hero', link: '/blocks/hero' },
+      { text: 'Pricing card', link: '/blocks/pricing-card' },
+      { text: 'Pricing table', link: '/blocks/pricing-table' },
+      { text: 'Section', link: '/blocks/section' },
+      { text: 'Testimonial card', link: '/blocks/testimonial-card' },
+    ],
+  },
+  {
     title: 'Composables',
     items: [
       { text: 'Overview', link: '/composables/' },
@@ -382,6 +395,7 @@ export default defineConfig({
     nav: [
       { text: 'Guide', link: '/guide/' },
       { text: 'Components', link: '/components/' },
+      { text: 'Blocks', link: '/blocks/' },
       { text: 'Composables', link: '/composables/' },
       { text: 'Examples', link: '/examples/' },
     ],
@@ -394,6 +408,9 @@ export default defineConfig({
     plugins: [tailwindcss()],
     resolve: {
       alias: {
+        // Ahead of the bare specifier below: an object alias matches by prefix,
+        // so `iryx-ui` alone would rewrite this to `…/index.ts/marketing`.
+        'iryx-ui/marketing': resolve(import.meta.dirname, '../../packages/iryx-ui/src/marketing.ts'),
         // Same trick as the playground: build against the library source, so
         // a component change shows up here without a rebuild.
         'iryx-ui': resolve(import.meta.dirname, '../../packages/iryx-ui/src/index.ts'),
