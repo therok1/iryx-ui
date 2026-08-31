@@ -6,9 +6,9 @@ export const tagsInputTheme = tv({
     root: `flex flex-wrap items-center ${fieldBase} h-auto cursor-text focus-within:ring-2 focus-within:ring-primary/50`,
     tag: 'inline-flex shrink-0 items-center rounded-md border border-border bg-background font-medium whitespace-nowrap text-foreground data-[state=active]:border-primary data-[state=active]:bg-accent',
     tagText: 'truncate',
-    tagDelete: 'flex shrink-0 items-center rounded-sm text-muted-foreground transition-colors outline-none hover:text-danger focus-visible:ring-2 focus-visible:ring-primary/50',
+    tagDelete: 'flex shrink-0 items-center rounded-sm text-muted-foreground transition-[color,background-color,border-color,box-shadow] outline-none hover:text-danger focus-visible:ring-2 focus-visible:ring-primary/50',
     input: 'min-w-24 flex-1 bg-transparent text-foreground outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed',
-    clear: 'flex shrink-0 items-center rounded-md text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary/50',
+    clear: 'flex shrink-0 items-center rounded-md text-muted-foreground transition-[color,background-color,border-color,box-shadow] outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary/50',
   },
   variants: {
     size: {

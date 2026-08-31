@@ -8,8 +8,8 @@ export const toastTheme = tv({
     content: 'min-w-0 flex-1',
     title: 'text-sm font-medium text-foreground',
     description: 'text-sm text-muted-foreground',
-    action: 'shrink-0 self-center rounded-lg border border-border px-2.5 py-1 text-xs font-medium transition-colors outline-none hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-primary/50',
-    close: '-m-1 shrink-0 self-start rounded-lg p-1 text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary/50 [&_svg]:size-4',
+    action: 'shrink-0 self-center rounded-lg border border-border px-2.5 py-1 text-xs font-medium transition-[color,background-color,border-color,box-shadow] outline-none hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-primary/50',
+    close: '-m-1 shrink-0 self-start rounded-lg p-1 text-muted-foreground transition-[color,background-color,border-color,box-shadow] outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary/50 [&_svg]:size-4',
   },
   variants: {
     variant: {

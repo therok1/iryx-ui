@@ -6,7 +6,7 @@ export const appShellTheme = tv({
     header: 'z-30 shrink-0',
     headerRow: 'flex w-full items-center',
     headerContent: 'min-w-0 flex-1',
-    navTrigger: 'ms-2 inline-flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-lg text-muted-foreground transition-colors outline-none hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-primary/50 [&_svg]:size-5',
+    navTrigger: 'ms-2 inline-flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-lg text-muted-foreground transition-[color,background-color,border-color,box-shadow] outline-none hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-primary/50 [&_svg]:size-5',
     body: 'flex min-h-0 w-full flex-1',
     sidebar: 'shrink-0',
     main: 'flex min-w-0 flex-1 flex-col',

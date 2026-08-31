@@ -10,7 +10,7 @@ export const drawerTheme = tv({
     description: 'text-sm text-muted-foreground',
     body: '-m-1 min-h-0 flex-1 touch-auto overflow-y-auto p-1',
     footer: 'flex flex-wrap items-center justify-end gap-2',
-    close: 'absolute top-4 right-4 rounded-lg p-1 text-muted-foreground transition-colors outline-none hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-primary/50 [&_svg]:size-4',
+    close: 'absolute top-4 right-4 rounded-lg p-1 text-muted-foreground transition-[color,background-color,border-color,box-shadow] outline-none hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-primary/50 [&_svg]:size-4',
   },
   variants: {
     side: {

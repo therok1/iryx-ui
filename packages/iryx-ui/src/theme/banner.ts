@@ -8,7 +8,7 @@ export const bannerTheme = tv({
     content: 'min-w-0 flex-1 text-sm',
     title: 'font-medium',
     actions: 'flex shrink-0 items-center gap-2',
-    close: '-mr-1 shrink-0 rounded-lg p-1 opacity-70 transition-opacity outline-none hover:opacity-100 focus-visible:ring-2 focus-visible:ring-current/50 [&_svg]:size-4',
+    close: '-mr-1 shrink-0 rounded-lg p-1 opacity-70 transition-opacity transition-shadow outline-none hover:opacity-100 focus-visible:ring-2 focus-visible:ring-current/50 [&_svg]:size-4',
   },
   variants: {
     variant: {

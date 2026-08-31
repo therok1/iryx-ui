@@ -4,7 +4,7 @@ export const popoverTheme = tv({
   slots: {
     content: 'z-50 rounded-xl border border-border bg-background text-foreground shadow-lg outline-none data-[state=closed]:animate-fade-out data-[state=open]:animate-fade-in',
     arrow: 'fill-background stroke-border',
-    close: 'absolute top-2 right-2 rounded-lg p-1 text-muted-foreground transition-colors outline-none hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-primary/50 [&_svg]:size-4',
+    close: 'absolute top-2 right-2 rounded-lg p-1 text-muted-foreground transition-[color,background-color,border-color,box-shadow] outline-none hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-primary/50 [&_svg]:size-4',
     title: 'mb-2 text-sm font-medium text-foreground',
   },
   variants: {

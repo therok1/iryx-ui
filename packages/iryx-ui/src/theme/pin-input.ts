@@ -3,7 +3,7 @@ import { tv } from 'tailwind-variants'
 export const pinInputTheme = tv({
   slots: {
     root: 'flex items-center',
-    input: 'rounded-xl border border-border bg-input text-center font-medium text-foreground tabular-nums transition-colors outline-none focus-visible:z-10 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/50 disabled:cursor-not-allowed disabled:opacity-50',
+    input: 'rounded-xl border border-border bg-input text-center font-medium text-foreground tabular-nums transition-[color,background-color,border-color,box-shadow] outline-none focus-visible:z-10 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/50 disabled:cursor-not-allowed disabled:opacity-50',
     separator: 'text-muted-foreground select-none',
   },
   variants: {

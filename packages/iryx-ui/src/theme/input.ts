@@ -2,7 +2,7 @@ import { tv } from 'tailwind-variants'
 
 /** Shared field chrome for Input, Textarea and the Select trigger. */
 export const fieldBase
-  = 'w-full rounded-xl border border-border bg-input text-foreground transition-colors outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/50 disabled:cursor-not-allowed disabled:opacity-50'
+  = 'w-full rounded-xl border border-border bg-input text-foreground transition-[color,background-color,border-color,box-shadow] outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/50 disabled:cursor-not-allowed disabled:opacity-50'
 
 export const inputTheme = tv({
   slots: {
@@ -10,7 +10,7 @@ export const inputTheme = tv({
     input: 'w-full min-w-0 flex-1 bg-transparent outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed',
     leading: 'flex shrink-0 items-center text-muted-foreground [&_svg]:size-4',
     trailing: 'flex shrink-0 items-center gap-1.5 text-muted-foreground [&_svg]:size-4',
-    clear: 'flex items-center rounded-md text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary/50 [&_svg]:size-3.5',
+    clear: 'flex items-center rounded-md text-muted-foreground transition-[color,background-color,border-color,box-shadow] outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary/50 [&_svg]:size-3.5',
   },
   variants: {
     size: {

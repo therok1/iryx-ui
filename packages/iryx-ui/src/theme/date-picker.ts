@@ -7,7 +7,7 @@ export const datePickerTheme = tv({
     placeholder: 'text-muted-foreground',
     content: 'z-50 rounded-xl border border-border bg-background p-3 text-foreground shadow-md',
     footer: 'flex items-center justify-between gap-2 pt-3',
-    action: 'rounded-lg px-2 py-1 text-sm text-muted-foreground transition-colors outline-none hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-primary/50',
+    action: 'rounded-lg px-2 py-1 text-sm text-muted-foreground transition-[color,background-color,border-color,box-shadow] outline-none hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-primary/50',
   },
   variants: {
     size: {

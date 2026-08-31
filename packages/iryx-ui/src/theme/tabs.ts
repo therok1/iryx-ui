@@ -5,7 +5,7 @@ export const tabsTheme = tv({
     root: 'flex flex-col gap-4',
     list: 'relative flex shrink-0 items-center gap-1',
     indicator: 'absolute left-0 transition-[translate,width,height] duration-200 ease-out',
-    trigger: 'relative z-10 inline-flex items-center justify-center gap-2 text-sm font-medium whitespace-nowrap transition-colors outline-none focus-visible:ring-2 focus-visible:ring-primary/50 disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0',
+    trigger: 'relative z-10 inline-flex items-center justify-center gap-2 text-sm font-medium whitespace-nowrap transition-[color,background-color,border-color,box-shadow] outline-none focus-visible:ring-2 focus-visible:ring-primary/50 disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0',
     content: 'outline-none',
   },
   variants: {

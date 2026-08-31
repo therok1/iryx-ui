@@ -8,7 +8,7 @@ export const alertTheme = tv({
     title: 'text-sm font-medium text-foreground',
     description: 'text-sm text-muted-foreground',
     actions: 'mt-3 flex flex-wrap items-center gap-2',
-    close: '-m-1 shrink-0 self-start rounded-lg p-1 text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary/50 [&_svg]:size-4',
+    close: '-m-1 shrink-0 self-start rounded-lg p-1 text-muted-foreground transition-[color,background-color,border-color,box-shadow] outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary/50 [&_svg]:size-4',
   },
   variants: {
     variant: {

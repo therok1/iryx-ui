@@ -4,7 +4,7 @@ export const stepperTheme = tv({
   slots: {
     root: 'flex w-full',
     item: 'group relative flex flex-1 items-center gap-3 last:flex-none',
-    trigger: 'flex items-center gap-3 rounded-xl text-left outline-none focus-visible:ring-2 focus-visible:ring-primary/50 disabled:pointer-events-none disabled:opacity-50',
+    trigger: 'flex items-center gap-3 rounded-xl text-left transition-shadow outline-none focus-visible:ring-2 focus-visible:ring-primary/50 disabled:pointer-events-none disabled:opacity-50',
     indicator: 'flex size-8 shrink-0 items-center justify-center rounded-full border border-border bg-linear-to-b text-sm font-medium transition-[color,border-color] group-data-[state=active]:border-primary group-data-[state=active]:from-primary-from group-data-[state=active]:to-primary-to group-data-[state=active]:text-primary-foreground group-data-[state=completed]:border-primary group-data-[state=completed]:from-primary-from group-data-[state=completed]:to-primary-to group-data-[state=completed]:text-primary-foreground [&_svg]:size-4',
     content: 'flex flex-col gap-0.5',
     title: 'text-sm font-medium text-foreground',
