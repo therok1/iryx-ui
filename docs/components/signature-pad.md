@@ -103,7 +103,7 @@ const pad = ref()
 | `disabled` | `boolean` | `false` | |
 | `invalid` | `boolean` | — | Inherited from `IFormField` when unset |
 | `unstyled` | `boolean` | — | Skip built-in classes |
-| `ui` | `Record<string, string>` | — | Per-slot class overrides |
+| `ui` | `Record<string, string>` | — | Per-element class overrides |
 
 ## Events
 

@@ -43,7 +43,7 @@ export interface ToggleGroupProps {
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   class?: ClassValue
-  /** Override classes per slot, e.g. `{ item: 'px-6' }`. */
+  /** Override classes per element, e.g. `{ item: 'px-6' }`. */
   ui?: {
     root?: string
     item?: string

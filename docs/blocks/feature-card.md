@@ -102,7 +102,7 @@ Recolour the square through `ui` when a card needs to read differently:
 | `align` | `'start' \| 'center'` | `'start'` | Text and icon alignment |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged with the built-in classes |
-| `ui` | `{ root?, icon?, title?, description? }` | — | Per-slot class overrides |
+| `ui` | `{ root?, icon?, title?, description? }` | — | Per-element class overrides |
 
 ## Slots
 

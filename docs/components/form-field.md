@@ -129,7 +129,7 @@ The wiring reaches every field in the library, including composed ones like [`IP
 | `error` | `string` | — | Error message; supplied by `IForm` when inside one |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged with the built-in classes |
-| `ui` | `{ root?, header?, label?, hint?, description?, error?, help? }` | — | Per-slot class overrides |
+| `ui` | `{ root?, header?, label?, hint?, description?, error?, help? }` | — | Per-element class overrides |
 
 ## Slots
 

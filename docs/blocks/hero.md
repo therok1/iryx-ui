@@ -113,7 +113,7 @@ The `media` region is full width. If its child has a `max-w-*`, give the child `
 | `as` | `string` | `'section'` | Element to render |
 | `unstyled` | `boolean` | — | Drop built-in classes, including the backdrop |
 | `class` | `string` | — | Merged with the built-in classes |
-| `ui` | `{ root?, container?, badge?, heading?, description?, actions?, note?, media? }` | — | Per-slot class overrides |
+| `ui` | `{ root?, container?, badge?, heading?, description?, actions?, note?, media? }` | — | Per-element class overrides |
 
 `unstyled` keeps the structure and the slots but drops every built-in class — the backdrop and grid layers included, since those are classes rather than markup of their own. You get the regions and nothing else.
 

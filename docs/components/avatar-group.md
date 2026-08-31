@@ -73,7 +73,7 @@ The overlap scales with the avatar.
 | `size` | `'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'` | `'md'` | Applied to every avatar |
 | `shape` | `'circle' \| 'square'` | `'circle'` | |
 | `unstyled` | `boolean` | — | Skip built-in classes |
-| `ui` | `{ root?, item?, overflow? }` | — | Per-slot class overrides |
+| `ui` | `{ root?, item?, overflow? }` | — | Per-element class overrides |
 
 ## Slots
 

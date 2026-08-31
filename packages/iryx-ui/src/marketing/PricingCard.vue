@@ -34,7 +34,7 @@ export interface PricingCardProps {
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   class?: ClassValue
-  /** Override classes per slot, e.g. `{ amount: 'text-5xl' }`. */
+  /** Override classes per element, e.g. `{ amount: 'text-5xl' }`. */
   ui?: {
     root?: string
     header?: string

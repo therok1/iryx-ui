@@ -136,7 +136,7 @@ Use the `content` slot when the tooltip needs markup. It closes as soon as the p
 | `disabled` | `boolean` | `false` | Never opens |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged with the built-in classes |
-| `ui` | `{ content?, arrow? }` | — | Per-slot class overrides |
+| `ui` | `{ content?, arrow? }` | — | Per-element class overrides |
 
 `v-model:open` controls it directly when you need to open one programmatically.
 

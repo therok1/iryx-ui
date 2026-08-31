@@ -64,7 +64,7 @@ export interface CalendarProps {
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   class?: ClassValue
-  /** Override classes per slot, e.g. `{ cellTrigger: 'rounded-full' }`. */
+  /** Override classes per element, e.g. `{ cellTrigger: 'rounded-full' }`. */
   ui?: Partial<Record<
     'root' | 'header' | 'heading' | 'nav' | 'months' | 'grid'
     | 'headCell' | 'cell' | 'cellTrigger',

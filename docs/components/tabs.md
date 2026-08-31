@@ -117,7 +117,7 @@ By default only the active panel is in the DOM. `keepMounted` renders them all a
 | `keepMounted` | `boolean` | `false` | Render every panel, hiding the inactive ones |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged with the built-in classes |
-| `ui` | `{ root?, list?, indicator?, trigger?, content? }` | — | Per-slot class overrides |
+| `ui` | `{ root?, list?, indicator?, trigger?, content? }` | — | Per-element class overrides |
 
 The model is the active item's `value`, falling back to its `label`.
 

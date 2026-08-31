@@ -101,7 +101,7 @@ The title renders as an `<h1>` by default. Drop it to `2` or `3` when the header
 | `as` | `string` | `'header'` | Element to render |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged with the built-in classes |
-| `ui` | `{ root?, top?, row?, heading?, title?, description?, actions? }` | — | Per-slot class overrides |
+| `ui` | `{ root?, top?, row?, heading?, title?, description?, actions? }` | — | Per-element class overrides |
 
 ## Slots
 

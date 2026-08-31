@@ -42,7 +42,7 @@ export interface FileUploadProps {
   unstyled?: boolean
   /** Applied to the outer wrapper, which stacks the zone above the list. */
   class?: ClassValue
-  /** Override classes per slot, e.g. `{ dropzone: 'py-10' }`. */
+  /** Override classes per element, e.g. `{ dropzone: 'py-10' }`. */
   ui?: Partial<Record<
     'root' | 'dropzone' | 'input' | 'icon' | 'label' | 'browse' | 'hint' | 'list'
     | 'item' | 'thumbnail' | 'placeholder' | 'details' | 'name' | 'meta' | 'remove' | 'error',

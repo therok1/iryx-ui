@@ -20,7 +20,7 @@ export interface PageHeaderProps {
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   class?: ClassValue
-  /** Override classes per slot, e.g. `{ title: 'text-3xl' }`. */
+  /** Override classes per element, e.g. `{ title: 'text-3xl' }`. */
   ui?: {
     root?: string
     top?: string

@@ -65,7 +65,7 @@ export interface DateRangePickerProps {
   unstyled?: boolean
   /** Applied to the trigger, which is the element carrying the field chrome. */
   class?: ClassValue
-  /** Override classes per slot, e.g. `{ content: 'p-4' }`. */
+  /** Override classes per element, e.g. `{ content: 'p-4' }`. */
   ui?: Partial<Record<
     'trigger' | 'placeholder' | 'content' | 'header' | 'heading' | 'nav'
     | 'months' | 'grid' | 'headCell' | 'cell' | 'cellTrigger' | 'footer' | 'action',

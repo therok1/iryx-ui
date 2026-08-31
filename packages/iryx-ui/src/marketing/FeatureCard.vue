@@ -16,7 +16,7 @@ export interface FeatureCardProps {
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   class?: ClassValue
-  /** Override classes per slot, e.g. `{ icon: 'bg-success/10' }`. */
+  /** Override classes per element, e.g. `{ icon: 'bg-success/10' }`. */
   ui?: {
     root?: string
     icon?: string

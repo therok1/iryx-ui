@@ -34,7 +34,7 @@ export interface AvatarProps {
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   class?: ClassValue
-  /** Override classes per slot, e.g. `{ fallback: 'bg-primary' }`. */
+  /** Override classes per element, e.g. `{ fallback: 'bg-primary' }`. */
   ui?: {
     root?: string
     image?: string

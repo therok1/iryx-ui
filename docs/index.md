@@ -153,7 +153,7 @@ async function copy() {
  <p class="max-w-2xl text-lg text-muted-foreground">
   {{ theme.componentCount }} components that arrive with keyboard navigation, focus management and ARIA already working —
   then hand you a
-  <code class="rounded bg-muted px-1.5 py-0.5 font-mono text-[0.85em] text-foreground">class</code>, a per-slot
+  <code class="rounded bg-muted px-1.5 py-0.5 font-mono text-[0.85em] text-foreground">class</code>, a per-element
   <code class="rounded bg-muted px-1.5 py-0.5 font-mono text-[0.85em] text-foreground">ui</code>, or
   <code class="rounded bg-muted px-1.5 py-0.5 font-mono text-[0.85em] text-foreground">unstyled</code>
   when the defaults are not what you want. No fighting the library over a border radius.

@@ -139,7 +139,7 @@ The `trigger` slot replaces the row's own content the same way — a badge besid
 | `disabled` | `boolean` | — | Disable every row |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged with the built-in classes |
-| `ui` | `{ root?, item?, header?, trigger?, icon?, content?, contentInner? }` | — | Per-slot class overrides |
+| `ui` | `{ root?, item?, header?, trigger?, icon?, content?, contentInner? }` | — | Per-element class overrides |
 
 `v-model` is a `string` for `single` and a `string[]` for `multiple`.
 

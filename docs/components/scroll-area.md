@@ -89,7 +89,7 @@ Give the root a height. A scroll area with nothing constraining it has nothing t
 | `size` | `'sm' \| 'md' \| 'lg'` | `'md'` | Bar thickness |
 | `scrollHideDelay` | `number` | — | How long bars linger, for `scroll` and `hover` |
 | `unstyled` | `boolean` | — | Skip built-in classes |
-| `ui` | `{ root?, viewport?, scrollbar?, thumb?, corner? }` | — | Per-slot class overrides |
+| `ui` | `{ root?, viewport?, scrollbar?, thumb?, corner? }` | — | Per-element class overrides |
 
 ## Accessibility
 

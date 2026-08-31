@@ -147,7 +147,7 @@ Panels open on hover after `delayDuration` milliseconds. `disableHoverTrigger` s
 | `disableHoverTrigger` | `boolean` | — | Open on click only |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged with the built-in classes |
-| `ui` | `{ root?, list?, item?, link?, triggerIcon?, viewportWrapper?, viewport?, content?, panelLink?, panelLabel?, panelDescription?, panelIcon? }` | — | Per-slot class overrides |
+| `ui` | `{ root?, list?, item?, link?, triggerIcon?, viewportWrapper?, viewport?, content?, panelLink?, panelLabel?, panelDescription?, panelIcon? }` | — | Per-element class overrides |
 
 ## Slots
 

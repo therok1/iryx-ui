@@ -30,7 +30,7 @@ export interface StatProps {
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   class?: ClassValue
-  /** Override classes per slot, e.g. `{ value: 'text-4xl' }`. */
+  /** Override classes per element, e.g. `{ value: 'text-4xl' }`. */
   ui?: {
     root?: string
     label?: string

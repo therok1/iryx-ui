@@ -194,7 +194,7 @@ The same five sizes as [`IToggle`](/components/toggle) and [`IButton`](/componen
 | `disabled` | `boolean` | `false` | Disables the whole group |
 | `loop` | `boolean` | `false` | Wrap from the last item back to the first |
 | `unstyled` | `boolean` | — | Skip built-in classes |
-| `ui` | `{ root?, item? }` | — | Per-slot class overrides |
+| `ui` | `{ root?, item? }` | — | Per-element class overrides |
 
 ### `ToggleGroupItemOption`
 

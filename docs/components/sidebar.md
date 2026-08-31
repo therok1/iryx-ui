@@ -263,7 +263,7 @@ Both slots stay pinned, with the link list as the only scrolling region. Each re
 | `label` | `string` | `'Sidebar'` | Accessible name for the navigation landmark |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged with the built-in classes |
-| `ui` | `{ root?, header?, nav?, footer?, section?, sectionLabel?, link?, linkLabel?, linkBadge?, groupIcon?, groupContent?, groupInner? }` | — | Per-slot class overrides |
+| `ui` | `{ root?, header?, nav?, footer?, section?, sectionLabel?, link?, linkLabel?, linkBadge?, groupIcon?, groupContent?, groupInner? }` | — | Per-element class overrides |
 
 `v-model:collapsed` is a boolean model, defaulting to `false`.
 

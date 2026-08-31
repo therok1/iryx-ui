@@ -160,4 +160,4 @@ The native control gives no say over the segment order, no way to mark individua
 | `required` | `boolean` | `false` | — |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Classes for the field |
-| `ui` | `{ root?, segment?, literal? }` | — | Per-slot class overrides |
+| `ui` | `{ root?, segment?, literal? }` | — | Per-element class overrides |

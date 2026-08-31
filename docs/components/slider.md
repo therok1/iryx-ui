@@ -213,7 +213,7 @@ Without a label, each thumb falls back to its own formatted value. Arrow keys st
 | `formatValue` | `(value: number) => string` | `String` | Drives the value, the scale and the thumb labels |
 | `rangeLabels` | `[string, string]` | `['minimum', 'maximum']` | How each end of a range is named |
 | `unstyled` | `boolean` | — | Skip built-in classes |
-| `ui` | `Record<string, string>` | — | Per-slot class overrides |
+| `ui` | `Record<string, string>` | — | Per-element class overrides |
 
 ## Events
 

@@ -94,7 +94,7 @@ There is no `v-model:open` — the menu appears wherever the pointer is. Listen 
 | `items` | `DropdownMenuEntry[]` | `[]` | |
 | `collisionPadding` | `number` | — | Distance kept from the viewport edge |
 | `unstyled` | `boolean` | — | Skip built-in classes |
-| `ui` | `{ content?, item?, label?, separator?, subTrigger?, subContent? }` | — | Per-slot class overrides |
+| `ui` | `{ content?, item?, label?, separator?, subTrigger?, subContent? }` | — | Per-element class overrides |
 
 ## Events
 

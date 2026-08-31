@@ -22,7 +22,7 @@ export interface BadgeProps {
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   class?: ClassValue
-  /** Override classes per slot, e.g. `{ dot: 'size-3' }`. */
+  /** Override classes per element, e.g. `{ dot: 'size-3' }`. */
   ui?: {
     root?: string
     dot?: string

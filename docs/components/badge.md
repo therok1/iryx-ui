@@ -110,6 +110,6 @@ One badge per row, scanned down a column.
 | `asChild` | `boolean` | `false` | Render the child instead, forwarding props |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged with the built-in classes |
-| `ui` | `{ root?, dot? }` | — | Per-slot class overrides |
+| `ui` | `{ root?, dot? }` | — | Per-element class overrides |
 
 For a message with a body rather than a one-word status, use [`IAlert`](/components/alert).

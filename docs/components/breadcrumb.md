@@ -97,7 +97,7 @@ The `separator` slot replaces the divider between crumbs.
 | `label` | `string` | `'Breadcrumb'` | Accessible name for the navigation region |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged with the built-in classes |
-| `ui` | `{ root?, list?, item?, link?, current?, separator? }` | — | Per-slot class overrides |
+| `ui` | `{ root?, list?, item?, link?, current?, separator? }` | — | Per-element class overrides |
 
 ```ts
 interface BreadcrumbItem {

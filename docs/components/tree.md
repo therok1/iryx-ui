@@ -196,7 +196,7 @@ Depth is padding on the row rather than a nested container, so hover and selecti
 | `disabled` | `boolean` | `false` | |
 | `ariaLabel` | `string` | — | Names the tree |
 | `unstyled` | `boolean` | — | Skip built-in classes |
-| `ui` | `{ root?, item?, expander?, spacer?, icon?, label?, count? }` | — | Per-slot class overrides |
+| `ui` | `{ root?, item?, expander?, spacer?, icon?, label?, count? }` | — | Per-element class overrides |
 
 ### `TreeItemOption`
 

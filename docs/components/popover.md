@@ -155,7 +155,7 @@ The panel has a width by default. Set `width="none"` for content that knows its 
 | `width` | `'none' \| 'sm' \| 'md' \| 'lg'` | `'md'` | `none` lets the content size itself |
 | `ariaLabel` | `string` | — | Names the panel |
 | `unstyled` | `boolean` | — | Skip built-in classes |
-| `ui` | `{ content?, arrow?, close? }` | — | Per-slot class overrides |
+| `ui` | `{ content?, arrow?, close? }` | — | Per-element class overrides |
 
 ## Slots
 

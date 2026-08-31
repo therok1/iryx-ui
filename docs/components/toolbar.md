@@ -156,7 +156,7 @@ Drops the container so the controls sit directly on the page.
 | `loop` | `boolean` | `false` | Wrap from the last control back to the first |
 | `ariaLabel` | `string` | — | Names the bar |
 | `unstyled` | `boolean` | — | Skip built-in classes |
-| `ui` | `{ root?, button?, separator? }` | — | Per-slot class overrides |
+| `ui` | `{ root?, button?, separator? }` | — | Per-element class overrides |
 
 ### `ToolbarButtonOption`
 

@@ -28,7 +28,7 @@ export interface DateFieldProps {
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   class?: ClassValue
-  /** Override classes per slot, e.g. `{ segment: 'px-1' }`. */
+  /** Override classes per element, e.g. `{ segment: 'px-1' }`. */
   ui?: {
     root?: string
     segment?: string

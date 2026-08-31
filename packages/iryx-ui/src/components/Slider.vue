@@ -43,7 +43,7 @@ export interface SliderProps extends /* @vue-ignore */ Omit<SliderRootProps, 'mo
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   class?: ClassValue
-  /** Override classes per slot, e.g. `{ thumb: 'size-6' }`. */
+  /** Override classes per element, e.g. `{ thumb: 'size-6' }`. */
   ui?: {
     root?: string
     header?: string

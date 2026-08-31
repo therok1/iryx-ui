@@ -120,7 +120,7 @@ Centred by default, since pagination usually sits under a full-width list.
 | `label` | `string` | `'Pagination'` | Accessible name for the navigation region |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged with the built-in classes |
-| `ui` | `{ root?, list?, item?, ellipsis? }` | — | Per-slot class overrides |
+| `ui` | `{ root?, list?, item?, ellipsis? }` | — | Per-element class overrides |
 
 The model is `v-model:page`, one-based.
 

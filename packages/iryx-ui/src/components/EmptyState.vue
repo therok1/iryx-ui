@@ -18,7 +18,7 @@ export interface EmptyStateProps {
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   class?: ClassValue
-  /** Override classes per slot, e.g. `{ title: 'text-xl' }`. */
+  /** Override classes per element, e.g. `{ title: 'text-xl' }`. */
   ui?: {
     root?: string
     icon?: string

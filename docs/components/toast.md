@@ -179,6 +179,6 @@ The store behind it is a module-level singleton, so `toast()` can be called from
 | `closeLabel` | `string` | `'Close'` | Accessible name for each dismiss button |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged with the built-in classes |
-| `ui` | `{ viewport?, root?, icon?, content?, title?, description?, action?, close? }` | — | Per-slot class overrides |
+| `ui` | `{ viewport?, root?, icon?, content?, title?, description?, action?, close? }` | — | Per-element class overrides |
 
 Mount exactly one. Two toasters render the same store twice, so every toast appears twice.

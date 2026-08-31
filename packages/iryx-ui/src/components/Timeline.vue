@@ -31,7 +31,7 @@ export interface TimelineProps {
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   class?: ClassValue
-  /** Override classes per slot, e.g. `{ title: 'text-base' }`. */
+  /** Override classes per element, e.g. `{ title: 'text-base' }`. */
   ui?: {
     root?: string
     item?: string

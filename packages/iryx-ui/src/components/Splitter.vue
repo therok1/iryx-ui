@@ -32,7 +32,7 @@ export interface SplitterProps {
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   class?: ClassValue
-  /** Override classes per slot, e.g. `{ rule: 'bg-primary' }`. */
+  /** Override classes per element, e.g. `{ rule: 'bg-primary' }`. */
   ui?: {
     root?: string
     panel?: string

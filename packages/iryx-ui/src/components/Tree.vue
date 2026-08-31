@@ -41,7 +41,7 @@ export interface TreeProps {
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   class?: ClassValue
-  /** Override classes per slot, e.g. `{ item: 'py-2' }`. */
+  /** Override classes per element, e.g. `{ item: 'py-2' }`. */
   ui?: {
     root?: string
     item?: string

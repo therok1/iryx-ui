@@ -38,7 +38,7 @@ export interface ToolbarProps {
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   class?: ClassValue
-  /** Override classes per slot, e.g. `{ button: 'px-3' }`. */
+  /** Override classes per element, e.g. `{ button: 'px-3' }`. */
   ui?: {
     root?: string
     button?: string

@@ -120,7 +120,7 @@ Override it with `trend` when a rising number is bad news — days to payment, e
 | `as` | `string` | `'div'` | Element to render |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged with the built-in classes |
-| `ui` | `{ root?, label?, value?, delta?, hint?, row? }` | — | Per-slot class overrides |
+| `ui` | `{ root?, label?, value?, delta?, hint?, row? }` | — | Per-element class overrides |
 
 Colour is carried by the delta text rather than a filled surface, and the arrow beside it is decorative — the sign already says which way it went.
 

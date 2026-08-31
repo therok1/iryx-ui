@@ -122,7 +122,7 @@ The gap between the heading block and the body is fixed at `mt-12`, and disappea
 | `as` | `string` | `'section'` | Element to render |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged with the built-in classes |
-| `ui` | `{ root?, container?, header?, eyebrow?, heading?, description?, body? }` | — | Per-slot class overrides |
+| `ui` | `{ root?, container?, header?, eyebrow?, heading?, description?, body? }` | — | Per-element class overrides |
 
 The default `section` is the semantic element a page section wants. Reach for `as` when the surrounding document structure needs something else.
 

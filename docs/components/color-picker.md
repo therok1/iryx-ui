@@ -85,7 +85,7 @@ For a handful of *named* options — "Red", "Green", "Blue" — use [`IRadioGrou
 | `swatches` | `string[]` | — | Preset colours |
 | `disabled` | `boolean` | `false` | |
 | `unstyled` | `boolean` | — | Skip built-in classes |
-| `ui` | `{ root?, area?, thumb?, slider?, checkerboard?, track?, field?, input?, preview?, swatches?, swatch? }` | — | Per-slot class overrides |
+| `ui` | `{ root?, area?, thumb?, slider?, checkerboard?, track?, field?, input?, preview?, swatches?, swatch? }` | — | Per-element class overrides |
 
 ## Events
 

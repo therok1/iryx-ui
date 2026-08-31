@@ -21,7 +21,7 @@ export interface AvatarGroupProps {
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   class?: ClassValue
-  /** Override classes per slot, e.g. `{ overflow: 'bg-primary' }`. */
+  /** Override classes per element, e.g. `{ overflow: 'bg-primary' }`. */
   ui?: {
     root?: string
     item?: string

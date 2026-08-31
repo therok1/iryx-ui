@@ -34,7 +34,7 @@ export interface MenubarProps {
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   class?: ClassValue
-  /** Override classes per slot, e.g. `{ trigger: 'px-4' }`. */
+  /** Override classes per element, e.g. `{ trigger: 'px-4' }`. */
   ui?: {
     root?: string
     trigger?: string

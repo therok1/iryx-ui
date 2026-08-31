@@ -88,7 +88,7 @@ Replace it through the `footer` slot when the action is a link rather than a han
 | `badge` | `string` | `'Most popular'` | Badge text, when featured |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged with the built-in classes |
-| `ui` | `{ root?, header?, name?, price?, amount?, period?, description?, features?, feature?, featureIcon? }` | — | Per-slot class overrides |
+| `ui` | `{ root?, header?, name?, price?, amount?, period?, description?, features?, feature?, featureIcon? }` | — | Per-element class overrides |
 
 ## Slots
 

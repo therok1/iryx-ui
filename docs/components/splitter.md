@@ -139,7 +139,7 @@ Give `auto-save-id` a stable key and the layout is stored in `localStorage`, sur
 | `autoSaveId` | `string` | — | Remember the arrangement under this key |
 | `keyboardResizeBy` | `number` | — | Percentage moved per arrow key press |
 | `unstyled` | `boolean` | — | Skip built-in classes |
-| `ui` | `{ root?, panel?, handle?, rule? }` | — | Per-slot class overrides |
+| `ui` | `{ root?, panel?, handle?, rule? }` | — | Per-element class overrides |
 
 ### `SplitterPanelOption`
 

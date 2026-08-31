@@ -133,7 +133,7 @@ The `actions` slot sits under the description, for the thing the alert is asking
 | `as` | `string` | `'div'` | Element to render |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged with the built-in classes |
-| `ui` | `{ root?, icon?, content?, title?, description?, actions?, close? }` | — | Per-slot class overrides |
+| `ui` | `{ root?, icon?, content?, title?, description?, actions?, close? }` | — | Per-element class overrides |
 
 `v-model:open` controls visibility, and `close` is emitted when the button is pressed.
 

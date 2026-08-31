@@ -29,7 +29,7 @@ export interface AppShellProps {
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   class?: ClassValue
-  /** Override classes per slot, e.g. `{ main: 'p-8' }`. */
+  /** Override classes per element, e.g. `{ main: 'p-8' }`. */
   ui?: {
     root?: string
     header?: string

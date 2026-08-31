@@ -189,7 +189,7 @@ Clearing sets both ends back to `null`.
 | `nextLabel` | `string` | `'Next month'` | Accessible name for the forward arrow |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Applied to the trigger, which carries the field chrome |
-| `ui` | `{ trigger?, placeholder?, content?, header?, heading?, nav?, months?, grid?, headCell?, cell?, cellTrigger?, footer?, action? }` | — | Per-slot class overrides |
+| `ui` | `{ trigger?, placeholder?, content?, header?, heading?, nav?, months?, grid?, headCell?, cell?, cellTrigger?, footer?, action? }` | — | Per-element class overrides |
 
 ## Model
 

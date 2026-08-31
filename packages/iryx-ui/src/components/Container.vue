@@ -17,7 +17,7 @@ export interface ContainerProps {
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   class?: ClassValue
-  /** Override classes per slot, e.g. `{ root: 'py-10' }`. */
+  /** Override classes per element, e.g. `{ root: 'py-10' }`. */
   ui?: {
     root?: string
   }

@@ -35,7 +35,7 @@ export interface NavigationMenuProps {
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   class?: ClassValue
-  /** Override classes per slot, e.g. `{ viewport: 'w-96' }`. */
+  /** Override classes per element, e.g. `{ viewport: 'w-96' }`. */
   ui?: {
     root?: string
     list?: string

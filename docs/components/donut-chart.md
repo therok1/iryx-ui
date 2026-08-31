@@ -252,7 +252,7 @@ It plays **once**, on the first paint with something to draw — not again when 
 | `label` | `string` | — | Accessible name for the figure and its data table |
 | `unstyled` | `boolean` | — | Skip built-in classes |
 | `class` | `string` | — | Classes for the root |
-| `ui` | `{ root?, svg?, slice?, center?, tooltip?, tooltipLabel?, tooltipValue?, tooltipShare?, table? }` | — | Per-slot class overrides |
+| `ui` | `{ root?, svg?, slice?, center?, tooltip?, tooltipLabel?, tooltipValue?, tooltipShare?, table? }` | — | Per-element class overrides |
 
 ## Slots
 

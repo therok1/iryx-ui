@@ -28,7 +28,7 @@ export interface HeroProps {
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   class?: ClassValue
-  /** Override classes per slot, e.g. `{ heading: 'text-7xl' }`. */
+  /** Override classes per element, e.g. `{ heading: 'text-7xl' }`. */
   ui?: {
     root?: string
     container?: string

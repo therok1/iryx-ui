@@ -41,7 +41,7 @@ export interface ProgressProps {
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   class?: ClassValue
-  /** Override classes per slot, e.g. `{ track: 'h-4' }`. */
+  /** Override classes per element, e.g. `{ track: 'h-4' }`. */
   ui?: {
     root?: string
     header?: string

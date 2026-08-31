@@ -180,7 +180,7 @@ Inside an [`IFormField`](/components/form-field) the invalid state, the id and t
 | `invalid` | `boolean` | — | Inherited from `IFormField` when unset |
 | `size` | `'sm' \| 'md' \| 'lg'` | `'md'` | |
 | `unstyled` | `boolean` | — | Skip built-in classes |
-| `ui` | `{ root?, tag?, tagText?, tagDelete?, input?, clear? }` | — | Per-slot class overrides |
+| `ui` | `{ root?, tag?, tagText?, tagDelete?, input?, clear? }` | — | Per-element class overrides |
 
 ## Events
 

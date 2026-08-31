@@ -79,6 +79,6 @@ Separators are `decorative` by default and hidden from assistive technology. Set
 | `decorative` | `boolean` | `true` | Hides it from assistive technology |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged with the built-in classes |
-| `ui` | `{ root?, line?, label? }` | — | Per-slot class overrides |
+| `ui` | `{ root?, line?, label? }` | — | Per-element class overrides |
 
 [`ITable`](/components/table) and [`ICard`](/components/card) draw their own rules, so a separator on top of one gives you two lines.

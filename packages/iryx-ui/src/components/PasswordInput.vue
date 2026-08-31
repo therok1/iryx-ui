@@ -31,7 +31,7 @@ export interface PasswordInputProps {
   unstyled?: boolean
   /** Applied to the outer wrapper, which stacks the field above the meter. */
   class?: ClassValue
-  /** Override classes per slot, e.g. `{ meter: 'mt-1' }`. */
+  /** Override classes per element, e.g. `{ meter: 'mt-1' }`. */
   ui?: {
     root?: string
     input?: string

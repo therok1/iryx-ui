@@ -167,7 +167,7 @@ const command = { label: 'Documentation', href: '/docs', onSelect: () => track('
 | `footer` | `boolean` | `true` | The keyboard-hint row along the bottom |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged onto the panel |
-| `ui` | `{ overlay?, content?, header?, icon?, input?, viewport?, group?, groupLabel?, item?, itemIcon?, itemLabel?, shortcut?, key?, empty?, footer? }` | — | Per-slot class overrides |
+| `ui` | `{ overlay?, content?, header?, icon?, input?, viewport?, group?, groupLabel?, item?, itemIcon?, itemLabel?, shortcut?, key?, empty?, footer? }` | — | Per-element class overrides |
 
 `v-model:open` controls it. Nothing is rendered while it is closed.
 

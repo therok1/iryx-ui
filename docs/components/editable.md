@@ -173,7 +173,7 @@ Both states inherit their typography from whatever surrounds them, and the field
 | `cancelLabel` | `string` | `'Cancel'` | Names the cancel button |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Classes for the root |
-| `ui` | `{ root?, area?, preview?, placeholder?, input?, control? }` | — | Per-slot class overrides |
+| `ui` | `{ root?, area?, preview?, placeholder?, input?, control? }` | — | Per-element class overrides |
 
 ## Events
 

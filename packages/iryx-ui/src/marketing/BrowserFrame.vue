@@ -19,7 +19,7 @@ export interface BrowserFrameProps {
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   class?: ClassValue
-  /** Override classes per slot, e.g. `{ bar: 'py-2' }`. */
+  /** Override classes per element, e.g. `{ bar: 'py-2' }`. */
   ui?: {
     root?: string
     bar?: string

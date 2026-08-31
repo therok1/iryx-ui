@@ -63,7 +63,7 @@ The attribution renders if either `name` or `role` is given, so a quote can be c
 | `size` | `'sm' \| 'md' \| 'lg'` | `'md'` | Quote size |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged with the built-in classes |
-| `ui` | `{ root?, quote?, author?, identity?, name?, role? }` | — | Per-slot class overrides |
+| `ui` | `{ root?, quote?, author?, identity?, name?, role? }` | — | Per-element class overrides |
 
 ## Slots
 

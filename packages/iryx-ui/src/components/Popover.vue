@@ -42,7 +42,7 @@ export interface PopoverProps {
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   class?: ClassValue
-  /** Override classes per slot, e.g. `{ content: 'w-96' }`. */
+  /** Override classes per element, e.g. `{ content: 'w-96' }`. */
   ui?: {
     content?: string
     title?: string

@@ -91,7 +91,7 @@ By default any step can be clicked. `linear` restricts the reader to steps alrea
 | `linear` | `boolean` | `false` | Only allow steps already reached |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged with the built-in classes |
-| `ui` | `{ root?, item?, trigger?, indicator?, content?, title?, description?, separator? }` | — | Per-slot class overrides |
+| `ui` | `{ root?, item?, trigger?, indicator?, content?, title?, description?, separator? }` | — | Per-element class overrides |
 
 ```ts
 interface StepperItemOption {

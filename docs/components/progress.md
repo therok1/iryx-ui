@@ -227,7 +227,7 @@ The legend still shows each run's own value, so the overspend stays readable as 
 | `formatValue` | `(value, max) => string` | percentage | Formats that readout |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged with the built-in classes |
-| `ui` | `{ root?, header?, label?, value?, track?, indicator?, segment?, legend?, legendItem?, legendSwatch?, legendValue? }` | — | Per-slot class overrides |
+| `ui` | `{ root?, header?, label?, value?, track?, indicator?, segment?, legend?, legendItem?, legendSwatch?, legendValue? }` | — | Per-element class overrides |
 
 The value is clamped to `0…max`.
 

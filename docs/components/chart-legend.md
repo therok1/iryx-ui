@@ -161,7 +161,7 @@ A chart with two or more series draws its own legend, so pass `:legend="false"` 
 | `active` | `number` | — | Index to highlight; the rest are dimmed |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged with the built-in classes |
-| `ui` | `{ root?, item?, swatch?, name? }` | — | Per-slot class overrides |
+| `ui` | `{ root?, item?, swatch?, name? }` | — | Per-element class overrides |
 
 ```ts
 interface ChartSeries {

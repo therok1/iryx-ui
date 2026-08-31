@@ -116,7 +116,7 @@ An [`ITable`](/components/table) is the other common occupant of a `none` card.
 | `asChild` | `boolean` | `false` | Render the child instead, forwarding props |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged with the built-in classes |
-| `ui` | `{ root?, header?, title?, description?, body?, footer? }` | — | Per-slot class overrides |
+| `ui` | `{ root?, header?, title?, description?, body?, footer? }` | — | Per-element class overrides |
 
 ## Slots
 

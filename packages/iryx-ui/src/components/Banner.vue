@@ -38,7 +38,7 @@ export interface BannerProps {
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   class?: ClassValue
-  /** Override classes per slot, e.g. `{ container: 'max-w-3xl' }`. */
+  /** Override classes per element, e.g. `{ container: 'max-w-3xl' }`. */
   ui?: {
     root?: string
     container?: string

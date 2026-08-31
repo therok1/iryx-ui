@@ -7,7 +7,7 @@ A Vue 3 component library built on [Reka UI](https://reka-ui.com) and [Tailwind 
 
 **[Documentation →](https://iryx-ui.com)**
 
-Every component arrives with keyboard navigation, focus management and ARIA already working, then hands you a `class`, a per-slot `ui`, or `unstyled` when the defaults are not what you want.
+Every component arrives with keyboard navigation, focus management and ARIA already working, then hands you a `class`, a per-element `ui`, or `unstyled` when the defaults are not what you want.
 
 ## Installation
 

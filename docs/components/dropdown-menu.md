@@ -223,7 +223,7 @@ An entry with no `onSelect` renders as a group label, which is the right thing f
 | `sideOffset` | `number` | `4` | Distance from the trigger, in px |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged with the built-in classes |
-| `ui` | `{ content?, header?, item?, label?, separator?, subTrigger?, subContent? }` | — | Per-slot class overrides |
+| `ui` | `{ content?, header?, item?, label?, separator?, subTrigger?, subContent? }` | — | Per-element class overrides |
 
 ```ts
 interface DropdownMenuItemOption {

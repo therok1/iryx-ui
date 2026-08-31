@@ -81,7 +81,7 @@ The hero's `media` region is full width. When you constrain the frame with `max-
 | `shadow` | `'none' \| 'sm' \| 'md' \| 'lg'` | `'lg'` | Lift off the page |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged with the built-in classes |
-| `ui` | `{ root?, bar?, dot?, url?, body? }` | — | Per-slot class overrides |
+| `ui` | `{ root?, bar?, dot?, url?, body? }` | — | Per-element class overrides |
 
 ## Slots
 

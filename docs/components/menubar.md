@@ -125,7 +125,7 @@ Drops the container so the triggers sit directly on the page — for an app shel
 | `align` | `'start' \| 'center' \| 'end'` | `'start'` | How each panel aligns to its trigger |
 | `sideOffset` | `number` | `6` | Gap between panel and trigger |
 | `unstyled` | `boolean` | — | Skip built-in classes |
-| `ui` | `{ root?, trigger?, content?, item?, label?, separator?, subTrigger?, subContent? }` | — | Per-slot class overrides |
+| `ui` | `{ root?, trigger?, content?, item?, label?, separator?, subTrigger?, subContent? }` | — | Per-element class overrides |
 
 ### `MenubarMenuOption`
 

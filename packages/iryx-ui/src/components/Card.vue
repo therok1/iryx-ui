@@ -20,7 +20,7 @@ export interface CardProps {
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   class?: ClassValue
-  /** Override classes per slot, e.g. `{ footer: 'justify-end' }`. */
+  /** Override classes per element, e.g. `{ footer: 'justify-end' }`. */
   ui?: {
     root?: string
     header?: string

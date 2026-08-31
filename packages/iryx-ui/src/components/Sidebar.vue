@@ -22,7 +22,7 @@ export interface SidebarProps {
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   class?: ClassValue
-  /** Override classes per slot, e.g. `{ nav: 'px-4' }`. */
+  /** Override classes per element, e.g. `{ nav: 'px-4' }`. */
   ui?: {
     root?: string
     header?: string

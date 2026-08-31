@@ -104,6 +104,6 @@ The gutter is the horizontal padding that keeps content off the window edge. Eac
 | `asChild` | `boolean` | `false` | Render the child instead, forwarding props |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged with the built-in classes |
-| `ui` | `{ root? }` | — | Per-slot class overrides |
+| `ui` | `{ root? }` | — | Per-element class overrides |
 
 The widths come from Tailwind v4's width scale.

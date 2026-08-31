@@ -113,7 +113,7 @@ const paid = {
 | `size` | `'sm' \| 'md'` | `'md'` | |
 | `variant` | `TimelineVariant` | `'neutral'` | Applied to any item without its own |
 | `unstyled` | `boolean` | — | Skip built-in classes |
-| `ui` | `{ root?, item?, rail?, marker?, line?, content?, header?, title?, time?, description? }` | — | Per-slot class overrides |
+| `ui` | `{ root?, item?, rail?, marker?, line?, content?, header?, title?, time?, description? }` | — | Per-element class overrides |
 
 ### `TimelineItem`
 

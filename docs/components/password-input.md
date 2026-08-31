@@ -135,4 +135,4 @@ Set `autocomplete` so password managers recognise the field: `new-password` on a
 | `id` | `string` | generated | Useful when an external `ILabel` targets it |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged with the built-in classes |
-| `ui` | `{ root?, input?, toggle?, meter?, track?, segment?, label? }` | — | Per-slot class overrides |
+| `ui` | `{ root?, input?, toggle?, meter?, track?, segment?, label? }` | — | Per-element class overrides |

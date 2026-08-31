@@ -27,7 +27,7 @@ export interface ToasterProps {
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   class?: ClassValue
-  /** Override classes per slot, e.g. `{ viewport: 'sm:max-w-md' }`. */
+  /** Override classes per element, e.g. `{ viewport: 'sm:max-w-md' }`. */
   ui?: {
     viewport?: string
     root?: string

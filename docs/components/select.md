@@ -147,7 +147,7 @@ Disable the whole control, or a single option with `disabled` on the item — "N
 | `invalid` | `boolean` | — | Mark as failing validation. Taken from the enclosing `IFormField` when omitted |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged with the built-in classes |
-| `ui` | `{ trigger?, content?, viewport?, item?, group?, groupLabel? }` | — | Per-slot class overrides |
+| `ui` | `{ trigger?, content?, viewport?, item?, group?, groupLabel? }` | — | Per-element class overrides |
 
 `disabled`, `required`, `name` and `dir` are forwarded to Reka UI's `SelectRoot`.
 

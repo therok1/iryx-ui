@@ -125,7 +125,7 @@ The stepper buttons are on by default. Drop them where the value is typed rather
 | `decrementLabel` | `string` | `'Decrement'` | Accessible name for the down button |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged with the built-in classes |
-| `ui` | `{ root?, input?, stepper?, step? }` | — | Per-slot class overrides |
+| `ui` | `{ root?, input?, stepper?, step? }` | — | Per-element class overrides |
 
 ### Sizing it
 

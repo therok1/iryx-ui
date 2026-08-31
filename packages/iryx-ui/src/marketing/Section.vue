@@ -25,7 +25,7 @@ export interface SectionProps {
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   class?: ClassValue
-  /** Override classes per slot, e.g. `{ heading: 'text-5xl' }`. */
+  /** Override classes per element, e.g. `{ heading: 'text-5xl' }`. */
   ui?: {
     root?: string
     container?: string

@@ -19,7 +19,7 @@ export interface TestimonialCardProps {
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   class?: ClassValue
-  /** Override classes per slot, e.g. `{ quote: 'italic' }`. */
+  /** Override classes per element, e.g. `{ quote: 'italic' }`. */
   ui?: {
     root?: string
     quote?: string

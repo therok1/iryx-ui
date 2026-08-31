@@ -36,7 +36,7 @@ export interface StepperProps {
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   class?: ClassValue
-  /** Override classes per slot, e.g. `{ indicator: 'size-10' }`. */
+  /** Override classes per element, e.g. `{ indicator: 'size-10' }`. */
   ui?: {
     root?: string
     item?: string

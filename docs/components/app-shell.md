@@ -235,7 +235,7 @@ To make room for that trigger, the shell wraps `#header` in a flex row. A bar th
 | `navLabel` | `string` | `'Open navigation'` | Accessible name for the drawer trigger |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged with the built-in classes |
-| `ui` | `{ root?, header?, headerRow?, headerContent?, navTrigger?, navDrawer?, navDrawerBody?, body?, sidebar?, main?, footer? }` | — | Per-slot class overrides |
+| `ui` | `{ root?, header?, headerRow?, headerContent?, navTrigger?, navDrawer?, navDrawerBody?, body?, sidebar?, main?, footer? }` | — | Per-element class overrides |
 
 ## Slots
 

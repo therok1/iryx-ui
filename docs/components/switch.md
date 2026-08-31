@@ -106,7 +106,7 @@ Leave `label` off and the switch renders alone. Give it an `aria-label`, or poin
 | `invalid` | `boolean` | — | Mark as failing validation. Taken from the enclosing `IFormField` when omitted |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged with the built-in classes |
-| `ui` | `{ wrapper?, root?, thumb?, content?, label?, description? }` | — | Per-slot class overrides |
+| `ui` | `{ wrapper?, root?, thumb?, content?, label?, description? }` | — | Per-element class overrides |
 
 `disabled`, `required`, `name` and `value` are forwarded to Reka UI's `SwitchRoot`, so the switch posts in a plain `<form>`.
 

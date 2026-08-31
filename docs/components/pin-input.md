@@ -144,7 +144,7 @@ Set `otp` and the cells advertise themselves as a one-time code, so a phone can 
 | `invalid` | `boolean` | `false` | |
 | `size` | `'sm' \| 'md' \| 'lg'` | `'md'` | |
 | `unstyled` | `boolean` | — | Skip built-in classes |
-| `ui` | `{ root?, input?, separator? }` | — | Per-slot class overrides |
+| `ui` | `{ root?, input?, separator? }` | — | Per-element class overrides |
 
 ## Events
 

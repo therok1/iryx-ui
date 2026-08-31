@@ -32,7 +32,7 @@ export interface SignaturePadProps {
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   class?: ClassValue
-  /** Override classes per slot, e.g. `{ canvas: 'bg-white' }`. */
+  /** Override classes per element, e.g. `{ canvas: 'bg-white' }`. */
   ui?: {
     root?: string
     canvas?: string

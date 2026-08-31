@@ -46,7 +46,7 @@ export interface NumberInputProps {
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   class?: ClassValue
-  /** Override classes per slot, e.g. `{ step: 'px-2' }`. */
+  /** Override classes per element, e.g. `{ step: 'px-2' }`. */
   ui?: {
     root?: string
     input?: string

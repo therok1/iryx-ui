@@ -277,7 +277,7 @@ Reach for [`ITagsInput`](/components/tags-input) instead when the values are fre
 | `overscan` | `number` | `12` | Rows rendered beyond the viewport on each side |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged with the built-in classes |
-| `ui` | `{ anchor?, input?, trigger?, clear?, tag?, tagText?, tagDelete?, content?, viewport?, item?, empty?, group?, groupLabel? }` | — | Per-slot class overrides |
+| `ui` | `{ anchor?, input?, trigger?, clear?, tag?, tagText?, tagDelete?, content?, viewport?, item?, empty?, group?, groupLabel? }` | — | Per-element class overrides |
 
 `disabled`, `dir` and the rest of Reka UI's `ComboboxRoot` props are forwarded.
 

@@ -40,7 +40,7 @@ export interface SparklineProps {
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   class?: ClassValue
-  /** Override classes per slot, e.g. `{ line: 'stroke-[3]' }`. */
+  /** Override classes per element, e.g. `{ line: 'stroke-[3]' }`. */
   ui?: Partial<Record<'root' | 'plot' | 'line' | 'area' | 'dot' | 'ring', string>>
 }
 

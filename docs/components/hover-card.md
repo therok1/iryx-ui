@@ -186,7 +186,7 @@ const open = ref(false)
 | `width` | `'none' \| 'sm' \| 'md' \| 'lg'` | `'md'` | Card width; `none` sizes to content |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Classes for the card |
-| `ui` | `{ content?, arrow? }` | — | Per-slot class overrides |
+| `ui` | `{ content?, arrow? }` | — | Per-element class overrides |
 
 ## Slots
 

@@ -54,7 +54,7 @@ export interface DrawerProps {
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   class?: ClassValue
-  /** Override classes per slot, e.g. `{ content: 'sm:max-w-3xl' }`. */
+  /** Override classes per element, e.g. `{ content: 'sm:max-w-3xl' }`. */
   ui?: {
     overlay?: string
     content?: string

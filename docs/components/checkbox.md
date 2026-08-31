@@ -119,7 +119,7 @@ const all = computed({
 | `invalid` | `boolean` | — | Mark as failing validation. Taken from the enclosing `IFormField` when omitted |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged with the built-in classes |
-| `ui` | `{ wrapper?, root?, indicator?, content?, label?, description? }` | — | Per-slot class overrides |
+| `ui` | `{ wrapper?, root?, indicator?, content?, label?, description? }` | — | Per-element class overrides |
 
 The model is `boolean | 'indeterminate'`. `disabled`, `required`, `name` and `value` are forwarded to the underlying control, so the checkbox posts in a plain `<form>`.
 

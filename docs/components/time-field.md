@@ -144,7 +144,7 @@ Inside an [`IFormField`](/components/form-field) the id, the invalid state and t
 | `readonly` | `boolean` | `false` | |
 | `invalid` | `boolean` | — | Inherited from `IFormField` when unset |
 | `unstyled` | `boolean` | — | Skip built-in classes |
-| `ui` | `{ root?, segment?, literal? }` | — | Per-slot class overrides |
+| `ui` | `{ root?, segment?, literal? }` | — | Per-element class overrides |
 
 ## Helpers
 

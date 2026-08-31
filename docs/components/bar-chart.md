@@ -226,7 +226,7 @@ It plays **once**, on the first paint with something to draw — not again when 
 | `label` | `string` | — | Accessible name for the figure |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged with the built-in classes |
-| `ui` | `{ root?, svg?, grid?, tick?, category?, bar?, tooltip?, tooltipLabel?, tooltipValue?, table? }` | — | Per-slot class overrides |
+| `ui` | `{ root?, svg?, grid?, tick?, category?, bar?, tooltip?, tooltipLabel?, tooltipValue?, table? }` | — | Per-element class overrides |
 
 ## Slots
 

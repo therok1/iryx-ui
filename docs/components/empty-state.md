@@ -100,7 +100,7 @@ An icon is drawn by default. Pass your own, or `:icon="false"` to drop it.
 | `as` | `string` | `'div'` | Element to render |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged with the built-in classes |
-| `ui` | `{ root?, icon?, title?, description?, actions? }` | — | Per-slot class overrides |
+| `ui` | `{ root?, icon?, title?, description?, actions? }` | — | Per-element class overrides |
 
 ## Slots
 

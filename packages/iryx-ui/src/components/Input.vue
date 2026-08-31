@@ -32,7 +32,7 @@ export interface InputProps {
   unstyled?: boolean
   /** Applied to the outer field, which is the element carrying the chrome. */
   class?: ClassValue
-  /** Override classes per slot, e.g. `{ input: 'text-right' }`. */
+  /** Override classes per element, e.g. `{ input: 'text-right' }`. */
   ui?: {
     root?: string
     input?: string

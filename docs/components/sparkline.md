@@ -179,6 +179,6 @@ It plays **once** per instance, and a reader who has asked for reduced motion ge
 | `animate` | `boolean` or `{ duration, easing }` | `false` | Draw the line on; off by default here |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged with the built-in classes |
-| `ui` | `{ root?, plot?, line?, area?, dot?, ring? }` | — | Per-slot class overrides |
+| `ui` | `{ root?, plot?, line?, area?, dot?, ring? }` | — | Per-element class overrides |
 
 For an axis, a tooltip and more than one series, use [`ILineChart`](/components/line-chart).

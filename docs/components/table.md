@@ -364,7 +364,7 @@ const table = useDataTable({
 | `caption` | `string` | — | Visible caption |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged with the built-in classes |
-| `ui` | `{ root?, table?, thead?, tbody?, tr?, th?, td?, empty?, caption? }` | — | Per-slot class overrides |
+| `ui` | `{ root?, table?, thead?, tbody?, tr?, th?, td?, empty?, caption? }` | — | Per-element class overrides |
 
 Models: `v-model:sort`, `v-model:page`, `v-model:perPage`, `v-model:selection` and `v-model:expanded`.
 

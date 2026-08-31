@@ -39,7 +39,7 @@ export interface AuthProvidersProps {
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   class?: ClassValue
-  /** Override classes per slot, e.g. `{ provider: 'rounded-full' }`. */
+  /** Override classes per element, e.g. `{ provider: 'rounded-full' }`. */
   ui?: {
     root?: string
     provider?: string

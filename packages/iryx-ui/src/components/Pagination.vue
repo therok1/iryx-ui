@@ -32,7 +32,7 @@ export interface PaginationProps {
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   class?: ClassValue
-  /** Override classes per slot, e.g. `{ item: 'rounded-full' }`. */
+  /** Override classes per element, e.g. `{ item: 'rounded-full' }`. */
   ui?: {
     root?: string
     list?: string

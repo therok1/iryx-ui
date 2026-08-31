@@ -143,7 +143,7 @@ Search
 | `joined` | `boolean` | `false` | Draw a `+` between chips |
 | `ariaLabel` | `string` | the spoken combination | Overrides the spoken name |
 | `unstyled` | `boolean` | — | Skip built-in classes |
-| `ui` | `{ root?, key?, separator? }` | — | Per-slot class overrides |
+| `ui` | `{ root?, key?, separator? }` | — | Per-element class overrides |
 
 ## Slots
 

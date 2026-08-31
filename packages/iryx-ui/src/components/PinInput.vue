@@ -41,7 +41,7 @@ export interface PinInputProps {
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   class?: ClassValue
-  /** Override classes per slot, e.g. `{ input: 'size-14' }`. */
+  /** Override classes per element, e.g. `{ input: 'size-14' }`. */
   ui?: {
     root?: string
     input?: string

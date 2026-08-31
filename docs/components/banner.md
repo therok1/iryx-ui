@@ -138,7 +138,7 @@ Persist the dismissal, or the banner returns on the next navigation.
 | `as` | `string` | `'div'` | Element to render |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged with the built-in classes |
-| `ui` | `{ root?, container?, icon?, content?, title?, actions?, close? }` | — | Per-slot class overrides |
+| `ui` | `{ root?, container?, icon?, content?, title?, actions?, close? }` | — | Per-element class overrides |
 
 `v-model:open` controls visibility.
 

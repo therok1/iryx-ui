@@ -101,7 +101,7 @@ For a plain redirect, give the provider an `href` instead and it renders as a li
 | `disabled` | `boolean` | `false` | Disables every provider |
 | `unstyled` | `boolean` | — | Skip built-in classes |
 | `class` | `ClassValue` | — | Merged onto the root |
-| `ui` | `{ root?, provider?, icon?, label? }` | — | Per-slot class overrides |
+| `ui` | `{ root?, provider?, icon?, label? }` | — | Per-element class overrides |
 
 ## Events
 

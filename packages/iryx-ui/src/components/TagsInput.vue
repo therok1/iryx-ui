@@ -45,7 +45,7 @@ export interface TagsInputProps {
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   class?: ClassValue
-  /** Override classes per slot, e.g. `{ tag: 'bg-accent' }`. */
+  /** Override classes per element, e.g. `{ tag: 'bg-accent' }`. */
   ui?: {
     root?: string
     tag?: string

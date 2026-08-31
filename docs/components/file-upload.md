@@ -147,7 +147,7 @@ Inside an [`IFormField`](/components/form-field) the field passes its own validi
 | `tooManyText` | `string` | `'exceeds the file limit'` | Message for a `count` rejection |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Applied to the wrapper stacking the zone above the list |
-| `ui` | `{ root?, dropzone?, input?, icon?, label?, browse?, hint?, list?, item?, thumbnail?, placeholder?, details?, name?, meta?, remove?, error? }` | — | Per-slot class overrides |
+| `ui` | `{ root?, dropzone?, input?, icon?, label?, browse?, hint?, list?, item?, thumbnail?, placeholder?, details?, name?, meta?, remove?, error? }` | — | Per-element class overrides |
 
 ## Events
 

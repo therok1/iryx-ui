@@ -26,7 +26,7 @@ export interface CollapsibleProps {
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   class?: ClassValue
-  /** Override classes per slot, e.g. `{ content: 'pt-2' }`. */
+  /** Override classes per element, e.g. `{ content: 'pt-2' }`. */
   ui?: {
     root?: string
     trigger?: string

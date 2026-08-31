@@ -10,7 +10,7 @@ const { theme } = useData()
 
 # Components
 
-{{ theme.componentCount }} components, all prefixed `I`. Every one supports `unstyled` and a `class` override; multi-part components take a `ui` prop for per-slot classes.
+{{ theme.componentCount }} components, all prefixed `I`. Every one supports `unstyled` and a `class` override; multi-part components take a `ui` prop for per-element classes.
 
 Anywhere a component takes an `icon`, it accepts either shape: a [Hugeicons](https://hugeicons.com) export, or any component that renders an SVG — [`IIcon`](/components/icon) is what resolves the difference, and you can use it directly.
 

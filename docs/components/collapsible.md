@@ -116,7 +116,7 @@ The content stays in the DOM while closed. `unmount-on-hide` removes it instead,
 | `unmountOnHide` | `boolean` | `false` | Remove the content while closed |
 | `disabled` | `boolean` | `false` | |
 | `unstyled` | `boolean` | — | Skip built-in classes |
-| `ui` | `{ root?, trigger?, content?, icon? }` | — | Per-slot class overrides |
+| `ui` | `{ root?, trigger?, content?, icon? }` | — | Per-element class overrides |
 
 ## Events
 

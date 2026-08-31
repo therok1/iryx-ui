@@ -127,7 +127,7 @@ The dot carries a name, defaulting to the status word. Pass `status-label` for s
 | `statusLabel` | `string` | the status word | Names that dot |
 | `delayMs` | `number` | — | Hold the fallback back while the image loads |
 | `unstyled` | `boolean` | — | Skip built-in classes |
-| `ui` | `{ root?, image?, fallback?, status? }` | — | Per-slot class overrides |
+| `ui` | `{ root?, image?, fallback?, status? }` | — | Per-element class overrides |
 
 ## Slots
 

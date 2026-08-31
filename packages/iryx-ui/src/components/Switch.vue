@@ -19,7 +19,7 @@ export interface SwitchProps extends SwitchRootProps {
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   class?: ClassValue
-  /** Override classes per slot, e.g. `{ thumb: 'bg-black' }`. */
+  /** Override classes per element, e.g. `{ thumb: 'bg-black' }`. */
   ui?: {
     wrapper?: string
     root?: string
