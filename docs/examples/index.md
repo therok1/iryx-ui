@@ -41,7 +41,9 @@ Two lines exist only because it runs inside this repository: the `iryx-ui` alias
 
 ## Marketing
 
-A product marketing site: a sticky header with a mobile drawer, a hero over an aurora and a ruled grid, feature and stats sections, pricing cards, customer logos, testimonials, an accordion of questions, and a split-screen sign-in page with third-party providers.
+A product marketing site, built from the [blocks](/blocks/): a sticky header with a mobile drawer, an `IHero` over an aurora and a ruled grid, banded `ISection`s of features and stats, an `IPricingTable`, customer logos, testimonials, an accordion of questions, and a split-screen sign-in page with third-party providers.
+
+It is the reference for what the blocks are for — the page files hold copy and data, and almost no layout.
 
 <div class="mt-6 flex flex-wrap gap-3">
   <IButton as="a" href="https://marketing.iryx-ui.com" target="_blank" rel="noreferrer">
@@ -63,4 +65,4 @@ pnpm --filter @iryx-ui/example-marketing dev
 
 ### Copying it out
 
-The same two lines are local to this repository: the `iryx-ui` alias in `vite.config.ts` and the `@source` line in `src/style.css`. Delete both and `iryx-ui` resolves to the published package.
+The same lines are local to this repository: the two `iryx-ui` aliases in `vite.config.ts` — one for the package root, one for the `iryx-ui/marketing` subpath the blocks come from — and the `@source` line in `src/style.css`. Delete all three and both specifiers resolve to the published package.
