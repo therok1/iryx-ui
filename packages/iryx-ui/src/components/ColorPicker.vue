@@ -43,7 +43,7 @@ export interface ColorPickerProps {
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   class?: ClassValue
-  /** Override classes per slot, e.g. `{ area: 'h-56' }`. */
+  /** Override classes per element, e.g. `{ area: 'h-56' }`. */
   ui?: {
     root?: string
     area?: string
@@ -234,9 +234,9 @@ function slotClass(name: keyof NonNullable<ColorPickerProps['ui']>, extra?: Clas
       @update:model-value="value => value && set(String(value))"
     >
       <ColorSwatchPickerItem
-        v-for="colour in props.swatches"
-        :key="colour"
-        :value="colour"
+        v-for="swatch in props.swatches"
+        :key="swatch"
+        :value="swatch"
         :class="slotClass('swatch')"
       >
         <!-- Reka publishes the colour as a CSS variable; painting it is ours. -->
