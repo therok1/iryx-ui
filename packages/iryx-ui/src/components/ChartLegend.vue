@@ -15,7 +15,9 @@ export interface ChartLegendProps {
   ui?: Partial<Record<'root' | 'item' | 'swatch' | 'name', string>>
 }
 
-const props = defineProps<ChartLegendProps>()
+const props = withDefaults(defineProps<ChartLegendProps>(), {
+  unstyled: undefined,
+})
 
 const config = useIryxUiConfig()
 const isUnstyled = computed(() => props.unstyled ?? config.unstyled)
