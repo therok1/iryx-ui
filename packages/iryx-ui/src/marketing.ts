@@ -7,6 +7,8 @@ export * from './marketing/index'
 export type { PricingCardProps } from './marketing/PricingCard.vue'
 export type { PricingPlan, PricingTableProps } from './marketing/PricingTable.vue'
 export type { SectionProps } from './marketing/Section.vue'
+export type { SiteFooterProps } from './marketing/SiteFooter.vue'
+export type { SiteHeaderProps, SiteLink } from './marketing/SiteHeader.vue'
 export type { TestimonialCardProps } from './marketing/TestimonialCard.vue'
 
 /**

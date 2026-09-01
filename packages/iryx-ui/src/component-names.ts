@@ -99,6 +99,8 @@ export const marketingComponentNames = [
   'PricingCard',
   'PricingTable',
   'Section',
+  'SiteFooter',
+  'SiteHeader',
   'TestimonialCard',
 ] as const
 

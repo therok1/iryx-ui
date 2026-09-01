@@ -55,8 +55,16 @@ import { AlarmClockIcon, CoinsDollarIcon } from '@hugeicons/core-free-icons'
 </script>
 
 <template>
-  <IFeatureCard :icon="CoinsDollarIcon" title="Every currency, every locale" />
-  <IFeatureCard :icon="AlarmClockIcon" title="Reminders that go out" />
+  <IFeatureCard
+    :icon="CoinsDollarIcon"
+    title="Every currency, every locale"
+    description="Rates are fetched once a day and stored with the invoice, so a total never moves after it is sent."
+  />
+  <IFeatureCard
+    :icon="AlarmClockIcon"
+    title="Reminders that go out"
+    description="Set the terms once, and the nudge goes out on day three without you."
+  />
 </template>
 ```
 </Demo>
@@ -71,7 +79,12 @@ Recolour the square through `ui` when a card needs to read differently:
 </template>
 
 ```vue
-<IFeatureCard :icon="ShieldIcon" title="Locked down by default" :ui="{ icon: 'bg-success/10 text-success' }" />
+<IFeatureCard
+  :icon="ShieldIcon"
+  title="Locked down by default"
+  description="Every session is scoped to one workspace, and a key only ever sees what it was issued for."
+  :ui="{ icon: 'bg-success/10 text-success' }"
+/>
 ```
 </Demo>
 
@@ -88,7 +101,12 @@ Recolour the square through `ui` when a card needs to read differently:
 </template>
 
 ```vue
-<IFeatureCard align="center" :icon="CoinsDollarIcon" title="Every currency, every locale" />
+<IFeatureCard
+  align="center"
+  :icon="CoinsDollarIcon"
+  title="Every currency, every locale"
+  description="Rates are stored with the invoice, so a total never moves after it is sent."
+/>
 ```
 </Demo>
 

@@ -26,6 +26,8 @@ import { IHero, ISection } from 'iryx-ui/marketing'
 | [`IPricingTable`](/blocks/pricing-table) | A row of plans, laid out from data |
 | [`IPricingCard`](/blocks/pricing-card) | One plan: price, what you get, and the button |
 | [`IFeatureCard`](/blocks/feature-card) | One thing the product does: icon, title, a line about it |
+| [`ISiteHeader`](/blocks/site-header) | The bar across the top: brand, links, buttons, and a drawer for them below `md` |
+| [`ISiteFooter`](/blocks/site-footer) | The band that closes the page: brand, links, small print |
 | [`ITestimonialCard`](/blocks/testimonial-card) | Someone's words, with their name and their job under them |
 | [`IBrowserFrame`](/blocks/browser-frame) | Browser chrome around a screenshot, so a flat image reads as a running product |
 

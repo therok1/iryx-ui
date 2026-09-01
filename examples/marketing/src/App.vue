@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import {
   ArrowRight02Icon,
-  Menu01Icon,
   Moon02Icon,
   Sun03Icon,
 } from '@hugeicons/core-free-icons'
@@ -33,74 +32,53 @@ const view = ref<'home' | 'signIn'>('home')
     <SignIn v-if="view === 'signIn'" @back="view = 'home'" />
 
     <div v-else class="min-h-svh bg-background text-foreground">
-      <header class="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur">
-        <IContainer class="flex h-16 items-center gap-6">
-          <a href="#top" class="flex items-center gap-2.5 font-semibold tracking-tight">
-            <img src="/logo.svg" alt="" class="h-5 w-auto">
-            {{ product.name }}
+      <ISiteHeader v-model:menu-open="menuOpen" :name="product.name" href="#top" :links="nav">
+        <template #brand>
+          <img src="/logo.svg" alt="" class="h-5 w-auto">
+          {{ product.name }}
+        </template>
+
+        <template #actions>
+          <IButton
+            variant="ghost"
+            size="sm"
+            square
+            :aria-label="isDark ? 'Switch to light appearance' : 'Switch to dark appearance'"
+            @click="toggleAppearance"
+          >
+            <IIcon :icon="isDark ? Sun03Icon : Moon02Icon" data-icon />
+          </IButton>
+
+          <IButton variant="ghost" size="sm" class="hidden sm:inline-flex" @click="view = 'signIn'">
+            Sign in
+          </IButton>
+          <IButton size="sm">
+            Start free
+          </IButton>
+        </template>
+
+        <template #menu="{ close }">
+          <a
+            v-for="link in nav"
+            :key="link.href"
+            :href="link.href"
+            class="rounded-lg px-3 py-2.5 text-sm transition-colors hover:bg-accent"
+            @click="close"
+          >
+            {{ link.label }}
           </a>
 
-          <nav class="ml-4 hidden items-center gap-1 md:flex">
-            <a
-              v-for="link in nav"
-              :key="link.href"
-              :href="link.href"
-              class="rounded-lg px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
-            >
-              {{ link.label }}
-            </a>
-          </nav>
+          <ISeparator class="my-2" />
 
-          <div class="ml-auto flex items-center gap-2">
-            <IButton
-              variant="ghost"
-              size="sm"
-              square
-              :aria-label="isDark ? 'Switch to light appearance' : 'Switch to dark appearance'"
-              @click="toggleAppearance"
-            >
-              <IIcon :icon="isDark ? Sun03Icon : Moon02Icon" data-icon />
-            </IButton>
-
-            <IButton variant="ghost" size="sm" class="hidden sm:inline-flex" @click="view = 'signIn'">
-              Sign in
-            </IButton>
-            <IButton size="sm">
-              Start free
-            </IButton>
-
-            <IDrawer v-model:open="menuOpen" side="right" title="Menu" class="md:hidden">
-              <template #trigger>
-                <IButton variant="ghost" size="sm" square aria-label="Open the menu" class="md:hidden">
-                  <IIcon :icon="Menu01Icon" data-icon />
-                </IButton>
-              </template>
-
-              <nav class="flex flex-col">
-                <a
-                  v-for="link in nav"
-                  :key="link.href"
-                  :href="link.href"
-                  class="rounded-lg px-3 py-2.5 text-sm transition-colors hover:bg-accent"
-                  @click="menuOpen = false"
-                >
-                  {{ link.label }}
-                </a>
-
-                <ISeparator class="my-2" />
-
-                <button
-                  type="button"
-                  class="rounded-lg px-3 py-2.5 text-left text-sm transition-colors hover:bg-accent"
-                  @click="menuOpen = false; view = 'signIn'"
-                >
-                  Sign in
-                </button>
-              </nav>
-            </IDrawer>
-          </div>
-        </IContainer>
-      </header>
+          <button
+            type="button"
+            class="rounded-lg px-3 py-2.5 text-left text-sm transition-colors hover:bg-accent"
+            @click="close(); view = 'signIn'"
+          >
+            Sign in
+          </button>
+        </template>
+      </ISiteHeader>
 
       <main id="top">
         <IHero
@@ -234,29 +212,16 @@ const view = ref<'home' | 'signIn'>('home')
         </ISection>
       </main>
 
-      <footer class="border-t border-border py-12">
-        <IContainer class="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-          <span class="flex items-center gap-2.5 text-sm font-medium">
-            <img src="/logo.svg" alt="" class="h-4 w-auto">
-            {{ product.name }}
-          </span>
-
-          <nav class="flex flex-wrap gap-x-6 gap-y-2">
-            <a
-              v-for="link in [...nav, { label: 'Status', href: '#top' }, { label: 'Privacy', href: '#top' }]"
-              :key="link.label"
-              :href="link.href"
-              class="text-sm text-muted-foreground transition-colors hover:text-foreground"
-            >
-              {{ link.label }}
-            </a>
-          </nav>
-
-          <p class="text-sm text-muted-foreground">
-            © 2026 Iryx Billing. A fictional product.
-          </p>
-        </IContainer>
-      </footer>
+      <ISiteFooter
+        :name="product.name"
+        :links="[...nav, { label: 'Status', href: '#top' }, { label: 'Privacy', href: '#top' }]"
+        note="© 2026 Iryx Billing. A fictional product."
+      >
+        <template #brand>
+          <img src="/logo.svg" alt="" class="h-4 w-auto">
+          {{ product.name }}
+        </template>
+      </ISiteFooter>
     </div>
   </IApp>
 </template>

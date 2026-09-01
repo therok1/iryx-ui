@@ -145,6 +145,8 @@ const sidebar = [
       { text: 'Pricing card', link: '/blocks/pricing-card' },
       { text: 'Pricing table', link: '/blocks/pricing-table' },
       { text: 'Section', link: '/blocks/section' },
+      { text: 'Site footer', link: '/blocks/site-footer' },
+      { text: 'Site header', link: '/blocks/site-header' },
       { text: 'Testimonial card', link: '/blocks/testimonial-card' },
     ],
   },

@@ -104,8 +104,8 @@ export default defineNuxtConfig({
 </ISection>
 ```
 
-Seven so far: `IHero`, `ISection`, `IPricingTable`, `IPricingCard`, `IFeatureCard`,
-`ITestimonialCard` and `IBrowserFrame`. Importing the subpath also declares
+Nine so far: `IHero`, `ISection`, `IPricingTable`, `IPricingCard`, `IFeatureCard`,
+`ITestimonialCard`, `IBrowserFrame`, `ISiteHeader` and `ISiteFooter`. Importing the subpath also declares
 them on Vue's `GlobalComponents`; a project that never imports it is untouched.
 
 ## Three ways to take the styling back
