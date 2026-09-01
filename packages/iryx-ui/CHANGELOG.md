@@ -1,5 +1,41 @@
 # iryx-ui
 
+## 0.20.0
+
+### Minor Changes
+
+- ed89852: Add `IRating` — a score out of five, read or set.
+  
+  Read-only by default, because most ratings on a page are being shown rather than
+  collected. A fractional score is painted rather than rounded: the filled icon is
+  layered over the empty one and clipped, so 3.7 fills seven tenths of the fourth
+  icon and any icon works, not just a star.
+  
+  `interactive` collects one instead. It is a single tab stop rather than one per
+  icon — arrow keys move by `step`, `Home` and `End` go to the ends, and a click
+  sets the value. `step` takes half stars or anything else.
+  
+  The two modes announce differently because they are different things: read-only
+  is one image whose text alternative is the score, and interactive is a `slider`,
+  which is what the reader is actually setting and brings the arrow keys they
+  already expect. Both take a `label`.
+- dd71b1f: Add `ISiteHeader` and `ISiteFooter`, the chrome around a marketing page.
+  
+  `ISiteHeader` is the bar across the top: the brand, the section links, a slot
+  for the buttons that matter, and — below `md` — the links folded into a drawer
+  behind a menu button. It sticks to the top with a blur under it by default. The
+  menu button is rendered only when the links or the `menu` slot give it something
+  to open, and `v-model:menu-open` lets a page close the drawer itself after
+  routing.
+  
+  `ISiteFooter` is the band that closes the page: the brand, a row of links and a
+  line of small print, in one row on a desktop and stacked on a phone. Its brand
+  is a link only when given an `href`, since the page a footer sits on is usually
+  the one its brand would point at.
+  
+  Both take the same `SiteLink` shape — `{ label, href, current?, external? }` —
+  so a site's navigation is defined once and passed to each.
+
 ## 0.19.1
 
 ### Patch Changes
