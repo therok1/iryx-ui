@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useData, useRoute, withBase } from 'vitepress'
-import { computed } from 'vue'
+import { computed, nextTick, onMounted, useTemplateRef, watch } from 'vue'
 
 interface NavItem { text: string, link: string }
 interface NavGroup { title: string, items: NavItem[] }
@@ -20,6 +20,51 @@ function normalise(path: string) {
 }
 
 const current = computed(() => normalise(route.path))
+
+const root = useTemplateRef<HTMLElement>('root')
+
+/**
+ * Bring the current page's entry into view inside the index's own scroller.
+ *
+ * `scrollIntoView` is the obvious call and the wrong one: it walks every
+ * scrollable ancestor, so on a deep page it also scrolls the document and the
+ * reader lands halfway down the article they just opened. Setting `scrollTop`
+ * on the scroller alone moves the index and nothing else.
+ *
+ * Nothing happens when the entry is already visible, so an ordinary click near
+ * the top of the list does not shunt the index under the reader's cursor.
+ */
+function scrollerOf(element: HTMLElement): HTMLElement | undefined {
+  for (let node = element.parentElement; node; node = node.parentElement) {
+    const { overflowY } = getComputedStyle(node)
+    if ((overflowY === 'auto' || overflowY === 'scroll') && node.scrollHeight > node.clientHeight)
+      return node
+  }
+}
+
+function revealCurrent() {
+  const link = root.value?.querySelector<HTMLElement>('[aria-current="page"]')
+  const scroller = link && scrollerOf(link)
+  if (!link || !scroller)
+    return
+
+  // Measured against the scroller rather than via `offsetTop`, which is
+  // relative to the offset parent — not necessarily the element that scrolls.
+  const top = link.getBoundingClientRect().top - scroller.getBoundingClientRect().top + scroller.scrollTop
+  const above = top < scroller.scrollTop
+  const below = top + link.offsetHeight > scroller.scrollTop + scroller.clientHeight
+  if (!above && !below)
+    return
+
+  // Centred rather than flush to an edge: an entry pinned to the top reads as
+  // the start of the list, and the group heading above it is the context.
+  scroller.scrollTop = top - scroller.clientHeight / 2 + link.offsetHeight / 2
+}
+
+// After paint: the drawer mounts this while still animating open, and the
+// scroller has no height until it has finished.
+onMounted(() => nextTick(revealCurrent))
+watch(current, () => nextTick(revealCurrent))
 </script>
 
 <!--
@@ -29,7 +74,7 @@ const current = computed(() => normalise(route.path))
   between the drawer and the desktop gutter, where it has no column to align to.
 -->
 <template>
-  <nav aria-label="Documentation">
+  <nav ref="root" aria-label="Documentation">
     <div v-for="group in groups" :key="group.title" class="mb-9">
       <h2 class="mb-3 font-mono text-xs font-medium tracking-[0.14em] text-muted-foreground uppercase">
         {{ group.title }}
