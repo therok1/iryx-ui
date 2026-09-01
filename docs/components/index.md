@@ -58,6 +58,7 @@ Anywhere a component takes an `icon`, it accepts either shape: a [Hugeicons](htt
 | [`IToggle`](/components/toggle) | A button that stays pressed — one look, sizes and icon padding matching `IButton` |
 | [`IToggleGroup`](/components/toggle-group) | A row of toggles sharing one Tab stop — `joined` or `plain`, single or multiple |
 | [`IRadioGroup`](/components/radio-group) | Radio list with labels wired up automatically |
+| [`IRating`](/components/rating) | A score out of five, read or set — fractional fill, any icon, keyboard-driven when interactive |
 | [`ISelect`](/components/select) | Listbox with keyboard nav and typeahead, driven by an `items` array |
 | [`ICombobox`](/components/combobox) | Searchable select — filters as you type, with virtualized rows |
 | [`IColorPicker`](/components/color-picker) | Saturation plane, hue and opacity ramps, hex field and presets |

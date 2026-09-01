@@ -108,6 +108,7 @@ const sidebar = [
       { text: 'Popover', link: '/components/popover' },
       { text: 'Progress', link: '/components/progress' },
       { text: 'Radio group', link: '/components/radio-group' },
+      { text: 'Rating', link: '/components/rating' },
       { text: 'Scroll area', link: '/components/scroll-area' },
       { text: 'Scroll fade', link: '/components/scroll-fade' },
       { text: 'Select', link: '/components/select' },

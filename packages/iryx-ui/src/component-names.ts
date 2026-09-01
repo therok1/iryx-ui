@@ -57,6 +57,7 @@ export const componentNames = [
   'Popover',
   'Progress',
   'RadioGroup',
+  'Rating',
   'ScrollArea',
   'ScrollFade',
   'Select',
