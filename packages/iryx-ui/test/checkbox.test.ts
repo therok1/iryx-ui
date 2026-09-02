@@ -61,6 +61,22 @@ describe('checkbox', () => {
     expect(label.attributes('for')).toBe(control(wrapper).attributes('id'))
   })
 
+  /*
+   * The card and the tile carry their own text, so the control is named
+   * through `aria-labelledby` rather than by its content — otherwise the
+   * description is read out as part of the name.
+   */
+  it.each(['card', 'tile'] as const)('names the %s by its label alone', (variant) => {
+    const wrapper = mount(Checkbox, {
+      props: { variant, label: 'Reminders', description: 'Chase an invoice.' },
+    })
+    const box = control(wrapper)
+
+    expect(box.text()).toContain('Reminders')
+    expect(wrapper.get(`#${box.attributes('aria-labelledby')}`).text()).toBe('Reminders')
+    expect(wrapper.get(`#${box.attributes('aria-describedby')}`).text()).toBe('Chase an invoice.')
+  })
+
   it('renders a description and links it via aria-describedby', () => {
     const wrapper = mount(Checkbox, {
       props: { label: 'Emails', description: 'We only send receipts.' },
@@ -68,6 +84,21 @@ describe('checkbox', () => {
     const describedBy = control(wrapper).attributes('aria-describedby')
     expect(describedBy).toBeTruthy()
     expect(wrapper.get(`#${describedBy}`).text()).toBe('We only send receipts.')
+  })
+
+  /*
+   * Text through a slot counts the same as text through a prop: it needs the
+   * layout beside the control, and the description needs to be pointed at.
+   */
+  it('lays out beside the control for slotted text', () => {
+    const wrapper = mount(Checkbox, {
+      slots: { label: 'I agree to the <a href="#">terms</a>', description: '<em>Renews yearly.</em>' },
+    })
+    const box = control(wrapper)
+
+    expect(wrapper.find('label').exists()).toBe(true)
+    expect(wrapper.get('a').text()).toBe('terms')
+    expect(wrapper.get(`#${box.attributes('aria-describedby')}`).text()).toBe('Renews yearly.')
   })
 
   it('supports a description without a label', () => {

@@ -3,6 +3,7 @@ eyebrow: Forms
 ---
 
 <script setup lang="ts">
+import { CreditCardIcon, Invoice01Icon, Mail01Icon } from '@hugeicons/core-free-icons'
 import { ref } from 'vue'
 
 const terms = ref('net-30')
@@ -11,6 +12,15 @@ const delivery = ref('email')
 const sizeSm = ref('a')
 const sizeMd = ref('a')
 const sizeLg = ref('a')
+
+const card = ref('pro')
+const tile = ref('card')
+
+const tileItems = [
+  { label: 'Card', value: 'card', icon: CreditCardIcon },
+  { label: 'Invoice', value: 'invoice', icon: Invoice01Icon },
+  { label: 'Email', value: 'email', icon: Mail01Icon },
+]
 
 const planItems = [
   { label: 'Free', value: 'free', description: 'Up to three invoices a month.' },
@@ -59,6 +69,44 @@ const planItems = [
 ```
 </Demo>
 
+## Cards and tiles
+
+`variant` changes the shape. `card` makes the whole bordered surface the control, which suits options that carry a description.
+
+<Demo stack>
+<template #demo>
+<IRadioGroup v-model="card" :items="planItems" variant="card" class="w-full" />
+</template>
+
+```vue
+<IRadioGroup v-model="plan" :items="planItems" variant="card" />
+```
+</Demo>
+
+`tile` centres an icon above the label, for a short row of choices read at a glance. The icon comes from the item's `icon`.
+
+<Demo stack>
+<template #demo>
+<IRadioGroup v-model="tile" :items="tileItems" variant="tile" orientation="horizontal" class="w-full" />
+</template>
+
+```vue
+<script setup lang="ts">
+import { CreditCardIcon, Invoice01Icon, Mail01Icon } from '@hugeicons/core-free-icons'
+
+const tileItems = [
+  { label: 'Card', value: 'card', icon: CreditCardIcon },
+  { label: 'Invoice', value: 'invoice', icon: Invoice01Icon },
+  { label: 'Email', value: 'email', icon: Mail01Icon },
+]
+</script>
+
+<template>
+  <IRadioGroup v-model="method" :items="tileItems" variant="tile" orientation="horizontal" />
+</template>
+```
+</Demo>
+
 ## Horizontal
 
 `orientation="horizontal"` lays the options out in a row, and arrow-key navigation follows the orientation.
@@ -94,11 +142,12 @@ const planItems = [
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
 | `items` | `(RadioGroupItemOption \| string)[]` | `[]` | Options to render |
+| `variant` | `'radio' \| 'card' \| 'tile'` | `'radio'` | Shape of each option |
 | `size` | `'sm' \| 'md' \| 'lg'` | `'md'` | Control scale |
 | `invalid` | `boolean` | — | Mark as failing validation. Taken from the enclosing `IFormField` when omitted |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged with the built-in classes |
-| `ui` | `{ root?, item?, label?, description? }` | — | Per-element class overrides |
+| `ui` | `{ root?, item?, mark?, icon?, content?, label?, description? }` | — | Per-element class overrides |
 
 `disabled`, `required`, `name`, `orientation` and `dir` are forwarded to Reka UI's `RadioGroupRoot`, so the group posts in a plain `<form>`.
 
@@ -107,6 +156,7 @@ interface RadioGroupItemOption {
   label: string
   value: string
   description?: string
+  icon?: IconLike
   disabled?: boolean
 }
 ```

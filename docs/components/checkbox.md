@@ -3,6 +3,7 @@ eyebrow: Forms
 ---
 
 <script setup lang="ts">
+import { CloudIcon, HardDriveIcon, ServerStack01Icon } from '@hugeicons/core-free-icons'
 import { ref } from 'vue'
 
 const terms = ref(false)
@@ -12,6 +13,8 @@ const sizeSm = ref(true)
 const sizeMd = ref(true)
 const sizeLg = ref(true)
 const slotted = ref(false)
+const cardPlan = ref(true)
+const tiles = ref({ cloud: true, local: false, mirror: false })
 </script>
 
 # ICheckbox
@@ -78,6 +81,45 @@ const all = computed({
 ```
 </Demo>
 
+## Cards and tiles
+
+`variant` changes the shape. `card` makes the whole bordered surface the control.
+
+<Demo stack>
+<template #demo>
+<ICheckbox v-model="cardPlan" variant="card" label="Reminders" description="Chase an invoice three days after it falls due." class="w-full" />
+</template>
+
+```vue
+<ICheckbox
+  v-model="reminders"
+  variant="card"
+  label="Reminders"
+  description="Chase an invoice three days after it falls due."
+/>
+```
+</Demo>
+
+`tile` centres an `icon` above the label. Several in a row make a picker where more than one can be on.
+
+<Demo stack>
+<template #demo>
+<div class="grid w-full grid-flow-col auto-cols-fr gap-2">
+<ICheckbox v-model="tiles.cloud" variant="tile" :icon="CloudIcon" label="Cloud" />
+<ICheckbox v-model="tiles.local" variant="tile" :icon="HardDriveIcon" label="Local disk" />
+<ICheckbox v-model="tiles.mirror" variant="tile" :icon="ServerStack01Icon" label="Mirror" />
+</div>
+</template>
+
+```vue
+<div class="grid grid-flow-col auto-cols-fr gap-2">
+  <ICheckbox v-model="targets.cloud" variant="tile" :icon="CloudIcon" label="Cloud" />
+  <ICheckbox v-model="targets.local" variant="tile" :icon="HardDriveIcon" label="Local disk" />
+  <ICheckbox v-model="targets.mirror" variant="tile" :icon="ServerStack01Icon" label="Mirror" />
+</div>
+```
+</Demo>
+
 ## Sizes
 
 <Demo stack>
@@ -114,12 +156,14 @@ const all = computed({
 | --- | --- | --- | --- |
 | `label` | `string` | — | Text beside the box, wired to it |
 | `description` | `string` | — | Secondary line under the label |
+| `variant` | `'checkbox' \| 'card' \| 'tile'` | `'checkbox'` | Shape of the control |
+| `icon` | `IconLike` | — | Shown above the label by the `tile` variant |
 | `size` | `'sm' \| 'md' \| 'lg'` | `'md'` | Control scale |
 | `id` | `string` | generated | Useful when an external `ILabel` targets it |
 | `invalid` | `boolean` | — | Mark as failing validation. Taken from the enclosing `IFormField` when omitted |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged with the built-in classes |
-| `ui` | `{ wrapper?, root?, indicator?, content?, label?, description? }` | — | Per-element class overrides |
+| `ui` | `{ wrapper?, root?, mark?, icon?, indicator?, content?, label?, description? }` | — | Per-element class overrides |
 
 The model is `boolean | 'indeterminate'`. `disabled`, `required`, `name` and `value` are forwarded to the underlying control, so the checkbox posts in a plain `<form>`.
 
