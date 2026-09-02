@@ -119,6 +119,7 @@ Anywhere a component takes an `icon`, it accepts either shape: a [Hugeicons](htt
 | [`IKbd`](/components/kbd) | Keyboard shortcut as chips — `mod` renders ⌘ or Ctrl per platform |
 | [`IIcon`](/components/icon) | The shared icon renderer — takes a Hugeicons array or any SVG component |
 | [`ITimeline`](/components/timeline) | Ordered run of events — icons, status variants, machine-readable times |
+| [`ICarousel`](/components/carousel) | A row of slides you page through — scroll-snap track, arrows, dots, arrow keys |
 | [`ITree`](/components/tree) | Expandable nested list — selection and expansion as arrays of values |
 | [`IAvatar`](/components/avatar) | Person or organisation — initials fallback, five sizes, presence dot |
 | [`IAvatarGroup`](/components/avatar-group) | Overlapped stack with a `max` and a "+n" chip |

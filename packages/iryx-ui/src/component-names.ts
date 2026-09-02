@@ -20,6 +20,7 @@ export const componentNames = [
   'ButtonGroup',
   'Calendar',
   'Card',
+  'Carousel',
   'ChartLegend',
   'Checkbox',
   'ColorPicker',

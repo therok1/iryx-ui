@@ -71,6 +71,7 @@ const sidebar = [
       { text: 'Button group', link: '/components/button-group' },
       { text: 'Calendar', link: '/components/calendar' },
       { text: 'Card', link: '/components/card' },
+      { text: 'Carousel', link: '/components/carousel' },
       { text: 'Chart legend', link: '/components/chart-legend' },
       { text: 'Checkbox', link: '/components/checkbox' },
       { text: 'Collapsible', link: '/components/collapsible' },
