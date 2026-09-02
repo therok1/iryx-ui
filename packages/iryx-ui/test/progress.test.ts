@@ -137,3 +137,73 @@ describe('stacked segments', () => {
     expect(wrapper.get('li').text()).toContain('40 GB')
   })
 })
+
+describe('circle shape', () => {
+  /* r = (100 - stroke) / 2, in the 0-100 user space of the viewBox. */
+  const length = 2 * Math.PI * 46
+
+  it('draws an arc as long as the value', () => {
+    const wrapper = mount(Progress, { props: { shape: 'circle', modelValue: 25 } })
+    const arc = wrapper.get('circle[data-state]')
+    const [drawn, gap] = arc.attributes('stroke-dasharray')!.split(' ').map(Number)
+
+    expect(drawn).toBeCloseTo(length * 0.25, 5)
+    expect(gap).toBeCloseTo(length, 5)
+  })
+
+  it('puts the progressbar role on the ring itself', () => {
+    const wrapper = mount(Progress, { props: { shape: 'circle', modelValue: 60, showValue: true } })
+    const bar = wrapper.get('[role="progressbar"]')
+
+    expect(bar.element.tagName.toLowerCase()).toBe('svg')
+    expect(bar.attributes('aria-valuenow')).toBe('60')
+    expect(wrapper.text()).toContain('60%')
+  })
+
+  /* No value to draw, so a quarter of the ring is spun instead. */
+  it('draws a quarter arc when indeterminate', () => {
+    const wrapper = mount(Progress, { props: { shape: 'circle', indeterminate: true } })
+    const [drawn] = wrapper.get('circle[data-state]').attributes('stroke-dasharray')!.split(' ').map(Number)
+
+    expect(drawn).toBeCloseTo(length * 0.25, 5)
+    expect(wrapper.get('svg').classes().join(' ')).toContain('animate-spin')
+  })
+
+  /* A broken-up ring is a donut chart, so segments stay a bar's business. */
+  /*
+   * A partial ring shortens the track, and the value is a fraction of that
+   * track rather than of the whole circle — half of a half circle is a
+   * quarter of the ring, not half of it.
+   */
+  it('measures the value against a partial track', () => {
+    const wrapper = mount(Progress, { props: { shape: 'circle', angle: 180, modelValue: 50 } })
+    const [drawn] = wrapper.get('circle[data-state]').attributes('stroke-dasharray')!.split(' ').map(Number)
+    const [track] = wrapper.get('circle:not([data-state])').attributes('stroke-dasharray')!.split(' ').map(Number)
+
+    expect(track).toBeCloseTo(length / 2, 5)
+    expect(drawn).toBeCloseTo(length / 4, 5)
+  })
+
+  /* Turned back half its own sweep, so the gap sits at the bottom. */
+  it('centres a partial track on the top', () => {
+    const half = mount(Progress, { props: { shape: 'circle', angle: 180 } })
+    const full = mount(Progress, { props: { shape: 'circle' } })
+
+    expect(half.get('g').attributes('transform')).toBe('rotate(-180 50 50)')
+    expect(full.get('g').attributes('transform')).toBe('rotate(-90 50 50)')
+  })
+
+  it('clamps an angle outside the circle', () => {
+    const wrapper = mount(Progress, { props: { shape: 'circle', angle: 720, modelValue: 100 } })
+    const [drawn] = wrapper.get('circle[data-state]').attributes('stroke-dasharray')!.split(' ').map(Number)
+    expect(drawn).toBeCloseTo(length, 5)
+  })
+
+  it('ignores segments', () => {
+    const wrapper = mount(Progress, {
+      props: { shape: 'circle', modelValue: 30, segments: [{ value: 80, label: 'Docs' }] },
+    })
+    expect(wrapper.find('li').exists()).toBe(false)
+    expect(wrapper.get('[role="progressbar"]').attributes('aria-valuenow')).toBe('30')
+  })
+})

@@ -19,6 +19,18 @@ export interface ProgressProps {
   /** Current value. `null` (or `indeterminate`) means unknown duration. */
   modelValue?: number | null
   max?: number
+  /**
+   * `linear` is a bar, `circle` a ring with the value in the middle. A ring
+   * ignores `segments` — a broken-up ring is a donut chart, and `IDonutChart`
+   * is the component for that.
+   */
+  shape?: 'linear' | 'circle'
+  /**
+   * How many degrees of the ring the track covers — `180` is a half circle,
+   * `270` a gauge. The arc is centred at the top, so the gap sits at the
+   * bottom. Circles only, and ignored by the bar.
+   */
+  angle?: number
   variant?: ProgressVariant
   /**
    * Break the bar into runs that share one track — storage by file type, a
@@ -54,6 +66,12 @@ export interface ProgressProps {
     legendItem?: string
     legendSwatch?: string
     legendValue?: string
+    ring?: string
+    ringTrack?: string
+    ringIndicator?: string
+    ringContent?: string
+    ringValue?: string
+    ringLabel?: string
   }
 }
 
@@ -81,7 +99,8 @@ const slots = useSlots()
 const labelId = useId()
 const hasLabel = computed(() => Boolean(props.label || slots.label))
 
-const isStacked = computed(() => (props.segments?.length ?? 0) > 0)
+const isCircle = computed(() => props.shape === 'circle')
+const isStacked = computed(() => !isCircle.value && (props.segments?.length ?? 0) > 0)
 
 /*
  * A stacked bar always has a value — the sum of its runs — so it is never
@@ -145,6 +164,7 @@ const isUnstyled = computed(() => props.unstyled ?? config.unstyled)
 
 const theme = computed(() =>
   progressTheme({
+    shape: props.shape,
     variant: props.variant,
     size: props.size,
     indeterminate: isIndeterminate.value,
@@ -170,6 +190,25 @@ const trackClass = computed(() =>
 )
 const indicatorClass = computed(() =>
   isUnstyled.value ? props.ui?.indicator : theme.value.indicator({ class: props.ui?.indicator }),
+)
+
+const ringClass = computed(() =>
+  isUnstyled.value ? props.ui?.ring : theme.value.ring({ class: props.ui?.ring }),
+)
+const ringTrackClass = computed(() =>
+  isUnstyled.value ? props.ui?.ringTrack : theme.value.ringTrack({ class: props.ui?.ringTrack }),
+)
+const ringIndicatorClass = computed(() =>
+  isUnstyled.value ? props.ui?.ringIndicator : theme.value.ringIndicator({ class: props.ui?.ringIndicator }),
+)
+const ringContentClass = computed(() =>
+  isUnstyled.value ? props.ui?.ringContent : theme.value.ringContent({ class: props.ui?.ringContent }),
+)
+const ringValueClass = computed(() =>
+  isUnstyled.value ? props.ui?.ringValue : theme.value.ringValue({ class: props.ui?.ringValue }),
+)
+const ringLabelClass = computed(() =>
+  isUnstyled.value ? props.ui?.ringLabel : theme.value.ringLabel({ class: props.ui?.ringLabel }),
 )
 
 const legendClass = computed(() =>
@@ -198,14 +237,78 @@ function swatchClass(variant: ProgressVariant | undefined) {
   return progressTheme({ variant: variant ?? 'neutral' }).legendSwatch({ class: props.ui?.legendSwatch })
 }
 
-/** Determinate bars are revealed by sliding the indicator in from the left. */
+const RING_STROKE = 8
+const RING_RADIUS = (100 - RING_STROKE) / 2
+const RING_LENGTH = 2 * Math.PI * RING_RADIUS
+
+const angle = computed(() => Math.min(Math.max(props.angle ?? 360, 1), 360))
+const trackLength = computed(() => RING_LENGTH * (angle.value / 360))
+const ringRotation = computed(() => (angle.value === 360 ? -90 : -(90 + angle.value / 2)))
+
+const ringDash = computed(() => {
+  const arc = isIndeterminate.value
+    ? trackLength.value * 0.25
+    : trackLength.value * (percent.value / 100)
+  return `${arc} ${RING_LENGTH}`
+})
+
+const ringTrackDash = computed(() => `${trackLength.value} ${RING_LENGTH}`)
 const indicatorStyle = computed(() =>
   isIndeterminate.value ? undefined : { transform: `translateX(-${100 - percent.value}%)` },
 )
 </script>
 
 <template>
-  <div :class="rootClass">
+  <div v-if="isCircle" :class="rootClass">
+    <ProgressRoot
+      :model-value="value"
+      :max="props.max"
+      :get-value-label="() => formatted ?? ''"
+      :aria-labelledby="hasLabel ? labelId : undefined"
+      v-bind="$attrs"
+      as-child
+    >
+      <svg :class="ringClass" viewBox="0 0 100 100" aria-hidden="true">
+        <g :transform="`rotate(${ringRotation} 50 50)`">
+          <circle
+            :class="ringTrackClass"
+            cx="50"
+            cy="50"
+            :r="RING_RADIUS"
+            :stroke-width="RING_STROKE"
+            :stroke-linecap="angle === 360 ? undefined : 'round'"
+            :stroke-dasharray="ringTrackDash"
+          />
+          <ProgressIndicator as-child>
+            <circle
+              :class="ringIndicatorClass"
+              cx="50"
+              cy="50"
+              :r="RING_RADIUS"
+              :stroke-width="RING_STROKE"
+              stroke-linecap="round"
+              :stroke-dasharray="ringDash"
+            />
+          </ProgressIndicator>
+        </g>
+      </svg>
+    </ProgressRoot>
+
+    <div :class="ringContentClass">
+      <span v-if="props.showValue && formatted" :class="ringValueClass">
+        <slot name="value" :value="value" :percent="percent" :formatted="formatted">
+          {{ formatted }}
+        </slot>
+      </span>
+      <span v-if="hasLabel" :id="labelId" :class="ringLabelClass">
+        <slot name="label">
+          {{ props.label }}
+        </slot>
+      </span>
+    </div>
+  </div>
+
+  <div v-else :class="rootClass">
     <div v-if="hasHeader" :class="headerClass">
       <span v-if="hasLabel" :id="labelId" :class="labelClass">
         <slot name="label">
@@ -238,11 +341,6 @@ const indicatorStyle = computed(() =>
       <ProgressIndicator v-else :class="indicatorClass" :style="indicatorStyle" />
     </ProgressRoot>
 
-    <!--
-      The runs are `aria-hidden` through the track, so the legend is the only
-      place a screen reader meets the breakdown. It is text, not a tooltip,
-      for exactly that reason.
-    -->
     <ul v-if="legend.length" :class="legendClass">
       <li v-for="(run, index) in legend" :key="run.label ?? index" :class="legendItemClass">
         <span :class="swatchClass(run.variant)" />
