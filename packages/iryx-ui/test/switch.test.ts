@@ -132,4 +132,13 @@ describe('switch', () => {
     // No label, no line box to centre against.
     expect(mount(Switch, { props: { size: 'sm' } }).get('[role="switch"]').classes()).not.toContain('mt-0.5')
   })
+  it('lays out beside the control for slotted text', () => {
+    const wrapper = mount(Switch, {
+      slots: { label: 'Email <strong>digest</strong>', description: 'Sent every Monday.' },
+    })
+    const control = wrapper.get('[role="switch"]')
+
+    expect(wrapper.find('label').exists()).toBe(true)
+    expect(wrapper.get(`#${control.attributes('aria-describedby')}`).text()).toBe('Sent every Monday.')
+  })
 })

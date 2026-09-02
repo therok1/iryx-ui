@@ -2,7 +2,7 @@
 import type { SwitchRootEmits, SwitchRootProps } from 'reka-ui'
 import type { ClassValue } from '../class-value'
 import { Label, SwitchRoot, SwitchThumb, useForwardPropsEmits, useId } from 'reka-ui'
-import { computed } from 'vue'
+import { computed, useSlots } from 'vue'
 import { useFormField } from '../composables/form'
 import { useIryxUiConfig } from '../config'
 import { switchTheme } from '../theme/switch'
@@ -66,39 +66,43 @@ const rootProps = computed(() => {
 })
 const forwarded = useForwardPropsEmits(rootProps, emits)
 
+const slots = useSlots()
+
 const autoId = useId()
 const field = useFormField()
 const isInvalid = computed(() => props.invalid ?? field?.invalid.value ?? false)
 const controlId = computed(() => props.id ?? field?.id.value ?? autoId)
 if (field)
   field.id.value = controlId.value
-/** Only wrap in a labelled layout when there is text to show. */
-const hasText = computed(() => Boolean(props.label || props.description))
+
+const hasDescription = computed(() => Boolean(props.description || slots.description))
+const hasText = computed(() => Boolean(props.label || slots.label || hasDescription.value))
+const describedBy = computed(() => (hasDescription.value ? `${controlId.value}-description` : undefined))
 
 const config = useIryxUiConfig()
 const isUnstyled = computed(() => props.unstyled ?? config.unstyled)
 
-const slots = computed(() => switchTheme({ size: props.size, withText: hasText.value, invalid: isInvalid.value }))
+const theme = computed(() => switchTheme({ size: props.size, withText: hasText.value, invalid: isInvalid.value }))
 
 const wrapperClass = computed(() =>
-  isUnstyled.value ? props.ui?.wrapper : slots.value.wrapper({ class: props.ui?.wrapper }),
+  isUnstyled.value ? props.ui?.wrapper : theme.value.wrapper({ class: props.ui?.wrapper }),
 )
 const rootClass = computed(() =>
   isUnstyled.value
     ? [props.ui?.root, props.class]
-    : slots.value.root({ class: [props.ui?.root, props.class] }),
+    : theme.value.root({ class: [props.ui?.root, props.class] }),
 )
 const thumbClass = computed(() =>
-  isUnstyled.value ? props.ui?.thumb : slots.value.thumb({ class: props.ui?.thumb }),
+  isUnstyled.value ? props.ui?.thumb : theme.value.thumb({ class: props.ui?.thumb }),
 )
 const contentClass = computed(() =>
-  isUnstyled.value ? props.ui?.content : slots.value.content({ class: props.ui?.content }),
+  isUnstyled.value ? props.ui?.content : theme.value.content({ class: props.ui?.content }),
 )
 const labelClass = computed(() =>
-  isUnstyled.value ? props.ui?.label : slots.value.label({ class: props.ui?.label }),
+  isUnstyled.value ? props.ui?.label : theme.value.label({ class: props.ui?.label }),
 )
 const descriptionClass = computed(() =>
-  isUnstyled.value ? props.ui?.description : slots.value.description({ class: props.ui?.description }),
+  isUnstyled.value ? props.ui?.description : theme.value.description({ class: props.ui?.description }),
 )
 </script>
 
@@ -108,7 +112,7 @@ const descriptionClass = computed(() =>
       :id="controlId"
       v-bind="{ ...forwarded, ...$attrs }"
       :aria-invalid="isInvalid || undefined"
-      :aria-describedby="props.description ? `${controlId}-description` : undefined"
+      :aria-describedby="describedBy"
       :class="rootClass"
     >
       <SwitchThumb :class="thumbClass" />
@@ -118,7 +122,7 @@ const descriptionClass = computed(() =>
       <Label :for="controlId" :class="labelClass">
         <slot name="label">{{ props.label }}</slot>
       </Label>
-      <p v-if="props.description || $slots.description" :id="`${controlId}-description`" :class="descriptionClass">
+      <p v-if="hasDescription" :id="`${controlId}-description`" :class="descriptionClass">
         <slot name="description">
           {{ props.description }}
         </slot>
