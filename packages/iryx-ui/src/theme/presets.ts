@@ -39,8 +39,14 @@ export interface ThemeColors {
 
 /** A theme provides token values per appearance mode. Omitted tokens keep the defaults from theme.css. */
 export interface Theme {
-  light: ThemeColors
-  dark: ThemeColors
+  light?: ThemeColors
+  dark?: ThemeColors
+  /**
+   * Corner radius for the whole library — what `rounded-lg` resolves to, with
+   * the rest of the scale derived from it. One value rather than one per mode:
+   * corners do not change between light and dark.
+   */
+  radius?: string
 }
 
 const TOKEN_VARS: Record<keyof ThemeColors, string> = {
@@ -132,14 +138,15 @@ function declarations(colors: ThemeColors): string {
 export function applyTheme(theme: Theme | ThemePresetName): void {
   if (typeof document === 'undefined')
     return
-  const resolved = typeof theme === 'string' ? themes[theme] : theme
+  const resolved: Theme = typeof theme === 'string' ? themes[theme] : theme
+  const radius = resolved.radius == null ? '' : `--iryx-radius: ${resolved.radius}; `
   let style = document.getElementById(STYLE_ID) as HTMLStyleElement | null
   if (!style) {
     style = document.createElement('style')
     style.id = STYLE_ID
     document.head.appendChild(style)
   }
-  style.textContent = `:root { ${declarations(resolved.light)} }\n.dark { ${declarations(resolved.dark)} }`
+  style.textContent = `:root { ${radius}${declarations(resolved.light ?? {})} }\n.dark { ${declarations(resolved.dark ?? {})} }`
 }
 
 /** Remove a theme applied with {@link applyTheme}, restoring theme.css defaults. */

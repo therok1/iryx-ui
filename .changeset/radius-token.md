@@ -10,3 +10,6 @@ itself, and every other step is a multiple — so an app squares itself off with
 `--iryx-font-sans` swaps the typeface. At the default `0.5rem` every step
 resolves to the value Tailwind already shipped, so nothing moves until the knob
 is turned. `rounded-full` is untouched.
+
+`applyTheme` accepts it as well — `applyTheme({ radius: '0' })` — and its `light`
+and `dark` keys are now optional, so a theme can change the radius alone.

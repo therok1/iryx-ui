@@ -61,6 +61,13 @@ For a static re-brand, plain CSS is enough — the tokens are only variables:
 }
 ```
 
+`applyTheme` takes it too, alongside the colours or on its own:
+
+```ts
+applyTheme({ radius: '0' })
+applyTheme({ radius: '1rem', light: { primary: 'oklch(0.65 0.2 145)' } })
+```
+
 <Demo title="Set on a wrapper here, so only this box changes">
 <template #demo>
 <div class="w-full" :style="{ '--iryx-radius': radius }">

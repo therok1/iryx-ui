@@ -105,6 +105,13 @@ describe('applyTheme', () => {
     expect(styles[0]!.textContent).not.toContain('oklch')
   })
 
+  it('sets the radius once rather than per mode', () => {
+    applyTheme({ radius: '0' })
+    const style = document.getElementById('iryx-ui-theme')!
+    expect(style.textContent).toContain('--iryx-radius: 0;')
+    expect(style.textContent!.match(/--iryx-radius/g)).toHaveLength(1)
+  })
+
   it('clearTheme removes the override stylesheet', () => {
     applyTheme('rose')
     clearTheme()
