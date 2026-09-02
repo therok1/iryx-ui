@@ -4,8 +4,11 @@ eyebrow: Guide
 
 <script setup lang="ts">
 import { useAppearance } from 'iryx-ui'
+import { ref } from 'vue'
 
 const { toggleAppearance } = useAppearance()
+
+const radius = ref('0.5rem')
 </script>
 
 # Theming
@@ -46,6 +49,43 @@ For a static re-brand, plain CSS is enough — the tokens are only variables:
   --iryx-primary: oklch(0.75 0.18 145);
 }
 ```
+
+## Radius
+
+`--iryx-radius` is `rounded-lg`, and the rest of Tailwind's radius scale is derived from it. Set it once and every corner in the app follows; `rounded-full` stays a pill.
+
+```css
+:root {
+  --iryx-radius: 0; /* square */
+  --iryx-radius: 1rem; /* soft */
+}
+```
+
+<Demo title="Set on a wrapper here, so only this box changes">
+<template #demo>
+<div class="w-full" :style="{ '--iryx-radius': radius }">
+<div class="flex flex-wrap justify-center gap-2">
+<IButton v-for="value in ['0', '0.5rem', '1rem']" :key="value" :variant="radius === value ? 'solid' : 'outline'" size="sm" @click="radius = value">
+{{ value === '0' ? 'Square' : value }}
+</IButton>
+</div>
+<ICard class="mt-4" padding="lg">
+<div class="flex flex-wrap items-center gap-3">
+<IBadge>Badge</IBadge>
+<IInput placeholder="Input" class="w-40" />
+<IButton size="sm">Button</IButton>
+<IAvatar name="Rae Ellis" />
+</div>
+</ICard>
+</div>
+</template>
+
+```vue
+<div :style="{ '--iryx-radius': radius }">
+  <!-- … -->
+</div>
+```
+</Demo>
 
 ## Light and dark
 

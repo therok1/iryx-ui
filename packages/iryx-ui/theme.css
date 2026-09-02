@@ -30,6 +30,17 @@
    */
   --iryx-font-sans: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 
+  /*
+   * Corner radius. One knob for the whole scale: this is `rounded-lg`, and
+   * every other step is derived from it, so an app squares itself off or
+   * rounds itself up in a line:
+   *
+   *   :root { --iryx-radius: 0; }
+   *
+   * `rounded-full` is left alone — a pill is a shape, not a radius.
+   */
+  --iryx-radius: 0.5rem;
+
   /* Neutral surfaces — shadcn/ui "zinc" palette. */
   --iryx-background: oklch(1 0 0);
   --iryx-foreground: oklch(0.145 0 0);
@@ -158,6 +169,20 @@
 
 @theme inline {
   --font-sans: var(--iryx-font-sans);
+  /*
+   * Tailwind's own radius scale, rebuilt as multiples of the base. At the
+   * default `0.5rem` every step comes out at exactly the value Tailwind ships,
+   * so nothing moves until someone changes the knob — and `0` squares the app
+   * off completely, which offsets from the base cannot do.
+   */
+  --radius: calc(var(--iryx-radius) * 0.5);
+  --radius-xs: calc(var(--iryx-radius) * 0.25);
+  --radius-sm: calc(var(--iryx-radius) * 0.5);
+  --radius-md: calc(var(--iryx-radius) * 0.75);
+  --radius-lg: var(--iryx-radius);
+  --radius-xl: calc(var(--iryx-radius) * 1.5);
+  --radius-2xl: calc(var(--iryx-radius) * 2);
+  --radius-3xl: calc(var(--iryx-radius) * 3);
   --color-background: var(--iryx-background);
   --color-foreground: var(--iryx-foreground);
   --color-primary: var(--iryx-primary);

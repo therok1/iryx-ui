@@ -22,11 +22,11 @@ function tokensIn(source: string): string[] {
 }
 
 /**
- * Tokens that are deliberately mode-independent: a typeface does not change
- * between light and dark, so redeclaring it under `.dark` would be noise that
- * every future theme has to keep in sync for no benefit.
+ * Tokens that are deliberately mode-independent: a typeface and a corner radius
+ * do not change between light and dark, so redeclaring them under `.dark` would
+ * be noise that every future theme has to keep in sync for no benefit.
  */
-const modeAgnosticTokens = ['--iryx-font-sans']
+const modeAgnosticTokens = ['--iryx-font-sans', '--iryx-radius']
 
 /**
  * A token is only usable if it is declared for both modes and exposed to
