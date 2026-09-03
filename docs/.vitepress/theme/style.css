@@ -279,14 +279,18 @@ body {
    * This replaces the old rule, which hid one of two stacked `<pre>`s. That
    * was the shape Shiki emitted under VitePress 1; the elements it targeted
    * do not exist any more, so it had quietly become dead CSS.
+   *
+   * Unscoped from `.prose`: a `Demo`'s specimen stage renders Shiki output
+   * too — a live component fed real highlighted markup — and that stage sits
+   * outside `.prose` on purpose, so it wants the same variables read.
    */
-  .prose .shiki,
-  .prose .shiki span {
+  .shiki,
+  .shiki span {
     color: var(--shiki-light);
   }
 
-  html.dark .prose .shiki,
-  html.dark .prose .shiki span {
+  html.dark .shiki,
+  html.dark .shiki span {
     color: var(--shiki-dark);
   }
 }

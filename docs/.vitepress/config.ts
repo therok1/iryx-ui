@@ -74,6 +74,7 @@ const sidebar = [
       { text: 'Carousel', link: '/components/carousel' },
       { text: 'Chart legend', link: '/components/chart-legend' },
       { text: 'Checkbox', link: '/components/checkbox' },
+      { text: 'Code', link: '/components/code' },
       { text: 'Collapsible', link: '/components/collapsible' },
       { text: 'Color picker', link: '/components/color-picker' },
       { text: 'Combobox', link: '/components/combobox' },

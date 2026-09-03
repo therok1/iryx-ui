@@ -117,6 +117,7 @@ Anywhere a component takes an `icon`, it accepts either shape: a [Hugeicons](htt
 | [`ITable`](/components/table) | Sorting, selection, expansion and per-cell slots, client- or server-driven |
 | [`IStat`](/components/stat) | KPI tile — label, value, signed delta with trend colour, and a hint |
 | [`IDescriptionList`](/components/description-list) | Term and value pairs as `dl`/`dt`/`dd` — vertical or side by side, optionally ruled |
+| [`ICode`](/components/code) | Inline code chip or a `pre` block with a copy button |
 | [`IKbd`](/components/kbd) | Keyboard shortcut as chips — `mod` renders ⌘ or Ctrl per platform |
 | [`IIcon`](/components/icon) | The shared icon renderer — takes a Hugeicons array or any SVG component |
 | [`ITimeline`](/components/timeline) | Ordered run of events — icons, status variants, machine-readable times |

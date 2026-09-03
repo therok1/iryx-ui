@@ -23,6 +23,7 @@ export const componentNames = [
   'Carousel',
   'ChartLegend',
   'Checkbox',
+  'Code',
   'ColorPicker',
   'Combobox',
   'Collapsible',

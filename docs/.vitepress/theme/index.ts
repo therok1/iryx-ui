@@ -2,6 +2,7 @@ import type { Theme } from 'vitepress'
 import { createIryxUi } from 'iryx-ui'
 import { marketingComponents } from 'iryx-ui/marketing'
 import ChartReplay from './components/ChartReplay.vue'
+import CodeHighlightDemo from './components/CodeHighlightDemo.vue'
 import Demo from './components/Demo.vue'
 import InstallCommand from './components/InstallCommand.vue'
 import Layout from './Layout.vue'
@@ -20,6 +21,7 @@ export default {
     // way a consumer does.
     app.use(createIryxUi({ components: marketingComponents }))
     app.component('ChartReplay', ChartReplay)
+    app.component('CodeHighlightDemo', CodeHighlightDemo)
     app.component('Demo', Demo)
     app.component('InstallCommand', InstallCommand)
   },
