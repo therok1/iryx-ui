@@ -1,5 +1,46 @@
 # iryx-ui
 
+## 0.22.0
+
+### Minor Changes
+
+- 0c16956: Add `shape="circle"` to `IProgress` — the same value drawn as a ring, with the
+  readout in its middle.
+  
+  Everything else carries over: `variant`, `size`, `formatValue`, `label` and the
+  indeterminate mode, which spins a quarter arc rather than animating a bar. The
+  ring is drawn in a 0-100 viewBox, so its stroke scales with the diameter and
+  every size keeps the same relative thickness.
+  
+  An `angle` shortens the track to part of a circle — 180 for a half, 270 for a
+  gauge — centred at the top, with the value measured against that track rather
+  than the whole ring.
+  
+  A ring ignores `segments`. A broken-up ring is a donut chart, and `IDonutChart`
+  already covers that.
+- e4d2fe5: Add `--iryx-radius`, a single token for the corner radius of the whole library.
+  
+  Tailwind's radius scale is now derived from it — `rounded-lg` is the token
+  itself, and every other step is a multiple — so an app squares itself off with
+  `--iryx-radius: 0` or softens with `--iryx-radius: 1rem`, the same way
+  `--iryx-font-sans` swaps the typeface. At the default `0.5rem` every step
+  resolves to the value Tailwind already shipped, so nothing moves until the knob
+  is turned. `rounded-full` is untouched.
+  
+  `applyTheme` accepts it as well — `applyTheme({ radius: '0' })` — and its `light`
+  and `dark` keys are now optional, so a theme can change the radius alone.
+- 341a0ae: Add `card` and `tile` shapes to `IRadioGroup` and `ICheckbox` through a new
+  `variant` prop.
+  
+  `card` makes the whole bordered surface the control, for options that carry a
+  description; `tile` centres an icon above the label, for a short row of choices
+  read at a glance. Items gain an `icon`, which the tile renders and the other
+  shapes ignore. The default stays the circle or box beside its label, unchanged.
+  
+  Both new shapes put the text inside the control, so they are named through
+  `aria-labelledby` — naming them by content would read the description out as
+  part of the option's name.
+
 ## 0.21.0
 
 ### Minor Changes
