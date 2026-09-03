@@ -33,6 +33,7 @@ export const componentNames = [
   'DateField',
   'DatePicker',
   'DateRangePicker',
+  'DescriptionList',
   'Dialog',
   'DonutChart',
   'Drawer',
