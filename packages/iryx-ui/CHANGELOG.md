@@ -1,5 +1,12 @@
 # iryx-ui
 
+## 0.23.0
+
+### Minor Changes
+
+- cc9e543: Add `ICode`, an inline code chip or a `pre` block with a copy button.
+- 4c122f1: Add `IDescriptionList`, a `dl` of term and value pairs with `vertical` and `horizontal` orientations and an optional `divided` rule between rows.
+
 ## 0.22.0
 
 ### Minor Changes
