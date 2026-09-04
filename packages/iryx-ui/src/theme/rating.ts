@@ -5,7 +5,7 @@ export const ratingTheme = tv({
     root: 'inline-flex items-center gap-2',
     items: 'flex items-center',
     item: 'relative isolate shrink-0 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-primary/50',
-    empty: 'text-muted-foreground/40',
+    empty: 'text-muted-foreground/80',
     fill: 'absolute inset-y-0 left-0 overflow-hidden text-warning',
     label: 'text-sm text-muted-foreground tabular-nums',
   },

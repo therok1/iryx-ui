@@ -18,7 +18,7 @@ export const kbdTheme = tv({
   slots: {
     root: 'inline-flex shrink-0 items-center',
     key: 'inline-flex items-center justify-center rounded border border-current/25 text-center font-medium text-current',
-    separator: 'text-current/60',
+    separator: 'text-current',
   },
   variants: {
     size: {

@@ -9,7 +9,7 @@ export const tableTheme = tv({
     tr: 'border-b border-border transition-colors last:border-b-0',
     th: 'border-b border-border px-3 py-3 text-start align-middle text-xs font-semibold tracking-wide text-muted-foreground uppercase',
     sortButton: 'inline-flex cursor-pointer items-center gap-1.5 rounded-md tracking-wide uppercase transition-shadow outline-none focus-visible:ring-2 focus-visible:ring-primary/50 [&_svg]:size-3.5 [&_svg]:shrink-0',
-    sortIcon: 'text-muted-foreground/70 transition-colors',
+    sortIcon: 'text-muted-foreground/80 transition-colors',
     td: 'px-3 py-3 align-middle text-foreground',
     gutter: 'w-px px-3 py-3 align-middle',
     headGutter: 'w-px border-b border-border px-3 py-3 align-middle',

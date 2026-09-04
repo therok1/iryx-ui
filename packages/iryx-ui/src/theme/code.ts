@@ -15,7 +15,7 @@ export const codeTheme = tv({
       },
       false: {
         root: 'inline-flex items-center gap-1',
-        code: 'rounded border border-current/25 bg-current/10 px-1.5 py-0.5 font-mono text-[0.875em] text-current/90',
+        code: 'rounded border border-current/25 px-1.5 py-0.5 font-mono text-[0.875em] text-current',
         copy: 'size-5 [&_svg]:size-3.5',
       },
     },
