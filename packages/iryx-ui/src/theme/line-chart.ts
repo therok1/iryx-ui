@@ -10,6 +10,7 @@ export const lineChartTheme = tv({
     category: 'fill-muted-foreground text-xs',
     line: 'fill-none stroke-current stroke-2 [stroke-linecap:round] [stroke-linejoin:round]',
     area: 'stroke-none',
+    band: 'stroke-none opacity-80',
     crosshair: 'stroke-border',
     marker: 'fill-current',
     markerRing: 'fill-background',

@@ -98,6 +98,14 @@ async function mountChart(props: Record<string, unknown> = {}) {
   return wrapper
 }
 
+/**
+ * The hover targets, not every `rect` in the SVG — the reveal's clip holds one
+ * too, and it sits ahead of them in document order.
+ */
+function hits(wrapper: ReturnType<typeof mount>) {
+  return wrapper.findAll('rect').filter(node => node.attributes('class')?.includes('fill-transparent'))
+}
+
 describe('lineChart', () => {
   it('draws one path through the series', async () => {
     const wrapper = await mountChart()
@@ -147,7 +155,7 @@ describe('lineChart', () => {
     const wrapper = await mountChart()
     expect(wrapper.findAll('circle')).toHaveLength(0)
 
-    await wrapper.findAll('rect')[1]!.trigger('pointerenter')
+    await hits(wrapper)[1]!.trigger('pointerenter')
     // Ring plus marker for the hovered reading only.
     expect(wrapper.findAll('circle')).toHaveLength(2)
     expect(wrapper.findAll('line').some(node => node.attributes('x1') === node.attributes('x2'))).toBe(true)
@@ -158,7 +166,7 @@ describe('lineChart', () => {
     const wrapper = await mountChart({
       data: [{ label: 'Jan', value: 1 }, { label: 'Feb', value: null }],
     })
-    await wrapper.findAll('rect')[1]!.trigger('pointerenter')
+    await hits(wrapper)[1]!.trigger('pointerenter')
     expect(wrapper.findAll('circle')).toHaveLength(0)
   })
 
@@ -233,7 +241,9 @@ describe('chart annotations', () => {
 
   it('renders nothing extra when the slots are unused', async () => {
     const wrapper = await mountChart()
-    expect(wrapper.findAll('rect')).toHaveLength(data.length)
+    // The hit targets and the reveal's clip rect, and nothing drawn besides.
+    expect(hits(wrapper)).toHaveLength(data.length)
+    expect(wrapper.findAll('rect')).toHaveLength(data.length + 1)
   })
 })
 
@@ -278,7 +288,7 @@ describe('multi-series charts', () => {
 
   it('reports every series in one tooltip', async () => {
     const wrapper = await mountChart({ data: multi, series: twoSeries })
-    await wrapper.findAll('rect')[0]!.trigger('pointerenter')
+    await hits(wrapper)[0]!.trigger('pointerenter')
 
     // The tooltip is the only div positioned by an inline style. Taking the
     // last div instead broke as soon as the chart gained another one.
@@ -290,7 +300,7 @@ describe('multi-series charts', () => {
 
   it('marks every series at the hovered category', async () => {
     const wrapper = await mountChart({ data: multi, series: twoSeries })
-    await wrapper.findAll('rect')[0]!.trigger('pointerenter')
+    await hits(wrapper)[0]!.trigger('pointerenter')
     // Ring plus dot, per series.
     expect(wrapper.findAll('circle')).toHaveLength(4)
   })
@@ -300,7 +310,7 @@ describe('multi-series charts', () => {
       data: [{ label: 'Jan', revenue: 4200, expenses: null }],
       series: twoSeries,
     })
-    await wrapper.findAll('rect')[0]!.trigger('pointerenter')
+    await hits(wrapper)[0]!.trigger('pointerenter')
     expect(wrapper.findAll('circle')).toHaveLength(2)
   })
 
@@ -347,5 +357,83 @@ describe('multi-series charts', () => {
     await mountChart({ data: [{ label: 'Jan', ...row }], series: nine })
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('exceeds the 8 categorical slots'))
     warn.mockRestore()
+  })
+})
+
+const stackedData = [
+  { label: 'Jan', direct: 100, partner: 50 },
+  { label: 'Feb', direct: 200, partner: 100 },
+]
+const stackedSeries = [{ key: 'direct', name: 'Direct' }, { key: 'partner', name: 'Partner' }]
+
+async function mountStacked(props: Record<string, unknown> = {}) {
+  return mountChart({ data: stackedData, series: stackedSeries, variant: 'stacked', animate: false, ...props })
+}
+
+describe('lineChart stacked', () => {
+  it('draws a closed band per series', async () => {
+    const wrapper = await mountStacked()
+    const bands = wrapper.findAll('path').filter(path => path.attributes('d')?.endsWith('Z'))
+    expect(bands).toHaveLength(2)
+  })
+
+  it('sits each band on the one below it', async () => {
+    const wrapper = await mountStacked()
+    const [lower, upper] = wrapper.findAll('path').filter(p => p.attributes('d')?.endsWith('Z'))
+    // The second band's return leg runs along the first band's top edge, so
+    // the same y appears in both — that shared edge is what stacking means.
+    const topOfLower = lower!.attributes('d')!.match(/^M[\d.]+ ([\d.]+)/)![1]
+    expect(upper!.attributes('d')).toContain(topOfLower!)
+  })
+
+  it('scales the axis to the total rather than the tallest series', async () => {
+    const stacked = await mountStacked()
+    const grouped = await mountChart({ data: stackedData, series: stackedSeries, animate: false })
+    // 300 is the tallest total, 200 the tallest single reading.
+    expect(stacked.text()).toContain('300')
+    expect(grouped.text()).not.toContain('300')
+  })
+
+  it('treats a gap as no contribution instead of breaking the band', async () => {
+    const wrapper = await mountStacked({
+      data: [
+        { label: 'Jan', direct: 100, partner: 50 },
+        { label: 'Feb', direct: 200, partner: null },
+      ],
+    })
+    expect(wrapper.findAll('path').filter(p => p.attributes('d')?.endsWith('Z'))).toHaveLength(2)
+  })
+
+  it('reports each series own value in the tooltip, not the running total', async () => {
+    const wrapper = await mountStacked()
+    await hits(wrapper)[0]!.trigger('pointerenter')
+    await nextTick()
+    // Jan is 100 and 50; stacking puts the upper band's edge at 150, which is
+    // geometry rather than a reading and must not be what the tooltip says.
+    const tooltip = wrapper.get('div.absolute').text()
+    expect(tooltip).toContain('100')
+    expect(tooltip).toContain('50')
+    expect(tooltip).not.toContain('150')
+  })
+
+  it('falls back to a plain wash for a single series', async () => {
+    const wrapper = await mountChart({ variant: 'stacked', animate: false })
+    expect(wrapper.findAll('path')).toHaveLength(2)
+  })
+})
+
+describe('lineChart reveal', () => {
+  /**
+   * The clip lived inside a `<defs v-if="showArea">`, so a plain line pointed
+   * at an id that was never rendered. An absent clip path renders unclipped,
+   * so the reveal failed silently rather than throwing.
+   */
+  it('clips the plot for every variant, not just the ones with a wash', async () => {
+    for (const variant of ['line', 'area'] as const) {
+      const wrapper = await mountChart({ variant })
+      const clip = wrapper.find('clipPath')
+      expect(clip.exists()).toBe(true)
+      expect(wrapper.get('g[clip-path]').attributes('clip-path')).toContain(clip.attributes('id')!)
+    }
   })
 })

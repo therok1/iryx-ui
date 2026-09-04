@@ -29,8 +29,12 @@ export interface LineChartProps {
   /**
    * `area` adds a wash beneath the line. Ignored for multiple series, where
    * overlapping washes muddy into a colour that belongs to neither.
+   *
+   * `stacked` is the multi-series answer to that: each series sits on top of
+   * the one before it, so the bands abut instead of overlapping and the top
+   * edge reads as the total. It falls back to `area` for a single series.
    */
-  variant?: 'line' | 'area'
+  variant?: 'line' | 'area' | 'stacked'
   /**
    * How much to curve the line, from `0` (straight segments between
    * readings) to `1` (fully rounded). Straight by default: a curve claims the
@@ -77,7 +81,7 @@ export interface LineChartProps {
   unstyled?: boolean
   class?: ClassValue
   ui?: Partial<Record<
-    'root' | 'svg' | 'grid' | 'tick' | 'category' | 'line' | 'area' | 'crosshair'
+    'root' | 'svg' | 'grid' | 'tick' | 'category' | 'line' | 'area' | 'band' | 'crosshair'
     | 'marker' | 'markerRing' | 'tooltip' | 'tooltipLabel' | 'tooltipValue' | 'table',
     string
   >>
@@ -125,8 +129,34 @@ function readValue(datum: LineChartDatum, key: string): SparseValue {
   return typeof raw === 'number' && Number.isFinite(raw) ? raw : null
 }
 
+/** A single series has nothing to stack against, so it stays a plain wash. */
+const isStacked = computed(() => props.variant === 'stacked' && isMulti.value)
+
+/**
+ * Running totals per category, one entry per series.
+ *
+ * A gap counts as nothing rather than breaking the band. Splitting a stack at
+ * a missing reading would drop every series above it by that series' height,
+ * which reads as a fall in *their* numbers — a worse lie than treating an
+ * absent contribution as no contribution. The gap is still visible in the
+ * exposed table, where the cell is empty rather than zero.
+ */
+const stacks = computed(() =>
+  props.data.map(datum =>
+    series.value.reduce<number[]>((running, entry) => {
+      const previous = running[running.length - 1] ?? 0
+      running.push(previous + (readValue(datum, entry.key) ?? 0))
+      return running
+    }, []),
+  ),
+)
+
 const layout = computed(() => cartesianLayout({
-  values: props.data.flatMap(datum => series.value.map(entry => readValue(datum, entry.key))),
+  // Stacked, the axis has to reach the tallest total rather than the tallest
+  // single reading, or the top band runs off the plot.
+  values: isStacked.value
+    ? stacks.value.map(running => running[running.length - 1]!)
+    : props.data.flatMap(datum => series.value.map(entry => readValue(datum, entry.key))),
   categories: props.data.length,
   longestLabel: Math.max(...props.data.map(datum => datum.label.length), 1),
   width: width.value,
@@ -134,7 +164,9 @@ const layout = computed(() => cartesianLayout({
   tickCount: props.ticks,
   showAxis: props.axis,
   formatTick: formatValue,
-  includeZero: props.zero,
+  // Bands are magnitudes measured from the baseline, so the baseline has to be
+  // on the chart — the same reason bars always include zero.
+  includeZero: props.zero || isStacked.value,
 }))
 
 interface Point { x: number, y: number, index: number }
@@ -153,7 +185,11 @@ const lines = computed(() => {
     let current: Point[] = []
 
     props.data.forEach((datum, index) => {
-      const value = readValue(datum, entry.key)
+      // Stacked, a gap contributes nothing but does not end the run — the band
+      // has to stay continuous for the series above it to sit on.
+      const value = isStacked.value
+        ? stacks.value[index]![seriesIndex]!
+        : readValue(datum, entry.key)
       if (value == null) {
         if (current.length)
           runs.push(current)
@@ -179,7 +215,35 @@ const lines = computed(() => {
  * only the single-series case gets one. Also gated on there being a measured
  * line at all — before the first measurement there is nothing to fill under.
  */
-const showArea = computed(() => props.variant === 'area' && !isMulti.value && lines.value.length > 0)
+const showArea = computed(() =>
+  (props.variant === 'area' || props.variant === 'stacked')
+  && !isMulti.value
+  && lines.value.length > 0,
+)
+
+/**
+ * One band per series, each closed against the series below it rather than
+ * against the baseline — that abutting edge is what makes the heights add up
+ * instead of overlapping. The first series closes on the baseline itself.
+ */
+const bands = computed(() => {
+  if (!isStacked.value || !width.value)
+    return []
+
+  return series.value.map((entry, seriesIndex) => {
+    const top = props.data.map((_, index) => ({
+      x: round(layout.value.pointAt(index)),
+      y: round(layout.value.y(stacks.value[index]![seriesIndex]!)),
+      index,
+    }))
+    const base = props.data.map((_, index) => ({
+      x: round(layout.value.pointAt(index)),
+      y: round(layout.value.y(seriesIndex === 0 ? 0 : stacks.value[index]![seriesIndex - 1]!)),
+      index,
+    }))
+    return { top, base, color: seriesColor(slotOf(entry, seriesIndex)), seriesIndex }
+  })
+})
 
 /** Where the data starts and ends, and the plot edges it can be carried to. */
 const edgeX = computed(() => {
@@ -259,6 +323,15 @@ function toArea(points: Point[]): string {
   const leftX = props.flush && first.x === edgeX.value.first ? edgeX.value.left : first.x
   const rightX = props.flush && last.x === edgeX.value.last ? edgeX.value.right : last.x
   return `${toLine(points)} L${rightX} ${base} L${leftX} ${base} Z`
+}
+
+/**
+ * Along the top edge, then back along the edge below it. The return leg is
+ * the same `toLine` reversed, so a curved band closes on exactly the curve
+ * its neighbour was drawn with instead of leaving a sliver between them.
+ */
+function toBand(top: Point[], base: Point[]): string {
+  return `${toLine(top)} ${toLine([...base].reverse()).replace('M', 'L')} Z`
 }
 
 /*
@@ -406,8 +479,8 @@ function slotClass(slot: keyof NonNullable<LineChartProps['ui']>, extra?: ClassV
           so the line stays the strongest thing in the plot and the area
           reads as depth under it rather than as a filled shape.
         -->
-        <defs v-if="showArea">
-          <linearGradient :id="areaGradientId" x1="0" y1="0" x2="0" y2="1">
+        <defs>
+          <linearGradient v-if="showArea" :id="areaGradientId" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stop-color="currentColor" stop-opacity="0.35" />
             <stop offset="100%" stop-color="currentColor" stop-opacity="0" />
           </linearGradient>
@@ -416,6 +489,11 @@ function slotClass(slot: keyof NonNullable<LineChartProps['ui']>, extra?: ClassV
             The reveal's wipe. It widens with the line rather than fading,
             and lives here so the area keeps its own translucency — an
             opacity applied to the shape would override the wash's.
+
+            Unconditional, unlike the gradient above it. Everything in the plot
+            is clipped by this, so gating it on the wash left a plain line
+            pointing at an id that did not exist — which renders unclipped, so
+            the reveal silently never played for `variant="line"`.
           -->
           <clipPath :id="plotClipId">
             <rect
@@ -454,6 +532,19 @@ function slotClass(slot: keyof NonNullable<LineChartProps['ui']>, extra?: ClassV
             :fill="`url(#${areaGradientId})`"
             :style="{ color: lines[0]!.color }"
             :class="slotClass('area')"
+          />
+
+          <!--
+            Flat tints rather than the single-series gradient: bands abut, so
+            one fading out would show the band below through its own top edge
+            and read as a colour neither of them is.
+          -->
+          <path
+            v-for="band in bands"
+            :key="`band-${band.seriesIndex}`"
+            :d="toBand(band.top, band.base)"
+            :style="{ fill: band.color }"
+            :class="slotClass('band')"
           />
 
           <template v-for="line in lines" :key="`series-${line.seriesIndex}`">

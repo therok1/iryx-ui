@@ -135,6 +135,32 @@ const regions = [
 
 A legend appears automatically from two series up; `legend` is honoured only for a single series. When series come and go, give each one a `slot` so its colour stays with the entity.
 
+## Stacked
+
+`stacked` sits each series on top of the one before it, so the bands abut instead of overlapping and the top edge is the total. It is the multi-series answer to `area`, which stays single-series because overlapping washes muddy into a colour belonging to neither.
+
+<Demo stack>
+<template #demo>
+<ILineChart :data="byRegion" :series="regions" variant="stacked" :format="currency" class="w-full" label="Revenue by month and region, stacked" />
+</template>
+
+```vue
+<ILineChart
+  :data="byRegion"
+  :series="regions"
+  variant="stacked"
+  :format="currency"
+  label="Revenue by month and region, stacked"
+/>
+```
+</Demo>
+
+Stacking reads as parts of a whole, so it carries two rules the other variants do not. The axis always includes zero, because a band's height *is* its value and measuring that from anywhere else makes the parts stop adding up. And a gap counts as no contribution rather than breaking the band — dropping every series above it by its own height would read as a fall in *their* numbers. The gap is still a gap in the exposed table, where the cell is empty rather than zero.
+
+The tooltip reports each series' own reading, not its running total. Read the totals off the top edge.
+
+Reach for it when the parts belong to one quantity — revenue by region, storage by bucket. When they are independent measures that happen to share an axis, keep them as lines: stacking implies a sum, and summing two unrelated numbers gives a total that means nothing.
+
 ## Where the axis starts
 
 Zero is off by default, unlike [`IBarChart`](/components/bar-chart): the axis is fitted to the data so the shape of the line stays readable.
@@ -234,12 +260,12 @@ The plot is uncovered left to right: the line and its wash share one clip, so th
 <Demo stack>
 <template #demo>
 <ChartReplay v-slot="{ key, animate }">
-<ILineChart :key="key" :data="monthly" area :animate="animate" label="Revenue by month" class="w-full" />
+<ILineChart :key="key" :data="monthly" variant="area" :animate="animate" label="Revenue by month" class="w-full" />
 </ChartReplay>
 </template>
 
 ```vue
-<ILineChart :data="monthly" area :animate="{ easing: 'ease-out', duration: 700 }" />
+<ILineChart :data="monthly" variant="area" :animate="{ easing: 'ease-out', duration: 700 }" />
 
 <!-- Off entirely -->
 <ILineChart :data="monthly" :animate="false" />
@@ -258,7 +284,7 @@ It plays **once**, on the first paint with something to draw — not again when 
 | --- | --- | --- | --- |
 | `data` | `LineChartDatum[]` | `[]` | One entry per category, in order |
 | `series` | `ChartSeries[]` | — | Two or more measures per category |
-| `variant` | `'line' \| 'area'` | `'line'` | `area` adds a wash; ignored for multiple series |
+| `variant` | `'line' \| 'area' \| 'stacked'` | `'line'` | `area` washes under a single series; `stacked` sits several on each other |
 | `tension` | `number` | `0` | Curve between readings, `0` straight to `1` rounded |
 | `flush` | `boolean` | — | Carry the line and fill flat to the plot edges |
 | `height` | `number` | `240` | Rendered height in px; width fills the container |
@@ -272,7 +298,7 @@ It plays **once**, on the first paint with something to draw — not again when 
 | `label` | `string` | — | Accessible name for the figure |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged with the built-in classes |
-| `ui` | `{ root?, svg?, grid?, tick?, category?, line?, area?, crosshair?, marker?, markerRing?, tooltip?, tooltipLabel?, tooltipValue?, table? }` | — | Per-element class overrides |
+| `ui` | `{ root?, svg?, grid?, tick?, category?, line?, area?, band?, crosshair?, marker?, markerRing?, tooltip?, tooltipLabel?, tooltipValue?, table? }` | — | Per-element class overrides |
 
 ## Slots
 
