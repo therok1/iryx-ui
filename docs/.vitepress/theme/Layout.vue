@@ -156,9 +156,14 @@ watch(() => route.path, () => {
       `body` also works — and breaks `position: sticky` for every descendant,
       which silently killed the sticky header site-wide.
     -->
-    <div v-if="isHome" id="content" class="flex-1 overflow-x-clip">
+    <!--
+      `main`, not a `div`: this is what "Skip to content" jumps to, and a plain
+      `div` gives a screen reader nothing to land on — the inner pages below
+      already get this right.
+    -->
+    <main v-if="isHome" id="content" class="flex-1 overflow-x-clip">
       <Content />
-    </div>
+    </main>
 
     <!--
       Inner pages: a margin index rather than a sidebar. It sits in the gutter
