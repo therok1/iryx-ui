@@ -30,6 +30,7 @@ export const componentNames = [
   'CommandPalette',
   'Container',
   'ConfirmDialog',
+  'ConfirmPopover',
   'ContextMenu',
   'DateField',
   'DatePicker',

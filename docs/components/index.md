@@ -79,6 +79,7 @@ Anywhere a component takes an `icon`, it accepts either shape: a [Hugeicons](htt
 | [`IDialog`](/components/dialog) | Modal with header/body/footer slots, `dismissible` and `showClose` |
 | [`IDrawer`](/components/drawer) | Panel or sheet attached to any edge — swipe to dismiss, optional snap points |
 | [`IConfirmDialog`](/components/confirm-dialog) | Host for `useConfirm()` — renders the promise-based confirmation |
+| [`IConfirmPopover`](/components/confirm-popover) | A yes/no popover for a lower-stakes confirm — inline, no backdrop |
 | [`ITooltip`](/components/tooltip) | Hover/focus tooltip with side, align, delay and optional arrow |
 | [`IPopover`](/components/popover) | Panel anchored to its trigger — sides, arrow, optional `modal` focus trap |
 | [`IHoverCard`](/components/hover-card) | Hover-summoned preview of what a link points at — delays, sides, arrow |

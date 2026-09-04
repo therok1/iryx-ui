@@ -80,6 +80,7 @@ const sidebar = [
       { text: 'Combobox', link: '/components/combobox' },
       { text: 'Command palette', link: '/components/command-palette' },
       { text: 'Confirm dialog', link: '/components/confirm-dialog' },
+      { text: 'Confirm popover', link: '/components/confirm-popover' },
       { text: 'Container', link: '/components/container' },
       { text: 'Context menu', link: '/components/context-menu' },
       { text: 'Date field', link: '/components/date-field' },
