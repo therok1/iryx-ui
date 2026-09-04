@@ -1,5 +1,18 @@
 # iryx-ui
 
+## 0.24.0
+
+### Minor Changes
+
+- 69a7328: Add `IConfirmPopover`, an anchored yes/no confirm for actions too frequent or low-stakes for `IConfirmDialog`'s modal.
+- c5a5547: Add `variant="stacked"` to `ILineChart`: each series sits on the one before it, so the bands abut instead of overlapping and the top edge reads as the total. The axis always includes zero and a gap counts as no contribution rather than breaking the band.
+  
+  Fix the reveal animation never playing for `variant="line"`. Its clip path was rendered only alongside the area wash, so a plain line referenced an id that did not exist.
+
+### Patch Changes
+
+- c0cf2c0: Fix `IKbd` failing WCAG AA contrast. The key text was drawn at 75% of `currentColor` over a `currentColor` fill, which measured 2.8:1 against a muted context in light mode. The text is now full strength and the fill is gone, so a chip no longer lowers the contrast of the text it sits in; the border carries the key-cap shape.
+
 ## 0.23.0
 
 ### Minor Changes
