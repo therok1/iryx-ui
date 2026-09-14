@@ -8,6 +8,14 @@ const trail = [
   { label: 'Northwind Supply', href: '#' },
   { label: 'INV-1042' },
 ]
+
+const deep = [
+  { label: 'Home', href: '#' },
+  { label: 'Clients', href: '#' },
+  { label: 'Europe', href: '#' },
+  { label: 'Northwind Supply', href: '#' },
+  { label: 'INV-1042' },
+]
 </script>
 
 # IBreadcrumb
@@ -69,6 +77,22 @@ const trail = [
 </script>
 ```
 
+## Collapsing a long trail
+
+`max` caps how many crumbs show. The first stays, the last `max - 1` stay, and the rest fold into a "…" menu.
+
+<Demo stack>
+<template #demo>
+<IBreadcrumb :items="deep" :max="3" />
+</template>
+
+```vue
+<IBreadcrumb :items="deep" :max="3" />
+```
+</Demo>
+
+Hidden crumbs open through `onSelect` when they have one, or navigate to their `href`. Menu rows aren't real links, so middle-click won't open them in a new tab.
+
 ## A custom separator
 
 The `separator` slot replaces the divider between crumbs.
@@ -95,6 +119,8 @@ The `separator` slot replaces the divider between crumbs.
 | --- | --- | --- | --- |
 | `items` | `BreadcrumbItem[]` | `[]` | The trail, root first |
 | `label` | `string` | `'Breadcrumb'` | Accessible name for the navigation region |
+| `max` | `number` | — | Show at most this many crumbs, folding the middle into a menu |
+| `moreLabel` | `string` | `'Show hidden pages'` | Accessible name for the "…" button |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged with the built-in classes |
 | `ui` | `{ root?, list?, item?, link?, current?, separator? }` | — | Per-element class overrides |

@@ -134,6 +134,40 @@ describe('stat', () => {
   })
 })
 
+describe('breadcrumb collapse', () => {
+  const trail = ['Home', 'Clients', 'Europe', 'Northwind', 'INV-1042'].map((label, i, all) =>
+    i === all.length - 1 ? { label } : { label, href: `/${i}` },
+  )
+
+  it('keeps the first and last crumbs, folding the middle into a menu', () => {
+    const wrapper = mount(Breadcrumb, { props: { items: trail, max: 3 } })
+    expect(wrapper.findAll('li')).toHaveLength(4)
+    expect(wrapper.text()).toContain('Home')
+    expect(wrapper.text()).not.toContain('Clients')
+    expect(wrapper.text()).not.toContain('Europe')
+    expect(wrapper.text()).toContain('Northwind')
+    expect(wrapper.get('[aria-current="page"]').text()).toBe('INV-1042')
+    expect(wrapper.find('button[aria-label="Show hidden pages"]').exists()).toBe(true)
+  })
+
+  it('does not collapse when everything fits', () => {
+    const wrapper = mount(Breadcrumb, { props: { items: trail, max: 5 } })
+    expect(wrapper.findAll('li')).toHaveLength(5)
+    expect(wrapper.find('button[aria-label]').exists()).toBe(false)
+  })
+
+  it('never hides the current page', () => {
+    const wrapper = mount(Breadcrumb, { props: { items: trail, max: 0 } })
+    expect(wrapper.findAll('li')).toHaveLength(3)
+    expect(wrapper.get('[aria-current="page"]').text()).toBe('INV-1042')
+  })
+
+  it('takes a translated label for the menu button', () => {
+    const wrapper = mount(Breadcrumb, { props: { items: trail, max: 3, moreLabel: 'Mostrar más' } })
+    expect(wrapper.find('button[aria-label="Mostrar más"]').exists()).toBe(true)
+  })
+})
+
 describe('breadcrumb', () => {
   const items = [
     { label: 'Home', href: '/', icon: Home },
