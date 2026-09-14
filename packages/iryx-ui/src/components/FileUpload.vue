@@ -257,6 +257,7 @@ const theme = computed(() =>
     dragging: isDragging.value,
     invalid: isInvalid.value,
     disabled: props.disabled,
+    withStatus: !!props.statusFor,
   }),
 )
 
@@ -336,12 +337,12 @@ const browseClass = computed(() =>
             {{ formatSize(file.size) }}<template v-if="statusOf(file)?.state === 'uploading' && statusOf(file)!.progress != null"> · {{ Math.round(statusOf(file)!.progress!) }}%</template><template v-else-if="statusOf(file)?.state === 'done'"> · {{ props.doneText }}</template>
           </span>
           <Progress
-            v-if="props.statusFor"
-            :model-value="statusOf(file)?.state === 'uploading' ? statusOf(file)!.progress ?? null : 100"
+            v-if="statusOf(file)?.state === 'uploading'"
+            :model-value="statusOf(file)!.progress ?? null"
             size="sm"
             :aria-label="file.name"
             :unstyled="isUnstyled"
-            :class="slotClass('progress', statusOf(file)?.state !== 'uploading' && 'invisible')"
+            :class="slotClass('progress')"
           />
         </span>
 

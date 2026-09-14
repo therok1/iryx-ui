@@ -32,6 +32,9 @@ export const fileUploadTheme = tv({
     disabled: {
       true: { dropzone: 'pointer-events-none opacity-50' },
     },
+    withStatus: {
+      true: { details: 'min-h-11.5 justify-center' },
+    },
   },
 })
 

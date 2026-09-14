@@ -203,12 +203,11 @@ describe('fileUpload', () => {
       expect(wrapper.text()).not.toContain('%')
     })
 
-    // Hidden rather than removed, so the row keeps its height.
-    it('hides the bar once done without collapsing the row', () => {
+    it('drops the bar once done', () => {
       const wrapper = mount(FileUpload, {
         props: { modelValue: [doc], statusFor: () => ({ state: 'done' }) },
       })
-      expect(wrapper.html()).toMatch(/class="[^"]*invisible[^"]*"/)
+      expect(wrapper.find('[role="progressbar"]').exists()).toBe(false)
       expect(wrapper.text()).toContain('1 kB · Uploaded')
     })
 
@@ -226,6 +225,12 @@ describe('fileUpload', () => {
         props: { modelValue: [doc], failedText: 'Échec', statusFor: () => ({ state: 'error' }) },
       })
       expect(wrapper.get('[role="alert"]').text()).toBe('Échec')
+    })
+
+    it('makes room for the bar on every row only when statusFor is set', () => {
+      const tracked = mount(FileUpload, { props: { modelValue: [doc], statusFor: () => undefined } })
+      expect(tracked.html()).toContain('min-h-11.5')
+      expect(mount(FileUpload, { props: { modelValue: [doc] } }).html()).not.toContain('min-h-11.5')
     })
 
     it('shows plain rows without statusFor', () => {
