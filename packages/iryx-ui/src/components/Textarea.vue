@@ -3,7 +3,7 @@ import type { ClassValue } from '../class-value'
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useFormField } from '../composables/form'
 import { useIryxUiConfig } from '../config'
-import { textareaTheme } from '../theme/input'
+import { textareaCountTheme, textareaTheme } from '../theme/input'
 
 export interface TextareaProps {
   size?: 'sm' | 'md' | 'lg'
@@ -22,14 +22,30 @@ export interface TextareaProps {
   required?: boolean
   /** Mark the field as invalid — styles the border and ring red. */
   invalid?: boolean
+  /** Hard limit in characters, enforced by the browser. */
+  maxlength?: number
+  /**
+   * Show a character count under the field — "120/500" with `maxlength`,
+   * turning red within the last tenth of the limit.
+   */
+  showCount?: boolean
+  /**
+   * What a screen reader announces near the limit. Override for non-English
+   * apps.
+   */
+  countLabel?: (remaining: number) => string
   id?: string
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
+  /** Applied to the wrapper when `showCount` is on, otherwise to the textarea. */
   class?: ClassValue
 }
 
+defineOptions({ inheritAttrs: false })
+
 const props = withDefaults(defineProps<TextareaProps>(), {
   invalid: undefined,
+  countLabel: (remaining: number) => `${remaining} ${remaining === 1 ? 'character' : 'characters'} left`,
   unstyled: undefined,
 })
 
@@ -51,9 +67,17 @@ const classes = computed(() => {
     size: props.size,
     invalid: isInvalid.value,
     autosize: !!props.autosize,
-    class: props.class,
+    class: props.showCount ? undefined : props.class,
   })
 })
+
+const length = computed(() => model.value?.length ?? 0)
+const remaining = computed(() => (props.maxlength == null ? undefined : props.maxlength - length.value))
+const nearLimit = computed(() => remaining.value != null && remaining.value <= Math.ceil(props.maxlength! * 0.1))
+
+const countTheme = computed(() => textareaCountTheme({ nearLimit: nearLimit.value }))
+const countRootClass = computed(() => (isUnstyled.value ? props.class : countTheme.value.root({ class: props.class })))
+const countClass = computed(() => (isUnstyled.value ? undefined : countTheme.value.count()))
 
 const el = ref<HTMLTextAreaElement>()
 
@@ -112,11 +136,36 @@ watch(() => [model.value, props.autosize, props.size], () => void nextTick(resiz
 </script>
 
 <template>
+  <div v-if="props.showCount" :class="countRootClass">
+    <textarea
+      :id="inputId"
+      ref="el"
+      v-bind="$attrs"
+      v-model="model"
+      :rows="props.autosize ? bounds.min : props.rows"
+      :maxlength="props.maxlength"
+      :placeholder="props.placeholder"
+      :disabled="props.disabled"
+      :required="props.required"
+      :aria-invalid="isInvalid || undefined"
+      :aria-describedby="field?.describedBy.value"
+      :class="classes"
+    />
+    <span aria-hidden="true" :class="countClass">
+      {{ props.maxlength == null ? length : `${length}/${props.maxlength}` }}
+    </span>
+    <span class="sr-only" aria-live="polite">
+      {{ nearLimit ? props.countLabel(remaining!) : '' }}
+    </span>
+  </div>
   <textarea
+    v-else
     :id="inputId"
     ref="el"
+    v-bind="$attrs"
     v-model="model"
     :rows="props.autosize ? bounds.min : props.rows"
+    :maxlength="props.maxlength"
     :placeholder="props.placeholder"
     :disabled="props.disabled"
     :required="props.required"

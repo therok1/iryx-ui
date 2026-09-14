@@ -47,6 +47,18 @@ export const textareaTheme = tv({
   },
 })
 
+export const textareaCountTheme = tv({
+  slots: {
+    root: 'grid gap-1.5',
+    count: 'justify-self-end text-xs text-muted-foreground tabular-nums',
+  },
+  variants: {
+    nearLimit: {
+      true: { count: 'text-danger' },
+    },
+  },
+})
+
 export type InputVariants = Parameters<typeof inputTheme>[0]
 export type InputSlots = keyof ReturnType<typeof inputTheme>
 export type TextareaVariants = Parameters<typeof textareaTheme>[0]

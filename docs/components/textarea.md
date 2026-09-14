@@ -12,6 +12,7 @@ const sizeSm = ref('')
 const sizeMd = ref('')
 const sizeLg = ref('')
 const invalid = ref('')
+const bio = ref('')
 </script>
 
 # ITextarea
@@ -56,6 +57,26 @@ Pass an object to bound the growth. `min` and `max` are counted in rows.
 ```
 </Demo>
 
+## Character count
+
+`showCount` adds a count under the field. With `maxlength` it reads against the limit and turns red in the last tenth. Screen readers only hear it then, so they aren't told the count on every keystroke.
+
+<Demo stack>
+<template #demo>
+<ITextarea v-model="bio" show-count :maxlength="160" placeholder="A short bio" class="w-full max-w-md" />
+</template>
+
+```vue
+<ITextarea v-model="bio" show-count :maxlength="160" placeholder="A short bio" />
+```
+</Demo>
+
+The announcement is English by default. Pass `countLabel` to translate it:
+
+```vue
+<ITextarea v-model="bio" show-count :maxlength="160" :count-label="n => `quedan ${n}`" />
+```
+
 ## Sizes
 
 <Demo stack>
@@ -99,8 +120,11 @@ Inside an [`IFormField`](/components/form-field), `invalid` is set for you from 
 | `disabled` | `boolean` | `false` | Disables the field |
 | `required` | `boolean` | `false` | Marks it required |
 | `invalid` | `boolean` | — | Error styling; set automatically inside `IFormField` |
+| `maxlength` | `number` | — | Hard character limit |
+| `showCount` | `boolean` | `false` | Show a character count under the field |
+| `countLabel` | `(remaining: number) => string` | English | What screen readers announce near the limit |
 | `id` | `string` | generated | Useful when an external `ILabel` targets it |
 | `unstyled` | `boolean` | — | Drop built-in classes |
-| `class` | `string` | — | Merged with the built-in classes |
+| `class` | `string` | — | Merged with the built-in classes; lands on the wrapper when `showCount` is on |
 
 For a single line use [`IInput`](/components/input); for a number, [`INumberInput`](/components/number-input).

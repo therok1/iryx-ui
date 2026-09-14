@@ -131,6 +131,48 @@ describe('textarea', () => {
   })
 })
 
+describe('textarea count', () => {
+  it('stays a bare textarea without a counter', () => {
+    const wrapper = mount(Textarea, { props: { maxlength: 10 } })
+    expect(wrapper.element.tagName).toBe('TEXTAREA')
+    expect(wrapper.attributes('maxlength')).toBe('10')
+  })
+
+  it('shows the count against the limit', () => {
+    const wrapper = mount(Textarea, { props: { showCount: true, maxlength: 100, modelValue: 'hello' } })
+    expect(wrapper.get('[aria-hidden="true"]').text()).toBe('5/100')
+    expect(wrapper.get('textarea').attributes('maxlength')).toBe('100')
+  })
+
+  it('shows a plain count without a limit', () => {
+    const wrapper = mount(Textarea, { props: { showCount: true, modelValue: 'hello' } })
+    expect(wrapper.get('[aria-hidden="true"]').text()).toBe('5')
+  })
+
+  // Announcing every keystroke would drown out what the user is typing.
+  it('only announces near the limit', async () => {
+    const wrapper = mount(Textarea, { props: { showCount: true, maxlength: 20, modelValue: 'hello' } })
+    expect(wrapper.get('[aria-live]').text()).toBe('')
+    expect(wrapper.get('[aria-hidden="true"]').classes()).not.toContain('text-danger')
+    await wrapper.setProps({ modelValue: 'a'.repeat(19) })
+    expect(wrapper.get('[aria-live]').text()).toBe('1 character left')
+    expect(wrapper.get('[aria-hidden="true"]').classes()).toContain('text-danger')
+  })
+
+  it('keeps attributes on the textarea', () => {
+    const wrapper = mount(Textarea, { props: { showCount: true }, attrs: { name: 'notes' } })
+    expect(wrapper.get('textarea').attributes('name')).toBe('notes')
+    expect(wrapper.attributes('name')).toBeUndefined()
+  })
+
+  it('takes a translated label', () => {
+    const wrapper = mount(Textarea, {
+      props: { showCount: true, maxlength: 5, modelValue: 'abcd', countLabel: (n: number) => `quedan ${n}` },
+    })
+    expect(wrapper.get('[aria-live]').text()).toBe('quedan 1')
+  })
+})
+
 describe('textarea autosize', () => {
   it('drops the fixed min-height and the drag handle', () => {
     const wrapper = mount(Textarea, { props: { autosize: true } })
