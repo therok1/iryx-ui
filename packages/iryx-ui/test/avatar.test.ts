@@ -140,6 +140,18 @@ describe('avatarGroup', () => {
     expect(wrapper.html()).toContain('size-8')
   })
 
+  it('lifts and focuses avatars when tooltips are on', () => {
+    const wrapper = mount(AvatarGroup, { props: { items: people, tooltip: true } })
+    expect(wrapper.html()).toContain('group-hover:-translate-y-1')
+    expect(wrapper.findAll('[tabindex="0"]')).toHaveLength(4)
+  })
+
+  it('stays static without tooltips', () => {
+    const wrapper = mount(AvatarGroup, { props: { items: people } })
+    expect(wrapper.html()).not.toContain('translate-y')
+    expect(wrapper.find('[tabindex="0"]').exists()).toBe(false)
+  })
+
   it('drops every built-in class when unstyled', () => {
     const wrapper = mount(AvatarGroup, { props: { items: people, unstyled: true } })
     expect(wrapper.classes()).toHaveLength(0)

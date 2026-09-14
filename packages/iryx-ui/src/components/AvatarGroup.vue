@@ -5,6 +5,7 @@ import { computed } from 'vue'
 import { useIryxUiConfig } from '../config'
 import { avatarGroupTheme } from '../theme/avatar'
 import Avatar from './Avatar.vue'
+import Tooltip from './Tooltip.vue'
 
 /** One member of the stack — an `IAvatar`'s own props, minus the shared ones. */
 export type AvatarGroupItem = Omit<AvatarProps, 'size' | 'shape' | 'unstyled' | 'class' | 'ui'>
@@ -18,12 +19,18 @@ export interface AvatarGroupProps {
   max?: number
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
   shape?: 'circle' | 'square'
+  /**
+   * Show each person's `name` in a tooltip, and lift the avatar under the
+   * pointer or focus out of the stack.
+   */
+  tooltip?: boolean
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   class?: ClassValue
   /** Override classes per element, e.g. `{ overflow: 'bg-primary' }`. */
   ui?: {
     root?: string
+    trigger?: string
     item?: string
     overflow?: string
   }
@@ -60,12 +67,15 @@ const hiddenCount = computed(() => {
 const config = useIryxUiConfig()
 const isUnstyled = computed(() => props.unstyled ?? config.unstyled)
 
-const theme = computed(() => avatarGroupTheme({ size: props.size }))
+const theme = computed(() => avatarGroupTheme({ size: props.size, tooltip: props.tooltip }))
 
 const rootClass = computed(() =>
   isUnstyled.value
     ? [props.ui?.root, props.class]
     : theme.value.root({ class: [props.ui?.root, props.class] }),
+)
+const triggerClass = computed(() =>
+  isUnstyled.value ? props.ui?.trigger : theme.value.trigger({ class: props.ui?.trigger }),
 )
 const itemClass = computed(() =>
   isUnstyled.value ? props.ui?.item : theme.value.item({ class: props.ui?.item }),
@@ -77,22 +87,29 @@ const overflowClass = computed(() =>
 
 <template>
   <div :class="rootClass">
-    <!--
-      The chip comes first in the DOM because the row is reversed, which puts
-      it visually last — at the end of the stack, where "and n more" belongs.
-    -->
     <span v-if="hiddenCount" :class="overflowClass">
       <slot name="overflow" :count="hiddenCount">+{{ hiddenCount }}</slot>
     </span>
 
-    <Avatar
+    <Tooltip
       v-for="(item, index) in shown"
       :key="index"
-      v-bind="item"
-      :size="props.size"
-      :shape="props.shape"
+      :text="item.name"
+      :disabled="!props.tooltip || !item.name"
+      :side-offset="10"
       :unstyled="isUnstyled"
-      :class="itemClass"
-    />
+    >
+      <template #trigger>
+        <span :class="triggerClass" :tabindex="props.tooltip && item.name ? 0 : undefined">
+          <Avatar
+            v-bind="item"
+            :size="props.size"
+            :shape="props.shape"
+            :unstyled="isUnstyled"
+            :class="itemClass"
+          />
+        </span>
+      </template>
+    </Tooltip>
   </div>
 </template>

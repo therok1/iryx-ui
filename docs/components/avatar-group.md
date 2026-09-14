@@ -64,6 +64,20 @@ The overlap scales with the avatar.
 ```
 </Demo>
 
+## Tooltips
+
+`tooltip` names each person on hover or focus, lifting their avatar out of the stack.
+
+<Demo stack>
+<template #demo>
+<IAvatarGroup :items="team" :max="4" tooltip />
+</template>
+
+```vue
+<IAvatarGroup :items="team" :max="4" tooltip />
+```
+</Demo>
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -72,8 +86,9 @@ The overlap scales with the avatar.
 | `max` | `number` | — | Cap the stack, counting the rest in a chip |
 | `size` | `'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'` | `'md'` | Applied to every avatar |
 | `shape` | `'circle' \| 'square'` | `'circle'` | |
+| `tooltip` | `boolean` | `false` | Name each avatar in a tooltip and lift it on hover or focus |
 | `unstyled` | `boolean` | — | Skip built-in classes |
-| `ui` | `{ root?, item?, overflow? }` | — | Per-element class overrides |
+| `ui` | `{ root?, trigger?, item?, overflow? }` | — | Per-element class overrides |
 
 ## Slots
 

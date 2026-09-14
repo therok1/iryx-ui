@@ -37,6 +37,7 @@ export type AvatarSlots = keyof ReturnType<typeof avatarTheme>
 export const avatarGroupTheme = tv({
   slots: {
     root: 'flex flex-row-reverse items-center justify-end',
+    trigger: 'group relative inline-flex rounded-full outline-none',
     item: 'ring-2 ring-background',
     overflow: 'flex shrink-0 items-center justify-center rounded-full bg-muted font-medium text-muted-foreground ring-2 ring-background',
   },
@@ -47,6 +48,11 @@ export const avatarGroupTheme = tv({
       md: { root: '-space-x-2.5 space-x-reverse', overflow: 'size-10 text-sm' },
       lg: { root: '-space-x-3 space-x-reverse', overflow: 'size-12 text-base' },
       xl: { root: '-space-x-4 space-x-reverse', overflow: 'size-16 text-xl' },
+    },
+    tooltip: {
+      true: {
+        item: 'transition-transform duration-300 ease-out group-hover:-translate-y-1 group-focus-visible:-translate-y-1 group-focus-visible:ring-primary motion-reduce:transition-none',
+      },
     },
   },
   defaultVariants: {
