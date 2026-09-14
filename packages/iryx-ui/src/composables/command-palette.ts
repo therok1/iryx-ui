@@ -4,6 +4,11 @@ import { isApplePlatform } from './kbd'
 export interface CommandItem {
   /** What the reader searches for and reads. */
   label: string
+  /**
+   * Stable identity for the recent list. Falls back to the group and label,
+   * so set it when a label can change (a translated app, a renamed page).
+   */
+  id?: string
   icon?: IconLike
   /**
    * Displayed at the trailing edge, split on spaces into separate keys.
@@ -54,6 +59,14 @@ export function toCommandGroups(entries: CommandEntry[] | undefined): CommandGro
   }
 
   return groups
+}
+
+export function commandId(item: CommandItem, group: string): string {
+  return item.id ?? `${group}/${item.label}`
+}
+
+export function pushRecent(recent: string[], id: string, limit: number): string[] {
+  return [id, ...recent.filter(existing => existing !== id)].slice(0, Math.max(0, limit))
 }
 
 /**

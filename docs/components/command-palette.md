@@ -61,7 +61,7 @@ Every command in the app behind one shortcut. It opens on <IKbd keys="mod+k" siz
 <template #demo>
 <IButton variant="outline" @click="grouped = true">Open the palette</IButton>
 <p v-if="chosen" class="text-sm text-muted-foreground">You chose: <strong class="text-foreground">{{ chosen }}</strong></p>
-<ICommandPalette v-model:open="grouped" :items="groups" :hotkey="null" placeholder="Search commands…" />
+<ICommandPalette v-model:open="grouped" :items="groups" :hotkey="null" recent-key="docs-command-palette-demo" placeholder="Search commands…" />
 </template>
 
 ```vue
@@ -138,6 +138,14 @@ Groups are optional. A bare array is a single list, and entries written before o
 
 The demos on this page pass `:hotkey="null"` so they cannot fight the site's own palette. Press <IKbd keys="mod+k" size="xs" /> anywhere on these docs to see the real one.
 
+## Recent commands
+
+`recent-key` makes the palette remember the commands a reader picks and list the latest ones first, under "Recent", while the search is empty. They're stored in `localStorage` under that key, so give each palette its own.
+
+```vue
+<ICommandPalette :items="commands" recent-key="app-command-palette" />
+```
+
 ## Shortcuts on a row
 
 `shortcut` is display only — bind the chord yourself, where the command lives. Write it as spaced keys and each is rendered as its own `kbd`: `mod n`, `g i`, `⇧ ⌘ P`.
@@ -164,6 +172,9 @@ const command = { label: 'Documentation', href: '/docs', onSelect: () => track('
 | `label` | `string` | `'Command palette'` | Accessible name for the dialog |
 | `hotkey` | `string \| null` | `'mod+k'` | Chord that opens it; `null` binds nothing |
 | `closeOnSelect` | `boolean` | `true` | Close once a command is chosen |
+| `recentKey` | `string` | — | `localStorage` key for remembering recent commands; unset remembers nothing |
+| `recentLimit` | `number` | `5` | How many recent commands to keep |
+| `recentLabel` | `string` | `'Recent'` | Heading over the recent commands |
 | `footer` | `boolean` | `true` | The keyboard-hint row along the bottom |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged onto the panel |
@@ -188,6 +199,8 @@ const command = { label: 'Documentation', href: '/docs', onSelect: () => track('
 ```ts
 interface CommandItem {
   label: string
+  /** Stable identity for the recent list; defaults to group and label. */
+  id?: string
   icon?: IconLike
   /** Display only, split on spaces into separate keys. */
   shortcut?: string

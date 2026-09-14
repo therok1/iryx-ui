@@ -2,7 +2,7 @@ import { mount } from '@vue/test-utils'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { nextTick } from 'vue'
 import { CommandPalette } from '../src'
-import { commandHaystack, matchesHotkey, toCommandGroups } from '../src/composables/command-palette'
+import { commandHaystack, commandId, matchesHotkey, pushRecent, toCommandGroups } from '../src/composables/command-palette'
 
 const items = [
   {
@@ -202,5 +202,124 @@ describe('command data', () => {
     const haystack = commandHaystack({ label: 'Go to invoices', keywords: ['billing'] }, 'Navigation')
     expect(haystack).toContain('billing')
     expect(haystack).toContain('Navigation')
+  })
+})
+
+describe('commandPalette recent commands', () => {
+  const KEY = 'test-palette-recent'
+
+  afterEach(() => {
+    window.localStorage.clear()
+    vi.restoreAllMocks()
+  })
+
+  function groupLabels() {
+    return [...document.querySelectorAll('[role="group"]')].map(group => group.firstElementChild?.textContent?.trim())
+  }
+
+  function option(label: string) {
+    return [...document.querySelectorAll<HTMLElement>('[role="option"]')].find(el => el.textContent?.includes(label))!
+  }
+
+  it('lists remembered commands first while the search is empty', async () => {
+    window.localStorage.setItem(KEY, JSON.stringify(['Actions/Create invoice']))
+    const wrapper = openPalette({ recentKey: KEY })
+    await nextTick()
+    await nextTick()
+    expect(groupLabels()[0]).toBe('Recent')
+    expect(document.querySelector('[role="group"]')!.textContent).toContain('Create invoice')
+    wrapper.unmount()
+  })
+
+  it('remembers a chosen command, newest first', async () => {
+    const wrapper = openPalette({ recentKey: KEY, closeOnSelect: false })
+    await nextTick()
+    option('Go to clients').click()
+    await nextTick()
+    option('Create invoice').click()
+    await nextTick()
+    expect(JSON.parse(window.localStorage.getItem(KEY)!)).toEqual(['Actions/Create invoice', 'Navigation/Go to clients'])
+    wrapper.unmount()
+  })
+
+  // Otherwise picking it again from "Recent" would store "Recent/Create invoice".
+  it('remembers a command picked from the recent group under its own group', async () => {
+    window.localStorage.setItem(KEY, JSON.stringify(['Actions/Create invoice']))
+    const wrapper = openPalette({ recentKey: KEY, closeOnSelect: false })
+    await nextTick()
+    await nextTick()
+    document.querySelector<HTMLElement>('[role="group"] [role="option"]')!.click()
+    await nextTick()
+    expect(JSON.parse(window.localStorage.getItem(KEY)!)).toEqual(['Actions/Create invoice'])
+    wrapper.unmount()
+  })
+
+  it('hides the recent group once the reader types', async () => {
+    window.localStorage.setItem(KEY, JSON.stringify(['Actions/Create invoice']))
+    const wrapper = openPalette({ recentKey: KEY })
+    await nextTick()
+    const input = document.querySelector<HTMLInputElement>('input')!
+    input.value = 'invoice'
+    input.dispatchEvent(new Event('input'))
+    await nextTick()
+    expect(groupLabels()).not.toContain('Recent')
+    wrapper.unmount()
+  })
+
+  it('skips remembered commands that were removed or disabled', async () => {
+    window.localStorage.setItem(KEY, JSON.stringify(['Actions/Deleted command', 'Actions/Archive invoice']))
+    const wrapper = openPalette({ recentKey: KEY })
+    await nextTick()
+    await nextTick()
+    expect(groupLabels()).not.toContain('Recent')
+    wrapper.unmount()
+  })
+
+  it('remembers nothing without a recentKey', async () => {
+    const setItem = vi.spyOn(Storage.prototype, 'setItem')
+    const wrapper = openPalette({ closeOnSelect: false })
+    await nextTick()
+    option('Go to clients').click()
+    await nextTick()
+    expect(setItem).not.toHaveBeenCalled()
+    wrapper.unmount()
+  })
+
+  // Private windows and strict settings throw on storage access.
+  it('keeps working when storage is blocked', async () => {
+    vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+      throw new Error('blocked')
+    })
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new Error('blocked')
+    })
+    const onSelect = vi.fn()
+    const wrapper = openPalette({ recentKey: KEY, items: [{ label: 'Go to clients', onSelect }] })
+    await nextTick()
+    option('Go to clients').click()
+    await nextTick()
+    expect(onSelect).toHaveBeenCalledOnce()
+    wrapper.unmount()
+  })
+
+  it('takes a translated heading', async () => {
+    window.localStorage.setItem(KEY, JSON.stringify(['Actions/Create invoice']))
+    const wrapper = openPalette({ recentKey: KEY, recentLabel: 'Nedavno' })
+    await nextTick()
+    await nextTick()
+    expect(groupLabels()[0]).toBe('Nedavno')
+    wrapper.unmount()
+  })
+})
+
+describe('recent helpers', () => {
+  it('prefers an explicit id over group and label', () => {
+    expect(commandId({ label: 'Settings', id: 'settings' }, 'Navigation')).toBe('settings')
+    expect(commandId({ label: 'Settings' }, 'Navigation')).toBe('Navigation/Settings')
+  })
+
+  it('moves a repeat to the front and trims to the limit', () => {
+    expect(pushRecent(['a', 'b', 'c'], 'c', 5)).toEqual(['c', 'a', 'b'])
+    expect(pushRecent(['a', 'b', 'c'], 'd', 3)).toEqual(['d', 'a', 'b'])
   })
 })

@@ -18,7 +18,7 @@ import {
   VisuallyHidden,
 } from 'reka-ui'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { commandHaystack, matchesHotkey, toCommandGroups } from '../composables/command-palette'
+import { commandHaystack, commandId, matchesHotkey, pushRecent, toCommandGroups } from '../composables/command-palette'
 import { useIryxUiConfig } from '../config'
 import { commandPaletteTheme } from '../theme/command-palette'
 import Icon from './Icon.vue'
@@ -39,6 +39,16 @@ export interface CommandPaletteProps {
   hotkey?: string | null
   /** Close once a command is chosen. */
   closeOnSelect?: boolean
+  /**
+   * Remember recently chosen commands under this `localStorage` key and list
+   * them first while the search is empty. Unset (the default) remembers
+   * nothing. Use a different key per palette.
+   */
+  recentKey?: string
+  /** How many recent commands to keep. */
+  recentLimit?: number
+  /** Heading over the recent commands. Override for non-English apps. */
+  recentLabel?: string
   /** Hint row along the bottom. Set `false` to drop it. */
   footer?: boolean
   /** Skip built-in classes; you take over styling entirely. */
@@ -58,6 +68,8 @@ const props = withDefaults(defineProps<CommandPaletteProps>(), {
   hotkey: 'mod+k',
   closeOnSelect: true,
   footer: true,
+  recentLimit: 5,
+  recentLabel: 'Recent',
   unstyled: undefined,
 })
 
@@ -84,6 +96,48 @@ const { contains } = useFilter({ sensitivity: 'base' })
 
 const groups = computed(() => toCommandGroups(props.items))
 
+const recent = ref<string[]>([])
+
+function readRecent(): void {
+  if (!props.recentKey)
+    return
+  try {
+    const stored = JSON.parse(window.localStorage.getItem(props.recentKey) ?? '[]')
+    recent.value = Array.isArray(stored) ? stored.filter((id): id is string => typeof id === 'string') : []
+  }
+  catch {
+    recent.value = []
+  }
+}
+
+function remember(item: CommandItem, group: string): void {
+  if (!props.recentKey)
+    return
+  recent.value = pushRecent(recent.value, commandId(item, group), props.recentLimit)
+  try {
+    window.localStorage.setItem(props.recentKey, JSON.stringify(recent.value))
+  }
+  catch {}
+}
+
+onMounted(readRecent)
+watch(() => props.recentKey, readRecent)
+
+const recentGroup = computed(() => {
+  if (!props.recentKey || !recent.value.length)
+    return undefined
+  const byId = new Map<string, { item: CommandItem, group: string }>()
+  for (const group of groups.value) {
+    for (const item of group.items)
+      byId.set(commandId(item, group.label), { item, group: group.label })
+  }
+  const items = recent.value
+    .slice(0, props.recentLimit)
+    .map(id => byId.get(id))
+    .filter((entry): entry is { item: CommandItem, group: string } => !!entry && !entry.item.disabled)
+  return items.length ? { label: props.recentLabel, items: items.map(entry => entry.item), sources: items.map(entry => entry.group) } : undefined
+})
+
 /**
  * Groups with their surviving commands, and empty groups dropped — a heading
  * over nothing reads as a loading state.
@@ -91,14 +145,17 @@ const groups = computed(() => toCommandGroups(props.items))
 const results = computed(() => {
   const typed = query.value.trim()
 
-  return groups.value
+  const filtered = groups.value
     .map(group => ({
       ...group,
       items: typed
         ? group.items.filter(item => contains(commandHaystack(item, group.label), typed))
         : group.items,
     }))
+    .map(group => ({ ...group, sources: group.items.map(() => group.label) }))
     .filter(group => group.items.length > 0)
+
+  return !typed && recentGroup.value ? [recentGroup.value, ...filtered] : filtered
 })
 
 const isEmpty = computed(() => results.value.length === 0)
@@ -111,10 +168,11 @@ function valueOf(groupIndex: number, itemIndex: number): string {
   return `${groupIndex}:${itemIndex}`
 }
 
-function onSelect(item: CommandItem): void {
+function onSelect(item: CommandItem, group: string): void {
   if (item.disabled)
     return
 
+  remember(item, group)
   emit('select', item)
   item.onSelect?.()
 
@@ -214,7 +272,7 @@ function keysOf(shortcut: string): string[] {
                 :as="item.href ? 'a' : 'div'"
                 :href="item.href"
                 :class="slotClass('item')"
-                @select="onSelect(item)"
+                @select="onSelect(item, group.sources[itemIndex] ?? group.label)"
               >
                 <slot name="item" :item="item">
                   <span v-if="item.icon" :class="slotClass('itemIcon')">
