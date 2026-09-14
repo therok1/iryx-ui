@@ -1,5 +1,16 @@
 # iryx-ui
 
+## 0.25.0
+
+### Minor Changes
+
+- 52e1fbb: feat(avatar-group): add `tooltip` prop that names each avatar and lifts it on hover or focus
+- 4b727a1: feat(breadcrumb): add `max` to fold the middle of a long trail into a menu
+- 950daf7: feat(file-upload): add `statusFor` and `retry` to show per-file upload progress, completion and failures
+- 584695e: feat(input): add `showCount`, `maxlength` and `countLabel` for a character counter in the trailing area
+- e4fa5b2: feat(textarea): add `showCount`, `maxlength` and `countLabel` for a character counter
+- c080f93: feat(toast): add `promise()` and `update()` for toasts that follow async work, plus a `loading` variant
+
 ## 0.24.1
 
 ### Patch Changes
