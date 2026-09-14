@@ -10,6 +10,7 @@ const solid = ref('Overview')
 const lined = ref('Details')
 const panels = ref('overview')
 const vertical = ref('Profile')
+const many = ref('Taxes')
 
 const panelItems = [
   { label: 'Overview', value: 'overview' },
@@ -85,17 +86,47 @@ const items = [
 ```
 </Demo>
 
+## Many tabs
+
+When the tabs don't fit, the list scrolls sideways. The scrollbar is hidden, the tabs fade at whichever edge has more past it (the background stays put), and the selected tab is always scrolled fully into view, including on load.
+
+<Demo stack>
+<template #demo>
+<ITabs v-model="many" :items="['Overview', 'Invoices', 'Payments', 'Customers', 'Products', 'Reports', 'Taxes', 'Settings']" class="w-full max-w-sm" />
+</template>
+
+```vue
+<ITabs v-model="tab" :items="['Overview', 'Invoices', 'Payments', 'Customers', 'Products', 'Reports', 'Taxes', 'Settings']" class="max-w-sm" />
+```
+
+The list carries `data-overflowing`, `data-at-start` and `data-at-end`, for styling that should react to the scroll position.
+</Demo>
+
 ## Vertical
 
 `orientation="vertical"` stacks the triggers down the side, and arrow-key navigation follows the orientation.
 
 <Demo stack>
 <template #demo>
-<ITabs v-model="vertical" :items="['Profile', 'Billing', 'Members']" orientation="vertical" variant="line" class="w-full max-w-md" />
+<ITabs v-model="vertical" :items="['Profile', 'Billing', 'Members']" orientation="vertical" variant="line" class="w-full max-w-md">
+<template #Profile><p class="text-sm text-muted-foreground">Name, photo and the email invoices are sent from.</p></template>
+<template #Billing><p class="text-sm text-muted-foreground">Plan, payment method and past receipts.</p></template>
+<template #Members><p class="text-sm text-muted-foreground">Who can see and edit this workspace.</p></template>
+</ITabs>
 </template>
 
 ```vue
-<ITabs v-model="tab" :items="items" orientation="vertical" variant="line" />
+<ITabs v-model="tab" :items="['Profile', 'Billing', 'Members']" orientation="vertical" variant="line">
+  <template #Profile>
+    Name, photo and the email invoices are sent from.
+  </template>
+  <template #Billing>
+    Plan, payment method and past receipts.
+  </template>
+  <template #Members>
+    Who can see and edit this workspace.
+  </template>
+</ITabs>
 ```
 </Demo>
 
@@ -117,7 +148,7 @@ By default only the active panel is in the DOM. `keepMounted` renders them all a
 | `keepMounted` | `boolean` | `false` | Render every panel, hiding the inactive ones |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged with the built-in classes |
-| `ui` | `{ root?, list?, indicator?, trigger?, content? }` | — | Per-element class overrides |
+| `ui` | `{ root?, frame?, list?, indicator?, trigger?, content? }` | — | Per-element class overrides |
 
 The model is the active item's `value`, falling back to its `label`.
 

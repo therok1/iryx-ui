@@ -19,8 +19,8 @@ export interface ScrollEdges {
  * container that does not actually scroll is a lie about what is there.
  */
 export function useScrollEdges(
-  target: Ref<HTMLElement | undefined>,
-  axis: Ref<'vertical' | 'horizontal'>,
+  target: Readonly<Ref<HTMLElement | undefined>>,
+  axis: Readonly<Ref<'vertical' | 'horizontal'>>,
 ): ScrollEdges {
   const atStart = ref(true)
   const atEnd = ref(true)
