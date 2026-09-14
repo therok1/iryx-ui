@@ -1,5 +1,17 @@
 # iryx-ui
 
+## 0.26.0
+
+### Minor Changes
+
+- 65f7b59: feat(command-palette): remember recently chosen commands with `recentKey` and list them first
+- 4707a74: feat(date-range-picker): add `presets` beside the calendar, with `commonDateRangePresets()` for the usual shortcuts
+- 6889fcf: feat(tabs): scroll an overflowing tab list with faded edges, keeping the active tab in view
+
+### Patch Changes
+
+- 4c435c3: fix(date-range-picker): show one month on narrow screens so the calendar fits a phone
+
 ## 0.25.0
 
 ### Minor Changes
