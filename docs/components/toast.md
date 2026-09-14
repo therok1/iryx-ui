@@ -5,9 +5,26 @@ eyebrow: Feedback
 <script setup lang="ts">
 import { useToast } from 'iryx-ui'
 
-const { toast, success, warning, danger, info, dismiss, clear } = useToast()
+const { toast, success, warning, danger, info, promise, dismiss, clear } = useToast()
 
 let restored = 0
+
+// Vue templates can't reach the global Promise, so the demos live here.
+function sendInvoice() {
+  promise(new Promise(resolve => setTimeout(() => resolve('INV-1042'), 2000)), {
+    loading: 'Sending invoice…',
+    success: id => `${id} sent`,
+    error: 'Could not send the invoice',
+  })
+}
+
+function failUpload() {
+  promise(new Promise((_, reject) => setTimeout(() => reject(new Error('The connection dropped')), 2000)), {
+    loading: 'Uploading…',
+    success: 'Upload complete',
+    error: e => ({ title: 'Upload failed', description: (e as Error).message }),
+  })
+}
 
 function undo() {
   restored += 1
@@ -106,6 +123,31 @@ toast({
 ```
 </Demo>
 
+## Promises
+
+`promise()` covers a piece of async work with one toast: a spinner while it runs, then the success or error message in the same place. The spinner stays until the promise settles; the result then dismisses on the usual `duration`.
+
+<Demo stack>
+<template #demo>
+<div class="flex flex-wrap justify-center gap-2">
+<IButton size="sm" variant="outline" @click="sendInvoice">Send an invoice</IButton>
+<IButton size="sm" variant="outline" @click="failUpload">Fail an upload</IButton>
+</div>
+</template>
+
+```vue
+const { promise } = useToast()
+
+promise(sendInvoice(invoice), {
+  loading: 'Sending invoice…',
+  success: sent => `${sent.number} sent`,
+  error: error => ({ title: 'Could not send the invoice', description: error.message }),
+})
+```
+</Demo>
+
+Each message takes the same string or options object as `toast()`, or a function of the resolved value or the error. `promise()` returns the toast's id, not the result, so await your own promise for that. Dismissing the toast while the work runs keeps it dismissed.
+
 ## Dismissing from code
 
 `toast()` returns an id, so a toast raised while work is in flight can be taken down when the work finishes.
@@ -148,6 +190,8 @@ success(options)
 warning(options)
 danger(options)
 info(options)
+update(id, options) // replace an open toast's content
+promise(work, { loading, success, error }) // returns the toast's id
 dismiss(id)
 clear()
 ```
@@ -158,7 +202,7 @@ clear()
 interface ToastOptions {
   title?: string
   description?: string
-  variant?: 'neutral' | 'success' | 'warning' | 'danger' | 'info'
+  variant?: 'neutral' | 'success' | 'warning' | 'danger' | 'info' | 'loading'
   /** Milliseconds before auto-dismiss. `0` keeps it until dismissed. */
   duration?: number
   action?: {

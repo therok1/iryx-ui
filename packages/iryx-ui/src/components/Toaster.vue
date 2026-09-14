@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ClassValue } from '../class-value'
 import type { ToastRecord } from '../composables/toast'
-import { Alert02Icon, AlertCircleIcon, Cancel01Icon, CheckmarkCircle02Icon, InformationCircleIcon } from '@hugeicons/core-free-icons'
+import { Alert02Icon, AlertCircleIcon, Cancel01Icon, CheckmarkCircle02Icon, InformationCircleIcon, Loading03Icon } from '@hugeicons/core-free-icons'
 import {
   ToastAction,
   ToastClose,
@@ -54,6 +54,7 @@ const defaultIcons = {
   warning: Alert02Icon,
   danger: AlertCircleIcon,
   info: InformationCircleIcon,
+  loading: Loading03Icon,
 } as const
 
 function iconFor(toast: ToastRecord) {

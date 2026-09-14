@@ -18,6 +18,7 @@ export const toastTheme = tv({
       warning: { icon: 'text-warning' },
       danger: { icon: 'text-danger' },
       info: { icon: 'text-info' },
+      loading: { icon: 'text-muted-foreground [&_svg]:animate-spin' },
     },
     position: {
       'top-left': { viewport: 'top-0 left-0' },

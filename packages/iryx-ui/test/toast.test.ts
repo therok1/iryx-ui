@@ -125,6 +125,73 @@ describe('useToast', () => {
     expect(icon.className).not.toMatch(/dark:|emerald|amber|red-|blue-/)
   })
 
+  it('turns a loading toast into success when the promise resolves', async () => {
+    mount(Toaster, { attachTo: document.body })
+    let resolve!: (value: string) => void
+    const work = new Promise<string>(r => (resolve = r))
+    useToast().promise(work, { loading: 'Saving…', success: name => `Saved ${name}`, error: 'Failed' })
+    await settle()
+    expect(body()).toContain('Saving…')
+    expect(toastElements()[0]!.querySelector('div')!.className).toContain('animate-spin')
+
+    resolve('draft')
+    await work
+    await settle()
+    expect(body()).toContain('Saved draft')
+    expect(body()).not.toContain('Saving…')
+    // Updated in place, not stacked as a second toast.
+    expect(toastElements()).toHaveLength(1)
+    expect(toastElements()[0]!.querySelector('div')!.className).toContain('text-success')
+  })
+
+  it('shows the error message when the promise rejects', async () => {
+    mount(Toaster, { attachTo: document.body })
+    const work = Promise.reject(new Error('offline'))
+    useToast().promise(work, { loading: 'Saving…', success: 'Saved', error: e => `Failed: ${(e as Error).message}` })
+    await work.catch(() => {})
+    await settle()
+    expect(body()).toContain('Failed: offline')
+    expect(toastElements()[0]!.querySelector('div')!.className).toContain('text-danger')
+  })
+
+  it('stays open while pending and auto-dismisses once settled', async () => {
+    vi.useFakeTimers()
+    try {
+      mount(Toaster, { attachTo: document.body })
+      let resolve!: () => void
+      const work = new Promise<void>(r => (resolve = r))
+      useToast().promise(work, { loading: 'Saving…', success: 'Saved', error: 'Failed' })
+      await settle()
+      vi.advanceTimersByTime(60_000)
+      await settle()
+      expect(body()).toContain('Saving…')
+
+      resolve()
+      await work
+      await settle()
+      vi.advanceTimersByTime(6000)
+      await settle()
+      expect(body()).not.toContain('Saved')
+    }
+    finally {
+      vi.useRealTimers()
+    }
+  })
+
+  // Dismissing mid-flight means "I don't care", so settling must not bring it back.
+  it('does not bring back a toast dismissed while pending', async () => {
+    mount(Toaster, { attachTo: document.body })
+    let resolve!: () => void
+    const work = new Promise<void>(r => (resolve = r))
+    const toast = useToast()
+    const id = toast.promise(work, { loading: 'Saving…', success: 'Saved', error: 'Failed' })
+    toast.dismiss(id)
+    resolve()
+    await work
+    await settle()
+    expect(toastElements()).toHaveLength(0)
+  })
+
   it('allows overriding the close label for non-English apps', async () => {
     mount(Toaster, { props: { closeLabel: 'Zapri' }, attachTo: document.body })
     useToast().info('Hello')
