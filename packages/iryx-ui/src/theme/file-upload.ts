@@ -16,8 +16,11 @@ export const fileUploadTheme = tv({
     details: 'flex min-w-0 flex-1 flex-col',
     name: 'truncate text-sm text-foreground',
     meta: 'text-xs text-muted-foreground tabular-nums',
+    actions: 'flex shrink-0 items-center gap-1',
     remove: 'flex size-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-[color,background-color,border-color,box-shadow] outline-none hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-primary/50 [&_svg]:size-4',
     error: 'text-xs text-danger',
+    progress: 'mt-1.5',
+    retry: 'flex size-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-[color,background-color,border-color,box-shadow] outline-none hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-primary/50 [&_svg]:size-4',
   },
   variants: {
     dragging: {

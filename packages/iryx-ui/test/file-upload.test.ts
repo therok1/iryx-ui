@@ -184,6 +184,57 @@ describe('fileUpload', () => {
     expect(zone.findAll('button')).toHaveLength(0)
   })
 
+  describe('upload status', () => {
+    const doc = file('report.pdf', 'application/pdf', 1024)
+
+    it('shows a progress bar and percentage while uploading', () => {
+      const wrapper = mount(FileUpload, {
+        props: { modelValue: [doc], statusFor: () => ({ state: 'uploading', progress: 42.4 }) },
+      })
+      expect(wrapper.find('[role="progressbar"]').exists()).toBe(true)
+      expect(wrapper.text()).toContain('42%')
+    })
+
+    it('shows an indeterminate bar without a progress value', () => {
+      const wrapper = mount(FileUpload, {
+        props: { modelValue: [doc], statusFor: () => ({ state: 'uploading' }) },
+      })
+      expect(wrapper.find('[role="progressbar"]').exists()).toBe(true)
+      expect(wrapper.text()).not.toContain('%')
+    })
+
+    // Hidden rather than removed, so the row keeps its height.
+    it('hides the bar once done without collapsing the row', () => {
+      const wrapper = mount(FileUpload, {
+        props: { modelValue: [doc], statusFor: () => ({ state: 'done' }) },
+      })
+      expect(wrapper.html()).toMatch(/class="[^"]*invisible[^"]*"/)
+      expect(wrapper.text()).toContain('1 kB · Uploaded')
+    })
+
+    it('announces a failure and emits retry with the file', async () => {
+      const wrapper = mount(FileUpload, {
+        props: { modelValue: [doc], statusFor: () => ({ state: 'error', error: 'The connection dropped' }) },
+      })
+      expect(wrapper.get('[role="alert"]').text()).toBe('The connection dropped')
+      await wrapper.get('button[aria-label="Retry report.pdf"]').trigger('click')
+      expect(wrapper.emitted('retry')?.[0]?.[0]).toBe(doc)
+    })
+
+    it('falls back to failedText', () => {
+      const wrapper = mount(FileUpload, {
+        props: { modelValue: [doc], failedText: 'Échec', statusFor: () => ({ state: 'error' }) },
+      })
+      expect(wrapper.get('[role="alert"]').text()).toBe('Échec')
+    })
+
+    it('shows plain rows without statusFor', () => {
+      const wrapper = mount(FileUpload, { props: { modelValue: [doc] } })
+      expect(wrapper.find('[role="progressbar"]').exists()).toBe(false)
+      expect(wrapper.find('[role="alert"]').exists()).toBe(false)
+    })
+  })
+
   it('takes translated labels', () => {
     const wrapper = mount(FileUpload, {
       props: { label: 'Déposez un fichier ici', browseLabel: 'Parcourir', hint: 'PNG ou JPG' },

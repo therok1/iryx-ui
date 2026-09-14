@@ -40,7 +40,7 @@ export type { DrawerProps, DrawerSide, DrawerSnapPoint } from './components/Draw
 export type { DropdownMenuProps } from './components/DropdownMenu.vue'
 export type { EditableProps } from './components/Editable.vue'
 export type { EmptyStateProps } from './components/EmptyState.vue'
-export type { FileRejection, FileUploadProps } from './components/FileUpload.vue'
+export type { FileRejection, FileUploadProps, FileUploadStatus } from './components/FileUpload.vue'
 export type { FormProps } from './components/Form.vue'
 export type { FormFieldProps } from './components/FormField.vue'
 export type { HoverCardProps } from './components/HoverCard.vue'

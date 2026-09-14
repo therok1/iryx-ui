@@ -1,17 +1,26 @@
 <script setup lang="ts">
 import type { ClassValue } from '../class-value'
-import { Delete02Icon, File01Icon, Upload05Icon } from '@hugeicons/core-free-icons'
-import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import { Delete02Icon, File01Icon, Refresh01Icon, Upload05Icon } from '@hugeicons/core-free-icons'
+import { computed, onBeforeUnmount, ref, toRaw, watch } from 'vue'
 import { useFormField } from '../composables/form'
 import { useIryxUiConfig } from '../config'
 import { fileUploadTheme } from '../theme/file-upload'
 import Button from './Button.vue'
 import Icon from './Icon.vue'
+import Progress from './Progress.vue'
 
 /** Why a file was turned away, so the caller can word its own message. */
 export interface FileRejection {
   file: File
   reason: 'type' | 'size' | 'count'
+}
+
+export interface FileUploadStatus {
+  state: 'uploading' | 'done' | 'error'
+  /** 0–100. Leave it out while uploading for an indeterminate bar. */
+  progress?: number
+  /** Shown on the row when `state` is `'error'`. Falls back to `failedText`. */
+  error?: string
 }
 
 export interface FileUploadProps {
@@ -33,8 +42,18 @@ export interface FileUploadProps {
   hint?: string
   /** Text on the browse button. */
   browseLabel?: string
+  /**
+   * Upload state for a held file — a bar while uploading, "Uploaded" when done,
+   * the error and a retry button when it failed. Read reactively, so point it
+   * at your own reactive store.
+   */
+  statusFor?: (file: File) => FileUploadStatus | undefined
   /** Labels and messages — override for non-English apps. */
   removeLabel?: string
+  retryLabel?: string
+  /** Added to the size once a file's status is `'done'`. */
+  doneText?: string
+  failedText?: string
   tooLargeText?: string
   wrongTypeText?: string
   tooManyText?: string
@@ -45,7 +64,8 @@ export interface FileUploadProps {
   /** Override classes per element, e.g. `{ dropzone: 'py-10' }`. */
   ui?: Partial<Record<
     'root' | 'dropzone' | 'input' | 'icon' | 'label' | 'browse' | 'hint' | 'list'
-    | 'item' | 'thumbnail' | 'placeholder' | 'details' | 'name' | 'meta' | 'remove' | 'error',
+    | 'item' | 'thumbnail' | 'placeholder' | 'details' | 'name' | 'meta' | 'remove' | 'error'
+    | 'progress' | 'actions' | 'retry',
     string
   >>
 }
@@ -54,6 +74,9 @@ const props = withDefaults(defineProps<FileUploadProps>(), {
   label: 'Drag and drop a file here',
   browseLabel: 'Browse files',
   removeLabel: 'Remove',
+  retryLabel: 'Retry',
+  doneText: 'Uploaded',
+  failedText: 'Upload failed',
   tooLargeText: 'is too large',
   wrongTypeText: 'is not an accepted type',
   tooManyText: 'exceeds the file limit',
@@ -64,6 +87,8 @@ const props = withDefaults(defineProps<FileUploadProps>(), {
 const emit = defineEmits<{
   /** Files the component refused, with the reason for each. */
   reject: [rejections: FileRejection[]]
+  /** The retry button on a failed row was pressed. */
+  retry: [file: File]
 }>()
 
 /**
@@ -200,6 +225,14 @@ onBeforeUnmount(() => {
     URL.revokeObjectURL(url)
 })
 
+/**
+ * The model's files come back as reactive proxies, which a caller's
+ * `Map<File, …>` wouldn't recognise, so the raw file is what gets handed out.
+ */
+function statusOf(file: File): FileUploadStatus | undefined {
+  return props.statusFor?.(toRaw(file))
+}
+
 /** Rounded to one decimal, in the units a person would actually say. */
 function formatSize(bytes: number): string {
   const units = ['B', 'kB', 'MB', 'GB']
@@ -296,18 +329,44 @@ const browseClass = computed(() =>
 
         <span :class="slotClass('details')">
           <span :class="slotClass('name')">{{ file.name }}</span>
-          <span :class="slotClass('meta')">{{ formatSize(file.size) }}</span>
+          <span v-if="statusOf(file)?.state === 'error'" role="alert" :class="slotClass('error')">
+            {{ statusOf(file)!.error ?? props.failedText }}
+          </span>
+          <span v-else :class="slotClass('meta')">
+            {{ formatSize(file.size) }}<template v-if="statusOf(file)?.state === 'uploading' && statusOf(file)!.progress != null"> · {{ Math.round(statusOf(file)!.progress!) }}%</template><template v-else-if="statusOf(file)?.state === 'done'"> · {{ props.doneText }}</template>
+          </span>
+          <Progress
+            v-if="props.statusFor"
+            :model-value="statusOf(file)?.state === 'uploading' ? statusOf(file)!.progress ?? null : 100"
+            size="sm"
+            :aria-label="file.name"
+            :unstyled="isUnstyled"
+            :class="slotClass('progress', statusOf(file)?.state !== 'uploading' && 'invisible')"
+          />
         </span>
 
-        <button
-          type="button"
-          :aria-label="`${props.removeLabel} ${file.name}`"
-          :disabled="props.disabled"
-          :class="slotClass('remove')"
-          @click="remove(index)"
-        >
-          <Icon :icon="Delete02Icon" />
-        </button>
+        <span :class="slotClass('actions')">
+          <button
+            v-if="statusOf(file)?.state === 'error'"
+            type="button"
+            :aria-label="`${props.retryLabel} ${file.name}`"
+            :disabled="props.disabled"
+            :class="slotClass('retry')"
+            @click="emit('retry', toRaw(file))"
+          >
+            <Icon :icon="Refresh01Icon" />
+          </button>
+
+          <button
+            type="button"
+            :aria-label="`${props.removeLabel} ${file.name}`"
+            :disabled="props.disabled"
+            :class="slotClass('remove')"
+            @click="remove(index)"
+          >
+            <Icon :icon="Delete02Icon" />
+          </button>
+        </span>
       </li>
     </ul>
   </div>
