@@ -52,6 +52,7 @@ export const avatarGroupTheme = tv({
     tooltip: {
       true: {
         item: 'transition-transform duration-300 ease-out group-hover:-translate-y-1 group-focus-visible:-translate-y-1 group-focus-visible:ring-primary motion-reduce:transition-none',
+        overflow: 'outline-none focus-visible:ring-primary',
       },
     },
   },

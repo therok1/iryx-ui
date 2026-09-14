@@ -64,6 +64,10 @@ const hiddenCount = computed(() => {
   return all.value.length - limit
 })
 
+const hiddenNames = computed(() =>
+  all.value.slice(all.value.length - hiddenCount.value).map(item => item.name).filter(Boolean).join(', '),
+)
+
 const config = useIryxUiConfig()
 const isUnstyled = computed(() => props.unstyled ?? config.unstyled)
 
@@ -87,9 +91,19 @@ const overflowClass = computed(() =>
 
 <template>
   <div :class="rootClass">
-    <span v-if="hiddenCount" :class="overflowClass">
-      <slot name="overflow" :count="hiddenCount">+{{ hiddenCount }}</slot>
-    </span>
+    <Tooltip
+      v-if="hiddenCount"
+      :text="hiddenNames"
+      :disabled="!props.tooltip || !hiddenNames"
+      :side-offset="10"
+      :unstyled="isUnstyled"
+    >
+      <template #trigger>
+        <span :class="overflowClass" :tabindex="props.tooltip && hiddenNames ? 0 : undefined">
+          <slot name="overflow" :count="hiddenCount">+{{ hiddenCount }}</slot>
+        </span>
+      </template>
+    </Tooltip>
 
     <Tooltip
       v-for="(item, index) in shown"

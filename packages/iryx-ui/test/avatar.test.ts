@@ -146,6 +146,11 @@ describe('avatarGroup', () => {
     expect(wrapper.findAll('[tabindex="0"]')).toHaveLength(4)
   })
 
+  it('makes the overflow chip focusable when tooltips are on', () => {
+    const wrapper = mount(AvatarGroup, { props: { items: people, max: 2, tooltip: true } })
+    expect(wrapper.findAll('[tabindex="0"]')).toHaveLength(3)
+  })
+
   it('stays static without tooltips', () => {
     const wrapper = mount(AvatarGroup, { props: { items: people } })
     expect(wrapper.html()).not.toContain('translate-y')

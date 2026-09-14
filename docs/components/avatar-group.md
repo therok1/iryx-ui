@@ -66,7 +66,7 @@ The overlap scales with the avatar.
 
 ## Tooltips
 
-`tooltip` names each person on hover or focus, lifting their avatar out of the stack.
+`tooltip` names each person on hover or focus, lifting their avatar out of the stack. The "+n" chip lists everyone it hides.
 
 <Demo stack>
 <template #demo>
@@ -86,7 +86,7 @@ The overlap scales with the avatar.
 | `max` | `number` | — | Cap the stack, counting the rest in a chip |
 | `size` | `'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'` | `'md'` | Applied to every avatar |
 | `shape` | `'circle' \| 'square'` | `'circle'` | |
-| `tooltip` | `boolean` | `false` | Name each avatar in a tooltip and lift it on hover or focus |
+| `tooltip` | `boolean` | `false` | Name each avatar in a tooltip and lift it on hover or focus; the chip lists the hidden names |
 | `unstyled` | `boolean` | — | Skip built-in classes |
 | `ui` | `{ root?, trigger?, item?, overflow? }` | — | Per-element class overrides |
 
