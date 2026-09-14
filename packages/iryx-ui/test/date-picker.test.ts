@@ -1,7 +1,7 @@
 import { enableAutoUnmount, flushPromises, mount } from '@vue/test-utils'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { nextTick } from 'vue'
-import { Calendar, DatePicker, DateRangePicker, formatIsoDate, isoToday, toCalendarDate, toIsoDate } from '../src'
+import { Calendar, commonDateRangePresets, DatePicker, DateRangePicker, formatIsoDate, isoToday, toCalendarDate, toIsoDate } from '../src'
 
 // The calendars portal into document.body, so a left-over popover from an
 // earlier test would be counted by the next one's queries.
@@ -195,6 +195,100 @@ describe('dateRangePicker', () => {
     })
     expect(wrapper.text()).toContain('1 Aug')
     expect(wrapper.text()).not.toContain('to')
+  })
+})
+
+describe('commonDateRangePresets', () => {
+  afterEach(() => vi.useRealTimers())
+
+  function resolved(labels?: Parameters<typeof commonDateRangePresets>[0]) {
+    return commonDateRangePresets(labels).map(preset => [
+      preset.label,
+      typeof preset.range === 'function' ? preset.range() : preset.range,
+    ])
+  }
+
+  it('builds the usual ranges relative to today', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date(2026, 8, 14, 12))
+    expect(resolved()).toEqual([
+      ['Today', { start: '2026-09-14', end: '2026-09-14' }],
+      ['Yesterday', { start: '2026-09-13', end: '2026-09-13' }],
+      ['Last 7 days', { start: '2026-09-08', end: '2026-09-14' }],
+      ['Last 30 days', { start: '2026-08-16', end: '2026-09-14' }],
+      ['This month', { start: '2026-09-01', end: '2026-09-30' }],
+      ['Last month', { start: '2026-08-01', end: '2026-08-31' }],
+    ])
+  })
+
+  // "Last month" in March must be February, including its short length.
+  it('handles a short previous month', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date(2026, 2, 3, 12))
+    expect(resolved().at(-1)).toEqual(['Last month', { start: '2026-02-01', end: '2026-02-28' }])
+  })
+
+  it('takes translated labels', () => {
+    expect(resolved({ today: 'Danes' })[0]![0]).toBe('Danes')
+  })
+})
+
+describe('dateRangePicker presets', () => {
+  const august = { label: 'August', range: { start: '2026-08-01', end: '2026-08-31' } }
+
+  async function open(props: Record<string, unknown>) {
+    const wrapper = mount(DateRangePicker, {
+      props: { 'modelValue': { start: null, end: null }, 'onUpdate:modelValue': () => {}, ...props },
+      attachTo: document.body,
+    })
+    await wrapper.get('button').trigger('click')
+    await nextTick()
+    return wrapper
+  }
+
+  function presetButtons() {
+    return [...document.querySelectorAll<HTMLButtonElement>('[role="group"][aria-label="Presets"] button')]
+  }
+
+  it('lists presets beside the calendar', async () => {
+    await open({ presets: [august, { label: 'Q3', range: { start: '2026-07-01', end: '2026-09-30' } }] })
+    expect(presetButtons().map(b => b.textContent?.trim())).toEqual(['August', 'Q3'])
+  })
+
+  it('renders no preset list without presets', async () => {
+    await open({})
+    expect(presetButtons()).toHaveLength(0)
+  })
+
+  it('fills the range and closes when a preset is picked', async () => {
+    const wrapper = await open({ presets: [august] })
+    presetButtons()[0]!.click()
+    await flushPromises()
+    await flushPromises()
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([{ start: '2026-08-01', end: '2026-08-31' }])
+    expect(document.querySelectorAll('[data-reka-calendar-cell-trigger]').length).toBe(0)
+  })
+
+  it('marks the preset matching the current range', async () => {
+    await open({ presets: [august], modelValue: { start: '2026-08-01', end: '2026-08-31' } })
+    expect(presetButtons()[0]!.getAttribute('aria-pressed')).toBe('true')
+  })
+
+  it('disables a preset outside min or max', async () => {
+    await open({ presets: [august], min: '2026-08-15' })
+    expect(presetButtons()[0]!.disabled).toBe(true)
+  })
+
+  // A tab left open overnight must not keep yesterday's "Today".
+  it('re-runs a function preset when the picker opens', async () => {
+    const range = vi.fn(() => ({ start: '2026-09-14', end: '2026-09-14' }))
+    await open({ presets: [{ label: 'Today', range }] })
+    expect(range).toHaveBeenCalled()
+  })
+
+  it('takes a translated group label', async () => {
+    await open({ presets: [august], presetsLabel: 'Hitre izbire' })
+    expect(document.querySelector('[role="group"][aria-label="Hitre izbire"]')).not.toBeNull()
   })
 })
 

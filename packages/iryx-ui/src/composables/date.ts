@@ -1,5 +1,5 @@
 import type { DateValue } from '@internationalized/date'
-import { CalendarDate, DateFormatter, getLocalTimeZone, parseDate, Time, today } from '@internationalized/date'
+import { CalendarDate, DateFormatter, endOfMonth, getLocalTimeZone, parseDate, startOfMonth, Time, today } from '@internationalized/date'
 
 /**
  * The model is always an ISO `YYYY-MM-DD` **string**, never a `Date`.
@@ -39,6 +39,52 @@ export function toIsoDate(date: DateValue | null | undefined): string | null {
 /** Today in the viewer's own zone, as an ISO date string. */
 export function isoToday(): string {
   return toIsoDate(today(getLocalTimeZone()))!
+}
+
+/** One shortcut in `IDateRangePicker`'s preset list. */
+export interface DateRangePreset {
+  label: string
+  /** A function is re-run each time the picker opens, so "Today" stays today. */
+  range: { start: string | null, end: string | null } | (() => { start: string | null, end: string | null })
+}
+
+export interface CommonDateRangePresetLabels {
+  today: string
+  yesterday: string
+  last7Days: string
+  last30Days: string
+  thisMonth: string
+  lastMonth: string
+}
+
+/**
+ * The usual dashboard shortcuts, relative to today in the viewer's zone.
+ * Pass `labels` to translate them.
+ */
+export function commonDateRangePresets(labels: Partial<CommonDateRangePresetLabels> = {}): DateRangePreset[] {
+  const text: CommonDateRangePresetLabels = {
+    today: 'Today',
+    yesterday: 'Yesterday',
+    last7Days: 'Last 7 days',
+    last30Days: 'Last 30 days',
+    thisMonth: 'This month',
+    lastMonth: 'Last month',
+    ...labels,
+  }
+  const now = () => today(getLocalTimeZone())
+  const span = (start: CalendarDate, end: CalendarDate) => ({ start: toIsoDate(start), end: toIsoDate(end) })
+
+  return [
+    { label: text.today, range: () => span(now(), now()) },
+    { label: text.yesterday, range: () => span(now().subtract({ days: 1 }), now().subtract({ days: 1 })) },
+    { label: text.last7Days, range: () => span(now().subtract({ days: 6 }), now()) },
+    { label: text.last30Days, range: () => span(now().subtract({ days: 29 }), now()) },
+    { label: text.thisMonth, range: () => span(startOfMonth(now()), endOfMonth(now())) },
+    { label: text.lastMonth, range: () => {
+      const first = startOfMonth(now()).subtract({ months: 1 })
+      return span(first, endOfMonth(first))
+    } },
+  ]
 }
 
 /**

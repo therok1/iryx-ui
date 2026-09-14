@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { ClassValue } from '../class-value'
-import type { DateValue } from '../composables/date'
+import type { DateRangePreset, DateValue } from '../composables/date'
 import { ArrowLeft01Icon, ArrowRight01Icon, Calendar03Icon } from '@hugeicons/core-free-icons'
 import {
   PopoverContent,
@@ -53,6 +53,13 @@ export interface DateRangePickerProps {
   weekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6
   /** Months shown side by side. Two makes picking a span across a boundary sane. */
   months?: number
+  /**
+   * Shortcuts beside the calendar — "Last 7 days", "This month". Picking one
+   * fills the range and closes. `commonDateRangePresets()` builds the usual set.
+   */
+  presets?: DateRangePreset[]
+  /** Accessible name for the preset list — override for non-English apps. */
+  presetsLabel?: string
   /** Offer a "clear" action in the footer. */
   clearable?: boolean
   /** Separator between the two dates on the trigger. */
@@ -67,7 +74,7 @@ export interface DateRangePickerProps {
   class?: ClassValue
   /** Override classes per element, e.g. `{ content: 'p-4' }`. */
   ui?: Partial<Record<
-    'trigger' | 'placeholder' | 'content' | 'header' | 'heading' | 'nav'
+    'trigger' | 'placeholder' | 'content' | 'panel' | 'presets' | 'preset' | 'header' | 'heading' | 'nav'
     | 'months' | 'grid' | 'headCell' | 'cell' | 'cellTrigger' | 'footer' | 'action',
     string
   >>
@@ -78,6 +85,7 @@ const props = withDefaults(defineProps<DateRangePickerProps>(), {
   separator: ' – ',
   months: 2,
   clearLabel: 'Clear',
+  presetsLabel: 'Presets',
   previousLabel: 'Previous month',
   nextLabel: 'Next month',
   invalid: undefined,
@@ -160,6 +168,28 @@ watch(model, (value) => {
     open.value = false
 }, { deep: true })
 
+const resolvedPresets = computed(() => {
+  void open.value
+  return (props.presets ?? []).map(preset => ({
+    label: preset.label,
+    range: typeof preset.range === 'function' ? preset.range() : preset.range,
+  }))
+})
+
+function withinBounds(range: DateRange): boolean {
+  return (!props.min || !range.start || range.start >= props.min)
+    && (!props.max || !range.end || range.end <= props.max)
+}
+
+function isCurrent(range: DateRange): boolean {
+  return model.value?.start === range.start && model.value?.end === range.end
+}
+
+function applyPreset(range: DateRange): void {
+  model.value = { start: range.start, end: range.end }
+  open.value = false
+}
+
 function clear(): void {
   model.value = { start: null, end: null }
   open.value = false
@@ -204,66 +234,87 @@ function slotClass(slot: keyof NonNullable<DateRangePickerProps['ui']>, extra?: 
 
     <PopoverPortal>
       <PopoverContent :class="slotClass('content')" :side-offset="4" align="start">
-        <RangeCalendarRoot
-          v-slot="{ grid, weekDays }"
-          v-model="calendarValue"
-          :min-value="minValue"
-          :max-value="maxValue"
-          :locale="props.locale"
-          :week-starts-on="props.weekStartsOn"
-          :number-of-months="props.months"
-          fixed-weeks
-          initial-focus
-        >
-          <RangeCalendarHeader :class="slotClass('header')">
-            <RangeCalendarPrev :aria-label="props.previousLabel" :class="slotClass('nav')">
-              <Icon :icon="ArrowLeft01Icon" />
-            </RangeCalendarPrev>
-            <RangeCalendarHeading :class="slotClass('heading')" />
-            <RangeCalendarNext :aria-label="props.nextLabel" :class="slotClass('nav')">
-              <Icon :icon="ArrowRight01Icon" />
-            </RangeCalendarNext>
-          </RangeCalendarHeader>
-
-          <div :class="slotClass('months')">
-            <RangeCalendarGrid
-              v-for="month in grid"
-              :key="month.value.toString()"
-              :class="slotClass('grid')"
+        <div :class="slotClass('panel')">
+          <div
+            v-if="resolvedPresets.length"
+            role="group"
+            :aria-label="props.presetsLabel"
+            :class="slotClass('presets')"
+          >
+            <button
+              v-for="preset in resolvedPresets"
+              :key="preset.label"
+              type="button"
+              :disabled="!withinBounds(preset.range)"
+              :aria-pressed="isCurrent(preset.range)"
+              :class="slotClass('preset')"
+              @click="applyPreset(preset.range)"
             >
-              <RangeCalendarGridHead>
-                <RangeCalendarGridRow>
-                  <RangeCalendarHeadCell
-                    v-for="day in weekDays"
-                    :key="day"
-                    :class="slotClass('headCell')"
-                  >
-                    {{ day }}
-                  </RangeCalendarHeadCell>
-                </RangeCalendarGridRow>
-              </RangeCalendarGridHead>
-              <RangeCalendarGridBody>
-                <RangeCalendarGridRow
-                  v-for="(week, index) in month.rows"
-                  :key="`week-${index}`"
-                >
-                  <RangeCalendarCell
-                    v-for="date in week"
-                    :key="date.toString()"
-                    :date="date"
-                    :class="slotClass('cell')"
-                  >
-                    <RangeCalendarCellTrigger
-                      :day="date"
-                      :month="month.value"
-                      :class="slotClass('cellTrigger')"
-                    />
-                  </RangeCalendarCell>
-                </RangeCalendarGridRow>
-              </RangeCalendarGridBody>
-            </RangeCalendarGrid>
+              {{ preset.label }}
+            </button>
           </div>
-        </RangeCalendarRoot>
+
+          <RangeCalendarRoot
+            v-slot="{ grid, weekDays }"
+            v-model="calendarValue"
+            :min-value="minValue"
+            :max-value="maxValue"
+            :locale="props.locale"
+            :week-starts-on="props.weekStartsOn"
+            :number-of-months="props.months"
+            fixed-weeks
+            initial-focus
+          >
+            <RangeCalendarHeader :class="slotClass('header')">
+              <RangeCalendarPrev :aria-label="props.previousLabel" :class="slotClass('nav')">
+                <Icon :icon="ArrowLeft01Icon" />
+              </RangeCalendarPrev>
+              <RangeCalendarHeading :class="slotClass('heading')" />
+              <RangeCalendarNext :aria-label="props.nextLabel" :class="slotClass('nav')">
+                <Icon :icon="ArrowRight01Icon" />
+              </RangeCalendarNext>
+            </RangeCalendarHeader>
+
+            <div :class="slotClass('months')">
+              <RangeCalendarGrid
+                v-for="month in grid"
+                :key="month.value.toString()"
+                :class="slotClass('grid')"
+              >
+                <RangeCalendarGridHead>
+                  <RangeCalendarGridRow>
+                    <RangeCalendarHeadCell
+                      v-for="day in weekDays"
+                      :key="day"
+                      :class="slotClass('headCell')"
+                    >
+                      {{ day }}
+                    </RangeCalendarHeadCell>
+                  </RangeCalendarGridRow>
+                </RangeCalendarGridHead>
+                <RangeCalendarGridBody>
+                  <RangeCalendarGridRow
+                    v-for="(week, index) in month.rows"
+                    :key="`week-${index}`"
+                  >
+                    <RangeCalendarCell
+                      v-for="date in week"
+                      :key="date.toString()"
+                      :date="date"
+                      :class="slotClass('cell')"
+                    >
+                      <RangeCalendarCellTrigger
+                        :day="date"
+                        :month="month.value"
+                        :class="slotClass('cellTrigger')"
+                      />
+                    </RangeCalendarCell>
+                  </RangeCalendarGridRow>
+                </RangeCalendarGridBody>
+              </RangeCalendarGrid>
+            </div>
+          </RangeCalendarRoot>
+        </div>
 
         <div v-if="props.clearable" :class="slotClass('footer')">
           <button type="button" :class="slotClass('action')" @click="clear">

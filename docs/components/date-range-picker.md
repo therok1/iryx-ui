@@ -3,7 +3,11 @@ eyebrow: Forms
 ---
 
 <script setup lang="ts">
+import { commonDateRangePresets } from 'iryx-ui'
 import { ref } from 'vue'
+
+const presets = commonDateRangePresets()
+const withPresets = ref({ start: null, end: null })
 
 const period = ref({ start: '2026-08-01', end: '2026-08-31' })
 const empty = ref({ start: null, end: null })
@@ -50,6 +54,38 @@ Both ends are `null` while nothing is chosen, and the first click sets `start` w
 <IDateRangePicker v-model="period" placeholder="Select a reporting period" />
 ```
 </Demo>
+
+## Presets
+
+`presets` puts shortcuts beside the calendar. Picking one fills the range and closes the picker. `commonDateRangePresets()` builds the usual set: today, yesterday, the last 7 and 30 days, this month and last month, all relative to today in the viewer's time zone.
+
+<Demo stack>
+<template #demo>
+<IDateRangePicker v-model="withPresets" :presets="presets" class="w-80" />
+</template>
+
+```vue
+<script setup lang="ts">
+import { commonDateRangePresets } from 'iryx-ui'
+
+const range = ref({ start: null, end: null })
+const presets = commonDateRangePresets()
+</script>
+
+<template>
+  <IDateRangePicker v-model="range" :presets="presets" />
+</template>
+```
+</Demo>
+
+The preset matching the current range is highlighted, and any preset that falls outside `min` or `max` is disabled. Pass labels to translate the built-in set, or write your own presets. A function `range` is re-run every time the picker opens, so relative presets never go stale.
+
+```ts
+const presets = [
+  ...commonDateRangePresets({ today: 'Danes', yesterday: 'Včeraj' }),
+  { label: 'Q3 2026', range: { start: '2026-07-01', end: '2026-09-30' } },
+]
+```
 
 ## Months shown
 
@@ -182,6 +218,8 @@ Clearing sets both ends back to `null`.
 | `format` | `Intl.DateTimeFormatOptions` | — | How each end reads on the trigger |
 | `weekStartsOn` | `0`–`6` | — | `0` is Sunday. Defaults to the locale's convention |
 | `months` | `number` | `2` | Months shown side by side |
+| `presets` | `DateRangePreset[]` | — | Shortcuts beside the calendar |
+| `presetsLabel` | `string` | `'Presets'` | Accessible name for the preset list |
 | `clearable` | `boolean` | — | Adds a clear action to the footer |
 | `separator` | `string` | `' – '` | Text between the two dates on the trigger |
 | `clearLabel` | `string` | `'Clear'` | Clear action label |
@@ -189,7 +227,7 @@ Clearing sets both ends back to `null`.
 | `nextLabel` | `string` | `'Next month'` | Accessible name for the forward arrow |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Applied to the trigger, which carries the field chrome |
-| `ui` | `{ trigger?, placeholder?, content?, header?, heading?, nav?, months?, grid?, headCell?, cell?, cellTrigger?, footer?, action? }` | — | Per-element class overrides |
+| `ui` | `{ trigger?, placeholder?, content?, panel?, presets?, preset?, header?, heading?, nav?, months?, grid?, headCell?, cell?, cellTrigger?, footer?, action? }` | — | Per-element class overrides |
 
 ## Model
 
