@@ -20,7 +20,7 @@ import {
   RangeCalendarPrev,
   RangeCalendarRoot,
 } from 'reka-ui'
-import { computed, ref, shallowRef, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
 import { formatIsoDate, toCalendarDate, toIsoDate } from '../composables/date'
 import { useFormField } from '../composables/form'
 import { useIryxUiConfig } from '../config'
@@ -51,7 +51,10 @@ export interface DateRangePickerProps {
   format?: Intl.DateTimeFormatOptions
   /** 0 is Sunday. Defaults to the locale's own convention. */
   weekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6
-  /** Months shown side by side. Two makes picking a span across a boundary sane. */
+  /**
+   * Months shown side by side. Two makes picking a span across a boundary
+   * sane. Narrow screens always get one.
+   */
   months?: number
   /**
    * Shortcuts beside the calendar — "Last 7 days", "This month". Picking one
@@ -141,6 +144,21 @@ watch(calendarValue, (value) => {
   if (!sameAsModel(value))
     model.value = { start: toIsoDate(value.start), end: toIsoDate(value.end) }
 })
+
+const narrow = ref(false)
+let narrowQuery: MediaQueryList | undefined
+function onNarrowChange(event: MediaQueryListEvent): void {
+  narrow.value = event.matches
+}
+onMounted(() => {
+  if (typeof window.matchMedia !== 'function')
+    return
+  narrowQuery = window.matchMedia('(max-width: 39.99rem)')
+  narrow.value = narrowQuery.matches
+  narrowQuery.addEventListener('change', onNarrowChange)
+})
+onBeforeUnmount(() => narrowQuery?.removeEventListener('change', onNarrowChange))
+const visibleMonths = computed(() => (narrow.value ? 1 : props.months))
 
 const minValue = computed(() => toCalendarDate(props.min))
 const maxValue = computed(() => toCalendarDate(props.max))
@@ -261,7 +279,7 @@ function slotClass(slot: keyof NonNullable<DateRangePickerProps['ui']>, extra?: 
             :max-value="maxValue"
             :locale="props.locale"
             :week-starts-on="props.weekStartsOn"
-            :number-of-months="props.months"
+            :number-of-months="visibleMonths"
             fixed-weeks
             initial-focus
           >

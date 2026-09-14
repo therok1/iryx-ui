@@ -233,6 +233,59 @@ describe('commonDateRangePresets', () => {
   })
 })
 
+describe('dateRangePicker on narrow screens', () => {
+  afterEach(() => {
+    // jsdom has no matchMedia of its own, so remove the stub entirely.
+    delete (window as { matchMedia?: unknown }).matchMedia
+  })
+
+  function stubScreen(narrow: boolean) {
+    const listeners: ((event: { matches: boolean }) => void)[] = []
+    window.matchMedia = vi.fn(() => ({
+      matches: narrow,
+      addEventListener: (_: string, listener: (event: { matches: boolean }) => void) => listeners.push(listener),
+      removeEventListener: () => {},
+    })) as unknown as typeof window.matchMedia
+    return (matches: boolean) => listeners.forEach(listener => listener({ matches }))
+  }
+
+  async function openPicker() {
+    const wrapper = mount(DateRangePicker, {
+      props: { modelValue: { start: '2026-08-01', end: '2026-08-31' }, months: 2 },
+      attachTo: document.body,
+    })
+    await wrapper.get('button').trigger('click')
+    await nextTick()
+    return wrapper
+  }
+
+  const cells = () => document.querySelectorAll('[data-reka-calendar-cell-trigger]').length
+
+  // Two months side by side run off a phone screen.
+  it('shows one month on a narrow screen, whatever months says', async () => {
+    stubScreen(true)
+    await openPicker()
+    expect(cells()).toBe(42)
+  })
+
+  it('keeps every month on a wide screen', async () => {
+    stubScreen(false)
+    await openPicker()
+    expect(cells()).toBe(84)
+  })
+
+  it('follows the screen as it is resized', async () => {
+    const resize = stubScreen(true)
+    await openPicker()
+    expect(cells()).toBe(42)
+
+    resize(false)
+    await nextTick()
+    await nextTick()
+    expect(cells()).toBe(84)
+  })
+})
+
 describe('dateRangePicker presets', () => {
   const august = { label: 'August', range: { start: '2026-08-01', end: '2026-08-31' } }
 

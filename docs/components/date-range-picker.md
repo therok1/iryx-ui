@@ -103,6 +103,8 @@ Two months side by side is the default, since most ranges cross a month boundary
 ```
 </Demo>
 
+On screens narrower than Tailwind's `sm` breakpoint (40rem), the picker shows one month whatever `months` says, since two side by side won't fit a phone.
+
 ## Bounds
 
 <Demo stack>
@@ -217,7 +219,7 @@ Clearing sets both ends back to `null`.
 | `locale` | `string` | — | Month names, weekday initials and trigger text |
 | `format` | `Intl.DateTimeFormatOptions` | — | How each end reads on the trigger |
 | `weekStartsOn` | `0`–`6` | — | `0` is Sunday. Defaults to the locale's convention |
-| `months` | `number` | `2` | Months shown side by side |
+| `months` | `number` | `2` | Months shown side by side; always one on narrow screens |
 | `presets` | `DateRangePreset[]` | — | Shortcuts beside the calendar |
 | `presetsLabel` | `string` | `'Presets'` | Accessible name for the preset list |
 | `clearable` | `boolean` | — | Adds a clear action to the footer |
