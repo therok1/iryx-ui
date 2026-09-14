@@ -6,6 +6,7 @@ eyebrow: Forms
 import { ref } from 'vue'
 
 const value = ref('')
+const handle = ref('')
 const debounced = ref('')
 </script>
 
@@ -79,6 +80,22 @@ The `leading` and `trailing` slots take real space in the field rather than sitt
 ```
 </Demo>
 
+## Character count
+
+`showCount` puts a count in the trailing area. With `maxlength` it reads against the limit and turns red in the last tenth, which is also the only time screen readers hear it.
+
+<Demo stack>
+<template #demo>
+<IInput v-model="handle" show-count :maxlength="20" placeholder="Username" class="w-full max-w-xs" />
+</template>
+
+```vue
+<IInput v-model="handle" show-count :maxlength="20" placeholder="Username" />
+```
+</Demo>
+
+Pass `countLabel` to translate the announcement, as on [`ITextarea`](/components/textarea).
+
 ## Debounce
 
 `debounce` delays the model update, never the displayed text. Blur and Enter flush a pending update, and an external write cancels whatever is queued.
@@ -125,6 +142,9 @@ Inside an [`IFormField`](/components/form-field), `invalid` is inferred from the
 | `loading` | `boolean` | `false` | Trailing spinner. Does not disable the field |
 | `debounce` | `number` | `0` | Milliseconds to wait before the model updates |
 | `clearLabel` | `string` | `'Clear'` | Accessible name for the clear button |
+| `maxlength` | `number` | — | Hard character limit |
+| `showCount` | `boolean` | `false` | Show a character count in the trailing area |
+| `countLabel` | `(remaining: number) => string` | English | What screen readers announce near the limit |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Lands on the **wrapper**, which carries the field chrome |
 | `ui` | `object` | — | `root`, `input`, `leading`, `trailing`, `clear` |

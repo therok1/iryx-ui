@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { ClassValue } from '../class-value'
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import { defaultCountLabel, useCharacterCount } from '../composables/character-count'
 import { useFormField } from '../composables/form'
 import { useIryxUiConfig } from '../config'
 import { textareaCountTheme, textareaTheme } from '../theme/input'
@@ -45,7 +46,7 @@ defineOptions({ inheritAttrs: false })
 
 const props = withDefaults(defineProps<TextareaProps>(), {
   invalid: undefined,
-  countLabel: (remaining: number) => `${remaining} ${remaining === 1 ? 'character' : 'characters'} left`,
+  countLabel: defaultCountLabel,
   unstyled: undefined,
 })
 
@@ -71,9 +72,7 @@ const classes = computed(() => {
   })
 })
 
-const length = computed(() => model.value?.length ?? 0)
-const remaining = computed(() => (props.maxlength == null ? undefined : props.maxlength - length.value))
-const nearLimit = computed(() => remaining.value != null && remaining.value <= Math.ceil(props.maxlength! * 0.1))
+const { remaining, nearLimit, text: countText } = useCharacterCount(() => model.value, () => props.maxlength)
 
 const countTheme = computed(() => textareaCountTheme({ nearLimit: nearLimit.value }))
 const countRootClass = computed(() => (isUnstyled.value ? props.class : countTheme.value.root({ class: props.class })))
@@ -152,7 +151,7 @@ watch(() => [model.value, props.autosize, props.size], () => void nextTick(resiz
       :class="classes"
     />
     <span aria-hidden="true" :class="countClass">
-      {{ props.maxlength == null ? length : `${length}/${props.maxlength}` }}
+      {{ countText }}
     </span>
     <span class="sr-only" aria-live="polite">
       {{ nearLimit ? props.countLabel(remaining!) : '' }}

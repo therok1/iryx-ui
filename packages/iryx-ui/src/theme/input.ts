@@ -10,6 +10,7 @@ export const inputTheme = tv({
     input: 'w-full min-w-0 flex-1 bg-transparent outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed',
     leading: 'flex shrink-0 items-center text-muted-foreground [&_svg]:size-4',
     trailing: 'flex shrink-0 items-center gap-1.5 text-muted-foreground [&_svg]:size-4',
+    count: 'text-xs tabular-nums',
     clear: 'flex items-center rounded-md text-muted-foreground transition-[color,background-color,border-color,box-shadow] outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary/50 [&_svg]:size-3.5',
   },
   variants: {
@@ -20,6 +21,9 @@ export const inputTheme = tv({
     },
     invalid: {
       true: { root: 'border-red-500 focus-within:ring-red-500/40' },
+    },
+    nearLimit: {
+      true: { count: 'text-danger' },
     },
   },
   defaultVariants: {

@@ -2,6 +2,7 @@
 import type { ClassValue } from '../class-value'
 import { Cancel01Icon, Loading03Icon } from '@hugeicons/core-free-icons'
 import { computed, onBeforeUnmount, ref, useSlots, watch } from 'vue'
+import { defaultCountLabel, useCharacterCount } from '../composables/character-count'
 import { useFormField } from '../composables/form'
 import { useIryxUiConfig } from '../config'
 import { inputTheme } from '../theme/input'
@@ -28,6 +29,18 @@ export interface InputProps {
   debounce?: number
   /** Accessible name for the clear button — override for non-English apps. */
   clearLabel?: string
+  /** Hard limit in characters, enforced by the browser. */
+  maxlength?: number
+  /**
+   * Show a character count in the trailing area — "12/50" with `maxlength`,
+   * turning red within the last tenth of the limit.
+   */
+  showCount?: boolean
+  /**
+   * What a screen reader announces near the limit. Override for non-English
+   * apps.
+   */
+  countLabel?: (remaining: number) => string
   /** Skip built-in classes; you take over styling entirely. */
   unstyled?: boolean
   /** Applied to the outer field, which is the element carrying the chrome. */
@@ -39,6 +52,7 @@ export interface InputProps {
     leading?: string
     trailing?: string
     clear?: string
+    count?: string
   }
 }
 
@@ -50,6 +64,7 @@ const props = withDefaults(defineProps<InputProps>(), {
   type: 'text',
   debounce: 0,
   clearLabel: 'Clear',
+  countLabel: defaultCountLabel,
   invalid: undefined,
   unstyled: undefined,
 })
@@ -131,11 +146,13 @@ defineExpose({
 
 const hasValue = computed(() => draft.value !== '' && draft.value != null)
 const showClear = computed(() => props.clearable && hasValue.value && !props.disabled)
-const hasTrailing = computed(() => props.loading || showClear.value || !!slots.trailing)
+const hasTrailing = computed(() => props.loading || showClear.value || props.showCount || !!slots.trailing)
 
-const theme = computed(() => inputTheme({ size: props.size, invalid: isInvalid.value }))
+const { remaining, nearLimit, text: countText } = useCharacterCount(() => draft.value, () => props.maxlength)
 
-function slotClass(slot: 'root' | 'input' | 'leading' | 'trailing' | 'clear', extra?: ClassValue) {
+const theme = computed(() => inputTheme({ size: props.size, invalid: isInvalid.value, nearLimit: nearLimit.value }))
+
+function slotClass(slot: 'root' | 'input' | 'leading' | 'trailing' | 'clear' | 'count', extra?: ClassValue) {
   const override = props.ui?.[slot]
   return isUnstyled.value ? [override, extra] : theme.value[slot]({ class: [override, extra] })
 }
@@ -158,6 +175,7 @@ function slotClass(slot: 'root' | 'input' | 'leading' | 'trailing' | 'clear', ex
       :required="props.required"
       :aria-invalid="isInvalid || undefined"
       :aria-describedby="field?.describedBy.value"
+      :maxlength="props.maxlength"
       :class="slotClass('input')"
       v-bind="$attrs"
       @input="onInput"
@@ -167,6 +185,10 @@ function slotClass(slot: 'root' | 'input' | 'leading' | 'trailing' | 'clear', ex
 
     <span v-if="hasTrailing" :class="slotClass('trailing')">
       <slot name="trailing" />
+      <template v-if="props.showCount">
+        <span aria-hidden="true" :class="slotClass('count')">{{ countText }}</span>
+        <span class="sr-only" aria-live="polite">{{ nearLimit ? props.countLabel(remaining!) : '' }}</span>
+      </template>
       <button
         v-if="showClear"
         type="button"

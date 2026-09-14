@@ -116,6 +116,39 @@ describe('input debounce', () => {
   })
 })
 
+describe('input count', () => {
+  it('shows the count against the limit in the trailing area', () => {
+    const wrapper = mount(Input, { props: { showCount: true, maxlength: 50, modelValue: 'hello' } })
+    expect(wrapper.get('span[aria-hidden="true"]').text()).toBe('5/50')
+    expect(wrapper.get('input').attributes('maxlength')).toBe('50')
+  })
+
+  it('updates as the user types', async () => {
+    const wrapper = mount(Input, { props: { showCount: true, maxlength: 10 } })
+    await wrapper.get('input').setValue('a'.repeat(9))
+    expect(wrapper.get('span[aria-hidden="true"]').text()).toBe('9/10')
+    expect(wrapper.get('span[aria-hidden="true"]').classes()).toContain('text-danger')
+    expect(wrapper.get('[aria-live]').text()).toBe('1 character left')
+  })
+
+  it('stays quiet away from the limit', () => {
+    const wrapper = mount(Input, { props: { showCount: true, maxlength: 50, modelValue: 'hello' } })
+    expect(wrapper.get('[aria-live]').text()).toBe('')
+  })
+
+  it('renders no count without showCount', () => {
+    const wrapper = mount(Input, { props: { maxlength: 50 } })
+    expect(wrapper.find('[aria-live]').exists()).toBe(false)
+  })
+
+  it('takes a translated label', () => {
+    const wrapper = mount(Input, {
+      props: { showCount: true, maxlength: 5, modelValue: 'abcd', countLabel: (n: number) => `quedan ${n}` },
+    })
+    expect(wrapper.get('[aria-live]').text()).toBe('quedan 1')
+  })
+})
+
 describe('textarea', () => {
   it('renders a textarea and forwards rows', () => {
     const wrapper = mount(Textarea, { props: { rows: 5 } })
