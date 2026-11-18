@@ -210,6 +210,76 @@ describe('sidebar', () => {
     expect(wrapper.text()).toContain('icons')
   })
 
+  /*
+   * A collapsed rail has no room for a group to open in place: its children
+   * rendered there as label-less, icon-less rows a few pixels wide. They open
+   * in a menu beside the rail instead.
+   */
+  it('turns a group into a menu trigger when collapsed, instead of opening it in place', () => {
+    const wrapper = mount(Sidebar, { props: { items, collapsed: true } })
+    expect(wrapper.find('a[href="/invoices/drafts"]').exists()).toBe(false)
+    expect(wrapper.get('button[aria-label="Invoices"]').attributes('aria-haspopup')).toBe('menu')
+  })
+
+  it('reopens a group that was open before collapsing', async () => {
+    const wrapper = mount(Sidebar, {
+      props: { items: [{ label: 'Invoices', items: [{ label: 'Drafts', href: '/d' }] }] },
+    })
+    await wrapper.get('button[aria-label="Invoices"]').trigger('click')
+    await wrapper.setProps({ collapsed: true })
+    await wrapper.setProps({ collapsed: false })
+    expect(wrapper.find('a[href="/d"]').exists()).toBe(true)
+  })
+
+  it('keeps same-named groups in different sections apart', async () => {
+    const group = { label: 'Reports', items: [{ label: 'Q1', href: '/q1' }] }
+    const wrapper = mount(Sidebar, {
+      props: { items: [{ section: 'A', items: [group] }, { section: 'B', items: [{ ...group, items: [{ label: 'Q2', href: '/q2' }] }] }] },
+    })
+    await wrapper.findAll('button[aria-label="Reports"]')[0]!.trigger('click')
+    expect(wrapper.find('a[href="/q1"]').exists()).toBe(true)
+    expect(wrapper.find('a[href="/q2"]').exists()).toBe(false)
+  })
+
+  it('names a collapsed group in a tooltip and keeps the link slot', () => {
+    const wrapper = mount(Sidebar, {
+      props: { items, collapsed: true },
+      slots: { link: ({ link }: { link: { label: string } }) => h('i', { class: 'custom' }, link.label) },
+    })
+    const trigger = wrapper.get('button[aria-label="Invoices"]')
+    expect(trigger.attributes('aria-haspopup')).toBe('menu')
+    expect(trigger.attributes('data-state')).toBeDefined()
+    expect(trigger.find('i.custom').exists()).toBe(true)
+  })
+
+  it('still opens a collapsed group\'s menu through the tooltip', async () => {
+    const wrapper = mount(Sidebar, { props: { items, collapsed: true }, attachTo: document.body })
+    await wrapper.get('button[aria-label="Invoices"]').trigger('keydown', { key: 'Enter' })
+    await vi.waitFor(() => expect(document.body.querySelector('[role="menu"] a[href="/invoices/drafts"]')).not.toBeNull())
+  })
+
+  it('shows a first letter in place of a missing icon when collapsed', () => {
+    const wrapper = mount(Sidebar, { props: { items, collapsed: true } })
+    expect(wrapper.get('a[href="/inbox"] span[aria-hidden="true"]').text()).toBe('I')
+  })
+
+  /*
+   * IAppShell renders its sidebar slot twice, in the column and in the mobile
+   * drawer. A rail inside the drawer is a strip of icons in a panel with room
+   * for the labels, so only that copy ignores `collapsed`.
+   */
+  it('ignores collapsed in IAppShell\'s mobile drawer, and only there', async () => {
+    const wrapper = mount(AppShell, {
+      slots: { sidebar: () => h(Sidebar, { items, collapsed: true }) },
+      attachTo: document.body,
+    })
+    ;(wrapper.vm as unknown as { navOpen: boolean }).navOpen = true
+
+    await vi.waitFor(() => expect(document.body.querySelectorAll('nav')).toHaveLength(2))
+    const collapsed = [...document.body.querySelectorAll('nav')].map(nav => nav.hasAttribute('data-collapsed'))
+    expect(collapsed.sort()).toEqual([false, true])
+  })
+
   it('drops built-in classes when unstyled', () => {
     expect(mount(Sidebar, { props: { items, unstyled: true, class: 'mine' } }).attributes('class')).toBe('mine')
   })

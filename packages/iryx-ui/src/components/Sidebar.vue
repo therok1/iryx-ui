@@ -1,18 +1,21 @@
 <script setup lang="ts">
 import type { ClassValue } from '../class-value'
+import type { DropdownMenuItemOption } from '../composables/dropdown-menu'
 import type { SidebarItems, SidebarLink } from '../composables/sidebar'
 import { ArrowRight01Icon } from '@hugeicons/core-free-icons'
 import { CollapsibleContent, CollapsibleRoot, CollapsibleTrigger, Primitive } from 'reka-ui'
-import { computed } from 'vue'
-import { isSidebarGroup, toSidebarSections } from '../composables/sidebar'
+import { computed, inject, ref } from 'vue'
+import { isSidebarGroup, sidebarInDrawerKey, toSidebarSections } from '../composables/sidebar'
 import { useIryxUiConfig } from '../config'
 import { sidebarTheme } from '../theme/sidebar'
+import DropdownMenu from './DropdownMenu.vue'
 import Icon from './Icon.vue'
+import Tooltip from './Tooltip.vue'
 
 export interface SidebarProps {
   /** Links, optionally grouped into labelled sections. */
   items?: SidebarItems
-  /** Which edge it sits on. Only decides where the border goes. */
+  /** Which edge it sits on. Decides where the border goes and which way tooltips and group menus open. */
   side?: 'left' | 'right'
   /**
    * Accessible name for the navigation landmark — override for non-English
@@ -32,6 +35,7 @@ export interface SidebarProps {
     sectionLabel?: string
     link?: string
     linkLabel?: string
+    linkInitial?: string
     linkBadge?: string
     groupIcon?: string
     groupContent?: string
@@ -46,7 +50,15 @@ const props = withDefaults(defineProps<SidebarProps>(), {
 })
 
 /** Icons-only mode. Bind it to persist the choice, or leave it internal. */
-const collapsed = defineModel<boolean>('collapsed', { default: false })
+const collapsedModel = defineModel<boolean>('collapsed', { default: false })
+
+/**
+ * `IAppShell` renders its sidebar slot a second time, inside the mobile drawer.
+ * That copy stays full width whatever the model says: the drawer already has
+ * the room, and a rail inside it would be a strip of icons for nothing.
+ */
+const inDrawer = inject(sidebarInDrawerKey, false)
+const collapsed = computed(() => collapsedModel.value && !inDrawer)
 
 const config = useIryxUiConfig()
 const isUnstyled = computed(() => props.unstyled ?? config.unstyled)
@@ -62,8 +74,37 @@ function slotClass(slot: Slot) {
   return isUnstyled.value ? override : theme.value[slot]({ class: override })
 }
 
+/** Tooltips and group menus open away from the edge the sidebar sits on. */
+const outward = computed(() => (props.side === 'right' ? 'left' : 'right'))
+
+/**
+ * Which groups are open, held here rather than by each `CollapsibleRoot`.
+ * Collapsing swaps a group for a menu, and state kept in the root it unmounts
+ * would reset to `defaultOpen` on the way back.
+ */
+const openGroups = ref<Record<string, boolean>>({})
+/** Section index plus label: two sections may each have a group with the same name. */
+const groupKey = (sectionIndex: number, link: SidebarLink) => `${sectionIndex}:${link.label}`
+
 /** Anchors get a real href; everything else stays a button so it is focusable. */
 const tagOf = (link: SidebarLink) => (link.href ? 'a' : 'button')
+
+/** Stands in for a missing icon when collapsed, so the row is not an empty square. */
+const initialOf = (link: SidebarLink) => [...link.label][0]
+
+/** The badge folds away with the label, so the tooltip carries it instead. */
+const tipOf = (link: SidebarLink) => (link.badge === undefined ? link.label : `${link.label} (${link.badge})`)
+
+/** A collapsed group's children, as menu entries. Hrefs stay real anchors, as they are in the expanded list. */
+function menuItemsOf(link: SidebarLink): DropdownMenuItemOption[] {
+  return (link.items ?? []).map(child => ({
+    label: child.label,
+    icon: child.icon,
+    disabled: child.disabled,
+    href: child.href,
+    onSelect: child.onSelect,
+  }))
+}
 
 function onSelect(link: SidebarLink, event: Event) {
   if (link.disabled) {
@@ -105,11 +146,46 @@ const nameOf = (link: SidebarLink) => link.label
           </p>
 
           <template v-for="link in section.items" :key="link.label">
+            <!--
+              A collapsed group has no room to open in place, so its children
+              open in a menu beside the rail, under the group's name.
+            -->
+            <Tooltip
+              v-if="isSidebarGroup(link) && collapsed"
+              :text="tipOf(link)"
+              :side="outward"
+              :unstyled="isUnstyled"
+            >
+              <template #trigger>
+                <DropdownMenu :items="menuItemsOf(link)" :side="outward" :unstyled="isUnstyled">
+                  <template #trigger>
+                    <button
+                      type="button"
+                      :aria-label="nameOf(link)"
+                      :disabled="link.disabled"
+                      :data-active="link.active ? '' : undefined"
+                      :data-disabled="link.disabled ? '' : undefined"
+                      :class="slotClass('link')"
+                    >
+                      <slot name="link" :link="link" :collapsed="collapsed">
+                        <Icon v-if="link.icon" :icon="link.icon" />
+                        <span v-else aria-hidden="true" :class="slotClass('linkInitial')">{{ initialOf(link) }}</span>
+                      </slot>
+                    </button>
+                  </template>
+                  <template #header>
+                    {{ link.label }}
+                  </template>
+                </DropdownMenu>
+              </template>
+            </Tooltip>
+
             <!-- A group: the trigger is the link row, children live under it. -->
             <CollapsibleRoot
-              v-if="isSidebarGroup(link)"
-              :default-open="link.defaultOpen"
+              v-else-if="isSidebarGroup(link)"
+              :open="openGroups[groupKey(index, link)] ?? link.defaultOpen ?? false"
               :disabled="link.disabled"
+              @update:open="(open: boolean) => (openGroups[groupKey(index, link)] = open)"
             >
               <CollapsibleTrigger
                 :aria-label="nameOf(link)"
@@ -148,27 +224,38 @@ const nameOf = (link: SidebarLink) => link.label
               </CollapsibleContent>
             </CollapsibleRoot>
 
-            <component
-              :is="tagOf(link)"
+            <!-- Collapsed, the label is gone from sight, so a tooltip names the icon. -->
+            <Tooltip
               v-else
-              :href="link.href"
-              :type="link.href ? undefined : 'button'"
-              :aria-label="nameOf(link)"
-              :aria-current="link.active ? 'page' : undefined"
-              :aria-disabled="link.disabled || undefined"
-              :data-active="link.active ? '' : undefined"
-              :data-disabled="link.disabled ? '' : undefined"
-              :class="slotClass('link')"
-              @click="(event: Event) => onSelect(link, event)"
+              :text="tipOf(link)"
+              :side="outward"
+              :disabled="!collapsed"
+              :unstyled="isUnstyled"
             >
-              <slot name="link" :link="link" :collapsed="collapsed">
-                <Icon v-if="link.icon" :icon="link.icon" />
-                <span :class="slotClass('linkLabel')">{{ link.label }}</span>
-                <span v-if="link.badge !== undefined" :class="slotClass('linkBadge')">
-                  {{ link.badge }}
-                </span>
-              </slot>
-            </component>
+              <template #trigger>
+                <component
+                  :is="tagOf(link)"
+                  :href="link.href"
+                  :type="link.href ? undefined : 'button'"
+                  :aria-label="nameOf(link)"
+                  :aria-current="link.active ? 'page' : undefined"
+                  :aria-disabled="link.disabled || undefined"
+                  :data-active="link.active ? '' : undefined"
+                  :data-disabled="link.disabled ? '' : undefined"
+                  :class="slotClass('link')"
+                  @click="(event: Event) => onSelect(link, event)"
+                >
+                  <slot name="link" :link="link" :collapsed="collapsed">
+                    <Icon v-if="link.icon" :icon="link.icon" />
+                    <span v-else-if="collapsed" aria-hidden="true" :class="slotClass('linkInitial')">{{ initialOf(link) }}</span>
+                    <span :class="slotClass('linkLabel')">{{ link.label }}</span>
+                    <span v-if="link.badge !== undefined" :class="slotClass('linkBadge')">
+                      {{ link.badge }}
+                    </span>
+                  </slot>
+                </component>
+              </template>
+            </Tooltip>
           </template>
         </div>
       </slot>

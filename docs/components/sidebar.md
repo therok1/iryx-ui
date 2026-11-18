@@ -155,12 +155,12 @@ The panel animates its height, so the rows below slide rather than jump. Inside 
 
 ## Collapse to icons
 
-`v-model:collapsed` narrows the column to its icons. The labels are removed rather than visually hidden, and every link carries an `aria-label` in their place.
+`v-model:collapsed` narrows the column to its icons. The labels are removed rather than visually hidden, and every link carries an `aria-label` in their place. Hovering or focusing a link shows its label in a tooltip, badge included, and a link without an icon shows its first letter instead.
 
 <Demo stack>
 <template #demo>
 <div class="flex h-72 w-full max-w-3xl overflow-hidden rounded-lg border border-border">
-<ISidebar v-model:collapsed="collapsed" :items="sectioned" />
+<ISidebar v-model:collapsed="collapsed" :items="grouped" />
 <div class="flex flex-1 items-start p-4">
 <IButton size="sm" variant="outline" @click="collapsed = !collapsed">
 {{ collapsed ? 'Expand' : 'Collapse' }}
@@ -183,7 +183,7 @@ const collapsed = ref(false)
 ```
 </Demo>
 
-Badges and section headings fold away with the labels; the group chevron goes too, since there is no room to show what it would open.
+Badges and section headings fold away with the labels. A group has no room to open in place, so its children open in a menu beside the rail, under the group's name — and a group left open is open again when the column expands. Inside [`IAppShell`](/components/app-shell)'s mobile drawer the sidebar ignores `collapsed` and shows in full, since the drawer has the room.
 
 ## Header and footer
 
@@ -259,11 +259,11 @@ Both slots stay pinned, with the link list as the only scrolling region. Each re
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
 | `items` | `(SidebarLink \| SidebarSection)[]` | — | Links, optionally grouped into labelled sections |
-| `side` | `'left' \| 'right'` | `'left'` | Which edge carries the border |
+| `side` | `'left' \| 'right'` | `'left'` | Which edge carries the border; tooltips and group menus open away from it |
 | `label` | `string` | `'Sidebar'` | Accessible name for the navigation landmark |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged with the built-in classes |
-| `ui` | `{ root?, header?, nav?, footer?, section?, sectionLabel?, link?, linkLabel?, linkBadge?, groupIcon?, groupContent?, groupInner? }` | — | Per-element class overrides |
+| `ui` | `{ root?, header?, nav?, footer?, section?, sectionLabel?, link?, linkLabel?, linkInitial?, linkBadge?, groupIcon?, groupContent?, groupInner? }` | — | Per-element class overrides |
 
 `v-model:collapsed` is a boolean model, defaulting to `false`.
 

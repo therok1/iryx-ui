@@ -231,6 +231,8 @@ interface DropdownMenuItemOption {
   icon?: IconLike
   disabled?: boolean
   danger?: boolean
+  /** Renders the entry as a real link. */
+  href?: string
   onSelect?: () => void
   /** Makes this entry a submenu. */
   items?: DropdownMenuEntry[]

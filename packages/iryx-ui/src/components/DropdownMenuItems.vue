@@ -69,12 +69,14 @@ const subTriggerIconClass = props.unstyled ? undefined : dropdownMenuTheme().sub
       </DropdownMenuPortal>
     </DropdownMenuSub>
 
-    <DropdownMenuLabel v-else-if="!entry.onSelect" :class="slotClass('label')">
+    <DropdownMenuLabel v-else-if="!entry.onSelect && !entry.href" :class="slotClass('label')">
       {{ entry.label }}
     </DropdownMenuLabel>
 
     <DropdownMenuItem
       v-else
+      :as="entry.href ? 'a' : undefined"
+      :href="entry.href"
       :disabled="entry.disabled"
       :class="slotClass('item', entry.danger)"
       @select="entry.onSelect"

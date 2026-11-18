@@ -77,7 +77,8 @@ const hiddenItems = computed(() =>
   entries.value.slice(1, 1 + hiddenCount.value).map(item => ({
     label: item.label,
     icon: item.icon,
-    onSelect: item.onSelect ?? (item.href ? () => window.location.assign(item.href!) : undefined),
+    href: item.href,
+    onSelect: item.onSelect,
   })),
 )
 

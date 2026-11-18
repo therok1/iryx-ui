@@ -1,3 +1,4 @@
+import type { InjectionKey } from 'vue'
 import type { IconLike } from './icon'
 
 export interface SidebarLink {
@@ -32,6 +33,12 @@ export interface SidebarSection {
 }
 
 export type SidebarItems = (SidebarLink | SidebarSection)[]
+
+/**
+ * Provided by `IAppShell` around the copy of its sidebar slot that lives in
+ * the mobile drawer, so an `ISidebar` there ignores `collapsed`.
+ */
+export const sidebarInDrawerKey: InjectionKey<boolean> = Symbol.for('iryx-ui:sidebar-in-drawer')
 
 export function isSidebarSection(item: SidebarLink | SidebarSection): item is SidebarSection {
   return typeof (item as SidebarSection).section === 'string'

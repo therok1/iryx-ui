@@ -2,8 +2,9 @@
 import type { ClassValue } from '../class-value'
 import { Menu01Icon } from '@hugeicons/core-free-icons'
 import { Primitive } from 'reka-ui'
-import { computed, ref, useSlots } from 'vue'
+import { computed, defineComponent, provide, ref, useSlots } from 'vue'
 import { useElementSize } from '../composables/element-size'
+import { sidebarInDrawerKey } from '../composables/sidebar'
 import { useIryxUiConfig } from '../config'
 import { appShellTheme } from '../theme/app-shell'
 import Drawer from './Drawer.vue'
@@ -80,6 +81,16 @@ const rootStyle = computed(() =>
 
 /** Open state for the mobile drawer. Closed again whenever a link is used. */
 const navOpen = ref(false)
+
+/**
+ * Wraps the drawer's copy of the sidebar slot. The provide has to come from a
+ * component inside the drawer: one on the shell itself would reach the
+ * column's copy too, and that is the copy that should honour `collapsed`.
+ */
+const DrawerNav = defineComponent((_, { slots }) => {
+  provide(sidebarInDrawerKey, true)
+  return () => slots.default?.()
+})
 
 /*
  * Only worth a drawer if there is something to put in it. An app with no
@@ -160,7 +171,9 @@ function slotClass(slot: Slot) {
         content: 'md:hidden',
       }"
     >
-      <slot name="sidebar" :in-drawer="true" />
+      <DrawerNav>
+        <slot name="sidebar" :in-drawer="true" />
+      </DrawerNav>
     </Drawer>
 
     <div :class="slotClass('body')">

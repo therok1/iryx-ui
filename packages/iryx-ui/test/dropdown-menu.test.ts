@@ -18,6 +18,16 @@ async function settle() {
 }
 
 describe('dropdownMenu', () => {
+  it('renders an entry with href as a real link, not a label', async () => {
+    mount(DropdownMenu, {
+      props: { open: true, items: [{ label: 'Docs', href: '/docs' }] },
+      slots: { trigger },
+      attachTo: document.body,
+    })
+    await settle()
+    expect(query('a[role="menuitem"]')?.getAttribute('href')).toBe('/docs')
+  })
+
   it('stays closed until the trigger is used', async () => {
     mount(DropdownMenu, {
       props: { items: [{ label: 'One', onSelect: () => {} }] },

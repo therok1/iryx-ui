@@ -7,6 +7,8 @@ export interface DropdownMenuItemOption {
   disabled?: boolean
   /** Style the item as destructive. */
   danger?: boolean
+  /** Renders the item as a link, so it navigates like any anchor (and opens in a new tab on modifier-click). */
+  href?: string
   /** Run when the item is chosen. Omit on an entry that opens a submenu. */
   onSelect?: () => void
   /** Nested entries. Turns this item into a submenu trigger. */
@@ -17,7 +19,7 @@ export interface DropdownMenuItemOption {
  * One row of a menu.
  *
  * `'-'` renders a separator. An option with `items` opens a submenu, and one
- * with neither `items` nor `onSelect` is a non-interactive group label.
+ * with none of `items`, `href` or `onSelect` is a non-interactive group label.
  */
 export type DropdownMenuEntry = DropdownMenuItemOption | '-'
 
