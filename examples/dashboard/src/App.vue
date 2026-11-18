@@ -66,23 +66,14 @@ const account: DropdownMenuEntry[] = [
   <IApp>
     <IAppShell
       scroll="main"
-      :ui="{
-        main: 'bg-muted/20',
-        header: 'border-b border-border',
-        navDrawerBody: 'pt-0',
-      }"
+      :ui="{ navDrawerBody: 'pt-0', main: '[scrollbar-width:none] [&::-webkit-scrollbar]:hidden' }"
     >
       <template #header>
         <div class="flex h-14 items-center gap-3 px-4">
-          <span class="flex items-center gap-2.5 font-semibold tracking-tight">
-            <img src="/logo.svg" alt="" class="h-4 w-auto">
-            Iryx UI
-          </span>
-
           <IInput
             placeholder="Search invoices, customers…"
             size="sm"
-            class="ml-4 hidden w-72 md:flex"
+            class="hidden w-72 md:flex"
           >
             <template #leading>
               <IIcon :icon="Search01Icon" />
@@ -107,9 +98,9 @@ const account: DropdownMenuEntry[] = [
         <ISidebar
           :items="items"
           class="w-60"
-          :ui="inDrawer ? { header: '-mt-1 h-6 px-3 py-0' } : undefined"
+          :ui="inDrawer ? { header: '-mt-1 mb-3 h-6 px-3 py-0' } : undefined"
         >
-          <template v-if="inDrawer" #header>
+          <template #header>
             <span class="flex items-center gap-2.5 font-semibold tracking-tight">
               <img src="/logo.svg" alt="" class="h-4 w-auto">
               Iryx UI
@@ -127,7 +118,7 @@ const account: DropdownMenuEntry[] = [
                 <button
                   type="button"
                   aria-label="Account menu"
-                  class="flex w-full items-center gap-2.5 rounded-lg px-1 py-1 text-left transition-colors outline-none hover:bg-accent focus-visible:ring-2 focus-visible:ring-primary/50"
+                  class="flex w-full items-center gap-2.5 rounded-lg px-2 py-1.5 text-left transition-colors outline-none hover:bg-foreground/5 focus-visible:ring-2 focus-visible:ring-primary/50"
                 >
                   <IAvatar :name="user.name" size="sm" status="online" />
                   <div class="min-w-0 flex-1">

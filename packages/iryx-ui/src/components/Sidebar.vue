@@ -5,7 +5,7 @@ import type { SidebarItems, SidebarLink } from '../composables/sidebar'
 import { ArrowRight01Icon } from '@hugeicons/core-free-icons'
 import { CollapsibleContent, CollapsibleRoot, CollapsibleTrigger, Primitive } from 'reka-ui'
 import { computed, inject, ref } from 'vue'
-import { isSidebarGroup, sidebarInDrawerKey, toSidebarSections } from '../composables/sidebar'
+import { isSidebarGroup, sidebarPlacementKey, toSidebarSections } from '../composables/sidebar'
 import { useIryxUiConfig } from '../config'
 import { sidebarTheme } from '../theme/sidebar'
 import DropdownMenu from './DropdownMenu.vue'
@@ -15,7 +15,7 @@ import Tooltip from './Tooltip.vue'
 export interface SidebarProps {
   /** Links, optionally grouped into labelled sections. */
   items?: SidebarItems
-  /** Which edge it sits on. Decides where the border goes and which way tooltips and group menus open. */
+  /** Which edge it sits on: where the border goes and which way tooltips and group menus open. */
   side?: 'left' | 'right'
   /**
    * Accessible name for the navigation landmark — override for non-English
@@ -52,20 +52,15 @@ const props = withDefaults(defineProps<SidebarProps>(), {
 /** Icons-only mode. Bind it to persist the choice, or leave it internal. */
 const collapsedModel = defineModel<boolean>('collapsed', { default: false })
 
-/**
- * `IAppShell` renders its sidebar slot a second time, inside the mobile drawer.
- * That copy stays full width whatever the model says: the drawer already has
- * the room, and a rail inside it would be a strip of icons for nothing.
- */
-const inDrawer = inject(sidebarInDrawerKey, false)
-const collapsed = computed(() => collapsedModel.value && !inDrawer)
+const placement = inject(sidebarPlacementKey, undefined)
+const collapsed = computed(() => collapsedModel.value && placement !== 'drawer')
 
 const config = useIryxUiConfig()
 const isUnstyled = computed(() => props.unstyled ?? config.unstyled)
 
 const sections = computed(() => toSidebarSections(props.items))
 
-const theme = computed(() => sidebarTheme({ side: props.side, collapsed: collapsed.value }))
+const theme = computed(() => sidebarTheme({ side: props.side, collapsed: collapsed.value, inShell: placement !== undefined }))
 
 type Slot = keyof NonNullable<SidebarProps['ui']>
 
@@ -74,28 +69,19 @@ function slotClass(slot: Slot) {
   return isUnstyled.value ? override : theme.value[slot]({ class: override })
 }
 
-/** Tooltips and group menus open away from the edge the sidebar sits on. */
 const outward = computed(() => (props.side === 'right' ? 'left' : 'right'))
 
-/**
- * Which groups are open, held here rather than by each `CollapsibleRoot`.
- * Collapsing swaps a group for a menu, and state kept in the root it unmounts
- * would reset to `defaultOpen` on the way back.
- */
+// Held here, not in CollapsibleRoot, so open state survives collapsing (which unmounts the root).
 const openGroups = ref<Record<string, boolean>>({})
-/** Section index plus label: two sections may each have a group with the same name. */
 const groupKey = (sectionIndex: number, link: SidebarLink) => `${sectionIndex}:${link.label}`
 
 /** Anchors get a real href; everything else stays a button so it is focusable. */
 const tagOf = (link: SidebarLink) => (link.href ? 'a' : 'button')
 
-/** Stands in for a missing icon when collapsed, so the row is not an empty square. */
 const initialOf = (link: SidebarLink) => [...link.label][0]
 
-/** The badge folds away with the label, so the tooltip carries it instead. */
 const tipOf = (link: SidebarLink) => (link.badge === undefined ? link.label : `${link.label} (${link.badge})`)
 
-/** A collapsed group's children, as menu entries. Hrefs stay real anchors, as they are in the expanded list. */
 function menuItemsOf(link: SidebarLink): DropdownMenuItemOption[] {
   return (link.items ?? []).map(child => ({
     label: child.label,
@@ -146,10 +132,6 @@ const nameOf = (link: SidebarLink) => link.label
           </p>
 
           <template v-for="link in section.items" :key="link.label">
-            <!--
-              A collapsed group has no room to open in place, so its children
-              open in a menu beside the rail, under the group's name.
-            -->
             <Tooltip
               v-if="isSidebarGroup(link) && collapsed"
               :text="tipOf(link)"
@@ -224,7 +206,6 @@ const nameOf = (link: SidebarLink) => link.label
               </CollapsibleContent>
             </CollapsibleRoot>
 
-            <!-- Collapsed, the label is gone from sight, so a tooltip names the icon. -->
             <Tooltip
               v-else
               :text="tipOf(link)"

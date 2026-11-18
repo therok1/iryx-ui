@@ -210,11 +210,6 @@ describe('sidebar', () => {
     expect(wrapper.text()).toContain('icons')
   })
 
-  /*
-   * A collapsed rail has no room for a group to open in place: its children
-   * rendered there as label-less, icon-less rows a few pixels wide. They open
-   * in a menu beside the rail instead.
-   */
   it('turns a group into a menu trigger when collapsed, instead of opening it in place', () => {
     const wrapper = mount(Sidebar, { props: { items, collapsed: true } })
     expect(wrapper.find('a[href="/invoices/drafts"]').exists()).toBe(false)
@@ -263,11 +258,6 @@ describe('sidebar', () => {
     expect(wrapper.get('a[href="/inbox"] span[aria-hidden="true"]').text()).toBe('I')
   })
 
-  /*
-   * IAppShell renders its sidebar slot twice, in the column and in the mobile
-   * drawer. A rail inside the drawer is a strip of icons in a panel with room
-   * for the labels, so only that copy ignores `collapsed`.
-   */
   it('ignores collapsed in IAppShell\'s mobile drawer, and only there', async () => {
     const wrapper = mount(AppShell, {
       slots: { sidebar: () => h(Sidebar, { items, collapsed: true }) },
@@ -353,17 +343,32 @@ describe('appShell', () => {
     expect(wrapper.get('#hdr').element.closest('.sticky')).not.toBeNull()
   })
 
-  /*
-   * There is no way to say "below the header" in CSS without knowing how tall
-   * it is, so a sticky sidebar would park behind a sticky header. The shell
-   * measures the header and publishes the offset as a variable.
-   */
-  it('publishes the header height so the sticky sidebar clears it', async () => {
+  it('sticks the sidebar to the top of the viewport in page mode', async () => {
     const wrapper = mount(AppShell, { props: { scroll: 'page' }, slots, attachTo: document.body })
     await nextTick()
     expect(wrapper.attributes('style')).toContain('--iryx-shell-header-height')
-    expect(wrapper.get('#side').element.parentElement!.className)
-      .toContain('top-[var(--iryx-shell-header-height,0px)]')
+    const rail = wrapper.get('#side').element.parentElement!.className
+    expect(rail).toContain('top-0')
+    expect(rail).toContain('h-svh')
+  })
+
+  it('puts the header, page and footer in one card beside the sidebar', () => {
+    const wrapper = mount(AppShell, { slots })
+    const card = wrapper.get('main').element.parentElement!
+    expect(card.contains(wrapper.get('#hdr').element)).toBe(true)
+    expect(card.contains(wrapper.get('#side').element)).toBe(false)
+    expect(card.className).toContain('md:rounded-xl')
+    expect(card.className).toContain('md:ms-0')
+    expect(mount(AppShell, { slots: { default: 'x' } }).get('main').element.parentElement!.className).not.toContain('md:ms-0')
+  })
+
+  it('sets ISidebar on the canvas, without its own border or fill', () => {
+    const items = [{ label: 'Home', href: '/' }]
+    const wrapper = mount(AppShell, { slots: { sidebar: () => h(Sidebar, { items }) } })
+    const nav = wrapper.get('nav').classes()
+    expect(nav).toContain('bg-transparent')
+    expect(nav).not.toContain('border-r')
+    expect(mount(Sidebar, { props: { items } }).classes()).toContain('border-r')
   })
 
   it('does not publish an offset in main-scroll mode, where nothing is sticky', () => {

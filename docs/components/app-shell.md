@@ -29,19 +29,21 @@ const paged = {
   // The body must take its content height, not flex to the frame: a body
   // shorter than the rail leaves sticky nothing to stick inside.
   body: 'flex-none',
-  sidebar: 'h-[calc(18rem-var(--iryx-shell-header-height,0px))]',
+  sidebar: 'h-72',
 }
 </script>
 
 # IAppShell
 
-The page frame: header, sidebar, main and footer. Every slot takes whatever you put in it — navigation, account menu and routing stay yours, and [`ISidebar`](/components/sidebar) works with or without the shell.
+The page frame: header, sidebar, main and footer. The sidebar sits on a grey canvas, and the header, page and footer share one rounded card beside it. Every slot takes whatever you put in it — navigation, account menu and routing stay yours, and [`ISidebar`](/components/sidebar) works with or without the shell.
+
+The shell draws the rules between header, page and footer itself, so the bars you put in those slots need no borders of their own. Inside the shell an `ISidebar` drops its border and background to sit on the canvas. The canvas colour is the `--iryx-canvas` token.
 
 <Demo stack>
 <template #demo>
 <IAppShell :ui="framed" class="w-full">
 <template #header>
-<div class="flex h-14 items-center gap-3 border-b border-border px-4">
+<div class="flex h-14 items-center gap-3 px-4">
 <span class="flex size-7 items-center justify-center rounded-md bg-primary text-xs font-semibold text-primary-foreground">N</span>
 <span class="text-sm font-semibold">Northwind</span>
 </div>
@@ -53,7 +55,7 @@ The page frame: header, sidebar, main and footer. Every slot takes whatever you 
 <p v-for="row in rows" :key="row" class="rounded-md border border-border px-3 py-2 text-sm">{{ row }}</p>
 </div>
 <template #footer>
-<div class="flex h-10 items-center border-t border-border px-4 text-xs text-muted-foreground">Version 1.4.0</div>
+<div class="flex h-10 items-center px-4 text-xs text-muted-foreground">Version 1.4.0</div>
 </template>
 </IAppShell>
 </template>
@@ -81,13 +83,13 @@ Each of `header`, `sidebar` and `footer` is rendered only when you fill it, so a
 
 **`main`**, the default, pins the shell to the viewport and scrolls only the content column. The header and sidebar never move — what a data app wants.
 
-**`page`** scrolls the document, with a sticky header and a sticky sidebar. Anchor links and the browser's scroll restoration work in this mode, so content and marketing pages want it. Being sticky rather than fixed, the sidebar travels up with the end of the body and the footer pushes it off screen.
+**`page`** scrolls the document, with a header that sticks to the top of the card and a sidebar that sticks to the viewport. Anchor links and the browser's scroll restoration work in this mode, so content and marketing pages want it. Being sticky rather than fixed, the sidebar travels up with the end of the body and the footer pushes it off screen.
 
 <Demo stack>
 <template #demo>
 <IAppShell scroll="page" :ui="paged" class="w-full">
 <template #header>
-<div class="flex h-14 items-center border-b border-border bg-background px-4 text-sm font-semibold">Header</div>
+<div class="flex h-14 items-center px-4 text-sm font-semibold">Header</div>
 </template>
 <template #sidebar>
 <ISidebar :items="nav" class="h-full w-56" />
@@ -96,7 +98,7 @@ Each of `header`, `sidebar` and `footer` is rendered only when you fill it, so a
 <p v-for="row in rows" :key="row" class="rounded-md border border-border px-3 py-2 text-sm">{{ row }}</p>
 </div>
 <template #footer>
-<div class="flex h-10 items-center border-t border-border px-4 text-xs text-muted-foreground">Version 1.4.0</div>
+<div class="flex h-10 items-center px-4 text-xs text-muted-foreground">Version 1.4.0</div>
 </template>
 </IAppShell>
 </template>
@@ -120,14 +122,14 @@ The shell itself is the scroll container here, and the header sticks within it.
   :ui="{
     root: 'h-72 min-h-0 overflow-y-auto',
     body: 'flex-none',
-    sidebar: 'h-[calc(18rem-var(--iryx-shell-header-height,0px))]',
+    sidebar: 'h-72',
   }"
 >
 ```
 
 A full-page shell needs none of that.
 
-In `page` mode the shell measures its own header and publishes the height as `--iryx-shell-header-height`. Use that variable to offset anything you stick below the header yourself.
+In `page` mode the shell measures its own header and publishes the height as `--iryx-shell-header-height`. Use that variable to offset anything you stick below the header yourself. The sidebar does not need it: the header is in the card, not above the rail.
 
 ## Sidebar on the right
 
@@ -135,7 +137,7 @@ In `page` mode the shell measures its own header and publishes the height as `--
 <template #demo>
 <IAppShell sidebar-position="right" :ui="framed" class="w-full">
 <template #header>
-<div class="flex h-14 items-center border-b border-border px-4 text-sm font-semibold">Northwind</div>
+<div class="flex h-14 items-center px-4 text-sm font-semibold">Northwind</div>
 </template>
 <template #sidebar>
 <ISidebar :items="nav" side="right" class="h-full w-56" />
@@ -144,7 +146,7 @@ In `page` mode the shell measures its own header and publishes the height as `--
 <p v-for="row in rows.slice(0, 6)" :key="row" class="rounded-md border border-border px-3 py-2 text-sm">{{ row }}</p>
 </div>
 <template #footer>
-<div class="flex h-10 items-center border-t border-border px-4 text-xs text-muted-foreground">Version 1.4.0</div>
+<div class="flex h-10 items-center px-4 text-xs text-muted-foreground">Version 1.4.0</div>
 </template>
 </IAppShell>
 </template>
@@ -156,23 +158,23 @@ In `page` mode the shell measures its own header and publishes the height as `--
 ```
 </Demo>
 
-`sidebarPosition` moves the column; `ISidebar`'s own `side` decides which edge carries its border. Set both.
+`sidebarPosition` moves the column; `ISidebar`'s own `side` decides which way its tooltips and collapsed-group menus open. Set both. The card keeps its inset on every side except the one next to the sidebar.
 
 ## Where the footer sits
 
-Without a sidebar the shell is a header, a content column and the footer.
+Without a sidebar the shell is a card with a header, a content column and the footer, inset from the canvas on all four sides.
 
 <Demo stack>
 <template #demo>
 <IAppShell :ui="framed" class="w-full">
 <template #header>
-<div class="flex h-12 items-center border-b border-border px-4 text-sm font-semibold">Northwind</div>
+<div class="flex h-12 items-center px-4 text-sm font-semibold">Northwind</div>
 </template>
 <div class="space-y-2 p-4">
 <p v-for="row in rows.slice(0, 8)" :key="row" class="rounded-md border border-border px-3 py-2 text-sm">{{ row }}</p>
 </div>
 <template #footer>
-<div class="flex h-10 items-center border-t border-border px-4 text-xs text-muted-foreground">Version 1.4.0</div>
+<div class="flex h-10 items-center px-4 text-xs text-muted-foreground">Version 1.4.0</div>
 </template>
 </IAppShell>
 </template>
@@ -189,7 +191,7 @@ In `main` mode the footer is pinned below the scrolling column, so it stays visi
 
 ## Navigation on a phone
 
-Below `md` the sidebar column is hidden and the same `#sidebar` slot is rendered inside a drawer instead, with a trigger the shell puts in the header itself. Nothing needs wiring up: a shell with a sidebar has usable navigation on a phone by default.
+Below `md` the sidebar column is hidden and the same `#sidebar` slot is rendered inside a drawer instead, with a trigger the shell puts in the header itself. The card drops its inset, border and corners to fill the screen. Nothing needs wiring up: a shell with a sidebar has usable navigation on a phone by default.
 
 A sidebar narrow enough for a phone is not a sidebar, and one that merely squeezes takes the content column down with it.
 
@@ -220,10 +222,6 @@ The slot is rendered twice — once as the column, once in the drawer — and is
 
 Set `mobileNav` to `false` to turn the whole thing off. To place the trigger yourself rather than take the shell's, the `#header` slot receives `navOpen` and `toggleNav`.
 
-::: warning The header slot sits in a row
-To make room for that trigger, the shell wraps `#header` in a flex row. A bar that draws its own bottom rule should move it to `ui.header` — from inside the content column, the rule stops short of the trigger.
-:::
-
 ## Props
 
 | Prop | Type | Default | Description |
@@ -235,14 +233,14 @@ To make room for that trigger, the shell wraps `#header` in a flex row. A bar th
 | `navLabel` | `string` | `'Open navigation'` | Accessible name for the drawer trigger |
 | `unstyled` | `boolean` | — | Drop built-in classes |
 | `class` | `string` | — | Merged with the built-in classes |
-| `ui` | `{ root?, header?, headerRow?, headerContent?, navTrigger?, navDrawer?, navDrawerBody?, body?, sidebar?, main?, footer? }` | — | Per-element class overrides |
+| `ui` | `{ root?, header?, headerRow?, headerContent?, navTrigger?, navDrawer?, navDrawerBody?, body?, sidebar?, panel?, main?, footer? }` | — | Per-element class overrides |
 
 ## Slots
 
 | Slot | When to use it |
 | --- | --- |
 | default | The page itself, inside `<main>` |
-| `header` | App bar. Receives `navOpen` and `toggleNav`. Measured in `page` mode to position the sticky sidebar |
+| `header` | App bar at the top of the card. Receives `navOpen` and `toggleNav`. Sticky in `page` mode |
 | `sidebar` | The navigation rail — usually [`ISidebar`](/components/sidebar). Receives `inDrawer` — `false` in the rail, `true` in the mobile drawer, where the slot is rendered a second time |
 | `footer` | Pinned below the content in `main` mode, at the end of the document in `page` mode |
 

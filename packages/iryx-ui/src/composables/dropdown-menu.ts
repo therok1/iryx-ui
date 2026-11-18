@@ -7,7 +7,7 @@ export interface DropdownMenuItemOption {
   disabled?: boolean
   /** Style the item as destructive. */
   danger?: boolean
-  /** Renders the item as a link, so it navigates like any anchor (and opens in a new tab on modifier-click). */
+  /** Renders the item as a link. */
   href?: string
   /** Run when the item is chosen. Omit on an entry that opens a submenu. */
   onSelect?: () => void

@@ -34,11 +34,8 @@ export interface SidebarSection {
 
 export type SidebarItems = (SidebarLink | SidebarSection)[]
 
-/**
- * Provided by `IAppShell` around the copy of its sidebar slot that lives in
- * the mobile drawer, so an `ISidebar` there ignores `collapsed`.
- */
-export const sidebarInDrawerKey: InjectionKey<boolean> = Symbol.for('iryx-ui:sidebar-in-drawer')
+/** Provided by `IAppShell` around each copy of its sidebar slot. */
+export const sidebarPlacementKey: InjectionKey<'column' | 'drawer'> = Symbol.for('iryx-ui:sidebar-placement')
 
 export function isSidebarSection(item: SidebarLink | SidebarSection): item is SidebarSection {
   return typeof (item as SidebarSection).section === 'string'

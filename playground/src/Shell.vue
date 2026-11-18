@@ -68,7 +68,7 @@ const columns = [
   <IApp>
     <IAppShell :scroll="scroll" :sidebar-position="sidebarPosition">
       <template #header>
-        <header class="flex h-14 items-center gap-3 border-b border-border bg-background px-4">
+        <header class="flex h-14 items-center gap-3 px-4">
           <IButton
             variant="ghost"
             size="sm"

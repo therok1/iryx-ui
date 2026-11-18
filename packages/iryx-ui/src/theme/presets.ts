@@ -1,5 +1,6 @@
 export interface ThemeColors {
   background?: string
+  canvas?: string
   foreground?: string
   primary?: string
   primaryForeground?: string
@@ -51,6 +52,7 @@ export interface Theme {
 
 const TOKEN_VARS: Record<keyof ThemeColors, string> = {
   background: '--iryx-background',
+  canvas: '--iryx-canvas',
   foreground: '--iryx-foreground',
   primary: '--iryx-primary',
   primaryForeground: '--iryx-primary-foreground',

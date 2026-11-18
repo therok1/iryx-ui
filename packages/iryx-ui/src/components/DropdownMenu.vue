@@ -35,12 +35,8 @@ export interface DropdownMenuProps {
   }
 }
 
-/*
- * The root renders no element, so attrs go to the trigger. That lets a
- * Tooltip wrap a DropdownMenu: the tooltip's as-child trigger reaches the
- * button underneath. Nest it this way round, not the other: reka's slot merge
- * keeps the inner trigger's pointerdown, and the menu's is the one that opens it.
- */
+// Lets a Tooltip wrap a DropdownMenu. Not the other way round: reka's slot
+// merge keeps only the inner trigger's pointerdown, and the menu needs its own.
 defineOptions({ inheritAttrs: false })
 
 const props = withDefaults(defineProps<DropdownMenuProps>(), {

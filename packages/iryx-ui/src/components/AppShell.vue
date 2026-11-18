@@ -4,7 +4,7 @@ import { Menu01Icon } from '@hugeicons/core-free-icons'
 import { Primitive } from 'reka-ui'
 import { computed, defineComponent, provide, ref, useSlots } from 'vue'
 import { useElementSize } from '../composables/element-size'
-import { sidebarInDrawerKey } from '../composables/sidebar'
+import { sidebarPlacementKey } from '../composables/sidebar'
 import { useIryxUiConfig } from '../config'
 import { appShellTheme } from '../theme/app-shell'
 import Drawer from './Drawer.vue'
@@ -36,6 +36,7 @@ export interface AppShellProps {
     header?: string
     body?: string
     sidebar?: string
+    panel?: string
     headerRow?: string
     headerContent?: string
     navTrigger?: string
@@ -82,14 +83,12 @@ const rootStyle = computed(() =>
 /** Open state for the mobile drawer. Closed again whenever a link is used. */
 const navOpen = ref(false)
 
-/**
- * Wraps the drawer's copy of the sidebar slot. The provide has to come from a
- * component inside the drawer: one on the shell itself would reach the
- * column's copy too, and that is the copy that should honour `collapsed`.
- */
-const DrawerNav = defineComponent((_, { slots }) => {
-  provide(sidebarInDrawerKey, true)
-  return () => slots.default?.()
+const SidebarPlacement = defineComponent({
+  props: { placement: { type: String as () => 'column' | 'drawer', required: true } },
+  setup(props, { slots }) {
+    provide(sidebarPlacementKey, props.placement)
+    return () => slots.default?.()
+  },
 })
 
 /*
@@ -103,6 +102,7 @@ const theme = computed(() =>
     scroll: props.scroll,
     sidebarPosition: props.sidebarPosition,
     mobileNav: hasMobileNav.value,
+    hasSidebar: Boolean(slots.sidebar),
   }),
 )
 
@@ -125,32 +125,6 @@ function slotClass(slot: Slot) {
     :style="rootStyle"
     :class="isUnstyled ? [props.ui?.root, props.class] : theme.root({ class: [props.ui?.root, props.class] })"
   >
-    <div v-if="$slots.header" ref="header" :class="slotClass('header')">
-      <!--
-        The trigger is the shell's own, not the app's, so a sidebar becomes
-        usable on a phone without the app wiring anything up. It leads the row
-        because a navigation control belongs at the start of a bar, and it is
-        `md:hidden`, so the row collapses back to just the app's own content on
-        a wide screen.
-      -->
-      <div :class="slotClass('headerRow')">
-        <button
-          v-if="hasMobileNav"
-          type="button"
-          :aria-label="props.navLabel"
-          :aria-expanded="navOpen"
-          :class="slotClass('navTrigger')"
-          @click="navOpen = true"
-        >
-          <Icon :icon="Menu01Icon" />
-        </button>
-
-        <div :class="slotClass('headerContent')">
-          <slot name="header" :nav-open="navOpen" :toggle-nav="() => (navOpen = !navOpen)" />
-        </div>
-      </div>
-    </div>
-
     <!--
       The same slot, rendered a second time. Vue renders slot content per call
       site, so the drawer gets its own instances rather than moving the
@@ -171,23 +145,53 @@ function slotClass(slot: Slot) {
         content: 'md:hidden',
       }"
     >
-      <DrawerNav>
+      <SidebarPlacement placement="drawer">
         <slot name="sidebar" :in-drawer="true" />
-      </DrawerNav>
+      </SidebarPlacement>
     </Drawer>
 
     <div :class="slotClass('body')">
       <div v-if="$slots.sidebar" :class="slotClass('sidebar')">
-        <slot name="sidebar" :in-drawer="false" />
+        <SidebarPlacement placement="column">
+          <slot name="sidebar" :in-drawer="false" />
+        </SidebarPlacement>
       </div>
 
-      <main :class="slotClass('main')">
-        <slot />
-      </main>
-    </div>
+      <div :class="slotClass('panel')">
+        <div v-if="$slots.header" ref="header" :class="slotClass('header')">
+          <!--
+            The trigger is the shell's own, not the app's, so a sidebar becomes
+            usable on a phone without the app wiring anything up. It leads the
+            row because a navigation control belongs at the start of a bar, and
+            it is `md:hidden`, so the row collapses back to just the app's own
+            content on a wide screen.
+          -->
+          <div :class="slotClass('headerRow')">
+            <button
+              v-if="hasMobileNav"
+              type="button"
+              :aria-label="props.navLabel"
+              :aria-expanded="navOpen"
+              :class="slotClass('navTrigger')"
+              @click="navOpen = true"
+            >
+              <Icon :icon="Menu01Icon" />
+            </button>
 
-    <div v-if="$slots.footer" :class="slotClass('footer')">
-      <slot name="footer" />
+            <div :class="slotClass('headerContent')">
+              <slot name="header" :nav-open="navOpen" :toggle-nav="() => (navOpen = !navOpen)" />
+            </div>
+          </div>
+        </div>
+
+        <main :class="slotClass('main')">
+          <slot />
+        </main>
+
+        <div v-if="$slots.footer" :class="slotClass('footer')">
+          <slot name="footer" />
+        </div>
+      </div>
     </div>
   </Primitive>
 </template>
