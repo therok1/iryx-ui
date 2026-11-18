@@ -36,6 +36,7 @@ const props: Record<string, Record<string, unknown>> = {
   Drawer: { open: true, title: 'Filters' },
   DropdownMenu: { items: [{ label: 'Rename' }] },
   EmptyState: { title: 'Nothing here' },
+  Form: { state: {} },
   LineChart: { data: [{ label: 'Jan', value: 3 }] },
   NavigationMenu: { items: [{ label: 'Product', items: [{ label: 'Overview', href: '/overview' }] }] },
   Pagination: { total: 100 },
