@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
-import { h } from 'vue'
+import { h, markRaw } from 'vue'
 import { ToggleGroup } from '../src'
 
 const views = ['List', 'Board', 'Calendar']
@@ -10,7 +10,7 @@ const views = ['List', 'Board', 'Calendar']
  * declared props receives every attribute as a prop instead of letting it
  * fall through, so the marker would never reach the SVG.
  */
-const StubIcon = { render: () => h('svg') }
+const StubIcon = markRaw({ render: () => h('svg') })
 
 function items(wrapper: ReturnType<typeof mount>) {
   return wrapper.findAll('button')
