@@ -1,5 +1,14 @@
 # iryx-ui
 
+## 0.27.0
+
+### Minor Changes
+
+- caa3a32: feat(app-shell)!: the shell is now a grey canvas with the sidebar sitting on it, and the header, page and footer in one rounded card beside it. The shell draws the rules between header, page and footer itself, and an `ISidebar` inside it drops its border and fill. Below `md` the card fills the screen. New `--iryx-canvas` token (`canvas` in `applyTheme`) and `ui.panel` slot. Remove the borders your own header and footer bars drew, and move a logo from the header into the sidebar's `#header` slot, since the header no longer spans the sidebar.
+- 2a95370: feat(sidebar): name collapsed links in tooltips, open collapsed groups as menus, and keep IAppShell's mobile drawer at full width
+  
+  feat(dropdown-menu): items take an `href` and render as real links; Breadcrumb's folded items and the collapsed sidebar's group menus use it instead of `window.location.assign`
+
 ## 0.26.0
 
 ### Minor Changes
