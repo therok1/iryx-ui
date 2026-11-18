@@ -1,9 +1,9 @@
 import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
-import { h } from 'vue'
+import { h, markRaw } from 'vue'
 import { Timeline } from '../src'
 
-const StubIcon = { render: () => h('svg') }
+const StubIcon = markRaw({ render: () => h('svg') })
 
 const events = [
   { title: 'Invoice created', time: '09:12', datetime: '2026-08-22T09:12:00Z' },

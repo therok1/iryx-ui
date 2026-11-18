@@ -1,11 +1,11 @@
 import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
-import { defineComponent, h } from 'vue'
+import { defineComponent, h, markRaw } from 'vue'
 import { Icon } from '../src'
 
-const Star = defineComponent({
+const Star = markRaw(defineComponent({
   render: () => h('svg', { 'data-star': '' }),
-})
+}))
 
 describe('icon', () => {
   it('renders a component icon', () => {
