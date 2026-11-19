@@ -1,7 +1,7 @@
 import { enableAutoUnmount, mount } from '@vue/test-utils'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { h, nextTick } from 'vue'
-import { AppShell, Container, PageHeader, Sidebar, toSidebarSections } from '../src'
+import { defineComponent, h, nextTick, ref } from 'vue'
+import { AppShell, Container, PageHeader, Sidebar, sidebarCollapsedCookie, sidebarCollapsedKey, toSidebarSections, useSidebarCollapsed } from '../src'
 
 enableAutoUnmount(afterEach)
 
@@ -296,6 +296,56 @@ describe('toSidebarSections', () => {
 
   it('returns nothing for no items', () => {
     expect(toSidebarSections(undefined)).toEqual([])
+  })
+})
+
+describe('pinned sections', () => {
+  const items = [
+    { section: '', pinned: true, items: [{ label: 'Help', href: '/help' }] },
+    { label: 'Home', href: '/' },
+    { section: 'Billing', items: [{ label: 'Invoices', href: '/invoices' }] },
+  ]
+
+  it('move to the end and only the first one takes the free space', () => {
+    expect(toSidebarSections(items).map(s => s.items[0]!.label)).toEqual(['Home', 'Invoices', 'Help'])
+
+    const wrapper = mount(Sidebar, { props: { items: [...items, { section: 'More', pinned: true, items: [{ label: 'Docs' }] }] } })
+    const pinned = wrapper.findAll('[data-pinned]')
+    expect(pinned).toHaveLength(2)
+    expect(pinned[0]!.classes()).toContain('mt-auto')
+    expect(pinned[1]!.classes()).not.toContain('mt-auto')
+    expect(wrapper.findAll('a').at(-1)!.text()).toBe('Help')
+  })
+})
+
+describe('useSidebarCollapsed', () => {
+  afterEach(() => {
+    document.cookie = `${sidebarCollapsedCookie}=; max-age=0; path=/`
+  })
+
+  function run(provide?: Record<symbol, unknown>) {
+    let state!: ReturnType<typeof useSidebarCollapsed>
+    mount(defineComponent({
+      setup: () => {
+        state = useSidebarCollapsed()
+        return () => null
+      },
+    }), { global: { provide } })
+    return state
+  }
+
+  it('reads and writes the cookie', async () => {
+    document.cookie = `${sidebarCollapsedCookie}=true; path=/`
+    const state = run()
+    expect(state.value).toBe(true)
+    state.value = false
+    await nextTick()
+    expect(document.cookie).toContain(`${sidebarCollapsedCookie}=false`)
+  })
+
+  it('uses a provided ref, so the server can hand it the request cookie', () => {
+    const provided = ref(true)
+    expect(run({ [sidebarCollapsedKey as symbol]: provided })).toBe(provided)
   })
 })
 

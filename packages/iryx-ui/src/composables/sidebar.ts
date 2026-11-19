@@ -1,5 +1,6 @@
-import type { InjectionKey } from 'vue'
+import type { InjectionKey, Ref } from 'vue'
 import type { IconLike } from './icon'
+import { inject, ref, watch } from 'vue'
 
 export interface SidebarLink {
   label: string
@@ -30,6 +31,8 @@ export interface SidebarLink {
 export interface SidebarSection {
   section: string
   items: SidebarLink[]
+  /** Push to the bottom of the column, above the footer. Pass `section: ''` for no heading. */
+  pinned?: boolean
 }
 
 export type SidebarItems = (SidebarLink | SidebarSection)[]
@@ -61,9 +64,34 @@ export function toSidebarSections(items: SidebarItems | undefined): SidebarSecti
     loose.push(item)
   }
 
-  return sections
+  return [...sections.filter(s => !s.pinned), ...sections.filter(s => s.pinned)]
 }
 
 export function isSidebarGroup(link: SidebarLink): boolean {
   return Array.isArray(link.items) && link.items.length > 0
+}
+
+export const sidebarCollapsedCookie = 'iryx-ui-sidebar-collapsed'
+
+/**
+ * Provide a ref read from the request cookie so the server renders the sidebar
+ * the way the user left it. The Nuxt module does this for you.
+ */
+export const sidebarCollapsedKey: InjectionKey<Ref<boolean>> = Symbol.for('iryx-ui:sidebar-collapsed')
+
+/** Collapsed state remembered in a cookie. Bind it with `v-model:collapsed`. */
+export function useSidebarCollapsed(): Ref<boolean> {
+  const provided = inject(sidebarCollapsedKey, null)
+  if (provided)
+    return provided
+
+  if (typeof document === 'undefined')
+    return ref(false)
+
+  const match = document.cookie.match(new RegExp(`(?:^|; )${sidebarCollapsedCookie}=([^;]*)`))
+  const collapsed = ref(match?.[1] === 'true')
+  watch(collapsed, (value) => {
+    document.cookie = `${sidebarCollapsedCookie}=${value}; path=/; max-age=31536000; samesite=lax`
+  })
+  return collapsed
 }

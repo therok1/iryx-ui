@@ -24,7 +24,7 @@ export interface TextareaProps {
   /** Mark the field as invalid — styles the border and ring red. */
   invalid?: boolean
   /** Hard limit in characters, enforced by the browser. */
-  maxlength?: number
+  maxlength?: number | string
   /**
    * Show a character count under the field — "120/500" with `maxlength`,
    * turning red within the last tenth of the limit.

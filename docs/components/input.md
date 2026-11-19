@@ -142,7 +142,7 @@ Inside an [`IFormField`](/components/form-field), `invalid` is inferred from the
 | `loading` | `boolean` | `false` | Trailing spinner. Does not disable the field |
 | `debounce` | `number` | `0` | Milliseconds to wait before the model updates |
 | `clearLabel` | `string` | `'Clear'` | Accessible name for the clear button |
-| `maxlength` | `number` | — | Hard character limit |
+| `maxlength` | `number \| string` | — | Hard character limit |
 | `showCount` | `boolean` | `false` | Show a character count in the trailing area |
 | `countLabel` | `(remaining: number) => string` | English | What screen readers announce near the limit |
 | `unstyled` | `boolean` | — | Drop built-in classes |

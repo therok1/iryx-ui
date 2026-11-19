@@ -123,6 +123,13 @@ describe('input count', () => {
     expect(wrapper.get('input').attributes('maxlength')).toBe('50')
   })
 
+  it('takes maxlength written as a plain attribute', async () => {
+    const wrapper = mount(Input, { props: { showCount: true, maxlength: '10' } })
+    await wrapper.get('input').setValue('a'.repeat(9))
+    expect(wrapper.get('span[aria-hidden="true"]').text()).toBe('9/10')
+    expect(wrapper.get('[aria-live]').text()).toBe('1 character left')
+  })
+
   it('updates as the user types', async () => {
     const wrapper = mount(Input, { props: { showCount: true, maxlength: 10 } })
     await wrapper.get('input').setValue('a'.repeat(9))

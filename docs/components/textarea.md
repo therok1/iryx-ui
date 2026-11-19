@@ -120,7 +120,7 @@ Inside an [`IFormField`](/components/form-field), `invalid` is set for you from 
 | `disabled` | `boolean` | `false` | Disables the field |
 | `required` | `boolean` | `false` | Marks it required |
 | `invalid` | `boolean` | — | Error styling; set automatically inside `IFormField` |
-| `maxlength` | `number` | — | Hard character limit |
+| `maxlength` | `number \| string` | — | Hard character limit |
 | `showCount` | `boolean` | `false` | Show a character count under the field |
 | `countLabel` | `(remaining: number) => string` | English | What screen readers announce near the limit |
 | `id` | `string` | generated | Useful when an external `ILabel` targets it |

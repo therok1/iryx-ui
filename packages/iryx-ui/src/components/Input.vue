@@ -30,7 +30,7 @@ export interface InputProps {
   /** Accessible name for the clear button — override for non-English apps. */
   clearLabel?: string
   /** Hard limit in characters, enforced by the browser. */
-  maxlength?: number
+  maxlength?: number | string
   /**
    * Show a character count in the trailing area — "12/50" with `maxlength`,
    * turning red within the last tenth of the limit.

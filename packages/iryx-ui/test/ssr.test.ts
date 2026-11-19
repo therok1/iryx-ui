@@ -2,7 +2,7 @@
 
 import type { Component } from 'vue'
 import { describe, expect, it } from 'vitest'
-import { createSSRApp, h } from 'vue'
+import { createSSRApp, h, ref } from 'vue'
 // The subpath of `vue` itself, not the standalone `@vue/server-renderer`
 // package — depending on that separately resolved a second `@vue/runtime-core`
 // and the two copies' `Component` types stopped being assignable.
@@ -90,5 +90,28 @@ describe('server-side rendering', () => {
   it('exposes the imperative APIs without touching the DOM', () => {
     expect(() => iryx.useToast()).not.toThrow()
     expect(() => iryx.useConfirm()).not.toThrow()
+  })
+})
+
+describe('useSidebarCollapsed on the server', () => {
+  it('renders the state the app provides from the request cookie', async () => {
+    const app = createSSRApp({
+      setup: () => {
+        const collapsed = iryx.useSidebarCollapsed()
+        return () => h(iryx.Sidebar, { collapsed: collapsed.value, items: [{ label: 'Home', href: '/' }] })
+      },
+    })
+    app.provide(iryx.sidebarCollapsedKey, ref(true))
+    expect(await renderToString(app)).toContain('data-collapsed')
+  })
+
+  it('falls back to expanded without one', async () => {
+    const app = createSSRApp({
+      setup: () => {
+        const collapsed = iryx.useSidebarCollapsed()
+        return () => h(iryx.Sidebar, { collapsed: collapsed.value, items: [{ label: 'Home', href: '/' }] })
+      },
+    })
+    expect(await renderToString(app)).not.toContain('data-collapsed')
   })
 })

@@ -41,6 +41,11 @@ const sectioned = [
   },
 ]
 
+const pinnedItems = [
+  ...items,
+  { section: '', pinned: true, items: [{ label: 'Settings', href: '#', icon: Settings01Icon }] },
+]
+
 const grouped = [
   { label: 'Overview', href: '#', icon: DashboardSquare01Icon },
   {
@@ -124,6 +129,32 @@ const items = [
 
 Links written before or between sections keep their position.
 
+### Pinned to the bottom
+
+`pinned: true` moves a section to the bottom of the column, above the footer — the place for Settings or Help. Use `section: ''` to leave out the heading.
+
+<Demo stack>
+<template #demo>
+<div class="h-80 w-full max-w-3xl overflow-hidden rounded-lg border border-border">
+<ISidebar :items="pinnedItems" class="w-60" />
+</div>
+</template>
+
+```vue
+const items = [
+  { label: 'Overview', href: '/', icon: DashboardSquare01Icon },
+  { label: 'Invoices', href: '/invoices', icon: Invoice01Icon },
+  {
+    section: '',
+    pinned: true,
+    items: [{ label: 'Settings', href: '/settings', icon: Settings01Icon }],
+  },
+]
+```
+</Demo>
+
+Once the list is taller than the column, pinned sections scroll with it.
+
 ## Collapsible groups
 
 A link with its own `items` becomes a group that opens and closes in place. `defaultOpen` starts it open.
@@ -184,6 +215,22 @@ const collapsed = ref(false)
 </Demo>
 
 Badges and section headings fold away with the labels. A group has no room to open in place, so its children open in a menu beside the rail, under the group's name — and a group left open is open again when the column expands. Inside [`IAppShell`](/components/app-shell)'s mobile drawer the sidebar ignores `collapsed` and shows in full, since the drawer has the room.
+
+### Remembering the choice
+
+`useSidebarCollapsed()` returns a ref stored in a cookie, so the column comes back the way the user left it.
+
+```vue
+<script setup lang="ts">
+const collapsed = useSidebarCollapsed()
+</script>
+
+<template>
+  <ISidebar v-model:collapsed="collapsed" :items="items" />
+</template>
+```
+
+A cookie rather than `localStorage`, so the server can read it too. The Nuxt module wires this up, and the first paint is already collapsed with no flash. With another SSR setup, read the `iryx-ui-sidebar-collapsed` cookie from the request and `app.provide(sidebarCollapsedKey, ref(value === 'true'))`; without that, the server renders it expanded.
 
 ## Header and footer
 
@@ -294,6 +341,7 @@ interface SidebarLink {
 interface SidebarSection {
   section: string
   items: SidebarLink[]
+  pinned?: boolean
 }
 ```
 

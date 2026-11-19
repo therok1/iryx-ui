@@ -59,6 +59,8 @@ const config = useIryxUiConfig()
 const isUnstyled = computed(() => props.unstyled ?? config.unstyled)
 
 const sections = computed(() => toSidebarSections(props.items))
+// ponytail: mt-auto inside the scrolling nav; pinned sections scroll with the list once it overflows. Split into its own region if that matters.
+const firstPinned = computed(() => sections.value.findIndex(section => section.pinned))
 
 const theme = computed(() => sidebarTheme({ side: props.side, collapsed: collapsed.value, inShell: placement !== undefined }))
 
@@ -125,7 +127,8 @@ const nameOf = (link: SidebarLink) => link.label
         <div
           v-for="(section, index) in sections"
           :key="section.section || index"
-          :class="slotClass('section')"
+          :data-pinned="section.pinned ? '' : undefined"
+          :class="[slotClass('section'), index === firstPinned && 'mt-auto']"
         >
           <p v-if="section.section" :class="slotClass('sectionLabel')">
             {{ section.section }}

@@ -4,7 +4,11 @@ export function defaultCountLabel(remaining: number): string {
   return `${remaining} ${remaining === 1 ? 'character' : 'characters'} left`
 }
 
-export function useCharacterCount(value: () => string | number | null | undefined, max: () => number | undefined) {
+export function useCharacterCount(value: () => string | number | null | undefined, maxRaw: () => number | string | undefined) {
+  const max = () => {
+    const raw = maxRaw()
+    return raw == null || raw === '' ? undefined : Number(raw)
+  }
   const length = computed(() => String(value() ?? '').length)
   const remaining = computed(() => {
     const limit = max()

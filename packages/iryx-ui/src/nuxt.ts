@@ -54,11 +54,12 @@ export default defineNuxtModule<ModuleOptions>({
     addPluginTemplate({
       filename: 'iryx-ui.config.mjs',
       getContents: () => `
-import { applyTheme, initAppearance, iryxUiConfigKey } from 'iryx-ui'
-import { defineNuxtPlugin } from '#app'
+import { applyTheme, initAppearance, iryxUiConfigKey, sidebarCollapsedCookie, sidebarCollapsedKey } from 'iryx-ui'
+import { defineNuxtPlugin, useCookie } from '#app'
 
 export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.vueApp.provide(iryxUiConfigKey, ${JSON.stringify({ unstyled: options.unstyled })})
+  nuxtApp.vueApp.provide(sidebarCollapsedKey, useCookie(sidebarCollapsedCookie, { default: () => false, maxAge: 31536000, sameSite: 'lax' }))
   if (import.meta.client) {
     ${options.theme ? `applyTheme(${JSON.stringify(options.theme)})` : ''}
     ${options.appearance ? `initAppearance(${JSON.stringify(options.appearance)})` : ''}
