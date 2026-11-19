@@ -44,6 +44,8 @@ export interface SelectProps extends SelectRootProps {
    */
   items?: SelectItems
   placeholder?: string
+  /** Arrow keys wrap from the last option to the first and back. */
+  loop?: boolean
   size?: 'sm' | 'md' | 'lg'
   /** Lands on the trigger, so a `<label for>` names the control. */
   id?: string
@@ -81,6 +83,7 @@ const rootProps = computed(() => {
   const {
     items: _items,
     placeholder: _placeholder,
+    loop: _loop,
     size: _size,
     id: _id,
     invalid: _invalid,
@@ -174,7 +177,7 @@ const groupLabelClass = computed(() =>
         the selected item under the cursor, the way a native macOS select does.
         It takes no side offset — that belongs to `popper` positioning.
       -->
-      <SelectContent :class="contentClass" position="item-aligned">
+      <SelectContent :class="contentClass" position="item-aligned" :loop="props.loop">
         <SelectViewport :class="viewportClass">
           <slot>
             <template v-if="groups">

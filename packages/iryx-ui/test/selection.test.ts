@@ -48,6 +48,15 @@ describe('select', () => {
     expect(options[1]?.hasAttribute('data-disabled')).toBe(true)
   })
 
+  it('forwards loop to the content', async () => {
+    const wrapper = mount(Select, {
+      props: { items: ['One', 'Two'], defaultOpen: true, loop: true },
+      attachTo: document.body,
+    })
+    await nextTick()
+    expect(wrapper.findComponent({ name: 'SelectContent' }).props('loop')).toBe(true)
+  })
+
   it('renders grouped items under their labels', async () => {
     mount(Select, {
       props: {
