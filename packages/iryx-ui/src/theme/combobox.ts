@@ -6,10 +6,10 @@ export const comboboxTheme = tv({
     anchor: `flex items-center gap-2 ${fieldBase} focus-within:ring-2 focus-within:ring-primary/50`,
     input: 'min-w-0 grow bg-transparent outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed',
     trigger: 'flex shrink-0 cursor-pointer items-center text-muted-foreground disabled:cursor-not-allowed [&_svg]:size-4',
-    clear: 'flex shrink-0 cursor-pointer items-center rounded-md text-muted-foreground transition-[color,background-color,border-color,box-shadow] outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary/50 [&_svg]:size-3.5',
-    tag: 'inline-flex shrink-0 items-center rounded-md border border-border bg-background font-medium whitespace-nowrap text-foreground data-[state=active]:border-primary data-[state=active]:bg-accent',
+    clear: 'flex shrink-0 cursor-pointer items-center rounded-full text-muted-foreground transition-[color,background-color,border-color,box-shadow] outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary/50 [&_svg]:size-3.5',
+    tag: 'inline-flex shrink-0 items-center rounded-full border border-border bg-background font-medium whitespace-nowrap text-foreground data-[state=active]:border-primary data-[state=active]:bg-accent',
     tagText: 'truncate',
-    tagDelete: 'flex shrink-0 cursor-pointer items-center rounded-sm text-muted-foreground transition-[color,background-color,border-color,box-shadow] outline-none hover:text-danger focus-visible:ring-2 focus-visible:ring-primary/50',
+    tagDelete: 'flex shrink-0 cursor-pointer items-center rounded-full text-muted-foreground transition-[color,background-color,border-color,box-shadow] outline-none hover:text-danger focus-visible:ring-2 focus-visible:ring-primary/50',
     content: 'z-50 max-h-64 w-(--reka-combobox-trigger-width) min-w-32 overflow-hidden rounded-2xl border border-border bg-background text-foreground shadow-md',
     viewport: 'max-h-64 overflow-y-auto p-1',
     item: 'relative flex w-full cursor-pointer items-center rounded-xl py-1.5 pr-2 pl-8 text-sm outline-none select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground',
@@ -38,7 +38,7 @@ export const comboboxTheme = tv({
     },
     chips: {
       true: {
-        anchor: 'h-auto flex-wrap gap-1.5 py-1',
+        anchor: 'h-auto flex-wrap gap-1.5 rounded-2xl py-1',
         input: 'min-w-24 flex-1',
       },
     },
