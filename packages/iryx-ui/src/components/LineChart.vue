@@ -256,73 +256,71 @@ const edgeX = computed(() => {
   }
 })
 
-function tail(last: Point): string {
-  return props.flush && last.x === edgeX.value.last
-    ? `L${edgeX.value.right} ${last.y}`
-    : ''
-}
-
-/** `tension` is a 0–1 dial; a Catmull-Rom spline wants a sixth of it. */
-const curve = computed(() => Math.min(Math.max(props.tension, 0), 1) / 6)
-
-/*
- * Catmull-Rom through the readings, converted to the cubic segments SVG
- * draws, with each control point clamped to the pair it sits between.
- *
- * The clamp is the whole point. An unclamped spline overshoots: between a low
- * reading and a high one it swings past both, so the curve dips under the
- * smallest number in the data and over the largest. On a decorative shape
- * that is a flourish; on a chart it draws values that were never measured.
- */
-function toLine(points: Point[]): string {
+/** Flush edges as real points, so the curve eases into them. Only ends on a data edge. */
+function extend(points: Point[]): Point[] {
   const first = points[0]!
   const last = points[points.length - 1]!
+  if (!props.flush)
+    return points
+  const { first: from, last: to, left, right } = edgeX.value
+  const head = first.x === from ? left : first.x === to ? right : undefined
+  const end = last.x === to ? right : last.x === from ? left : undefined
+  return [
+    ...(head != null && head !== first.x ? [{ ...first, x: head }] : []),
+    ...points,
+    ...(end != null && end !== last.x ? [{ ...last, x: end }] : []),
+  ]
+}
 
-  /*
-   * Only the run that actually reaches an end of the data gets extended. A
-   * series broken by a gap renders as several runs, and carrying an inner
-   * one out to the edge would draw straight through the gap it was split for.
-   */
-  const lead = props.flush && first.x === edgeX.value.first
-    ? `M${edgeX.value.left} ${first.y} L${first.x} ${first.y}`
-    : `M${first.x} ${first.y}`
+const curve = computed(() => Math.min(Math.max(props.tension, 0), 1))
 
-  const start = lead
+/** Monotone cubic (Fritsch–Carlson) tangents: level at turns, capped to avoid overshoot. */
+function slopes(points: Point[]): number[] {
+  const secants = points.slice(1).map((point, index) =>
+    (point.y - points[index]!.y) / (point.x - points[index]!.x || 1))
+  return points.map((point, index) => {
+    const before = secants[index - 1]
+    const after = secants[index]
+    if (before == null || after == null)
+      return before ?? after ?? 0
+    if (before * after <= 0)
+      return 0
+    const prev = points[index - 1]!
+    const next = points[index + 1]!
+    const slope = (next.y - prev.y) / (next.x - prev.x)
+    const cap = 3 * Math.min(Math.abs(before), Math.abs(after))
+    return Math.sign(slope) * Math.min(Math.abs(slope), cap)
+  })
+}
+
+function toLine(run: Point[]): string {
+  const points = extend(run)
+  const start = `M${points[0]!.x} ${points[0]!.y}`
   if (curve.value === 0 || points.length < 2) {
     const line = points.slice(1).map(point => `L${point.x} ${point.y}`)
-    return [start, ...line, tail(last)].filter(Boolean).join(' ')
+    return [start, ...line].join(' ')
   }
 
-  const clamp = (value: number, a: number, b: number) =>
-    Math.min(Math.max(value, Math.min(a, b)), Math.max(a, b))
-
-  const segments = points.slice(1).map((point, index) => {
+  const m = slopes(points)
+  const segments = points.slice(1).map((p2, index) => {
     const p1 = points[index]!
-    // The ends have no neighbour beyond them, so they double back on themselves.
-    const p0 = points[index - 1] ?? p1
-    const p2 = point
-    const p3 = points[index + 2] ?? p2
-
-    const c1x = p1.x + (p2.x - p0.x) * curve.value
-    const c1y = clamp(p1.y + (p2.y - p0.y) * curve.value, p1.y, p2.y)
-    const c2x = p2.x - (p3.x - p1.x) * curve.value
-    const c2y = clamp(p2.y - (p3.y - p1.y) * curve.value, p1.y, p2.y)
-
+    const reach = ((p2.x - p1.x) / 3) * curve.value
+    const c1x = p1.x + reach
+    const c1y = p1.y + m[index]! * reach
+    const c2x = p2.x - reach
+    const c2y = p2.y - m[index + 1]! * reach
     return `C${round(c1x)} ${round(c1y)}, ${round(c2x)} ${round(c2y)}, ${p2.x} ${p2.y}`
   })
 
-  return [start, ...segments, tail(last)].filter(Boolean).join(' ')
+  return [start, ...segments].join(' ')
 }
 
 /** Closed to the bottom of the plot, not to zero — the axis may not show it. */
-function toArea(points: Point[]): string {
+function toArea(run: Point[]): string {
   const base = layout.value.plot.top + layout.value.plot.height
-  const first = points[0]!
-  const last = points[points.length - 1]!
   // Closed under whatever the line actually spans, extensions included.
-  const leftX = props.flush && first.x === edgeX.value.first ? edgeX.value.left : first.x
-  const rightX = props.flush && last.x === edgeX.value.last ? edgeX.value.right : last.x
-  return `${toLine(points)} L${rightX} ${base} L${leftX} ${base} Z`
+  const points = extend(run)
+  return `${toLine(run)} L${points[points.length - 1]!.x} ${base} L${points[0]!.x} ${base} Z`
 }
 
 /**

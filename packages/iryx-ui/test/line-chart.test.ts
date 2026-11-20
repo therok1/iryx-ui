@@ -121,6 +121,13 @@ describe('lineChart', () => {
     expect(wrapper.findAll('path')).toHaveLength(2)
   })
 
+  it('curves into a flush extension instead of meeting it at a corner', async () => {
+    const wrapper = await mountChart({ flush: true, tension: 1 })
+    const d = wrapper.get('path').attributes('d')!
+    expect(d).not.toContain('L')
+    expect(d.match(/C/g)).toHaveLength(data.length + 1)
+  })
+
   it('adds a wash under the line for the area variant', async () => {
     const wrapper = await mountChart({ variant: 'area' })
     const paths = wrapper.findAll('path')
