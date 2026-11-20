@@ -12,8 +12,9 @@ export const tabsTheme = tv({
   variants: {
     variant: {
       solid: {
-        frame: 'rounded-full bg-muted p-1',
-        indicator: 'top-0 h-full rounded-full bg-background shadow-sm',
+        frame: 'rounded-full bg-muted',
+        list: 'p-1',
+        indicator: 'inset-y-1 rounded-full bg-background shadow-sm',
         trigger: 'rounded-full px-3 py-1.5 text-muted-foreground data-[state=active]:text-foreground',
       },
       line: {
@@ -41,7 +42,7 @@ export const tabsTheme = tv({
     {
       variant: 'solid',
       orientation: 'vertical',
-      class: { indicator: 'top-0 left-0 w-full' },
+      class: { indicator: 'inset-x-1 top-0 bottom-auto' },
     },
     {
       variant: 'line',
