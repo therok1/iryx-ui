@@ -1,5 +1,22 @@
 # iryx-ui
 
+## 0.29.0
+
+### Minor Changes
+
+- 831cf9d: AppShell: `topbar` slot, a full-width bar on the canvas above the sidebar and panel.
+- e9499f1: `IDonutChart` gains a `radius` prop for rounded slice corners. It defaults to `4`, matching `IBarChart`, so existing donuts now render rounded — pass `:radius="0"` to keep them square.
+- 3518ff6: Upgrade reka-ui to 2.11. `ISelect` gains a `loop` prop, and `ICombobox` now accepts Reka's new `loop` and `unmountOnHide` root props.
+- 831cf9d: `ISidebar` `ui.menu` styles the menu a collapsed group opens.
+- 831cf9d: `IStat` `deltaPlacement="hint"` shows the delta beside the hint instead of the value.
+
+### Patch Changes
+
+- 831cf9d: `IAppShell` with `scroll="main"`: screen-reader-only text inside the page no longer stretches the document and adds a second scroll on mobile.
+- fc9a21c: `ILineChart` curves are now a monotone cubic: smooth through every reading, peaks and `flush` extensions included, and still never overshooting the data. Stacked bands also carry their base edge out to the plot edges under `flush`.
+- 831cf9d: Softer default border colour in light and dark themes.
+- 831cf9d: ToggleGroup: in single mode, clicking the selected item no longer clears the selection.
+
 ## 0.28.0
 
 ### Minor Changes
