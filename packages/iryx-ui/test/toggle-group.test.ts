@@ -51,6 +51,14 @@ describe('toggleGroup', () => {
     expect(item(wrapper, 0).attributes('data-state')).toBe('off')
   })
 
+  it('keeps the selected item on when clicked again in single mode', async () => {
+    const wrapper = mount(ToggleGroup, { props: { items: views } })
+    await item(wrapper, 1).trigger('click')
+    await item(wrapper, 1).trigger('click')
+    expect(wrapper.emitted('update:modelValue')).toEqual([['Board']])
+    expect(item(wrapper, 1).attributes('data-state')).toBe('on')
+  })
+
   it('emits an array when type is multiple', async () => {
     const wrapper = mount(ToggleGroup, {
       props: { items: views, type: 'multiple' as const, modelValue: ['List'] },

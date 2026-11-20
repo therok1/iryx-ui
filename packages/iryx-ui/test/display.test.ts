@@ -95,6 +95,13 @@ describe('skeleton', () => {
 })
 
 describe('stat', () => {
+  it('puts the delta beside the hint when asked', () => {
+    const wrapper = mount(Stat, { props: { value: '€1', delta: 5, hint: 'vs last month', deltaPlacement: 'hint' } })
+    const delta = wrapper.get('.text-success')
+    expect(delta.element.parentElement!.textContent).toContain('vs last month')
+    expect(wrapper.get('.text-3xl').element.parentElement!.textContent).not.toContain('+5%')
+  })
+
   it('renders label, value and hint', () => {
     const wrapper = mount(Stat, { props: { label: 'Revenue', value: '€12,400', hint: 'vs last month' } })
     expect(wrapper.text()).toContain('Revenue')

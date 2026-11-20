@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import type { Appearance, FormError } from 'iryx-ui'
+import { CreditCardIcon, Notification03Icon, PaintBoardIcon, UserIcon } from '@hugeicons/core-free-icons'
 import { useAppearance, useToast } from 'iryx-ui'
 import { reactive, ref } from 'vue'
+import Tray from '../components/Tray.vue'
 import { user } from '../data'
 
 const { success } = useToast()
@@ -69,96 +71,104 @@ async function onSubmit(): Promise<void> {
   <div class="flex max-w-2xl flex-col gap-6">
     <IPageHeader title="Settings" description="How invoices are issued and chased." />
 
-    <IForm :state="state" :validate="validate" @submit="onSubmit">
-      <ICard padding="none" class="mb-4 overflow-hidden shadow-xs">
-        <div class="flex items-center gap-4 border-b border-border bg-muted/50 p-4">
-          <IAvatar :name="state.name" size="lg" class="bg-background" />
+    <IForm :state="state" :validate="validate" class="flex flex-col gap-4" @submit="onSubmit">
+      <Tray label="Profile" :icon="UserIcon">
+        <ICard padding="none" class="flex-1 overflow-hidden rounded-xl shadow-none">
+          <div class="flex items-center gap-4 border-b border-border p-4">
+            <IAvatar :name="state.name" size="lg" class="bg-muted" />
 
-          <div class="min-w-0 flex-1">
-            <p class="truncate font-medium">
-              {{ state.name || 'Unnamed' }}
-            </p>
-            <p class="truncate text-sm text-muted-foreground">
-              {{ user.email }}
-            </p>
+            <div class="min-w-0 flex-1">
+              <p class="truncate font-medium">
+                {{ state.name || 'Unnamed' }}
+              </p>
+              <p class="truncate text-sm text-muted-foreground">
+                {{ user.email }}
+              </p>
+            </div>
+
+            <IButton class="rounded-full" variant="outline" size="sm" type="button">
+              Change photo
+            </IButton>
           </div>
 
-          <IButton variant="outline" size="sm" type="button">
-            Change photo
-          </IButton>
-        </div>
-
-        <div class="grid gap-4 p-4 sm:grid-cols-2">
-          <IFormField name="name" label="Full name" required>
-            <IInput v-model="state.name" />
-          </IFormField>
-
-          <IFormField
-            name="role"
-            label="Role"
-            help="Decides what this account can see and change."
-          >
-            <ISelect v-model="state.role" :items="roles" />
-          </IFormField>
-        </div>
-      </ICard>
-
-      <ICard title="Billing details" class="shadow-xs">
-        <div class="flex flex-col gap-4">
-          <IFormField name="company" label="Company name" required>
-            <IInput v-model="state.company" />
-          </IFormField>
-
-          <IFormField
-            name="email"
-            label="Billing email"
-            help="Replies to invoices and reminders arrive here."
-            required
-          >
-            <IInput v-model="state.email" type="email" />
-          </IFormField>
-
-          <div class="grid gap-4 sm:grid-cols-2">
-            <IFormField name="terms" label="Payment terms" hint="Days" required>
-              <INumberInput v-model="state.terms" min="1" max="180" />
+          <div class="grid gap-4 p-4 sm:grid-cols-2">
+            <IFormField name="name" label="Full name" required>
+              <IInput v-model="state.name" class="rounded-full" />
             </IFormField>
 
-            <IFormField name="currency" label="Currency">
-              <ISelect v-model="state.currency" :items="currencies" />
+            <IFormField
+              name="role"
+              label="Role"
+              help="Decides what this account can see and change."
+            >
+              <ISelect v-model="state.role" :ui="{ content: 'rounded-2xl', item: 'rounded-xl' }" class="rounded-full" :items="roles" />
             </IFormField>
           </div>
-        </div>
-      </ICard>
+        </ICard>
+      </Tray>
 
-      <ICard title="Reminders" class="mt-4 shadow-xs">
-        <div class="flex flex-col gap-4">
-          <ISwitch
-            v-model="state.reminders"
-            label="Chase overdue invoices"
-            description="Sends a reminder three days after the due date, then weekly."
+      <Tray label="Billing details" :icon="CreditCardIcon">
+        <ICard padding="md" class="flex-1 rounded-xl shadow-none">
+          <div class="flex flex-col gap-4">
+            <IFormField name="company" label="Company name" required>
+              <IInput v-model="state.company" class="rounded-full" />
+            </IFormField>
+
+            <IFormField
+              name="email"
+              label="Billing email"
+              help="Replies to invoices and reminders arrive here."
+              required
+            >
+              <IInput v-model="state.email" class="rounded-full" type="email" />
+            </IFormField>
+
+            <div class="grid gap-4 sm:grid-cols-2">
+              <IFormField name="terms" label="Payment terms" hint="Days" required>
+                <INumberInput v-model="state.terms" :ui="{ input: 'rounded-full', stepper: 'rounded-e-full' }" min="1" max="180" />
+              </IFormField>
+
+              <IFormField name="currency" label="Currency">
+                <ISelect v-model="state.currency" :ui="{ content: 'rounded-2xl', item: 'rounded-xl' }" class="rounded-full" :items="currencies" />
+              </IFormField>
+            </div>
+          </div>
+        </ICard>
+      </Tray>
+
+      <Tray label="Reminders" :icon="Notification03Icon">
+        <ICard padding="md" class="flex-1 rounded-xl shadow-none">
+          <div class="flex flex-col gap-4">
+            <ISwitch
+              v-model="state.reminders"
+              label="Chase overdue invoices"
+              description="Sends a reminder three days after the due date, then weekly."
+            />
+            <ISwitch
+              v-model="state.attachPdf"
+              label="Attach a PDF"
+              description="Some customers' systems will not accept a link."
+            />
+          </div>
+        </ICard>
+      </Tray>
+
+      <Tray label="Appearance" :icon="PaintBoardIcon">
+        <ICard padding="md" class="flex-1 rounded-xl shadow-none">
+          <IRadioGroup
+            :model-value="appearance"
+            :items="appearances"
+            orientation="horizontal"
+            @update:model-value="(value) => setAppearance(value as Appearance)"
           />
-          <ISwitch
-            v-model="state.attachPdf"
-            label="Attach a PDF"
-            description="Some customers' systems will not accept a link."
-          />
-        </div>
-      </ICard>
+        </ICard>
+      </Tray>
 
-      <ICard title="Appearance" class="mt-4 shadow-xs">
-        <IRadioGroup
-          :model-value="appearance"
-          :items="appearances"
-          orientation="horizontal"
-          @update:model-value="(value) => setAppearance(value as Appearance)"
-        />
-      </ICard>
-
-      <div class="mt-4 flex justify-end gap-3">
-        <IButton type="reset" variant="ghost">
+      <div class="flex justify-end gap-3">
+        <IButton class="rounded-full" type="reset" variant="ghost">
           Discard
         </IButton>
-        <IButton type="submit" :loading="saving">
+        <IButton class="rounded-full" type="submit" :loading="saving">
           Save changes
         </IButton>
       </div>

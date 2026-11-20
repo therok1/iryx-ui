@@ -2,6 +2,7 @@
 import type { ClassValue } from '../class-value'
 import type { DropdownMenuItemOption } from '../composables/dropdown-menu'
 import type { SidebarItems, SidebarLink } from '../composables/sidebar'
+import type { DropdownMenuProps } from './DropdownMenu.vue'
 import { ArrowRight01Icon } from '@hugeicons/core-free-icons'
 import { CollapsibleContent, CollapsibleRoot, CollapsibleTrigger, Primitive } from 'reka-ui'
 import { computed, inject, ref } from 'vue'
@@ -40,6 +41,8 @@ export interface SidebarProps {
     groupIcon?: string
     groupContent?: string
     groupInner?: string
+    /** Passed to the menu a collapsed group opens. */
+    menu?: DropdownMenuProps['ui']
   }
 }
 
@@ -64,7 +67,7 @@ const firstPinned = computed(() => sections.value.findIndex(section => section.p
 
 const theme = computed(() => sidebarTheme({ side: props.side, collapsed: collapsed.value, inShell: placement !== undefined }))
 
-type Slot = keyof NonNullable<SidebarProps['ui']>
+type Slot = Exclude<keyof NonNullable<SidebarProps['ui']>, 'menu'>
 
 function slotClass(slot: Slot) {
   const override = props.ui?.[slot]
@@ -142,7 +145,7 @@ const nameOf = (link: SidebarLink) => link.label
               :unstyled="isUnstyled"
             >
               <template #trigger>
-                <DropdownMenu :items="menuItemsOf(link)" :side="outward" :unstyled="isUnstyled">
+                <DropdownMenu :items="menuItemsOf(link)" :side="outward" :unstyled="isUnstyled" :ui="props.ui?.menu">
                   <template #trigger>
                     <button
                       type="button"

@@ -21,6 +21,8 @@ export interface StatProps {
   trend?: 'up' | 'down' | 'neutral'
   /** Secondary text under the value. */
   hint?: string
+  /** Show the delta beside the value, or beside the hint. */
+  deltaPlacement?: 'value' | 'hint'
   size?: 'sm' | 'md' | 'lg'
   /**
    * Format the delta. Defaults to a signed percentage; override for other
@@ -38,11 +40,13 @@ export interface StatProps {
     delta?: string
     hint?: string
     row?: string
+    hintRow?: string
   }
 }
 
 const props = withDefaults(defineProps<StatProps>(), {
   as: 'div',
+  deltaPlacement: 'value',
   unstyled: undefined,
 })
 
@@ -103,6 +107,10 @@ const hintClass = computed(() =>
 const rowClass = computed(() =>
   isUnstyled.value ? props.ui?.row : theme.value.row({ class: props.ui?.row }),
 )
+const hintRowClass = computed(() =>
+  isUnstyled.value ? props.ui?.hintRow : theme.value.hintRow({ class: props.ui?.hintRow }),
+)
+const hasDelta = computed(() => formattedDelta.value !== undefined)
 </script>
 
 <template>
@@ -115,7 +123,7 @@ const rowClass = computed(() =>
       <span :class="valueClass">
         <slot>{{ props.value }}</slot>
       </span>
-      <span v-if="formattedDelta || $slots.delta" :class="deltaClass">
+      <span v-if="props.deltaPlacement === 'value' && (hasDelta || $slots.delta)" :class="deltaClass">
         <slot name="delta" :trend="trend">
           <Icon :icon="trendArrow" data-icon="inline-start" />
           {{ formattedDelta }}
@@ -123,7 +131,19 @@ const rowClass = computed(() =>
       </span>
     </span>
 
-    <span v-if="props.hint || $slots.hint" :class="hintClass">
+    <span v-if="props.deltaPlacement === 'hint'" :class="hintRowClass">
+      <span v-if="hasDelta || $slots.delta" :class="deltaClass">
+        <slot name="delta" :trend="trend">
+          <Icon :icon="trendArrow" data-icon="inline-start" />
+          {{ formattedDelta }}
+        </slot>
+      </span>
+
+      <span v-if="props.hint || $slots.hint" :class="hintClass">
+        <slot name="hint">{{ props.hint }}</slot>
+      </span>
+    </span>
+    <span v-else-if="props.hint || $slots.hint" :class="hintClass">
       <slot name="hint">{{ props.hint }}</slot>
     </span>
   </Primitive>
