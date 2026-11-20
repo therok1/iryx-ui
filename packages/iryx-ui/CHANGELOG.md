@@ -1,5 +1,11 @@
 # iryx-ui
 
+## 1.0.2
+
+### Patch Changes
+
+- e00a025: Close IAppShell's mobile drawer when a sidebar link is chosen.
+
 ## 1.0.1
 
 ### Patch Changes
