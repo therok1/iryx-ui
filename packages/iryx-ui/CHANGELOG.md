@@ -1,5 +1,12 @@
 # iryx-ui
 
+## 1.0.1
+
+### Patch Changes
+
+- 128d7e8: `ISparkline` no longer cuts the line in half where it touches the top, bottom or ends of the plot.
+- 5b7e54d: Solid `ITabs` no longer clip the active tab's shadow: the padding moved from the frame onto the scrolling list.
+
 ## 1.0.0
 
 ### Major Changes
