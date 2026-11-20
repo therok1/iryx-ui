@@ -183,9 +183,10 @@ describe('donutChart', () => {
    * short of it, and that is where the slice ends.
    */
   it('gives a pie the same even gap, and a blunt tip to keep it', async () => {
-    const wrapper = await mountChart({ radius: 0,
+    const wrapper = await mountChart({
       data: [{ label: 'A', value: 1 }, { label: 'B', value: 1 }],
       pie: true,
+      radius: 0,
     })
     const [first, second] = wrapper.findAll('path').map(node => corners(node.attributes('d')!))
 
