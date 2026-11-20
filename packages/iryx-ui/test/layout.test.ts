@@ -276,6 +276,22 @@ describe('sidebar', () => {
     expect(collapsed.sort()).toEqual([false, true])
   })
 
+  it('closes IAppShell\'s mobile drawer when a link is chosen', async () => {
+    const onSelect = vi.fn()
+    const wrapper = mount(AppShell, {
+      slots: { sidebar: () => h(Sidebar, { items: [{ label: 'Home', onSelect }] }) },
+      attachTo: document.body,
+    })
+    const vm = wrapper.vm as unknown as { navOpen: boolean }
+    vm.navOpen = true
+
+    await vi.waitFor(() => expect(document.body.querySelectorAll('nav')).toHaveLength(2))
+    const drawerLink = [...document.body.querySelectorAll<HTMLElement>('[role="dialog"] nav button, [role="dialog"] nav a')][0]!
+    drawerLink.click()
+    expect(onSelect).toHaveBeenCalledOnce()
+    expect(vm.navOpen).toBe(false)
+  })
+
   it('drops built-in classes when unstyled', () => {
     expect(mount(Sidebar, { props: { items, unstyled: true, class: 'mine' } }).attributes('class')).toBe('mine')
   })

@@ -40,6 +40,9 @@ export type SidebarItems = (SidebarLink | SidebarSection)[]
 /** Provided by `IAppShell` around each copy of its sidebar slot. */
 export const sidebarPlacementKey: InjectionKey<'column' | 'drawer'> = Symbol.for('iryx-ui:sidebar-placement')
 
+/** Closes the shell's mobile drawer; provided only inside it. */
+export const sidebarCloseKey: InjectionKey<() => void> = Symbol.for('iryx-ui:sidebar-close')
+
 export function isSidebarSection(item: SidebarLink | SidebarSection): item is SidebarSection {
   return typeof (item as SidebarSection).section === 'string'
 }

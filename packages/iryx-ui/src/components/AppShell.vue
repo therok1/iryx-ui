@@ -4,7 +4,7 @@ import { Menu01Icon } from '@hugeicons/core-free-icons'
 import { Primitive } from 'reka-ui'
 import { computed, defineComponent, provide, ref, useSlots } from 'vue'
 import { useElementSize } from '../composables/element-size'
-import { sidebarPlacementKey } from '../composables/sidebar'
+import { sidebarCloseKey, sidebarPlacementKey } from '../composables/sidebar'
 import { useIryxUiConfig } from '../config'
 import { appShellTheme } from '../theme/app-shell'
 import Drawer from './Drawer.vue'
@@ -88,6 +88,8 @@ const SidebarPlacement = defineComponent({
   props: { placement: { type: String as () => 'column' | 'drawer', required: true } },
   setup(props, { slots }) {
     provide(sidebarPlacementKey, props.placement)
+    if (props.placement === 'drawer')
+      provide(sidebarCloseKey, () => (navOpen.value = false))
     return () => slots.default?.()
   },
 })

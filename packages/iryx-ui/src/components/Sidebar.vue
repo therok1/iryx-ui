@@ -6,7 +6,7 @@ import type { DropdownMenuProps } from './DropdownMenu.vue'
 import { ArrowRight01Icon } from '@hugeicons/core-free-icons'
 import { CollapsibleContent, CollapsibleRoot, CollapsibleTrigger, Primitive } from 'reka-ui'
 import { computed, inject, ref } from 'vue'
-import { isSidebarGroup, sidebarPlacementKey, toSidebarSections } from '../composables/sidebar'
+import { isSidebarGroup, sidebarCloseKey, sidebarPlacementKey, toSidebarSections } from '../composables/sidebar'
 import { useIryxUiConfig } from '../config'
 import { sidebarTheme } from '../theme/sidebar'
 import DropdownMenu from './DropdownMenu.vue'
@@ -56,6 +56,7 @@ const props = withDefaults(defineProps<SidebarProps>(), {
 const collapsedModel = defineModel<boolean>('collapsed', { default: false })
 
 const placement = inject(sidebarPlacementKey, undefined)
+const closeDrawer = inject(sidebarCloseKey, undefined)
 const collapsed = computed(() => collapsedModel.value && placement !== 'drawer')
 
 const config = useIryxUiConfig()
@@ -103,6 +104,7 @@ function onSelect(link: SidebarLink, event: Event) {
     return
   }
   link.onSelect?.()
+  closeDrawer?.()
 }
 
 /**
