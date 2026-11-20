@@ -148,6 +148,28 @@ The slot is sized to the hole, so long content wraps inside the ring rather than
 
 It is a width, not an angle, and it stays that width the whole way across. Each edge is pushed half a gap off its own radius rather than turned by a fixed angle, which is the difference between a divider that reads as a line and one that reads as a wedge widening towards the rim.
 
+## Rounded corners
+
+`radius` rounds each slice's corners, in pixels — `4` by default, matching `IBarChart`. `0` keeps them square.
+
+<Demo stack>
+<template #demo>
+<div class="grid w-full grid-cols-3 gap-8">
+<IDonutChart :data="plans" :size="160" :radius="0" :legend="false" label="Plans, square corners" />
+<IDonutChart :data="plans" :size="160" :legend="false" label="Plans, default corners" />
+<IDonutChart :data="plans" :size="160" :radius="12" :legend="false" label="Plans, pill corners" />
+</div>
+</template>
+
+```vue
+<div class="grid w-full grid-cols-3 gap-8">
+  <IDonutChart :data="plans" :size="160" :radius="0" />
+  <IDonutChart :data="plans" :size="160" />
+  <IDonutChart :data="plans" :size="160" :radius="12" />
+</div>
+```
+</Demo>
+
 A pie is drawn the same way, which is why its slices stop a hair short of the middle: two parallel edges meet before they reach the centre, and that meeting point is the tip. Wide gaps make that blunt tip visible — another reason the ring is the better default.
 
 ## Colour follows the entity
@@ -245,6 +267,7 @@ It plays **once**, on the first paint with something to draw — not again when 
 | `thickness` | `number` | — | Ring width in px; defaults to two fifths of the radius |
 | `pie` | `boolean` | `false` | Fill the middle in |
 | `gap` | `number` | `2` | Space between neighbouring slices in px; `0` closes it |
+| `radius` | `number` | `4` | Corner radius of each slice in px; `0` keeps them square. Clamped to half the band |
 | `animate` | `boolean` or `{ duration, easing }` | `true` | Reveal on the first paint; `false` turns it off |
 | `legend` | `boolean` | `true` | Show the legend |
 | `locale` | `string` | — | Passed to `Intl.NumberFormat` |

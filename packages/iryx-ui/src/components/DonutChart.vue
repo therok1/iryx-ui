@@ -60,6 +60,14 @@ export interface DonutChartProps {
    */
   gap?: number
   /**
+   * Corner radius of each slice, in px — 4 by default, matching `IBarChart`. `0` keeps them square.
+   *
+   * Drawn as a round-joined stroke in the slice's own colour around a shape
+   * shrunk by the same amount, so the outline still lands on the ring and the
+   * gap stays `gap` wide. Clamped to half the band.
+   */
+  radius?: number
+  /**
    * Sweep the ring open on the first paint. Skipped for a reader who has
    * asked for reduced motion, and played once — not again when the data
    * changes underneath it.
@@ -89,6 +97,7 @@ const props = withDefaults(defineProps<DonutChartProps>(), {
   data: () => [],
   size: 240,
   gap: 2,
+  radius: 4,
   animate: true,
   legend: true,
   unstyled: undefined,
@@ -214,8 +223,20 @@ const inner = computed(() => {
  */
 const START = -Math.PI / 2
 
-/** Half a gap is the distance each of the two edges is held off its radius. */
-const halfGap = computed(() => Math.max(props.gap, 0) / 2)
+/** Corner radius, clamped so the shrunk band never turns inside out. */
+const corner = computed(() =>
+  Math.min(Math.max(props.radius, 0), (outer.value - inner.value) / 2),
+)
+
+/**
+ * Half a gap is the distance each of the two edges is held off its radius —
+ * plus the corner, which the stroke grows back.
+ */
+const halfGap = computed(() => Math.max(props.gap, 0) / 2 + corner.value)
+
+/** The radii the geometry is drawn at, pulled in by the corner stroke. */
+const outerEdge = computed(() => outer.value - corner.value)
+const innerEdge = computed(() => (inner.value ? inner.value + corner.value : 0))
 
 /**
  * Two decimals is under a tenth of a device pixel, and it keeps the path free
@@ -304,13 +325,13 @@ function arcPath(from: number, to: number): string {
   const sweep = to - from
   const solid = !inner.value
   // A lone slice has no neighbour to be separated from.
-  const outerTrim = slices.value.length < 2 ? 0 : gapTrim(outer.value, sweep)
+  const outerTrim = slices.value.length < 2 ? 0 : gapTrim(outerEdge.value, sweep)
 
   const start = from + outerTrim
   const end = to - outerTrim
   const large = end - start > Math.PI ? 1 : 0
-  const [x0, y0] = point(outer.value, start)
-  const [x1, y1] = point(outer.value, end)
+  const [x0, y0] = point(outerEdge.value, start)
+  const [x1, y1] = point(outerEdge.value, end)
 
   if (solid) {
     /*
@@ -320,20 +341,20 @@ function arcPath(from: number, to: number): string {
      * before the slice gives up existing.
      */
     const tip = outerTrim
-      ? Math.min(halfGap.value / Math.sin(sweep / 2), outer.value / 2)
+      ? Math.min(halfGap.value / Math.sin(sweep / 2), outerEdge.value / 2)
       : 0
     const [tx, ty] = point(tip, from + sweep / 2)
-    return `M${x0} ${y0} A${round(outer.value)} ${round(outer.value)} 0 ${large} 1 ${x1} ${y1} L${tx} ${ty} Z`
+    return `M${x0} ${y0} A${round(outerEdge.value)} ${round(outerEdge.value)} 0 ${large} 1 ${x1} ${y1} L${tx} ${ty} Z`
   }
 
-  const innerTrim = outerTrim ? gapTrim(inner.value, sweep) : 0
+  const innerTrim = outerTrim ? gapTrim(innerEdge.value, sweep) : 0
   // The inner edge is trimmed harder than the outer one, so the two spans
   // straddle the half-turn at different slices and need their own flag.
   const innerLarge = sweep - innerTrim * 2 > Math.PI ? 1 : 0
-  const [x2, y2] = point(inner.value, to - innerTrim)
-  const [x3, y3] = point(inner.value, from + innerTrim)
-  return `M${x0} ${y0} A${round(outer.value)} ${round(outer.value)} 0 ${large} 1 ${x1} ${y1} `
-    + `L${x2} ${y2} A${round(inner.value)} ${round(inner.value)} 0 ${innerLarge} 0 ${x3} ${y3} Z`
+  const [x2, y2] = point(innerEdge.value, to - innerTrim)
+  const [x3, y3] = point(innerEdge.value, from + innerTrim)
+  return `M${x0} ${y0} A${round(outerEdge.value)} ${round(outerEdge.value)} 0 ${large} 1 ${x1} ${y1} `
+    + `L${x2} ${y2} A${round(innerEdge.value)} ${round(innerEdge.value)} 0 ${innerLarge} 0 ${x3} ${y3} Z`
 }
 
 /**
@@ -443,7 +464,7 @@ function sliceClass(index: number) {
           v-for="arc in sectors"
           :key="`slice-${arc.index}`"
           :d="arc.path"
-          :style="{ fill: arc.color }"
+          :style="{ fill: arc.color, ...(corner ? { stroke: arc.color, strokeWidth: corner * 2, strokeLinejoin: 'round' } : {}) }"
           :class="sliceClass(arc.index)"
           @pointerenter="hovered = arc.index"
           @pointerleave="hovered = undefined"

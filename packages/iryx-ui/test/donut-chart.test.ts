@@ -167,7 +167,7 @@ describe('donutChart', () => {
    * which is what this is here to catch.
    */
   it('keeps the gap between slices an even width across the ring', async () => {
-    const wrapper = await mountChart({ data: [{ label: 'A', value: 1 }, { label: 'B', value: 1 }] })
+    const wrapper = await mountChart({ radius: 0, data: [{ label: 'A', value: 1 }, { label: 'B', value: 1 }] })
     const [first, second] = wrapper.findAll('path').map(node => corners(node.attributes('d')!))
 
     const outerGap = distance(first!.outerEnd, second!.outerStart)
@@ -183,7 +183,7 @@ describe('donutChart', () => {
    * short of it, and that is where the slice ends.
    */
   it('gives a pie the same even gap, and a blunt tip to keep it', async () => {
-    const wrapper = await mountChart({
+    const wrapper = await mountChart({ radius: 0,
       data: [{ label: 'A', value: 1 }, { label: 'B', value: 1 }],
       pie: true,
     })
@@ -197,12 +197,12 @@ describe('donutChart', () => {
   it('takes the gap width from the caller, and closes it at zero', async () => {
     const two = [{ label: 'A', value: 1 }, { label: 'B', value: 1 }]
 
-    const wide = await mountChart({ data: two, gap: 10 })
+    const wide = await mountChart({ data: two, gap: 10, radius: 0 })
     const [first, second] = wide.findAll('path').map(node => corners(node.attributes('d')!))
     expect(distance(first!.outerEnd, second!.outerStart)).toBeCloseTo(10, 1)
     expect(distance(first!.innerStart, second!.innerEnd)).toBeCloseTo(10, 1)
 
-    const closed = await mountChart({ data: two, gap: 0 })
+    const closed = await mountChart({ data: two, gap: 0, radius: 0 })
     const [a, b] = closed.findAll('path').map(node => corners(node.attributes('d')!))
     expect(distance(a!.outerEnd, b!.outerStart)).toBeCloseTo(0, 1)
   })
