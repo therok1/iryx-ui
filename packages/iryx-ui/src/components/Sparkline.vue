@@ -64,6 +64,9 @@ const isUnstyled = computed(() => props.unstyled ?? config.unstyled)
  */
 const BOX = 100
 
+/** Clip overhang, so strokes on the box edge aren't cut in half. */
+const BLEED = 10
+
 /** Half the widest mark, in px — the ringed end dot at 12px, or the 2px line. */
 const inset = computed(() => (props.endDot ? 6 : 1))
 
@@ -150,7 +153,7 @@ const { revealed } = useChartReveal(ready, animation)
  */
 const wipeReveal = computed(() => ({
   transform: `scaleX(${revealed.value ? 1 : 0})`,
-  transformOrigin: '0px 0px',
+  transformOrigin: `${-BLEED}px 0px`,
   transition: `transform ${animation.value.duration}ms ${animation.value.css}`,
 }))
 
@@ -216,7 +219,7 @@ function slotClass(slot: 'root' | 'plot' | 'line' | 'area' | 'dot' | 'ring', ext
 
         <!-- The reveal's wipe — see `wipeReveal`. -->
         <clipPath :id="clipId">
-          <rect x="0" y="0" :width="BOX" :height="BOX" :style="wipeReveal" />
+          <rect :x="-BLEED" :y="-BLEED" :width="BOX + BLEED * 2" :height="BOX + BLEED * 2" :style="wipeReveal" />
         </clipPath>
       </defs>
 
