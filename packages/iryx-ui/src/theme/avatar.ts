@@ -38,7 +38,8 @@ export const avatarGroupTheme = tv({
   slots: {
     root: 'flex flex-row-reverse items-center justify-end',
     trigger: 'group relative inline-flex rounded-full outline-none',
-    item: 'ring-2 ring-background',
+    // Opaque, or the translucent avatar fill shows its neighbour through the overlap.
+    item: 'bg-muted ring-2 ring-background',
     overflow: 'flex shrink-0 items-center justify-center rounded-full bg-muted font-medium text-muted-foreground ring-2 ring-background',
   },
   variants: {

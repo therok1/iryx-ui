@@ -3,7 +3,6 @@ import type { Appearance, FormError } from 'iryx-ui'
 import { CreditCardIcon, Notification03Icon, PaintBoardIcon, UserIcon } from '@hugeicons/core-free-icons'
 import { useAppearance, useToast } from 'iryx-ui'
 import { reactive, ref } from 'vue'
-import Tray from '../components/Tray.vue'
 import { user } from '../data'
 
 const { success } = useToast()
@@ -72,8 +71,8 @@ async function onSubmit(): Promise<void> {
     <IPageHeader title="Settings" description="How invoices are issued and chased." />
 
     <IForm :state="state" :validate="validate" class="flex flex-col gap-4" @submit="onSubmit">
-      <Tray label="Profile" :icon="UserIcon">
-        <ICard padding="none" class="flex-1 overflow-hidden rounded-xl shadow-none">
+      <ITray label="Profile" :icon="UserIcon">
+        <ICard padding="none" class="flex-1 overflow-hidden">
           <div class="flex items-center gap-4 border-b border-border p-4">
             <IAvatar :name="state.name" size="lg" class="bg-muted" />
 
@@ -86,14 +85,14 @@ async function onSubmit(): Promise<void> {
               </p>
             </div>
 
-            <IButton class="rounded-full" variant="outline" size="sm" type="button">
+            <IButton variant="outline" size="sm" type="button">
               Change photo
             </IButton>
           </div>
 
           <div class="grid gap-4 p-4 sm:grid-cols-2">
             <IFormField name="name" label="Full name" required>
-              <IInput v-model="state.name" class="rounded-full" />
+              <IInput v-model="state.name" />
             </IFormField>
 
             <IFormField
@@ -101,17 +100,17 @@ async function onSubmit(): Promise<void> {
               label="Role"
               help="Decides what this account can see and change."
             >
-              <ISelect v-model="state.role" :ui="{ content: 'rounded-2xl', item: 'rounded-xl' }" class="rounded-full" :items="roles" />
+              <ISelect v-model="state.role" :items="roles" />
             </IFormField>
           </div>
         </ICard>
-      </Tray>
+      </ITray>
 
-      <Tray label="Billing details" :icon="CreditCardIcon">
-        <ICard padding="md" class="flex-1 rounded-xl shadow-none">
+      <ITray label="Billing details" :icon="CreditCardIcon">
+        <ICard padding="md" class="flex-1">
           <div class="flex flex-col gap-4">
             <IFormField name="company" label="Company name" required>
-              <IInput v-model="state.company" class="rounded-full" />
+              <IInput v-model="state.company" />
             </IFormField>
 
             <IFormField
@@ -120,24 +119,24 @@ async function onSubmit(): Promise<void> {
               help="Replies to invoices and reminders arrive here."
               required
             >
-              <IInput v-model="state.email" class="rounded-full" type="email" />
+              <IInput v-model="state.email" type="email" />
             </IFormField>
 
             <div class="grid gap-4 sm:grid-cols-2">
               <IFormField name="terms" label="Payment terms" hint="Days" required>
-                <INumberInput v-model="state.terms" :ui="{ input: 'rounded-full', stepper: 'rounded-e-full' }" min="1" max="180" />
+                <INumberInput v-model="state.terms" min="1" max="180" />
               </IFormField>
 
               <IFormField name="currency" label="Currency">
-                <ISelect v-model="state.currency" :ui="{ content: 'rounded-2xl', item: 'rounded-xl' }" class="rounded-full" :items="currencies" />
+                <ISelect v-model="state.currency" :items="currencies" />
               </IFormField>
             </div>
           </div>
         </ICard>
-      </Tray>
+      </ITray>
 
-      <Tray label="Reminders" :icon="Notification03Icon">
-        <ICard padding="md" class="flex-1 rounded-xl shadow-none">
+      <ITray label="Reminders" :icon="Notification03Icon">
+        <ICard padding="md" class="flex-1">
           <div class="flex flex-col gap-4">
             <ISwitch
               v-model="state.reminders"
@@ -151,10 +150,10 @@ async function onSubmit(): Promise<void> {
             />
           </div>
         </ICard>
-      </Tray>
+      </ITray>
 
-      <Tray label="Appearance" :icon="PaintBoardIcon">
-        <ICard padding="md" class="flex-1 rounded-xl shadow-none">
+      <ITray label="Appearance" :icon="PaintBoardIcon">
+        <ICard padding="md" class="flex-1">
           <IRadioGroup
             :model-value="appearance"
             :items="appearances"
@@ -162,13 +161,13 @@ async function onSubmit(): Promise<void> {
             @update:model-value="(value) => setAppearance(value as Appearance)"
           />
         </ICard>
-      </Tray>
+      </ITray>
 
       <div class="flex justify-end gap-3">
-        <IButton class="rounded-full" type="reset" variant="ghost">
+        <IButton type="reset" variant="ghost">
           Discard
         </IButton>
-        <IButton class="rounded-full" type="submit" :loading="saving">
+        <IButton type="submit" :loading="saving">
           Save changes
         </IButton>
       </div>

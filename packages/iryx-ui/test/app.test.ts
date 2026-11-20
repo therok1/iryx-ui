@@ -49,7 +49,7 @@ describe('app', () => {
       slots: { default: () => h(Input, { unstyled: false }) },
     })
     // Input's chrome lives on its wrapper, so that is where the classes land.
-    expect(wrapper.get('input').element.parentElement?.className).toContain('rounded-xl')
+    expect(wrapper.get('input').element.parentElement?.className).toContain('rounded-full')
   })
 
   it('applies a theme preset', () => {

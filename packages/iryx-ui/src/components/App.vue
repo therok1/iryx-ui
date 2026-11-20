@@ -6,7 +6,7 @@ import type { Theme, ThemePresetName } from '../theme/presets'
 import { ConfigProvider, Primitive } from 'reka-ui'
 import { computed, provide, reactive, watch } from 'vue'
 import { initAppearance, useAppearance } from '../composables/appearance'
-import { defaultConfig, iryxUiConfigKey } from '../config'
+import { defaultConfig, iryxUiConfigKey, useIryxUiConfig } from '../config'
 import { applyTheme, clearTheme } from '../theme/presets'
 
 export interface AppProps extends /* @vue-ignore */ ConfigProviderProps {
@@ -36,9 +36,11 @@ const props = withDefaults(defineProps<AppProps>(), {
  * Reactive config for every descendant. Components read `config.unstyled`
  * inside computeds, so changing the prop re-renders them.
  */
+const parent = useIryxUiConfig()
 const config = reactive({
   ...defaultConfig,
-  unstyled: computed(() => props.unstyled ?? defaultConfig.unstyled),
+  ...parent,
+  unstyled: computed(() => props.unstyled ?? parent.unstyled),
 })
 provide(iryxUiConfigKey, config)
 

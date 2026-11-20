@@ -12,9 +12,9 @@ export const tabsTheme = tv({
   variants: {
     variant: {
       solid: {
-        frame: 'rounded-xl bg-muted p-1',
-        indicator: 'top-0 h-full rounded-lg bg-background shadow-sm',
-        trigger: 'rounded-lg px-3 py-1.5 text-muted-foreground data-[state=active]:text-foreground',
+        frame: 'rounded-full bg-muted p-1',
+        indicator: 'top-0 h-full rounded-full bg-background shadow-sm',
+        trigger: 'rounded-full px-3 py-1.5 text-muted-foreground data-[state=active]:text-foreground',
       },
       line: {
         frame: 'border-b border-border',

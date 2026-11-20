@@ -71,12 +71,10 @@ const items = computed<SidebarItems>(() => nav.map((entry) => {
 
 const collapsed = ref(false)
 
-const sidebarUi = computed(() => ({
+const sidebarUi = {
   footer: 'flex-col items-stretch gap-2 px-2',
-  menu: { content: 'rounded-2xl', item: 'rounded-xl' },
-  link: `rounded-full border border-transparent text-foreground data-[active]:border-border data-[active]:bg-background ${collapsed.value ? '' : 'px-3'}`,
   linkBadge: 'flex size-5 items-center justify-center rounded-full bg-foreground text-[10px] font-semibold text-background',
-}))
+}
 
 const { isDark, setAppearance } = useAppearance()
 
@@ -115,7 +113,6 @@ const account: DropdownMenuEntry[] = [
             placeholder="Search invoices, customers…"
             size="sm"
             class="ml-auto w-72"
-            :ui="{ root: 'rounded-full' }"
           >
             <template #leading>
               <IIcon :icon="Search01Icon" />
@@ -129,17 +126,15 @@ const account: DropdownMenuEntry[] = [
             size="sm"
             icon-only
             aria-label="Appearance"
-            :ui="{ item: 'rounded-full' }"
             @update:model-value="value => value && setAppearance(value as 'light' | 'dark')"
           />
 
-          <IButton size="sm" class="rounded-full">
+          <IButton size="sm">
             <IIcon :icon="Download01Icon" data-icon="inline-start" />
             Export
           </IButton>
 
           <IDropdownMenu
-            :ui="{ content: 'rounded-2xl', item: 'rounded-xl', subTrigger: 'rounded-xl', subContent: 'rounded-2xl' }"
             :items="account"
             align="end"
             class="min-w-56"
@@ -173,7 +168,7 @@ const account: DropdownMenuEntry[] = [
             variant="ghost"
             size="sm"
             square
-            class="-ml-2 rounded-full max-md:hidden"
+            class="-ml-2 max-md:hidden"
             :aria-label="collapsed ? 'Expand sidebar' : 'Collapse sidebar'"
             :aria-pressed="!collapsed"
             @click="collapsed = !collapsed"
@@ -181,7 +176,7 @@ const account: DropdownMenuEntry[] = [
             <IIcon :icon="SidebarLeftIcon" data-icon />
           </IButton>
           <IBreadcrumb :items="crumbs" class="text-sm" />
-          <IButton variant="ghost" size="sm" square aria-label="More" class="ml-auto rounded-full">
+          <IButton variant="ghost" size="sm" square aria-label="More" class="ml-auto">
             <IIcon :icon="MoreHorizontalIcon" data-icon />
           </IButton>
         </div>
@@ -210,7 +205,7 @@ const account: DropdownMenuEntry[] = [
               <p class="mt-1 mb-3 text-muted-foreground">
                 Every invoice and payment from last month, ready to download.
               </p>
-              <IButton variant="outline" size="xs" block class="rounded-full">
+              <IButton variant="outline" size="xs" block>
                 <IIcon :icon="Download01Icon" data-icon="inline-start" />
                 Download PDF
               </IButton>

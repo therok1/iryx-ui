@@ -4,7 +4,6 @@ import type { Invoice } from '../data'
 import { Add01Icon, Download01Icon, Invoice01Icon, MoreVerticalIcon } from '@hugeicons/core-free-icons'
 import { useConfirm, useToast } from 'iryx-ui'
 import { computed, reactive, ref } from 'vue'
-import Tray from '../components/Tray.vue'
 import { formatDay, formatMoney, invoices, statusVariant } from '../data'
 
 const props = defineProps<{ status?: string }>()
@@ -170,14 +169,14 @@ async function voidInvoice(row: Invoice): Promise<void> {
   <div class="flex flex-col gap-6">
     <IPageHeader title="Invoices" :description="`${filtered.length} of ${rows.length} invoices`">
       <template #actions>
-        <IButton class="rounded-full" size="sm" @click="openCreate">
+        <IButton size="sm" @click="openCreate">
           <IIcon :icon="Add01Icon" data-icon="inline-start" />
           New invoice
         </IButton>
       </template>
     </IPageHeader>
 
-    <Tray label="All invoices" :icon="Invoice01Icon">
+    <ITray label="All invoices" :icon="Invoice01Icon">
       <template #actions>
         <div class="ml-auto flex flex-wrap items-center gap-2">
           <IInput
@@ -185,16 +184,15 @@ async function voidInvoice(row: Invoice): Promise<void> {
             placeholder="Search invoice or customer"
             clearable
             size="sm"
-            class="w-full rounded-full sm:w-64"
+            class="w-full sm:w-64"
             @update:model-value="resetPage"
           />
           <ISelect
             v-model="status"
-            :ui="{ content: 'rounded-2xl', item: 'rounded-xl' }"
             :items="statuses"
             placeholder="All statuses"
             size="sm"
-            class="w-40 rounded-full"
+            class="w-40"
             @update:model-value="resetPage"
           />
 
@@ -204,7 +202,7 @@ async function voidInvoice(row: Invoice): Promise<void> {
         </div>
       </template>
 
-      <ICard padding="none" class="flex-1 overflow-hidden rounded-xl shadow-none">
+      <ICard padding="none" class="flex-1 overflow-hidden">
         <ITable
           v-model:selection="selection"
           :rows="paged"
@@ -233,9 +231,9 @@ async function voidInvoice(row: Invoice): Promise<void> {
           </template>
 
           <template #row-actions="{ row }">
-            <IDropdownMenu :ui="{ content: 'rounded-2xl', item: 'rounded-xl', subTrigger: 'rounded-xl', subContent: 'rounded-2xl' }" :items="rowActions(row)" align="end">
+            <IDropdownMenu :items="rowActions(row)" align="end">
               <template #trigger>
-                <IButton class="rounded-full" variant="ghost" size="sm" square :aria-label="`Actions for ${row.number}`">
+                <IButton variant="ghost" size="sm" square :aria-label="`Actions for ${row.number}`">
                   <IIcon :icon="MoreVerticalIcon" data-icon />
                 </IButton>
               </template>
@@ -243,7 +241,7 @@ async function voidInvoice(row: Invoice): Promise<void> {
           </template>
         </ITable>
       </ICard>
-    </Tray>
+    </ITray>
 
     <IDrawer
       v-model:open="creating"
@@ -262,8 +260,7 @@ async function voidInvoice(row: Invoice): Promise<void> {
           >
             <ICombobox
               v-model="draft.customer"
-              :ui="{ content: 'rounded-2xl', item: 'rounded-xl' }"
-              class="rounded-full"
+
               :items="customerItems"
               placeholder="Search customers"
               clearable
@@ -274,11 +271,11 @@ async function voidInvoice(row: Invoice): Promise<void> {
 
           <div class="grid gap-4 sm:grid-cols-2">
             <IFormField name="issued" label="Issue date" required>
-              <IDatePicker v-model="draft.issued" :ui="{ content: 'rounded-2xl', cellTrigger: 'rounded-full', nav: 'rounded-full', action: 'rounded-full' }" class="rounded-full" />
+              <IDatePicker v-model="draft.issued" />
             </IFormField>
 
             <IFormField name="terms" label="Payment terms" hint="Days">
-              <INumberInput v-model="draft.terms" :ui="{ input: 'rounded-full', stepper: 'rounded-e-full' }" min="1" max="180" />
+              <INumberInput v-model="draft.terms" min="1" max="180" />
             </IFormField>
           </div>
 
@@ -288,7 +285,7 @@ async function voidInvoice(row: Invoice): Promise<void> {
             :help="`Due ${formatDay(addDays(draft.issued, Number(draft.terms) || 30))}`"
             required
           >
-            <INumberInput v-model="draft.total" :ui="{ input: 'rounded-full', stepper: 'rounded-e-full' }" min="0" :precision="2" placeholder="0.00" />
+            <INumberInput v-model="draft.total" min="0" :precision="2" placeholder="0.00" />
           </IFormField>
 
           <IFormField name="notes" label="Notes" hint="Optional">
@@ -297,10 +294,10 @@ async function voidInvoice(row: Invoice): Promise<void> {
         </div>
 
         <div class="mt-6 flex justify-end gap-3">
-          <IButton class="rounded-full" variant="ghost" type="button" @click="creating = false">
+          <IButton variant="ghost" type="button" @click="creating = false">
             Cancel
           </IButton>
-          <IButton class="rounded-full" type="submit">
+          <IButton type="submit">
             Create draft
           </IButton>
         </div>
@@ -309,7 +306,6 @@ async function voidInvoice(row: Invoice): Promise<void> {
 
     <IPagination
       v-model:page="page"
-      :ui="{ item: 'rounded-full' }"
       :total="filtered.length"
       :items-per-page="perPage"
       align="end"

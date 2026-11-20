@@ -28,6 +28,7 @@ Anywhere a component takes an `icon`, it accepts either shape: a [Hugeicons](htt
 | [`ISidebar`](/components/sidebar) | App sidebar — sections, collapsible groups, badges, and a collapse-to-icons mode |
 | [`IPageHeader`](/components/page-header) | Page title, description, breadcrumb slot and a right-aligned action row |
 | [`IContainer`](/components/container) | Centred max-width wrapper — five widths, four gutters |
+| [`ITray`](/components/tray) | Muted panel with a titled header that holds flat cards, charts or a table |
 | [`IAspectRatio`](/components/aspect-ratio) | Holds a box at a fixed ratio, so loading content cannot shift the page |
 
 ## Forms

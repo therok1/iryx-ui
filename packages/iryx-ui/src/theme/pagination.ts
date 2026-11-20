@@ -4,7 +4,7 @@ export const paginationTheme = tv({
   slots: {
     root: 'flex items-center gap-2',
     list: 'flex items-center gap-1',
-    item: 'inline-flex items-center justify-center rounded-xl border border-transparent text-sm font-medium transition-[color,background-color,border-color,box-shadow] outline-none focus-visible:ring-2 focus-visible:ring-primary/50 disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-4',
+    item: 'inline-flex items-center justify-center rounded-full border border-transparent text-sm font-medium transition-[color,background-color,border-color,box-shadow] outline-none focus-visible:ring-2 focus-visible:ring-primary/50 disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-4',
     active: 'bg-linear-to-b from-primary-from to-primary-to text-primary-foreground hover:brightness-110',
     inactive: 'text-foreground hover:bg-accent hover:text-accent-foreground',
     ellipsis: 'inline-flex items-center justify-center text-sm text-muted-foreground',

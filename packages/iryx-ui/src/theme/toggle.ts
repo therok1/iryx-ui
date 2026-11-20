@@ -1,7 +1,7 @@
 import { tv } from 'tailwind-variants'
 
 export const toggleTheme = tv({
-  base: 'inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border border-border bg-input font-medium whitespace-nowrap text-foreground transition-[color,background-color,border-color,box-shadow,opacity] outline-none hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-primary/50 disabled:pointer-events-none disabled:opacity-50 data-[state=on]:bg-accent data-[state=on]:text-accent-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0',
+  base: 'inline-flex shrink-0 items-center justify-center gap-2 rounded-full border border-border bg-input font-medium whitespace-nowrap text-foreground transition-[color,background-color,border-color,box-shadow,opacity] outline-none hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-primary/50 disabled:pointer-events-none disabled:opacity-50 data-[state=on]:bg-accent data-[state=on]:text-accent-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0',
   variants: {
     size: {
       xs: 'h-7 gap-1.5 px-2 text-xs has-[[data-icon=inline-end]]:pr-1.5 has-[[data-icon=inline-start]]:pl-1.5 [&_svg]:size-3.5',
@@ -56,8 +56,9 @@ export const toggleGroupTheme = tv({
     },
     {
       variant: 'joined',
+      // Pill ends turn a stack into a capsule; soften to 2xl.
       orientation: 'vertical',
-      class: { item: '[&:not(:first-child)]:-mt-px [&:not(:first-child)]:rounded-t-none [&:not(:last-child)]:rounded-b-none' },
+      class: { item: 'rounded-2xl [&:not(:first-child)]:-mt-px [&:not(:first-child)]:rounded-t-none [&:not(:last-child)]:rounded-b-none' },
     },
   ],
   defaultVariants: {

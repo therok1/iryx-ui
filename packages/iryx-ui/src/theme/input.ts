@@ -2,7 +2,7 @@ import { tv } from 'tailwind-variants'
 
 /** Shared field chrome for Input, Textarea and the Select trigger. */
 export const fieldBase
-  = 'w-full rounded-xl border border-border bg-input text-foreground transition-[color,background-color,border-color,box-shadow] outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/50 disabled:cursor-not-allowed disabled:opacity-50'
+  = 'w-full rounded-full border border-border bg-input text-foreground transition-[color,background-color,border-color,box-shadow] outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/50 disabled:cursor-not-allowed disabled:opacity-50'
 
 export const inputTheme = tv({
   slots: {
@@ -32,7 +32,7 @@ export const inputTheme = tv({
 })
 
 export const textareaTheme = tv({
-  base: `block resize-y ${fieldBase}`,
+  base: `block resize-y ${fieldBase} rounded-xl`,
   variants: {
     size: {
       sm: 'min-h-16 px-2.5 py-1.5 text-sm',

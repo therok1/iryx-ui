@@ -8,7 +8,7 @@ export const sidebarTheme = tv({
     footer: 'flex shrink-0 items-center gap-2 border-t border-border px-2 py-3',
     section: 'flex flex-col gap-1',
     sectionLabel: 'px-2 pt-1 pb-0.5 text-xs font-medium tracking-wide text-muted-foreground uppercase',
-    link: 'group/link relative flex w-full cursor-pointer items-center gap-3 rounded-lg px-2 py-2 text-sm font-medium text-muted-foreground no-underline transition-[color,background-color,border-color,box-shadow] outline-none select-none hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-primary/50 data-[active]:bg-accent data-[active]:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0',
+    link: 'group/link relative flex w-full cursor-pointer items-center gap-3 rounded-full border border-transparent px-3 py-2 text-sm font-medium text-muted-foreground no-underline transition-[color,background-color,border-color,box-shadow] outline-none select-none hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-primary/50 data-[active]:bg-accent data-[active]:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0',
     linkLabel: 'flex-1 truncate text-left',
     linkInitial: 'flex size-4 shrink-0 items-center justify-center text-xs leading-none font-semibold',
     linkBadge: 'ml-auto shrink-0',
@@ -21,12 +21,12 @@ export const sidebarTheme = tv({
       left: { root: 'border-r' },
       right: { root: 'border-l' },
     },
-    // `accent` matches the canvas grey, so rows darken from the foreground instead.
+    // On the shell's grey canvas the active row is a white pill.
     inShell: {
       true: {
         root: 'border-0 bg-transparent',
         footer: 'border-0',
-        link: 'hover:bg-foreground/5 data-[active]:bg-foreground/[0.07]',
+        link: 'text-foreground hover:bg-foreground/5 data-[active]:border-border data-[active]:bg-background',
       },
     },
     collapsed: {

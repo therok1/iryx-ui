@@ -6,10 +6,10 @@ export const siteHeaderTheme = tv({
     container: 'flex h-16 items-center gap-6',
     brand: 'flex items-center gap-2.5 font-semibold tracking-tight',
     nav: 'ml-4 hidden items-center gap-1 md:flex',
-    link: 'rounded-lg px-3 py-1.5 text-sm text-muted-foreground transition-[color,background-color,border-color,box-shadow] outline-none hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-primary/50 aria-[current=page]:text-foreground',
+    link: 'rounded-full px-3 py-1.5 text-sm text-muted-foreground transition-[color,background-color,border-color,box-shadow] outline-none hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-primary/50 aria-[current=page]:text-foreground',
     actions: 'ml-auto flex items-center gap-2',
     menu: 'flex flex-col',
-    menuLink: 'rounded-lg px-3 py-2.5 text-sm transition-[color,background-color,border-color,box-shadow] outline-none hover:bg-accent focus-visible:ring-2 focus-visible:ring-primary/50 aria-[current=page]:font-medium',
+    menuLink: 'rounded-full px-4 py-2.5 text-sm transition-[color,background-color,border-color,box-shadow] outline-none hover:bg-accent focus-visible:ring-2 focus-visible:ring-primary/50 aria-[current=page]:font-medium',
   },
   variants: {
     sticky: {

@@ -183,7 +183,7 @@ describe('combobox', () => {
       attachTo: document.body,
     })
     await nextTick()
-    const anchor = wrapper.get('input').element.closest('[class*="rounded-xl"]')!
+    const anchor = wrapper.get('input').element.closest('[class*="rounded-full"]')!
     expect(anchor.className).toContain('min-h-9')
     expect(anchor.className).toContain('h-auto')
     wrapper.unmount()

@@ -1,7 +1,8 @@
 import type { Component } from 'vue'
 import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
-import { Alert, Badge, Banner, Button, Card, Checkbox, Combobox, DatePicker, DateRangePicker, EmptyState, FileUpload, Input, iryxUiConfigKey, Label, LineChart, PasswordInput, Progress, RadioGroup, Select, Sparkline, Switch, Table, Textarea } from '../src'
+import { h } from 'vue'
+import { Alert, App, Badge, Banner, Button, Card, Checkbox, Combobox, DatePicker, DateRangePicker, EmptyState, FileUpload, Input, iryxUiConfigKey, Label, LineChart, PasswordInput, Progress, RadioGroup, Select, Sparkline, Switch, Table, Textarea } from '../src'
 
 /**
  * Regression guard: Vue casts absent boolean props to `false` rather than
@@ -54,6 +55,13 @@ describe('global unstyled config', () => {
       props: { unstyled: false },
       global: { provide: { [iryxUiConfigKey as symbol]: { unstyled: true } } },
     })
-    expect(wrapper.attributes('class')).toContain('rounded-xl')
+    expect(wrapper.attributes('class')).toContain('rounded-full')
+  })
+  it('keeps the plugin config under IApp', () => {
+    const wrapper = mount(App, {
+      slots: { default: () => h(Button, { class: 'mine' }) },
+      global: { provide: { [iryxUiConfigKey as symbol]: { unstyled: true } } },
+    })
+    expect(wrapper.get('button').attributes('class')).toBe('mine')
   })
 })

@@ -2,7 +2,7 @@ import { tv } from 'tailwind-variants'
 
 export const hoverCardTheme = tv({
   slots: {
-    content: 'z-50 rounded-xl border border-border bg-background text-foreground shadow-lg outline-none data-[state=closed]:animate-fade-out data-[state=open]:animate-fade-in',
+    content: 'z-50 rounded-2xl border border-border bg-background text-foreground shadow-lg outline-none data-[state=closed]:animate-fade-out data-[state=open]:animate-fade-in',
     arrow: 'fill-background stroke-border',
   },
   variants: {

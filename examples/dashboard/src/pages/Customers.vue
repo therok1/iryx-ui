@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { Mail01Icon, UserGroupIcon } from '@hugeicons/core-free-icons'
 import { computed } from 'vue'
-import Tray from '../components/Tray.vue'
 import { formatMoney, invoices } from '../data'
 
 const customers = computed(() => {
@@ -30,13 +29,13 @@ const customers = computed(() => {
   <div class="flex flex-col gap-6">
     <IPageHeader title="Customers" :description="`${customers.length} accounts billed this quarter.`" />
 
-    <Tray label="Accounts" :icon="UserGroupIcon">
+    <ITray label="Accounts" :icon="UserGroupIcon">
       <div class="grid flex-1 gap-1 sm:grid-cols-2 xl:grid-cols-3">
         <ICard
           v-for="customer in customers"
           :key="customer.name"
           padding="none"
-          class="overflow-hidden rounded-xl shadow-none"
+          class="overflow-hidden"
         >
           <div class="flex items-start gap-3 border-b border-border p-4">
             <IAvatar :name="customer.name" size="md" class="bg-muted" />
@@ -66,7 +65,6 @@ const customers = computed(() => {
             </div>
 
             <IButton
-              class="rounded-full"
               as="a"
               :href="`mailto:${customer.email}`"
               variant="outline"
@@ -82,6 +80,6 @@ const customers = computed(() => {
           </p>
         </ICard>
       </div>
-    </Tray>
+    </ITray>
   </div>
 </template>

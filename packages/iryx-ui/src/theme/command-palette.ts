@@ -11,7 +11,7 @@ export const commandPaletteTheme = tv({
     viewport: 'max-h-80 min-h-0 flex-1 overflow-y-auto overscroll-contain p-2',
     group: 'flex flex-col',
     groupLabel: 'px-2 py-1.5 font-mono text-xs tracking-[0.08em] text-muted-foreground uppercase',
-    item: 'flex cursor-pointer items-center gap-3 rounded-lg px-2 py-2 text-sm outline-none select-none data-[disabled]:pointer-events-none data-[disabled]:text-muted-foreground data-[disabled]:line-through data-[disabled]:decoration-border data-[disabled]:opacity-60 data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground',
+    item: 'flex cursor-pointer items-center gap-3 rounded-xl px-2 py-2 text-sm outline-none select-none data-[disabled]:pointer-events-none data-[disabled]:text-muted-foreground data-[disabled]:line-through data-[disabled]:decoration-border data-[disabled]:opacity-60 data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground',
     itemIcon: 'shrink-0 text-muted-foreground [&_svg]:size-4',
     itemLabel: 'min-w-0 flex-1 truncate',
     shortcut: 'pointer-events-none ms-auto flex shrink-0 gap-1',

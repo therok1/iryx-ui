@@ -84,6 +84,7 @@ export const componentNames = [
   'ToggleGroup',
   'TimeField',
   'Timeline',
+  'Tray',
   'Toolbar',
   'Tooltip',
   'Tree',

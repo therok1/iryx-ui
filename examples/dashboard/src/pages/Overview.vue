@@ -8,7 +8,6 @@ import {
   Invoice01Icon,
 } from '@hugeicons/core-free-icons'
 import { computed, ref } from 'vue'
-import Tray from '../components/Tray.vue'
 import { byChannel, formatDay, formatMoney, invoices, revenue, statusVariant } from '../data'
 
 function sumCents(rows: typeof invoices): string {
@@ -71,7 +70,7 @@ const columns: TableColumn[] = [
   <div class="flex flex-col gap-4">
     <IPageHeader title="Overview">
       <template #actions>
-        <IButton variant="outline" size="sm" class="rounded-full">
+        <IButton variant="outline" size="sm">
           <IIcon :icon="Calendar03Icon" data-icon="inline-start" />
           Last 30 days
         </IButton>
@@ -79,8 +78,8 @@ const columns: TableColumn[] = [
     </IPageHeader>
 
     <div class="grid gap-4 xl:grid-cols-[1.15fr_1fr_0.85fr]">
-      <Tray label="Invoiced" :icon="Invoice01Icon">
-        <ICard padding="md" class="flex flex-1 flex-col rounded-xl shadow-none">
+      <ITray label="Invoiced" :icon="Invoice01Icon">
+        <ICard padding="md" class="flex flex-1 flex-col">
           <div class="flex items-start gap-4">
             <div class="min-w-0 flex-1 sm:flex-none sm:basis-3/5">
               <IStat delta-placement="hint" :value="formatMoney(total)" :delta="9.4" hint="vs. last month" :ui="{ row: 'flex-nowrap' }" />
@@ -111,10 +110,10 @@ const columns: TableColumn[] = [
             </div>
           </div>
         </ICard>
-      </Tray>
+      </ITray>
 
-      <Tray label="Collected" :icon="CheckmarkCircle02Icon">
-        <ICard padding="md" class="flex flex-1 flex-col rounded-xl shadow-none">
+      <ITray label="Collected" :icon="CheckmarkCircle02Icon">
+        <ICard padding="md" class="flex flex-1 flex-col">
           <IStat delta-placement="hint" :value="formatMoney(collected)" :delta="12.1" hint="vs. target" />
           <IProgress :segments="[...collection]" :max="target" size="sm" class="my-4" label="Collected by method" :ui="{ header: 'sr-only', legend: 'hidden' }" />
           <ul class="space-y-1.5 text-xs">
@@ -125,10 +124,10 @@ const columns: TableColumn[] = [
             </li>
           </ul>
         </ICard>
-      </Tray>
+      </ITray>
 
-      <Tray label="Days to pay" :icon="Clock01Icon">
-        <ICard padding="md" class="flex flex-1 flex-col rounded-xl shadow-none">
+      <ITray label="Days to pay" :icon="Clock01Icon">
+        <ICard padding="md" class="flex flex-1 flex-col">
           <IStat delta-placement="hint" value="27 days" :delta="-4" trend="up" hint="vs. last month (faster)" />
           <ISeparator class="my-4" />
           <ul class="space-y-1.5 text-xs">
@@ -141,11 +140,11 @@ const columns: TableColumn[] = [
             </li>
           </ul>
         </ICard>
-      </Tray>
+      </ITray>
     </div>
 
-    <Tray label="Revenue vs. channel" :icon="Analytics01Icon">
-      <ICard padding="md" class="flex-[2] rounded-xl shadow-none">
+    <ITray label="Revenue vs. channel" :icon="Analytics01Icon">
+      <ICard padding="md" class="flex-[2]">
         <div class="mb-4 flex flex-wrap items-center gap-3">
           <div>
             <p class="text-sm font-medium">
@@ -155,7 +154,7 @@ const columns: TableColumn[] = [
               Last six months
             </p>
           </div>
-          <IToggleGroup v-model="metric" :items="['Revenue', 'Invoices']" size="xs" variant="plain" class="ml-auto" :ui="{ item: 'rounded-full' }" />
+          <IToggleGroup v-model="metric" :items="['Revenue', 'Invoices']" size="xs" variant="plain" class="ml-auto" />
         </div>
         <ILineChart
           :data="revenue"
@@ -168,7 +167,7 @@ const columns: TableColumn[] = [
         />
       </ICard>
 
-      <ICard padding="md" class="flex flex-1 flex-col rounded-xl shadow-none">
+      <ICard padding="md" class="flex flex-1 flex-col">
         <p class="text-sm font-medium">
           By channel
         </p>
@@ -185,10 +184,10 @@ const columns: TableColumn[] = [
           </li>
         </ul>
       </ICard>
-    </Tray>
+    </ITray>
 
-    <Tray label="Recent invoices" :icon="Invoice01Icon">
-      <ICard padding="none" class="flex-1 overflow-hidden rounded-xl shadow-none">
+    <ITray label="Recent invoices" :icon="Invoice01Icon">
+      <ICard padding="none" class="flex-1 overflow-hidden">
         <ITable
           :rows="recent"
           :columns="columns"
@@ -209,6 +208,6 @@ const columns: TableColumn[] = [
           </template>
         </ITable>
       </ICard>
-    </Tray>
+    </ITray>
   </div>
 </template>

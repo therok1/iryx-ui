@@ -135,6 +135,7 @@ const sidebar = [
       { text: 'Toast', link: '/components/toast' },
       { text: 'Toggle', link: '/components/toggle' },
       { text: 'Toggle group', link: '/components/toggle-group' },
+      { text: 'Tray', link: '/components/tray' },
       { text: 'Toolbar', link: '/components/toolbar' },
       { text: 'Tooltip', link: '/components/tooltip' },
       { text: 'Tree', link: '/components/tree' },
