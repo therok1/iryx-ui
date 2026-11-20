@@ -3,7 +3,7 @@ import type { ClassValue } from '../class-value'
 import type { IconLike } from '../composables/icon'
 import type { ToggleGroupVariant } from '../theme/toggle'
 import { ToggleGroupItem, ToggleGroupRoot } from 'reka-ui'
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useIryxUiConfig } from '../config'
 import { toggleGroupTheme, toggleTheme } from '../theme/toggle'
 import Icon from './Icon.vue'
@@ -25,7 +25,7 @@ export interface ToggleGroupProps {
   items?: (ToggleGroupItemOption | string)[]
   /**
    * `single` behaves like a segmented control — one item on at a time, and
-   * the model is that item's value. `multiple` lets any number be on, and the
+   * the model is that item's value. Once one is on, clicking it again keeps it on. `multiple` lets any number be on, and the
    * model is an array.
    */
   type?: 'single' | 'multiple'
@@ -56,6 +56,18 @@ const props = withDefaults(defineProps<ToggleGroupProps>(), {
 })
 
 const emits = defineEmits<{ 'update:modelValue': [value: string | string[]] }>()
+
+// Held locally so single mode can refuse to go empty even when uncontrolled.
+const value = ref(props.modelValue)
+watch(() => props.modelValue, next => (value.value = next))
+
+function onUpdate(raw: unknown) {
+  const next = raw as string | string[] | undefined
+  if (props.type === 'single' && !next)
+    return
+  value.value = next
+  emits('update:modelValue', next as string | string[])
+}
 
 const options = computed<ToggleGroupItemOption[]>(() =>
   (props.items ?? []).map(item => (typeof item === 'string' ? { label: item } : item)),
@@ -108,12 +120,12 @@ const itemClass = computed(() => {
 <template>
   <ToggleGroupRoot
     :type="props.type"
-    :model-value="props.modelValue"
+    :model-value="value ?? (props.type === 'multiple' ? [] : '')"
     :disabled="props.disabled"
     :orientation="props.orientation"
     :loop="props.loop"
     :class="rootClass"
-    @update:model-value="value => emits('update:modelValue', value as string | string[])"
+    @update:model-value="onUpdate"
   >
     <ToggleGroupItem
       v-for="item in options"

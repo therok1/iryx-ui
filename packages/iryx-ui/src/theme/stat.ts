@@ -8,6 +8,7 @@ export const statTheme = tv({
     delta: 'inline-flex shrink-0 items-center gap-0.5 text-xs font-medium tabular-nums [&_svg]:size-3.5',
     hint: 'text-xs text-muted-foreground',
     row: 'flex flex-wrap items-baseline gap-x-2 gap-y-1',
+    hintRow: 'flex flex-wrap items-center gap-x-1.5 gap-y-1',
   },
   variants: {
     size: {

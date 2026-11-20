@@ -1,7 +1,7 @@
 import { enableAutoUnmount, mount } from '@vue/test-utils'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { defineComponent, h, nextTick, ref } from 'vue'
-import { AppShell, Container, PageHeader, Sidebar, sidebarCollapsedCookie, sidebarCollapsedKey, toSidebarSections, useSidebarCollapsed } from '../src'
+import { AppShell, Container, DropdownMenu, PageHeader, Sidebar, sidebarCollapsedCookie, sidebarCollapsedKey, toSidebarSections, useSidebarCollapsed } from '../src'
 
 enableAutoUnmount(afterEach)
 
@@ -216,6 +216,12 @@ describe('sidebar', () => {
     expect(wrapper.get('button[aria-label="Invoices"]').attributes('aria-haspopup')).toBe('menu')
   })
 
+  it('passes ui.menu to a collapsed group\'s menu', () => {
+    const menu = { content: 'rounded-menu' }
+    const wrapper = mount(Sidebar, { props: { items, collapsed: true, ui: { menu } } })
+    expect(wrapper.findComponent(DropdownMenu).props('ui')).toEqual(menu)
+  })
+
   it('reopens a group that was open before collapsing', async () => {
     const wrapper = mount(Sidebar, {
       props: { items: [{ label: 'Invoices', items: [{ label: 'Drafts', href: '/d' }] }] },
@@ -361,6 +367,13 @@ describe('appShell', () => {
     expect(wrapper.find('#hdr').exists()).toBe(true)
     expect(wrapper.find('#side').exists()).toBe(true)
     expect(wrapper.get('main').text()).toContain('content')
+  })
+
+  it('renders a topbar above the panel, outside it', () => {
+    const wrapper = mount(AppShell, { slots: { ...slots, topbar: '<div id="top">top</div>' } })
+    const top = wrapper.get('#top').element
+    expect(wrapper.get('main').element.contains(top)).toBe(false)
+    expect(top.compareDocumentPosition(wrapper.get('#side').element) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })
 
   it('omits the regions it is not given', () => {

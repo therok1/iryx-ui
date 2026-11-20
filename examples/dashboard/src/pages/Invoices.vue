@@ -1,18 +1,20 @@
 <script setup lang="ts">
 import type { FormError, TableColumn } from 'iryx-ui'
 import type { Invoice } from '../data'
-import { Add01Icon, Download01Icon, MoreVerticalIcon } from '@hugeicons/core-free-icons'
+import { Add01Icon, Download01Icon, Invoice01Icon, MoreVerticalIcon } from '@hugeicons/core-free-icons'
 import { useConfirm, useToast } from 'iryx-ui'
 import { computed, reactive, ref } from 'vue'
+import Tray from '../components/Tray.vue'
 import { formatDay, formatMoney, invoices, statusVariant } from '../data'
 
+const props = defineProps<{ status?: string }>()
 const { toast, success } = useToast()
 const { confirm } = useConfirm()
 
 const rows = ref<Invoice[]>([...invoices])
 
 const query = ref('')
-const status = ref('all')
+const status = ref(props.status ?? 'all')
 const selection = ref<string[]>([])
 const page = ref(1)
 const perPage = 8
@@ -168,33 +170,80 @@ async function voidInvoice(row: Invoice): Promise<void> {
   <div class="flex flex-col gap-6">
     <IPageHeader title="Invoices" :description="`${filtered.length} of ${rows.length} invoices`">
       <template #actions>
-        <IButton size="sm" @click="openCreate">
+        <IButton class="rounded-full" size="sm" @click="openCreate">
           <IIcon :icon="Add01Icon" data-icon="inline-start" />
           New invoice
         </IButton>
       </template>
     </IPageHeader>
 
-    <div class="flex flex-wrap items-center gap-3">
-      <IInput
-        v-model="query"
-        placeholder="Search invoice or customer"
-        clearable
-        class="w-full sm:w-72"
-        @update:model-value="resetPage"
-      />
-      <ISelect
-        v-model="status"
-        :items="statuses"
-        placeholder="All statuses"
-        class="w-44"
-        @update:model-value="resetPage"
-      />
+    <Tray label="All invoices" :icon="Invoice01Icon">
+      <template #actions>
+        <div class="ml-auto flex flex-wrap items-center gap-2">
+          <IInput
+            v-model="query"
+            placeholder="Search invoice or customer"
+            clearable
+            size="sm"
+            class="w-full rounded-full sm:w-64"
+            @update:model-value="resetPage"
+          />
+          <ISelect
+            v-model="status"
+            :ui="{ content: 'rounded-2xl', item: 'rounded-xl' }"
+            :items="statuses"
+            placeholder="All statuses"
+            size="sm"
+            class="w-40 rounded-full"
+            @update:model-value="resetPage"
+          />
 
-      <IBadge v-if="selection.length" variant="info" class="ml-auto">
-        {{ selection.length }} selected
-      </IBadge>
-    </div>
+          <IBadge v-if="selection.length" variant="info">
+            {{ selection.length }} selected
+          </IBadge>
+        </div>
+      </template>
+
+      <ICard padding="none" class="flex-1 overflow-hidden rounded-xl shadow-none">
+        <ITable
+          v-model:selection="selection"
+          :rows="paged"
+          :columns="columns"
+          row-key="id"
+          :ui="{ table: '[&_th:first-child]:pl-6 [&_td:first-child]:pl-6 [&_th:last-child]:pr-6 [&_td:last-child]:pr-6' }"
+          selectable
+          striped
+          hoverable
+          label="Invoices"
+          empty-text="No invoices match those filters."
+        >
+          <template #cell-issued="{ row }">
+            {{ formatDay(row.issued) }}
+          </template>
+          <template #cell-due="{ row }">
+            {{ formatDay(row.due) }}
+          </template>
+          <template #cell-total="{ row }">
+            {{ formatMoney(row.total) }}
+          </template>
+          <template #cell-status="{ row }">
+            <IBadge :variant="statusVariant[row.status as keyof typeof statusVariant]" size="sm" class="capitalize">
+              {{ row.status }}
+            </IBadge>
+          </template>
+
+          <template #row-actions="{ row }">
+            <IDropdownMenu :ui="{ content: 'rounded-2xl', item: 'rounded-xl', subTrigger: 'rounded-xl', subContent: 'rounded-2xl' }" :items="rowActions(row)" align="end">
+              <template #trigger>
+                <IButton class="rounded-full" variant="ghost" size="sm" square :aria-label="`Actions for ${row.number}`">
+                  <IIcon :icon="MoreVerticalIcon" data-icon />
+                </IButton>
+              </template>
+            </IDropdownMenu>
+          </template>
+        </ITable>
+      </ICard>
+    </Tray>
 
     <IDrawer
       v-model:open="creating"
@@ -213,6 +262,8 @@ async function voidInvoice(row: Invoice): Promise<void> {
           >
             <ICombobox
               v-model="draft.customer"
+              :ui="{ content: 'rounded-2xl', item: 'rounded-xl' }"
+              class="rounded-full"
               :items="customerItems"
               placeholder="Search customers"
               clearable
@@ -223,11 +274,11 @@ async function voidInvoice(row: Invoice): Promise<void> {
 
           <div class="grid gap-4 sm:grid-cols-2">
             <IFormField name="issued" label="Issue date" required>
-              <IDatePicker v-model="draft.issued" />
+              <IDatePicker v-model="draft.issued" :ui="{ content: 'rounded-2xl', cellTrigger: 'rounded-full', nav: 'rounded-full', action: 'rounded-full' }" class="rounded-full" />
             </IFormField>
 
             <IFormField name="terms" label="Payment terms" hint="Days">
-              <INumberInput v-model="draft.terms" min="1" max="180" />
+              <INumberInput v-model="draft.terms" :ui="{ input: 'rounded-full', stepper: 'rounded-e-full' }" min="1" max="180" />
             </IFormField>
           </div>
 
@@ -237,7 +288,7 @@ async function voidInvoice(row: Invoice): Promise<void> {
             :help="`Due ${formatDay(addDays(draft.issued, Number(draft.terms) || 30))}`"
             required
           >
-            <INumberInput v-model="draft.total" min="0" :precision="2" placeholder="0.00" />
+            <INumberInput v-model="draft.total" :ui="{ input: 'rounded-full', stepper: 'rounded-e-full' }" min="0" :precision="2" placeholder="0.00" />
           </IFormField>
 
           <IFormField name="notes" label="Notes" hint="Optional">
@@ -246,58 +297,19 @@ async function voidInvoice(row: Invoice): Promise<void> {
         </div>
 
         <div class="mt-6 flex justify-end gap-3">
-          <IButton variant="ghost" type="button" @click="creating = false">
+          <IButton class="rounded-full" variant="ghost" type="button" @click="creating = false">
             Cancel
           </IButton>
-          <IButton type="submit">
+          <IButton class="rounded-full" type="submit">
             Create draft
           </IButton>
         </div>
       </IForm>
     </IDrawer>
 
-    <ICard padding="none" class="overflow-hidden shadow-xs">
-      <ITable
-        v-model:selection="selection"
-        :rows="paged"
-        :columns="columns"
-        row-key="id"
-        :ui="{ table: '[&_th:first-child]:pl-6 [&_td:first-child]:pl-6 [&_th:last-child]:pr-6 [&_td:last-child]:pr-6' }"
-        selectable
-        striped
-        hoverable
-        label="Invoices"
-        empty-text="No invoices match those filters."
-      >
-        <template #cell-issued="{ row }">
-          {{ formatDay(row.issued) }}
-        </template>
-        <template #cell-due="{ row }">
-          {{ formatDay(row.due) }}
-        </template>
-        <template #cell-total="{ row }">
-          {{ formatMoney(row.total) }}
-        </template>
-        <template #cell-status="{ row }">
-          <IBadge :variant="statusVariant[row.status as keyof typeof statusVariant]" size="sm" class="capitalize">
-            {{ row.status }}
-          </IBadge>
-        </template>
-
-        <template #row-actions="{ row }">
-          <IDropdownMenu :items="rowActions(row)" align="end">
-            <template #trigger>
-              <IButton variant="ghost" size="sm" square :aria-label="`Actions for ${row.number}`">
-                <IIcon :icon="MoreVerticalIcon" data-icon />
-              </IButton>
-            </template>
-          </IDropdownMenu>
-        </template>
-      </ITable>
-    </ICard>
-
     <IPagination
       v-model:page="page"
+      :ui="{ item: 'rounded-full' }"
       :total="filtered.length"
       :items-per-page="perPage"
       align="end"

@@ -33,6 +33,7 @@ export interface AppShellProps {
   /** Override classes per element, e.g. `{ main: 'p-8' }`. */
   ui?: {
     root?: string
+    topbar?: string
     header?: string
     body?: string
     sidebar?: string
@@ -149,6 +150,11 @@ function slotClass(slot: Slot) {
         <slot name="sidebar" :in-drawer="true" />
       </SidebarPlacement>
     </Drawer>
+
+    <!-- Full-width bar on the canvas, above sidebar and panel. -->
+    <div v-if="$slots.topbar" :class="slotClass('topbar')">
+      <slot name="topbar" :nav-open="navOpen" :toggle-nav="() => (navOpen = !navOpen)" />
+    </div>
 
     <div :class="slotClass('body')">
       <div v-if="$slots.sidebar" :class="slotClass('sidebar')">

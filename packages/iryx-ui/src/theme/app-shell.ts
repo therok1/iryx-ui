@@ -3,6 +3,7 @@ import { tv } from 'tailwind-variants'
 export const appShellTheme = tv({
   slots: {
     root: 'flex w-full flex-col bg-canvas text-foreground',
+    topbar: 'shrink-0',
     body: 'flex min-h-0 w-full flex-1',
     sidebar: 'shrink-0',
     panel: 'flex min-w-0 flex-1 flex-col bg-background md:m-2 md:rounded-xl md:border md:border-border md:shadow-xs',
@@ -20,7 +21,7 @@ export const appShellTheme = tv({
       main: {
         root: 'h-svh overflow-hidden',
         panel: 'min-h-0 overflow-hidden',
-        main: 'min-h-0 overflow-y-auto',
+        main: 'relative min-h-0 overflow-y-auto',
       },
       page: {
         root: 'min-h-svh',

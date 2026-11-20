@@ -1,26 +1,62 @@
 <script setup lang="ts">
-import type { TableColumn, TimelineItem } from 'iryx-ui'
-import { Download01Icon } from '@hugeicons/core-free-icons'
-import { computed } from 'vue'
-import { activity, byChannel, formatDay, formatMoment, formatMoney, invoices, revenue, statusVariant } from '../data'
+import type { TableColumn } from 'iryx-ui'
+import {
+  Analytics01Icon,
+  Calendar03Icon,
+  CheckmarkCircle02Icon,
+  Clock01Icon,
+  Invoice01Icon,
+} from '@hugeicons/core-free-icons'
+import { computed, ref } from 'vue'
+import Tray from '../components/Tray.vue'
+import { byChannel, formatDay, formatMoney, invoices, revenue, statusVariant } from '../data'
 
 function sumCents(rows: typeof invoices): string {
   const cents = rows.reduce((total, row) => total + Math.round(Number(row.total) * 100), 0)
   return (cents / 100).toFixed(2)
 }
 
-const outstanding = computed(() => sumCents(invoices.filter(row => row.status === 'sent' || row.status === 'overdue')))
-const overdue = computed(() => invoices.filter(row => row.status === 'overdue'))
-const collected = computed(() => sumCents(invoices.filter(row => row.status === 'paid')))
+const euro = { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 } as const
 
-const recent = computed(() => [...invoices].sort((a, b) => b.issued.localeCompare(a.issued)).slice(0, 5))
+const total = computed(() => sumCents(invoices))
+const collected = computed(() => sumCents(invoices.filter(row => row.status === 'paid')))
+const outstanding = computed(() => sumCents(invoices.filter(row => row.status === 'sent' || row.status === 'overdue')))
 
 const byStatus = computed(() => ([
-  { label: 'Paid', value: Number(sumCents(invoices.filter(row => row.status === 'paid'))), slot: 4 },
-  { label: 'Sent', value: Number(sumCents(invoices.filter(row => row.status === 'sent'))), slot: 0 },
-  { label: 'Overdue', value: Number(sumCents(overdue.value)), slot: 2 },
-  { label: 'Draft', value: Number(sumCents(invoices.filter(row => row.status === 'draft'))), slot: 6 },
-]))
+  { label: 'Paid', status: 'paid', slot: 4 },
+  { label: 'Sent', status: 'sent', slot: 0 },
+  { label: 'Overdue', status: 'overdue', slot: 2 },
+  { label: 'Draft', status: 'draft', slot: 6 },
+] as const).map(entry => ({ ...entry, value: Number(sumCents(invoices.filter(row => row.status === entry.status))) })))
+
+const share = (value: number) => `${Math.round((value / Number(total.value)) * 100)}%`
+
+// Collected vs a monthly target, split by how it arrived.
+const target = 40000
+const collection = [
+  { label: 'Transfer', value: 6200, variant: 'primary' },
+  { label: 'Card', value: 2800, variant: 'info' },
+  { label: 'Direct debit', value: 707, variant: 'neutral' },
+] as const
+
+const dot = { primary: 'bg-primary', info: 'bg-info', neutral: 'bg-muted-foreground' } as const
+const collectionRows = computed(() => [
+  ...collection.map(row => ({ label: row.label, amount: formatMoney(String(row.value)), dot: dot[row.variant] })),
+  { label: 'Outstanding', amount: formatMoney(outstanding.value), dot: 'bg-border' },
+])
+
+const daysToPay = [
+  { label: 'Meridian Foods', delta: -3, days: 21 },
+  { label: 'Halcyon Labs', delta: -1, days: 26 },
+  { label: 'Northgate Supply', delta: 6, days: 44 },
+  { label: 'Copperline Media', delta: -2, days: 19 },
+]
+
+const metric = ref('Revenue')
+const channelMax = Math.max(...byChannel.map(row => row.value))
+const channelVariant = ['primary', 'info', 'warning', 'neutral'] as const
+
+const recent = computed(() => [...invoices].sort((a, b) => b.issued.localeCompare(a.issued)).slice(0, 5))
 
 const columns: TableColumn[] = [
   { key: 'number', label: 'Invoice', width: '8rem' },
@@ -29,108 +65,135 @@ const columns: TableColumn[] = [
   { key: 'total', label: 'Total', numeric: true, width: '8rem' },
   { key: 'status', label: 'Status', align: 'center', width: '7rem' },
 ]
-
-const timeline = computed<TimelineItem[]>(() => activity.map(entry => ({
-  title: entry.title,
-  description: entry.description,
-  time: formatMoment(entry.at),
-  datetime: entry.at,
-  variant: entry.status,
-})))
 </script>
 
 <template>
-  <div class="flex flex-col gap-6">
-    <IPageHeader title="Overview" description="Where billing stands this month.">
+  <div class="flex flex-col gap-4">
+    <IPageHeader title="Overview">
       <template #actions>
-        <IButton variant="outline" size="sm">
-          <IIcon :icon="Download01Icon" data-icon="inline-start" />
-          Export
+        <IButton variant="outline" size="sm" class="rounded-full">
+          <IIcon :icon="Calendar03Icon" data-icon="inline-start" />
+          Last 30 days
         </IButton>
       </template>
     </IPageHeader>
 
-    <div class="grid gap-4 sm:grid-cols-2 2xl:grid-cols-4">
-      <ICard padding="sm" class="relative overflow-hidden bg-muted/50 shadow-xs">
-        <IStat
-          label="Outstanding"
-          :value="formatMoney(outstanding)"
-          :delta="8.2"
-          hint="Sent and overdue"
-          size="sm"
-        />
-      </ICard>
-      <ICard padding="sm" class="bg-muted/50 shadow-xs">
-        <IStat
-          label="Overdue"
-          :value="formatMoney(sumCents(overdue))"
-          :delta="-14"
-          trend="up"
-          :hint="`${overdue.length} invoices`"
-          size="sm"
-        />
-      </ICard>
-      <ICard padding="sm" class="bg-muted/50 shadow-xs">
-        <IStat size="sm" label="Collected" :value="formatMoney(collected)" :delta="12.1" hint="This month" />
-      </ICard>
-      <ICard padding="sm" class="bg-muted/50 shadow-xs">
-        <IStat size="sm" label="Average days to pay" value="27" :delta="-4" trend="up" hint="Target 30" />
-      </ICard>
+    <div class="grid gap-4 xl:grid-cols-[1.15fr_1fr_0.85fr]">
+      <Tray label="Invoiced" :icon="Invoice01Icon">
+        <ICard padding="md" class="flex flex-1 flex-col rounded-xl shadow-none">
+          <div class="flex items-start gap-4">
+            <div class="min-w-0 flex-1 sm:flex-none sm:basis-3/5">
+              <IStat delta-placement="hint" :value="formatMoney(total)" :delta="9.4" hint="vs. last month" :ui="{ row: 'flex-nowrap' }" />
+              <ISeparator class="my-4" />
+              <ul class="space-y-1.5 text-xs">
+                <li v-for="row in byStatus" :key="row.label" class="flex items-center gap-2">
+                  <span class="size-1.5 rounded-full" :style="{ background: `var(--iryx-chart-${row.slot + 1})` }" />
+                  <span class="flex-1 text-muted-foreground">{{ row.label }}</span>
+                  <span class="font-medium tabular-nums">{{ share(row.value) }}</span>
+                </li>
+              </ul>
+            </div>
+            <div class="flex min-w-28 flex-1 justify-center max-sm:hidden">
+              <IDonutChart
+                :data="byStatus"
+                :size="112"
+                :thickness="12"
+                locale="en-IE"
+                :format="euro"
+                label="Invoiced total by status"
+                :legend="false"
+              >
+                <template #center>
+                  <span class="text-lg font-semibold tabular-nums">{{ share(byStatus[0]!.value) }}</span>
+                  <span class="text-[11px] text-muted-foreground">paid</span>
+                </template>
+              </IDonutChart>
+            </div>
+          </div>
+        </ICard>
+      </Tray>
+
+      <Tray label="Collected" :icon="CheckmarkCircle02Icon">
+        <ICard padding="md" class="flex flex-1 flex-col rounded-xl shadow-none">
+          <IStat delta-placement="hint" :value="formatMoney(collected)" :delta="12.1" hint="vs. target" />
+          <IProgress :segments="[...collection]" :max="target" size="sm" class="my-4" label="Collected by method" :ui="{ header: 'sr-only', legend: 'hidden' }" />
+          <ul class="space-y-1.5 text-xs">
+            <li v-for="row in collectionRows" :key="row.label" class="flex items-center gap-2">
+              <span class="size-1.5 rounded-full" :class="row.dot" />
+              <span class="flex-1 text-muted-foreground">{{ row.label }}</span>
+              <span class="font-medium tabular-nums">{{ row.amount }}</span>
+            </li>
+          </ul>
+        </ICard>
+      </Tray>
+
+      <Tray label="Days to pay" :icon="Clock01Icon">
+        <ICard padding="md" class="flex flex-1 flex-col rounded-xl shadow-none">
+          <IStat delta-placement="hint" value="27 days" :delta="-4" trend="up" hint="vs. last month (faster)" />
+          <ISeparator class="my-4" />
+          <ul class="space-y-1.5 text-xs">
+            <li v-for="row in daysToPay" :key="row.label" class="flex items-center gap-2">
+              <span class="flex-1 text-muted-foreground">{{ row.label }}</span>
+              <span class="w-8 tabular-nums" :class="row.delta < 0 ? 'text-success' : 'text-danger'">
+                {{ row.delta > 0 ? '+' : '' }}{{ row.delta }}
+              </span>
+              <span class="w-14 text-right font-medium tabular-nums">{{ row.days }} days</span>
+            </li>
+          </ul>
+        </ICard>
+      </Tray>
     </div>
 
-    <div class="grid gap-4 lg:grid-cols-3">
-      <ICard title="Revenue" description="Last six months" class="shadow-xs lg:col-span-2">
+    <Tray label="Revenue vs. channel" :icon="Analytics01Icon">
+      <ICard padding="md" class="flex-[2] rounded-xl shadow-none">
+        <div class="mb-4 flex flex-wrap items-center gap-3">
+          <div>
+            <p class="text-sm font-medium">
+              All customers
+            </p>
+            <p class="text-xs text-muted-foreground">
+              Last six months
+            </p>
+          </div>
+          <IToggleGroup v-model="metric" :items="['Revenue', 'Invoices']" size="xs" variant="plain" class="ml-auto" :ui="{ item: 'rounded-full' }" />
+        </div>
         <ILineChart
           :data="revenue"
           variant="area"
           :tension="0.6"
           flush
-          :height="300"
+          :height="260"
           locale="en-IE"
-          :format="{ style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }"
+          :format="euro"
         />
       </ICard>
 
-      <ICard title="Where the book stands" description="Every invoice by status" class="shadow-xs">
-        <IDonutChart
-          :data="byStatus"
-          :size="260"
-          :thickness="26"
-          locale="en-IE"
-          :format="{ style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }"
-          label="Invoiced total by status"
-        >
-          <template #center="{ formatted }">
-            <span class="text-xl font-semibold tabular-nums">{{ formatted }}</span>
-            <span class="text-xs text-muted-foreground">invoiced</span>
-          </template>
-        </IDonutChart>
+      <ICard padding="md" class="flex flex-1 flex-col rounded-xl shadow-none">
+        <p class="text-sm font-medium">
+          By channel
+        </p>
+        <p class="text-xs text-muted-foreground">
+          Month to date
+        </p>
+        <IStat delta-placement="hint" :value="formatMoney('58420')" :delta="17.1" hint="vs. last month" class="mt-6" />
+        <ISeparator class="my-5" />
+        <ul class="space-y-3 text-xs">
+          <li v-for="(row, index) in byChannel" :key="row.label" class="grid grid-cols-[5.5rem_1fr_4rem] items-center gap-3">
+            <span class="text-muted-foreground">{{ row.label }}</span>
+            <IProgress :model-value="row.value" :max="channelMax" :variant="channelVariant[index]" size="sm" :label="row.label" :ui="{ label: 'sr-only' }" />
+            <span class="text-right font-medium tabular-nums">{{ formatMoney(String(row.value)) }}</span>
+          </li>
+        </ul>
       </ICard>
-    </div>
+    </Tray>
 
-    <ICard title="By channel" description="Month to date" class="shadow-xs">
-      <IBarChart
-        :data="byChannel"
-        orientation="horizontal"
-        :height="220"
-        locale="en-IE"
-        :format="{ style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }"
-      />
-    </ICard>
-
-    <div class="grid gap-4 lg:grid-cols-3">
-      <ICard
-        title="Recent invoices"
-        padding="none"
-        class="overflow-hidden shadow-xs lg:col-span-2"
-        :ui="{ header: 'px-6 pt-6 mb-4' }"
-      >
+    <Tray label="Recent invoices" :icon="Invoice01Icon">
+      <ICard padding="none" class="flex-1 overflow-hidden rounded-xl shadow-none">
         <ITable
           :rows="recent"
           :columns="columns"
           row-key="id"
           :ui="{ table: '[&_th:first-child]:pl-6 [&_td:first-child]:pl-6 [&_th:last-child]:pr-6 [&_td:last-child]:pr-6' }"
-          striped
           label="Recent invoices"
         >
           <template #cell-issued="{ row }">
@@ -146,10 +209,6 @@ const timeline = computed<TimelineItem[]>(() => activity.map(entry => ({
           </template>
         </ITable>
       </ICard>
-
-      <ICard title="Activity" class="shadow-xs">
-        <ITimeline :items="timeline" size="sm" />
-      </ICard>
-    </div>
+    </Tray>
   </div>
 </template>

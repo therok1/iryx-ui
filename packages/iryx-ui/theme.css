@@ -50,7 +50,7 @@
   --iryx-accent-foreground: oklch(0.205 0 0);
   --iryx-muted: oklch(0.97 0 0);
   --iryx-muted-foreground: oklch(0.556 0 0);
-  --iryx-border: oklch(0.922 0 0);
+  --iryx-border: oklch(0.94 0 0);
   /*
    * Fill for controls that read as recessed — the fields and the outline
    * button. Its own token rather than `--iryx-muted`, since how raised a
@@ -129,7 +129,7 @@
   --iryx-accent-foreground: oklch(0.985 0 0);
   --iryx-muted: oklch(0.269 0 0);
   --iryx-muted-foreground: oklch(0.708 0 0);
-  --iryx-border: oklch(1 0 0 / 10%);
+  --iryx-border: oklch(1 0 0 / 7%);
   /* Lifted just off the background — `--iryx-muted` reads as a panel here. */
   --iryx-input: oklch(0.205 0 0);
   /* Brand primary — kept as a violet gradient. */
