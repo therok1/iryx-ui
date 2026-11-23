@@ -1,5 +1,12 @@
 # iryx-ui
 
+## 1.0.3
+
+### Patch Changes
+
+- 33b39ba: Fields keep normal font weight inside bold containers like tray headers.
+- 985152c: Tray actions take the full row on small screens when they wrap under the label.
+
 ## 1.0.2
 
 ### Patch Changes
