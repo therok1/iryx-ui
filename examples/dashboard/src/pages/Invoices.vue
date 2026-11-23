@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { FormError, TableColumn } from 'iryx-ui'
 import type { Invoice } from '../data'
-import { Add01Icon, Download01Icon, Invoice01Icon, MoreVerticalIcon } from '@hugeicons/core-free-icons'
+import { Add01Icon, Download01Icon, Invoice01Icon, MoreVerticalIcon, Search01Icon } from '@hugeicons/core-free-icons'
 import { useConfirm, useToast } from 'iryx-ui'
 import { computed, reactive, ref } from 'vue'
 import { formatDay, formatMoney, invoices, statusVariant } from '../data'
@@ -178,21 +178,25 @@ async function voidInvoice(row: Invoice): Promise<void> {
 
     <ITray label="All invoices" :icon="Invoice01Icon">
       <template #actions>
-        <div class="ml-auto flex flex-wrap items-center gap-2">
+        <div class="flex flex-1 flex-wrap items-center gap-2">
           <IInput
             v-model="query"
             placeholder="Search invoice or customer"
             clearable
             size="sm"
-            class="w-full sm:w-64"
+            class="min-w-0 flex-1 sm:w-64 sm:flex-none"
             @update:model-value="resetPage"
-          />
+          >
+            <template #leading>
+              <IIcon :icon="Search01Icon" />
+            </template>
+          </IInput>
           <ISelect
             v-model="status"
             :items="statuses"
             placeholder="All statuses"
             size="sm"
-            class="w-40"
+            class="w-36 sm:w-40"
             @update:model-value="resetPage"
           />
 
