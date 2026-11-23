@@ -1,5 +1,12 @@
 # iryx-ui
 
+## 1.0.2
+
+### Patch Changes
+
+- e00a025: Close IAppShell's mobile drawer when a sidebar link is chosen.
+- f76cb72: Cards nested inside a wrapper in a tray now get the tray's inner radius too.
+
 ## 1.0.1
 
 ### Patch Changes
